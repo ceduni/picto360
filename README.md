@@ -26,11 +26,35 @@ Ce projet est une collaboration avec [École en Réseau](https://eer.qc.ca/) et 
 
 Le développement du projet sera divisé en plusieurs phases:
 
-- Phase 1 : Recherche et planification – Étude de marché, définition des besoins des utilisateurs et planification détaillée des fonctionnalités. 
-- Phase 2 : Conception de l'interface et de l'expérience utilisateur – Création des wireframes et des prototypes initiaux pour validation. 
-- Phase 3 : Développement – Codage des fonctionnalités en utilisant Flutter pour le frontend et choix d'une solution appropriée pour le backend (par exemple Firebase). 
-- Phase 4 : Tests et déploiement – Tests d'intégration et d'utilisation, correction des bugs, et 
-déploiement de l'application sur les plateformes correspondantes. 
+### Phase 1: Élaboration des exigences
+
+- Semaine 1
+- Semaine 2
+
+### Phase 2: Prototypage et conception
+
+- Semaine 3
+- Semaine 4
+- Semaine 5
+- Semaine 6
+
+### Phase 3: Développement 
+
+- Semaine 7
+- Semaine 8
+- Semaine 9
+- Semaine 10
+- Semaine 11
+- Semaine 12
+
+### Phase 4: Tests & Rapports
+
+- Semaine 13
+- Semaine 14
+- Semaine 15
+- Semaine 16
+
+Le suivi du projet est présenté dans le fichier [**TIMELINE**](TIMELINE.md).
 
 
 ## 🌐 Infrastructure
