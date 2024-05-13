@@ -79,8 +79,7 @@ Les dossiers du répertoire sont organisés comme suit:
 
 # 🌟 Contribution
 
-Le projet est supervisé par Louis-Edouard LAFONTANT.  
-Si vous êtes intéressé à participer au projet la session prochaine (hiver 2024), contactez [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca) d'ici le 20 décembre 2023.
+Le projet est supervisé par Louis-Edouard LAFONTANT.
 
 ## Contributeurs
 
