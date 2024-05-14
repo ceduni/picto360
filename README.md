@@ -22,7 +22,10 @@ Ce projet est une collaboration avec [École en Réseau](https://eer.qc.ca/) et 
 
 <!-- TODO -->
 
-## Plan
+## 📅 Échéancier
+
+> Début du projet: 6 mai 2024  
+> Fin du projet: 19 aout 2024
 
 Le développement du projet sera divisé en plusieurs phases:
 
@@ -68,18 +71,15 @@ L'infrastructure de l'application est basée sur...
 - [Dossier Drive](https://drive.google.com/drive/u/1/folders/12ap4jNxMDa4FnayR46Pu2auJaNviNHCZ): Contient la documentation du projet
 - [Wiki](https://github.com/ceduni/picto360/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
 
-<!-- 🔗 [Guide d'utilisation](https://github.com/ceduni/cafe-sans-fil/wiki/Base-de-donn%C3%A9es-(BD))  -->
-
 # 🗂️ Organisation
 
-Les documents associés au projet se trouvent dans le 
 Les dossiers du répertoire sont organisés comme suit:
 
 <!-- TODO -->
 
 # 🌟 Contribution
 
-Le projet est supervisé par Louis-Edouard LAFONTANT.
+Le projet est supervisé par [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
 
 ## Contributeurs
 
