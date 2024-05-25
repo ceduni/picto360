@@ -47,10 +47,14 @@
       </p>
 
       <!-- Problématique -->
-      <p></p>
+      <p>
+        Les environnements d'apprentissage actuels manquent d'outils interactifs et immersifs pour aider les étudiants à mieux comprendre et retenir les informations. Les images panoramiques et à 360 degrés offrent une opportunité unique de créer des expériences d'apprentissage immersives, mais les outils pour annoter ces images de manière interactive sont limités.
+      </p>
 
       <!-- Proposition -->
-      <p></p>
+      <p>
+        Le projet Picto360 propose de combler ce besoin en créant une application web permettant d'ajouter des annotations interactives à des images panoramiques et à 360 degrés. Ces annotations peuvent inclure des étiquettes, des boîtes de texte, des liens vers des ressources supplémentaires, des vidéos, des quiz, et bien plus encore. L'objectif est de fournir aux enseignants un outil puissant pour créer des expériences d'apprentissage immersives et interactives pour leurs étudiants. Conformément à la protection de la vie privée, Picto360 évite la création de comptes utilisateurs, assurant ainsi la protection des renseignements personnels.
+      </p>
 
     </header>
 
@@ -59,11 +63,98 @@
       <h2>Exigences</h2>
 
       <h3>Besoins fonctionnels</h3>
-      <!-- TODO: Ajouter la liste des besoins fonctionnels de l'application -->
+
+      <ol>
+        <li>
+          Gestion des Images
+          <br>• Télécharger et stocker des images standard, panoramiques et à 360 degrés au sein de l’application
+          <br>• Afficher les images de manière interactive permettant la navigation panoramique et à 360 degrés.
+        </li>
+        <br>
+        <li>
+          Annotation des Images
+          <br>• Ajouter, modifier, et supprimer des annotations sur les images.
+          <br>• Positionnement précis des annotations dans l'image
+        </li>
+        <br>
+        <li>
+          Gestion du projet
+          <br>• Permettre le partage, l’exportation et la modification du projet dans son ensemble
+          <br>
+        </li>
+        <br>
+        <li>
+          Base de Données
+          <br>• Stocker les annotations et les métadonnées associées aux images.
+          <br>• Gérer les relations entre les images et leurs annotations.
+        </li>
+        <br>
+        <li>
+          API
+          <br>• Fournir des endpoints pour la gestion des images et des annotations.
+          <br>• Assurer la communication entre le frontend et le backend de l'application.
+        </li>
+        <br>
+        <li>
+          Interface Utilisateur
+          <br>• Interface intuitive pour les utilisateurs permettant d’interagir avec les images et les annotations.
+          <br>• Permettre la navigation fluide et interactive dans les images panoramiques et à 360 degrés.
+        </li>
+        <br>
+        <li>
+          Interaction et Interactivité
+          <br>• Intégrer des fonctionnalités interactives telles que des quiz, des vidéos explicatives, et des liens vers des ressources externes.
+        </li>
+        <br>
+        <li>
+          Sécurité et Confidentialité
+          <br>• Assurer la protection des données personnelles et le respect de la loi 25 sur la protection des renseignements personnels.
+        </li>
+      </ol>
 
       <h3>Besoins non-fonctionnels</h3>
 
-      <!-- TODO: Ajouter la liste des besoins non-fonctionnels de l'application -->
+      <ol>
+        <li>
+          Performance
+          <br>• Temps de réponse rapide pour le chargement des images et des annotations.
+          <br>• Capacité de gérer un grand nombre d'annotations sans saturation ou dégradation de la performance.
+        </li>
+        <br>
+        <li>
+          Fiabilité
+          <br>• Système robuste avec une haute disponibilité.
+          <br>• Capacité de récupérer rapidement en cas de panne.
+        </li>
+        <br>
+        <li>
+          Utilisabilité
+          <br>• Interface utilisateur intuitive et facile à utiliser pour tous dans un contexte pédagogique
+          <br>• Documentation claire et accessible pour les utilisateurs
+        </li>
+        <br>
+        <li>
+          Sécurité
+          <br>• Mise en place de protocoles de sécurité pour protéger les données personnelles et les informations sensibles.
+        </li>
+        <br>
+        <li>
+          Compatibilité
+          <br>• Support des principaux navigateurs web (Chrome, Firefox, Safari, Edge).
+          <br>• Adaptabilité aux différentes tailles d'écran (ordinateurs, tablettes, smartphones).
+        </li>
+        <br>
+        <li>
+          Maintenance
+          <br>• Code bien documenté pour faciliter la maintenance et les futures améliorations.
+          <br>• Utilisation de pratiques de développement modernes comme l'intégration continue et le déploiement continu (CI/CD).
+        </li>
+        <br>
+        <li>
+          Accessibilité
+          <br>• Conformité avec les standards d'accessibilité pour garantir l'accès aux utilisateurs ayant des handicaps.
+        </li>
+      </ol>
 
     </section>
 
@@ -128,6 +219,7 @@
 
           <h4 class="title">Réalisations</h4>
           <ul>
+            <li>Test des services suivant: <a target="_blank" href="https://h5p.org/virtual-tour-360">H5P</a>, <a target="_blank" href="https://teliportme.com">Teliportme</a>, <a target="_blank" href="https://go.matterport.com/VT_EN_V2.html?utm_source=google&utm_campaign=EN_NORAM_CA_Brand_tROAS&utm_medium=ppc&utm_content=EN_NORAM_CAN_Brand-matterport&utm_term=matterport&matchtype=b&device=c&gad_source=1&gclid=CjwKCAjw9cCyBhBzEiwAJTUWNeebdEKKkX6d8OX9eqF6RoxnxXvR7_DaIFfFMktdAEieWkkhXBX-KhoCVLQQAvD_BwE">Matterport</a>, <a target="_blank" href="https://www.thinglink.com">Thinglink</a>, <a target="_blank" href="https://momento360.com">Momento360</a></li>
           </ul>
 
           <h4 class="title">Notes</h4>
@@ -173,6 +265,7 @@
               <li>Divulgation du domaine cible de Picto360: photos standards, panoramiques et de 360°</li>
               <li>Démonstration d'une gamme d'outils dédiés à la visualisation d'images à 360° et l'ajout de couches d’informations</li>
               <li>Précision de la livraison d'une solution n'ayant pas recourt à un compte d'utilisateur à des fins de protection des renseignements personnels garantis par la loi 25</li>
+              <li>Précision sur la livraison d'une application gratuite, open source avec la possibilité d'exporter le contenu</li>
             </ul>
           </ul>
 
@@ -185,7 +278,7 @@
 
   <footer class="page-footer">
     <a href="https://github.com/ceduni/picto360" target="_blank">Répertoire GitHub</a>
-    <p>Dernière mise à jour: 19 mai 2024</p>
+    <p>Dernière mise à jour: 25 mai 2024</p>
   </footer>
 
   <script>
