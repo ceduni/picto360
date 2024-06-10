@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projet IFT3150 | Picot360</title>
+  <title>Projet IFT3150 | Picto360</title>
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/style.css">
@@ -118,12 +118,6 @@
           </ul>
         </li>
         <br>
-        <li>
-          Sécurité et confidentialité
-          <ul>
-            <li>Assurer la protection des données personnelles et le respect de la loi 25 sur la protection des renseignements personnels</li>
-          </ul>
-        </li>
       </ol>
 
       <h3>Besoins non fonctionnels</h3>
@@ -206,6 +200,100 @@
 
       <section class="week">
         <header class="week-header">
+          <h3 class="week-title">Semaine 5 &ndash;
+            <time datetime="2024-05-06">Lundi 3 juin 2024</time>
+          </h3>
+          <p>Prototypage & Conception du modèle de données</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Continuation de la modélisation de données</li>
+            <li>Conception d'une application simple React en mode progressive web app</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+            <li>Flux des diagrammes de séquences système</li>
+            <li>Diagramme de classes entamé via la modélisation des données</li>
+            <li>Amélioration de la page d'annotation du prototype Figma</li>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Prise en charge d'un «nouveau» cas d'utilisation: changement d'image tout en conservant les annotations actuelles</li>
+            <ul>
+              <li>Précision: combinaison des cas "supprimer une image" et "ajouter une image"</li>
+            </ul>
+            <li>Discussion au sujet du concept de couche:</li>
+            <ul>
+              <li>Exemple de la ferme:</li>
+              <ul>
+                <li>Couche liée aux <ul>
+                    <li>informations et détails directement visibles</li>
+                    <li>agrégations de données (ex: commerce)</li>
+                    <li>"related data"/informations connexes non tangibles (ex: captures d'écran/vidéos liées à une visite scolaire)</li>
+                  </ul>
+                </li>
+              </ul>
+              <li>Picto360: Zoom + annotations à la même position:</li>
+              <ul>
+                <li>Jeu de superposition plus pertinent pour un étudiant</li>
+                <ul>
+                  <li>Ex: 1re & 2e couche: questions -> réponses</li>
+                </ul>
+
+              </ul>
+              <li>Absence de couches -> conflit d'information (manque de contexte)</li>
+            </ul>
+
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 4 &ndash;
+            <time datetime="2024-05-06">Lundi 27 mai 2024</time>
+          </h3>
+          <p>Prototypage & Conception du modèle de données</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Remplir la section "Infrastructure" du site internet</li>
+            <li>Compléter le diagramme de cas d'utilisation</li>
+            <li>Fournir le diagramme de séquence système</li>
+            <li>Concevoir un prototype "papier" de Picto360</li>
+            <li>Entamer la modélisation des données de l'application</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+            <li>Diagramme de cas d'utilisation complété</li>
+            <li>Prototype Figma couvrant le téléversement, l'annotation et le partage d'une image annotée</li>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Architecture MERN: ExpressJS remplacé par Fastify</li>
+            <ul>
+              <li>Backend programmé en TypeScript</li>
+              <ul>
+                <li>Problématique: latence de communication avec la BD (ex: efficacité des algorithmes) </li>
+              </ul>
+            </ul>
+            <li>Règle des 3 clics à suivre pour le prototypage:</li>
+            <ul>
+              <li>Pas plus de 3 changements de contexte pour chaque exécution d'action (ouverture de l'explorateur Windows, menu latéral caché, barre des paramètres, etc.)</li>
+            </ul>
+            <li>Paramètres de sécurité du système de partage par clé à débattre (public/privé/etc.)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
           <h3 class="week-title">Semaine 3 &ndash;
             <time datetime="2024-05-06">Lundi 20 mai 2024</time>
           </h3>
@@ -220,7 +308,6 @@
 
           <h4 class="title">Réalisations</h4>
           <ul>
-            <li>Production du diagramme de cas d'utilisation</li>
             <li>Enrichissement de la description du projet</li>
             <li>Liste des exigences fonctionnelles et non fonctionnelles</li>
           </ul>
