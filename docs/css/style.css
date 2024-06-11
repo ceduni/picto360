@@ -4,8 +4,11 @@
 }
 
 .page-header {
-    display: flex; flex-direction: column; align-items: center;
-    padding-top: 24px; padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 24px;
+    padding-bottom: 24px;
     background-color: #f5f5f5;
 }
 
@@ -19,63 +22,65 @@
 }
 
 .page-info {
-    display: flex; 
+    display: flex;
 }
 
-    .contributors {
-        margin-right: 6px;
-        padding: 8px 12px;
-        font-weight: 500;
-        color: #fff;
-        background-color: #404040;
-        border-radius: 180px;
-    }
+.contributors {
+    margin-right: 6px;
+    padding: 8px 12px;
+    font-weight: 500;
+    color: #fff;
+    background-color: #404040;
+    border-radius: 180px;
+}
 
-    .doc a {
-        display: flex; place-items: center;
-        height: 100%;
-        padding-left: 8px; padding-right: 8px;
-        border-radius: 180px;
-        font-weight: bold;
-        color: #fff;
-        background-color: rgb(var(--accent));
-        transition: .2s;
-    }
+.doc a {
+    display: flex;
+    place-items: center;
+    height: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 180px;
+    font-weight: bold;
+    color: #fff;
+    background-color: rgb(var(--accent));
+    transition: .2s;
+}
 
-        .doc img {
-            display: inline-block;
-            margin-left: 6px;
-            height: 18px; width: 18px;
-            transition: .2s;
-            transition-property: transform;
-        }
-        
-        .doc a:hover {
-            background-color: rgb(var(--accent-dark));
-        }
+.doc img {
+    display: inline-block;
+    margin-left: 6px;
+    height: 18px;
+    width: 18px;
+    transition: .2s;
+    transition-property: transform;
+}
 
-            .doc a:hover img {
-                transform: scale(1.1) translateX(2px);
-            }
+.doc a:hover {
+    background-color: rgb(var(--accent-dark));
+}
 
+.doc a:hover img {
+    transform: scale(1.1) translateX(2px);
+}
 
 .page-footer {
-    padding-top: 24px; padding-bottom: 30px;
+    padding-top: 24px;
+    padding-bottom: 30px;
     background-color: #232425;
     color: #fff;
     text-align: center;
 }
 
-    .page-footer a {
-        color: inherit;
-        font-weight: 500;
-        text-decoration: underline;
-    }
+.page-footer a {
+    color: inherit;
+    font-weight: 500;
+    text-decoration: underline;
+}
 
 .page-body {
     padding-top: 24px;
 }
-
 
 .progress-section {
     background-color: #eee;
@@ -89,28 +94,45 @@
 
 .phases {
     display: flex;
+    justify-content: space-between;
     width: 100%;
 }
 
 .phase {
+    position: relative;
     padding-top: 12px;
     padding-bottom: 4px;
-    text-align: left;
+    text-align: center;
     text-transform: uppercase;
     font-size: 1.7em;
+    flex: 1;
 }
 
-    .phase:nth-child(1) { width: 15%; }
-    .phase:nth-child(2) { width: 30%; }
-    .phase:nth-child(3) { width: 45%; }
-    .phase:nth-child(4) { width: 10%; }
+.phase::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1px;
+    height: 18px;
+    background-color: #d5d5d5;
+}
 
-    .phase.current {
-        font-weight: 500;
-        color: rgb(var(--accent));
-    }
+.phase:last-child::after {
+    display: none;
+}
 
-.timeline {   
+.phase.completed {
+    color: rgb(var(--accent));
+}
+
+.phase.current {
+    font-weight: 700;
+    color: rgb(var(--accent-dark));
+}
+
+.timeline {
+    margin-top: 16px;
     border-radius: 180px;
     height: 18px;
 }
@@ -125,37 +147,41 @@
 .week-header {
     color: #444;
 }
-    .week-header p {
-        margin: 0;
-        font-size: 1.6em; font-weight: 500;
-    }
 
-    .week-title {
-        margin: 0;
-        font-size: 2em; font-weight: bold;
-        color: rgb(var(--accent-dark));
-    }
+.week-header p {
+    margin: 0;
+    font-size: 1.6em;
+    font-weight: 500;
+}
+
+.week-title {
+    margin: 0;
+    font-size: 2em;
+    font-weight: bold;
+    color: rgb(var(--accent-dark));
+}
 
 .week-content {
     color: #333;
 }
 
-    .week-content .title {
-        margin-top: 8px; margin-bottom: 2px;
-        font-size: 1.6em;
-        color: rgb(var(--accent));
-        text-transform: uppercase;
-    }
+.week-content .title {
+    margin-top: 8px;
+    margin-bottom: 2px;
+    font-size: 1.6em;
+    color: rgb(var(--accent));
+    text-transform: uppercase;
+}
 
-    .week-content p {
-        margin: 0;
-        line-height: 1.5;
-    }
+.week-content p {
+    margin: 0;
+    line-height: 1.5;
+}
 
-    .week-content ul {
-        margin: 0;
-    }
+.week-content ul {
+    margin: 0;
+}
 
-    .week-content li {
-        line-height: 1.5;
-    }
+.week-content li {
+    line-height: 1.5;
+}
