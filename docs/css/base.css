@@ -121,3 +121,51 @@ td textarea { font-size: 1em; }
 * {
     box-sizing: border-box;
 }
+
+
+.phase {
+    position: relative;
+    padding-top: 12px;
+    padding-bottom: 4px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.7em;
+    flex: 1;
+}
+
+.timeline {
+    margin-top: 16px;
+    border-radius: 180px;
+    height: 18px;
+}
+
+/* Smaller screens optimization */
+@media (max-width: 768px) {
+    .phase {
+        font-size: 1.2em; 
+    }
+
+    .phases {
+        flex-direction: column; 
+    }
+
+    .phase {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .timeline {
+        height: 12px; 
+    }
+}
+
+/* Media query for very small screens */
+@media (max-width: 480px) {
+    .phase {
+        font-size: 1em; 
+    }
+
+    .timeline {
+        height: 8px; 
+    }
+}

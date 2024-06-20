@@ -146,6 +146,9 @@
 
 .week-header {
     color: #444;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
 }
 
 .week-header p {

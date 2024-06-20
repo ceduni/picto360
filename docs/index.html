@@ -189,128 +189,48 @@
 
       <section class="week">
         <header class="week-header">
-          <h3 class="week-title">Semaine 5 &ndash;
-            <time datetime="2024-05-06">Lundi 3 juin 2024</time>
+          <h3 class="week-title">Semaine 1 &ndash;
+            <time datetime="2024-05-06">Lundi 6 mai 2024</time>
           </h3>
-          <p>Prototypage & Conception du modèle de données</p>
+          <p>Ouverture de projet & Élaboration des exigences</p>
         </header>
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
-            <li>Continuation de la modélisation de données</li>
-            <li>Conception d'une application simple React en mode progressive web app</li>
+            <li>Prendre en main les outils qui seront utilisés pour le projet</li>
+            <li>Produire une première version de l'échéancier</li>
+            <li>Déterminer les exigences du projet</li>
+            <li>Étudier le domaine, les notions et outils envisagés pour le projet</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
+
           <ul>
-            <li>Flux des diagrammes de séquences système</li>
-            <li>Diagramme de classes entamé via la modélisation des données</li>
-            <li>Amélioration de la page d'annotation du prototype Figma</li>
+            <li>Échéancier divisant le projet en 4 phases:</li>
+            <ul>
+              <li>Semaines 1-2: élaboration des exigences</li>
+              <li>Semaines 3-6: prototypage et conception</li>
+              <li>Semaines 7-12: développement</li>
+              <li>Semaines 13-16: tests & rapports</li>
+            </ul>
+            <li>Exigences du projet:</li>
+            <ul>
+              <li>Espace de dépôt pour les images</li>
+              <li>Base de données préservant les annotations et les détails liés aux images</li>
+              <li>Service API traitant des opérations et communiquant avec la BD</li>
+              <li>Application web interagissant avec les utilisateurs</li>
+            </ul>
+            <li>Rencontre avec le représentant du client "Écoles en réseau" Michel Perreault:</li>
+            <ul>
+              <li>Divulgation du domaine cible de Picto360: photos standards, panoramiques et de 360°</li>
+              <li>Démonstration d'une gamme d'outils dédiés à la visualisation d'images à 360° et l'ajout de couches d’informations</li>
+              <li>Précision de la livraison d'une solution n'ayant pas recourt à un compte d'utilisateur à des fins de protection des renseignements personnels garantis par la loi 25</li>
+              <li>Précision sur la livraison d'une application gratuite, open source avec la possibilité d'exporter le contenu</li>
+            </ul>
           </ul>
 
           <h4 class="title">Notes</h4>
-          <ul>
-            <li>Prise en charge d'un «nouveau» cas d'utilisation: changement d'image tout en conservant les annotations actuelles</li>
-            <ul>
-              <li>Précision: combinaison des cas "supprimer une image" et "ajouter une image"</li>
-            </ul>
-            <li>Discussion au sujet du concept de couche:</li>
-            <ul>
-              <li>Exemple de la ferme:</li>
-              <ul>
-                <li>Couche liée aux <ul>
-                    <li>informations et détails directement visibles</li>
-                    <li>agrégations de données (ex: commerce)</li>
-                    <li>"related data"/informations connexes non tangibles (ex: captures d'écran/vidéos liées à une visite scolaire)</li>
-                  </ul>
-                </li>
-              </ul>
-              <li>Picto360: Zoom + annotations à la même position:</li>
-              <ul>
-                <li>Jeu de superposition plus pertinent pour un étudiant</li>
-                <ul>
-                  <li>Ex: 1re & 2e couche: questions -> réponses</li>
-                </ul>
-
-              </ul>
-              <li>Absence de couches -> conflit d'information (manque de contexte)</li>
-            </ul>
-
-          </ul>
-        </div>
-      </section>
-
-      <section class="week">
-        <header class="week-header">
-          <h3 class="week-title">Semaine 4 &ndash;
-            <time datetime="2024-05-06">Lundi 27 mai 2024</time>
-          </h3>
-          <p>Prototypage & Conception du modèle de données</p>
-        </header>
-        <div class="week-content">
-          <h4 class="title">Objectifs</h4>
-          <ul>
-            <li>Remplir la section "Infrastructure" du site internet</li>
-            <li>Compléter le diagramme de cas d'utilisation</li>
-            <li>Fournir le diagramme de séquence système</li>
-            <li>Concevoir un prototype "papier" de Picto360</li>
-            <li>Entamer la modélisation des données de l'application</li>
-          </ul>
-
-          <h4 class="title">Réalisations</h4>
-          <ul>
-            <li>Diagramme de cas d'utilisation complété</li>
-            <li>Prototype Figma couvrant le téléversement, l'annotation et le partage d'une image annotée</li>
-          </ul>
-
-          <h4 class="title">Notes</h4>
-          <ul>
-            <li>Architecture MERN: ExpressJS remplacé par Fastify</li>
-            <ul>
-              <li>Backend programmé en TypeScript</li>
-              <ul>
-                <li>Problématique: latence de communication avec la BD (ex: efficacité des algorithmes) </li>
-              </ul>
-            </ul>
-            <li>Règle des 3 clics à suivre pour le prototypage:</li>
-            <ul>
-              <li>Pas plus de 3 changements de contexte pour chaque exécution d'action (ouverture de l'explorateur Windows, menu latéral caché, barre des paramètres, etc.)</li>
-            </ul>
-            <li>Paramètres de sécurité du système de partage par clé à débattre (public/privé/etc.)</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="week">
-        <header class="week-header">
-          <h3 class="week-title">Semaine 3 &ndash;
-            <time datetime="2024-05-06">Lundi 20 mai 2024</time>
-          </h3>
-          <p>Prototypage & Conception du modèle de données</p>
-        </header>
-        <div class="week-content">
-          <h4 class="title">Objectifs</h4>
-          <ul>
-            <li>Formalisation des exigences fonctionnelles et non fonctionnelles à l'aide d'un diagramme de cas d'utilisation</li>
-            <li>Sprint de la modélisation des données et du prototypage à compléter idéalement avant le mois de juin</li>
-          </ul>
-
-          <h4 class="title">Réalisations</h4>
-          <ul>
-            <li>Enrichissement de la description du projet</li>
-            <li>Liste des exigences fonctionnelles et non fonctionnelles</li>
-          </ul>
-
-          <h4 class="title">Notes</h4>
-          <ul>
-            <li>Clarification de l'encapsulation que représente le contexte pédagogique de l'application désiré par le client: celui-ci doit être pris en charge par Picto360, mais les cas d'utilisations dérivés ne doivent pas exclusivement traiter d'acteurs du contexte tels que les enseignants et les élèves.</li>
-            <li>Recommandation de React pour l'interface et MongoDB pour la base de données faite par M. Lafontant: possibilité de converger vers la collection de technologies MERN</li>
-            <ul>
-              <li>Alternative de React: solution codée en Javascript "pur" dotée d'une gestion de "states" incontournable</li>
-              <li>Le langage de programmation choisi pour MongoDB déterminera s'il s'agira d'un projet assemblé avec Javascript à 100% ou non</li>
-            </ul>
-            </li>
-          </ul>
+          <p></p>
         </div>
       </section>
 
@@ -372,48 +292,180 @@
 
       <section class="week">
         <header class="week-header">
-          <h3 class="week-title">Semaine 1 &ndash;
-            <time datetime="2024-05-06">Lundi 6 mai 2024</time>
+          <h3 class="week-title">Semaine 3 &ndash;
+            <time datetime="2024-05-06">Lundi 20 mai 2024</time>
           </h3>
-          <p>Ouverture de projet & Élaboration des exigences</p>
+          <p>Prototypage & Conception du modèle de données</p>
         </header>
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
-            <li>Prendre en main les outils qui seront utilisés pour le projet</li>
-            <li>Produire une première version de l'échéancier</li>
-            <li>Déterminer les exigences du projet</li>
-            <li>Étudier le domaine, les notions et outils envisagés pour le projet</li>
+            <li>Formalisation des exigences fonctionnelles et non fonctionnelles à l'aide d'un diagramme de cas d'utilisation</li>
+            <li>Sprint de la modélisation des données et du prototypage à compléter idéalement avant le mois de juin</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
-
           <ul>
-            <li>Échéancier divisant le projet en 4 phases:</li>
-            <ul>
-              <li>Semaines 1-2: élaboration des exigences</li>
-              <li>Semaines 3-6: prototypage et conception</li>
-              <li>Semaines 7-12: développement</li>
-              <li>Semaines 13-16: tests & rapports</li>
-            </ul>
-            <li>Exigences du projet:</li>
-            <ul>
-              <li>Espace de dépôt pour les images</li>
-              <li>Base de données préservant les annotations et les détails liés aux images</li>
-              <li>Service API traitant des opérations et communiquant avec la BD</li>
-              <li>Application web interagissant avec les utilisateurs</li>
-            </ul>
-            <li>Rencontre avec le représentant du client "Écoles en réseau" Michel Perreault:</li>
-            <ul>
-              <li>Divulgation du domaine cible de Picto360: photos standards, panoramiques et de 360°</li>
-              <li>Démonstration d'une gamme d'outils dédiés à la visualisation d'images à 360° et l'ajout de couches d’informations</li>
-              <li>Précision de la livraison d'une solution n'ayant pas recourt à un compte d'utilisateur à des fins de protection des renseignements personnels garantis par la loi 25</li>
-              <li>Précision sur la livraison d'une application gratuite, open source avec la possibilité d'exporter le contenu</li>
-            </ul>
+            <li>Enrichissement de la description du projet</li>
+            <li>Liste des exigences fonctionnelles et non fonctionnelles</li>
           </ul>
 
           <h4 class="title">Notes</h4>
-          <p></p>
+          <ul>
+            <li>Clarification de l'encapsulation que représente le contexte pédagogique de l'application désiré par le client: celui-ci doit être pris en charge par Picto360, mais les cas d'utilisations dérivés ne doivent pas exclusivement traiter d'acteurs du contexte tels que les enseignants et les élèves.</li>
+            <li>Recommandation de React pour l'interface et MongoDB pour la base de données faite par M. Lafontant: possibilité de converger vers la collection de technologies MERN</li>
+            <ul>
+              <li>Alternative de React: solution codée en Javascript "pur" dotée d'une gestion de "states" incontournable</li>
+              <li>Le langage de programmation choisi pour MongoDB déterminera s'il s'agira d'un projet assemblé avec Javascript à 100% ou non</li>
+            </ul>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 4 &ndash;
+            <time datetime="2024-05-06">Lundi 27 mai 2024</time>
+          </h3>
+          <p>Prototypage & Conception du modèle de données</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Remplir la section "Infrastructure" du site internet</li>
+            <li>Compléter le diagramme de cas d'utilisation</li>
+            <li>Fournir le diagramme de séquence système</li>
+            <li>Concevoir un prototype "papier" de Picto360</li>
+            <li>Entamer la modélisation des données de l'application</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+            <li>Diagramme de cas d'utilisation complété</li>
+            <li>Prototype Figma couvrant le téléversement, l'annotation et le partage d'une image annotée</li>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Architecture MERN: ExpressJS remplacé par Fastify</li>
+            <ul>
+              <li>Backend programmé en TypeScript</li>
+              <ul>
+                <li>Problématique: latence de communication avec la BD (ex: efficacité des algorithmes) </li>
+              </ul>
+            </ul>
+            <li>Règle des 3 clics à suivre pour le prototypage:</li>
+            <ul>
+              <li>Pas plus de 3 changements de contexte pour chaque exécution d'action (ouverture de l'explorateur Windows, menu latéral caché, barre des paramètres, etc.)</li>
+            </ul>
+            <li>Paramètres de sécurité du système de partage par clé à débattre (public/privé/etc.)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 5 &ndash;
+            <time datetime="2024-05-06">Lundi 3 juin 2024</time>
+          </h3>
+          <p>Prototypage & Conception du modèle de données</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Continuation de la modélisation de données</li>
+            <li>Conception d'une application simple React en mode progressive web app</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+            <li>Flux des diagrammes de séquences système</li>
+            <li>Diagramme de classes entamé via la modélisation des données</li>
+            <li>Amélioration de la page d'annotation du prototype Figma</li>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Prise en charge d'un «nouveau» cas d'utilisation: changement d'image tout en conservant les annotations actuelles</li>
+            <ul>
+              <li>Précision: combinaison des cas "supprimer une image" et "ajouter une image"</li>
+            </ul>
+            <li>Discussion au sujet du concept de couche:</li>
+            <ul>
+              <li>Exemple de la ferme:</li>
+              <ul>
+                <li>Couche liée aux <ul>
+                    <li>informations et détails directement visibles</li>
+                    <li>agrégations de données (ex: commerce)</li>
+                    <li>"related data"/informations connexes non tangibles (ex: captures d'écran/vidéos liées à une visite scolaire)</li>
+                  </ul>
+                </li>
+              </ul>
+              <li>Picto360: Zoom + annotations à la même position:</li>
+              <ul>
+                <li>Jeu de superposition plus pertinent pour un étudiant</li>
+                <ul>
+                  <li>Ex: 1re & 2e couche: questions -> réponses</li>
+                </ul>
+
+              </ul>
+              <li>Absence de couches -> conflit d'information (manque de contexte)</li>
+            </ul>
+
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 6 &ndash;
+            <time datetime="2024-05-06">Lundi 10 juin 2024</time>
+          </h3>
+          <p>Prototypage & Conception du modèle de données</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Complétion de la modélisation de données et du prototype Figma</li>
+            <li>Acheminement d'une Progressive Web App sur React</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+            <li>Diagramme de classes entamé via la modélisation des données</li>
+            <li>Production d'une version prototypée fonctionnelle et prête pour la présentation au client</li>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Feedback concernant le diagramme de classes UML fourni par M. Lafontant</li>
+            <ul>
+              <li>Sous-classes de l'abstraction «Content» à compléter</li>
+            </ul>
+          </ul>
+        </div>
+      </section>
+
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 7 &ndash;
+            <time datetime="2024-05-06">Lundi 17 juin 2024</time>
+          </h3>
+          <p>Implémentation: Infrastructure & Développement de l'application</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+          </ul>
         </div>
       </section>
     </section>
@@ -425,13 +477,22 @@
   </footer>
 
   <script>
-    const NB_WEEK = 15;
-    const weeksPerPhase = NB_WEEK / 4;
+    const NB_WEEK = 16;
+    const phaseWeeks = [2, 4, 6, 4];
     let projetStart = new Date("2024-05-06");
-    let currentWeek = (Date.now() - projetStart) / 1000 / 60 / 60 / 24 / 7;
+    let currentWeek = Math.floor((Date.now() - projetStart) / 1000 / 60 / 60 / 24 / 7);
     let progress = Math.round((currentWeek / NB_WEEK) * 100);
 
-    let currentPhaseIndex = Math.min(Math.floor(currentWeek / weeksPerPhase), 3);
+    let cumulativeWeeks = 0;
+    let currentPhaseIndex = 0;
+    for (let i = 0; i < phaseWeeks.length; i++) {
+      cumulativeWeeks += phaseWeeks[i];
+      if (currentWeek < cumulativeWeeks) {
+        currentPhaseIndex = i;
+        break;
+      }
+    }
+
     document.querySelectorAll('.phase').forEach((phase, index) => {
       if (index <= currentPhaseIndex) {
         phase.classList.add('completed');
@@ -439,6 +500,8 @@
       if (index === currentPhaseIndex) {
         phase.classList.add('current');
       }
+      let widthPercentage = (phaseWeeks[index] / NB_WEEK) * 100;
+      phase.style.flex = `0 0 ${widthPercentage}%`;
     });
 
     let segmentPercentage = 100 / NB_WEEK;
