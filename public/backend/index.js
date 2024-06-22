@@ -1,4 +1,5 @@
 // picto360-backend/index.js
+import fastify from 'fastify';
 
 const fastify = require('fastify')({ logger: true });
 const { MongoClient } = require('mongodb');
