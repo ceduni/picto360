@@ -1,0 +1,36 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.left-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between logo and buttons */
+}
+
+.right-section {
+    display: flex;
+}
+
+.toolbar-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-left: 5px; /* Space between buttons */
+    cursor: pointer;
+}
+
+.toolbar-button:hover {
+    background-color: #0056b3;
+}
