@@ -1,7 +1,7 @@
 import Toolbar from './components/Toolbar';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="app">
       <Toolbar />
