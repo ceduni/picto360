@@ -1,0 +1,108 @@
+.context-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+    padding: 8px 0;
+    min-width: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+}
+
+.context-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.context-menu ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.context-menu ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.context-menu ul li:active {
+    background-color: #e0e0e0;
+}
+
+.menu-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.arrow-icon {
+    margin-left: auto;
+    font-size: 12px;
+}
+
+
+/*------------------- Submenu -------------------*/
+
+.submenu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+    padding: 8px 0; /*top and bottom padding somehow not being applied to the submenu -> fix later*/
+    min-width: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+
+    display: none;
+    left: 200px;
+    top: 0;
+    opacity: 0;
+    animation: fade-in 0.25s;
+}
+
+.context-menu ul li:hover .submenu {
+    display: block;
+    opacity: 1;
+}
+
+.submenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.submenu ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.submenu ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.submenu ul li:active {
+    background-color: #e0e0e0;
+}
+
+.submenu .menu-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 100;
+    }
+}

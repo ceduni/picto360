@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
-import {
-  AiOutlineForm,
-  AiOutlineFileText,
-  AiOutlineLink,
-  AiOutlinePicture,
-} from "react-icons/ai";
+import ContextMenu from "./ContextMenu";
 import "./ImageViewer.css";
 
 declare global {
@@ -23,7 +18,6 @@ const ImageViewer: React.FC = () => {
     x: 0,
     y: 0,
   });
-  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Initialize the pannellum viewer (360° image window)
   useEffect(() => {
@@ -34,6 +28,9 @@ const ImageViewer: React.FC = () => {
         autoLoad: true,
         autoRotate: -2,
         showZoomCtrl: false,
+        strings: {
+          loadingLabel: "Chargement en cours...",
+        },
       });
     }
   }, [imageSrc]);
@@ -53,26 +50,13 @@ const ImageViewer: React.FC = () => {
       handleContextMenu as EventListener
     );
 
-    // Event listener to close the context menu when clicking outside of it
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target as Node)
-      ) {
-        setContextMenu({ ...contextMenu, visible: false });
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       window.removeEventListener(
         "showContextMenu",
         handleContextMenu as EventListener
       );
-      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [contextMenu]);
+  }, []);
 
   // Drag and drop logic for image upload
   const handleDragOver = (e: React.DragEvent) => {
@@ -102,8 +86,11 @@ const ImageViewer: React.FC = () => {
   // Handle context menu item click
   const handleContextMenuItemClick = (type: string) => {
     console.log("Context menu item clicked:", type);
-    // logic to handle the creation of different types of hotspots here
     setContextMenu({ ...contextMenu, visible: false });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false }); //function to close context menu
   };
 
   return (
@@ -134,28 +121,13 @@ const ImageViewer: React.FC = () => {
         </div>
       )}
       <div ref={viewerElement} className="viewer-container"></div>
-      {contextMenu.visible && (
-        <div
-          ref={contextMenuRef}
-          className="context-menu"
-          style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}
-        >
-          <ul>
-            <li onClick={() => handleContextMenuItemClick("Form")}>
-              <AiOutlineForm className="menu-icon" /> Formulaire
-            </li>
-            <li onClick={() => handleContextMenuItemClick("Text")}>
-              <AiOutlineFileText className="menu-icon" /> Texte
-            </li>
-            <li onClick={() => handleContextMenuItemClick("Link")}>
-              <AiOutlineLink className="menu-icon" /> Lien
-            </li>
-            <li onClick={() => handleContextMenuItemClick("Media")}>
-              <AiOutlinePicture className="menu-icon" /> Média
-            </li>
-          </ul>
-        </div>
-      )}
+      <ContextMenu
+        visible={contextMenu.visible}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onMenuItemClick={handleContextMenuItemClick}
+        onClose={closeContextMenu} 
+      />
     </>
   );
 };
