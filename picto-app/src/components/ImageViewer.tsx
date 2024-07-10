@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { useImageViewer } from "../hooks/useImageViewer";
 import ContextMenu from "@components/ContextMenu";
 import "./css/ImageViewer.css";
-import { MdOutlineFileDownload } from "react-icons/md";
 
 interface HotSpot {
   pitch: number;
@@ -24,6 +23,7 @@ interface HotSpot {
 interface PannellumViewerProps {
   width: string;
   height: string;
+  imageSrc: string;
 }
 
 declare global {
@@ -32,19 +32,15 @@ declare global {
   }
 }
 
-const ImageViewer: React.FC<PannellumViewerProps> = ({ width, height }) => {
+const ImageViewer: React.FC<PannellumViewerProps> = ({
+  width,
+  height,
+  imageSrc,
+}) => {
   const viewerRef = useRef<HTMLDivElement>(null);
 
-  const {
-    imageSrc,
-    showPopup,
-    contextMenu,
-    handleDragOver,
-    handleDrop,
-    handleImageChange,
-    handleContextMenuItemClick,
-    closeContextMenu,
-  } = useImageViewer();
+  const { contextMenu, handleContextMenuItemClick, closeContextMenu } =
+    useImageViewer();
 
   useEffect(() => {
     if (viewerRef.current && imageSrc) {
@@ -89,31 +85,6 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({ width, height }) => {
 
   return (
     <>
-      {showPopup && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Choisissez une image</h2>
-            <div
-              className="drop-zone"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              style={{
-                border: "2px dashed #ccc",
-                padding: "50px",
-                cursor: "pointer",
-              }}
-            >
-              <p id="download-logo">
-                <MdOutlineFileDownload />
-              </p>
-              <p>
-                Déposez votre image ici ou cliquez pour sélectionner une image
-              </p>
-            </div>
-            <input type="file" onChange={handleImageChange} />
-          </div>
-        </div>
-      )}
       <div
         ref={viewerRef}
         className="viewer-container"
