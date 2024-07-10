@@ -1,27 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2022",        
+    "target": "ES2022",
     "jsx": "react-jsx",
-    "module": "commonjs",                                
+    "module": "commonjs",
     "lib": ["dom", "ES6"],
-    "rootDir": "./",                                  
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
-    "allowJs": true,                                
-    "outDir": "./",                                   
-    "esModuleInterop": true,                             
-    "forceConsistentCasingInFileNames": true,            
-    "strict": true,        
-    "noImplicitAny": true,                              
+    "rootDir": "./",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "allowJs": true,
+    "outDir": "./",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true                               
+    "resolveJsonModule": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../picto-app/src/components/Toolbar.tsx",
+    "../picto-app/src/components/ContextMenu.tsx"
   ],
-  "exclude": [
-    "node_modules",
-  ]
+  "exclude": ["node_modules"]
 }
