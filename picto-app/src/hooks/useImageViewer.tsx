@@ -31,27 +31,25 @@ export const useImageViewer = () => {
     };
   }, []);
 
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-  };
+  const handleDragOver = (event: React.DragEvent) => event.preventDefault();
 
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-      const file = event.dataTransfer.files[0];
-      const url = URL.createObjectURL(file);
-      setImageSrc(url);
-      setShowPopup(false);
+      processFile(event.dataTransfer.files[0]);
     }
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const url = URL.createObjectURL(file);
-      setImageSrc(url);
-      setShowPopup(false);
+      processFile(event.target.files[0]);
     }
+  };
+
+  const processFile = (file: File) => {
+    const url = URL.createObjectURL(file);
+    setImageSrc(url);
+    setShowPopup(false);
   };
 
   const handleContextMenuItemClick = (type: string) => {

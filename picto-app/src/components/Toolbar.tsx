@@ -11,12 +11,8 @@ import { PiExport } from "react-icons/pi";
 const Toolbar = () => {
   const [showShareOptions, setShowShareOptions] = useState(false);
 
-  const handleShareClick = () => {
-    setShowShareOptions(!showShareOptions);
-  };
-
-  const handleCloseClick = () => {
-    setShowShareOptions(false);
+  const toggleShareOptions = () => {
+    setShowShareOptions((prev) => !prev);
   };
 
   return (
@@ -39,7 +35,7 @@ const Toolbar = () => {
           <li className="toolbar-button">
             <PiExport />
           </li>
-          <li className="toolbar-button" onClick={handleShareClick}>
+          <li className="toolbar-button" onClick={toggleShareOptions}>
             <IoShareSocialSharp />
           </li>
         </ul>
@@ -47,7 +43,7 @@ const Toolbar = () => {
           <div className="modal">
             <div className="modal-content">
               <button
-                onClick={handleCloseClick}
+                onClick={toggleShareOptions}
                 className="modal-close-button"
                 style={{ float: "right" }}
               >

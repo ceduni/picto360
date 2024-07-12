@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import "./css/ContextMenu.css"
+import "./css/ContextMenu.css";
 import {
   AiOutlineForm,
   AiOutlineUnorderedList,
@@ -61,26 +61,22 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [onClose]);
 
-  const handleFormMouseEnter = () => {
-    setFormHoverTimer(setTimeout(() => setFormSubMenuVisible(true), 500));
-  };
-
-  const handleFormMouseLeave = () => {
-    if (formHoverTimer) {
-      clearTimeout(formHoverTimer);
+  const handleMouseEnter = (type: "form" | "media") => {
+    if (type === "form") {
+      setFormHoverTimer(setTimeout(() => setFormSubMenuVisible(true), 500));
+    } else {
+      setMediaHoverTimer(setTimeout(() => setMediaSubMenuVisible(true), 500));
     }
-    setFormSubMenuVisible(false);
   };
 
-  const handleMediaMouseEnter = () => {
-    setMediaHoverTimer(setTimeout(() => setMediaSubMenuVisible(true), 500));
-  };
-
-  const handleMediaMouseLeave = () => {
-    if (mediaHoverTimer) {
-      clearTimeout(mediaHoverTimer);
+  const handleMouseLeave = (type: "form" | "media") => {
+    if (type === "form") {
+      if (formHoverTimer) clearTimeout(formHoverTimer);
+      setFormSubMenuVisible(false);
+    } else {
+      if (mediaHoverTimer) clearTimeout(mediaHoverTimer);
+      setMediaSubMenuVisible(false);
     }
-    setMediaSubMenuVisible(false);
   };
 
   if (!visible) return null;
@@ -93,8 +89,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     >
       <ul>
         <li
-          onMouseEnter={handleFormMouseEnter}
-          onMouseLeave={handleFormMouseLeave}
+          onMouseEnter={() => handleMouseEnter("form")}
+          onMouseLeave={() => handleMouseLeave("form")}
         >
           <AiOutlineForm className="menu-icon" /> Formulaire{" "}
           <MdOutlineArrowForwardIos className="arrow-icon" />
@@ -116,8 +112,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           )}
         </li>
         <li
-          onMouseEnter={handleMediaMouseEnter}
-          onMouseLeave={handleMediaMouseLeave}
+          onMouseEnter={() => handleMouseEnter("media")}
+          onMouseLeave={() => handleMouseLeave("media")}
         >
           <MdOutlinePermMedia className="menu-icon" /> Média{" "}
           <MdOutlineArrowForwardIos className="arrow-icon" />

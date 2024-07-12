@@ -43,45 +43,52 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
     useImageViewer();
 
   useEffect(() => {
-    if (viewerRef.current && imageSrc) {
-      const viewer = window.pannellum.viewer(viewerRef.current, {
-        type: "equirectangular",
-        panorama: imageSrc,
-        autoLoad: true,
-        autoRotate: -2,
-        showZoomCtrl: true,
-        strings: {
-          loadingLabel: "Chargement en cours...",
-        },
-      });
+    if (!viewerRef.current || !imageSrc) return; //guard clause
 
-      const handleMouseDown = (event: MouseEvent) => {
-        const coords = viewer.mouseEventToCoords(event);
-        const hotspotId = `hotspot-${Date.now()}`;
+    const viewer = window.pannellum.viewer(viewerRef.current, {
+      type: "equirectangular",
+      panorama: imageSrc,
+      autoLoad: true,
+      autoRotate: -2,
+      showZoomCtrl: true,
+      strings: {
+        loadingLabel: "Chargement en cours...",
+      },
+    });
 
-        const hotspot: HotSpot = {
-          id: hotspotId,
-          pitch: coords[0],
-          yaw: coords[1],
-          type: "info",
-          text: "You clicked here!",
-          /*clickHandlerFunc: (args: any) => { //args error -> args is not used
-            alert("Missing annotation");
-          },*/
-        };
+    const handleMouseDown = (event: MouseEvent) => {
+      const coords = viewer.mouseEventToCoords(event);
+      addHotspot(viewer, coords);
+    };
 
-        viewer.addHotSpot(hotspot);
-      };
+    viewer.on("mousedown", handleMouseDown);
 
-      viewer.on("mousedown", handleMouseDown);
-
-      // Cleanup
-      return () => {
-        viewer.off("mousedown", handleMouseDown);
-        viewer.destroy();
-      };
-    }
+    return () => {
+      viewer.off("mousedown", handleMouseDown);
+      viewer.destroy();
+    };
   }, [imageSrc]);
+
+  const addHotspot = (
+    viewer: { addHotSpot: (arg0: HotSpot) => void },
+    coords: any[]
+  ) => {
+    //types assumed to avoid implicit any -> default: (viewer, coords)
+    const hotspotId = `hotspot-${Date.now()}`;
+
+    const hotspot: HotSpot = {
+      id: hotspotId,
+      pitch: coords[0],
+      yaw: coords[1],
+      type: "info",
+      text: "You clicked here!",
+      clickHandlerFunc: (args: any) => { //args never used issue
+        alert("Missing annotation");
+      },
+    };
+
+    viewer.addHotSpot(hotspot);
+  };
 
   return (
     <>

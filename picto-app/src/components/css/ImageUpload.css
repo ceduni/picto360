@@ -1,44 +1,142 @@
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    /* Ensure the modal background is black */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
 }
 
 .modal-content {
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  background-color: white;
+  width: 50%;
+  height: 70%;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .drop-zone {
-    border-color: black;
-    border-style: dashed;
-    border-width: 1px;
-    border-radius: 10px;
-    background-color: #f0f0f0;
-    padding: 50px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  width: 75%;
+  height: 50%;
+  border-color: black;
+  border-style: dashed;
+  border-width: 2px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  padding: 80px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 100px 0 40px 0
 }
 
-#download-logo {
-    font-size: 3em;
-    color: #bbbbbb;
-    margin-bottom: 10px;
+.drop-zone.dragging {
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    background-color: #f0f0f0;
+  }
+
+  50% {
+    background-color: #4d4d4d;
+  }
+}
+
+#download-icon {
+  font-size: 6em;
+  color: #bbb;
+}
+
+#drop-text {
+  font-size: 2em;
+  color: #585858;
+  text-align: center;
+}
+
+#logo {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15vw;
+  max-width: 100px;
+  height: auto;
+}
+
+.icon-container {
+  display: flex;
+  justify-content: space-around;
+  width: 97.5%;
+}
+
+.icon {
+  width: 6vw;
+  height: 6vw;
+  max-width: 100px;
+  max-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 2em;
+}
+
+.icon svg {
+  width: 60%;
+  height: 60%;
+  transition: all 0.3s ease-in-out;
+}
+
+.icon.camera:hover svg {
+  transform: scale(1.1);
+  color: #585858;
+  filter: drop-shadow(0 8px 16px rgba(24, 24, 24, 0.2));
+}
+
+.icon.import:hover svg {
+  transform: scale(1.1);
+  color: #585858;
+  filter: drop-shadow(0 8px 16px rgba(24, 24, 24 0.2));
+}
+
+.icon.drive:hover svg {
+  transform: scale(1.1);
+  color: #34A853;
+
+  filter: drop-shadow(0 8px 16px rgba(66, 133, 244, 0.2));
+}
+
+.icon.dropbox:hover svg {
+  transform: scale(1.1);
+  color: #0061FF;
+  filter: drop-shadow(0 8px 16px rgba(0, 97, 255, 0.2));
+}
+
+.icon.onedrive:hover svg {
+  transform: scale(1.1);
+  color: #0078D4;
+  filter: drop-shadow(0 8px 16px rgba(0, 120, 212, 0.2));
 }
 
 input[type="file"] {
-    margin-top: 10px;
+  display: none;
 }
