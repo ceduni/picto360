@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./css/Toolbar.css";
 import {
   IoSettingsSharp,
@@ -10,16 +10,26 @@ import { PiExport } from "react-icons/pi";
 
 const Toolbar = () => {
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [projectTitle, setProjectTitle] = useState("Projet#1.picto");
 
   const toggleShareOptions = () => {
     setShowShareOptions((prev) => !prev);
+  };
+
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setProjectTitle(event.target.value);
   };
 
   return (
     <div className="toolbar">
       <div className="left-section">
         <img src="/logo_picto360.png" alt="Logo" className="logo" />
-        <p>Projet#1.picto</p>
+        <input
+          type="text"
+          value={projectTitle}
+          onChange={handleTitleChange}
+          className="project-title-input"
+        />
       </div>
       <div className="right-section">
         <ul>

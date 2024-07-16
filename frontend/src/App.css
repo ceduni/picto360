@@ -1,3 +1,5 @@
+@import "./assets/normalize.css";
+
 .App {
   text-align: center;
 }
@@ -26,6 +28,16 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.body {
+  width: 100%;
+  height: auto;
+}
+
+.html {
+  width: 100%;
+  height: auto;
 }
 
 @keyframes App-logo-spin {

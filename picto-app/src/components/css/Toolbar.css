@@ -103,3 +103,9 @@ li{
     width: 200px;
     cursor: pointer;
 }
+
+.project-title-input {
+    background-color: #000000;
+    border: none;
+    color: white;
+}

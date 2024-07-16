@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Toolbar from "@components/Toolbar";
 import ImageViewer from "@components/ImageViewer";
 import ImageUpload from "@components/ImageUpload";
+import BottomBar from "@components/BottomBar";
+import FloatingMenu from "@components/FloatingMenu";
 import "./App.css";
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
             <ImageUpload onImageUpload={handleImageUpload} />
           )}
         </div>
+        {imageSrc && <BottomBar />}
+        {imageSrc && <FloatingMenu />} 
       </div>
     </>
   );

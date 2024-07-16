@@ -1,0 +1,66 @@
+.floating-menu {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.3s, height 0.3s;
+    z-index: 10;
+}
+  
+.floating-menu.open {
+    width: 200px;
+    height: 300px;
+    border-radius: 10px;
+}
+  
+.menu-toggle {
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #fff;
+    z-index: 20;
+}
+  
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+}
+  
+.menu-items {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+  
+.floating-menu.open .menu-items {
+    display: flex;
+}
+  
+.menu-items button {
+    background-color: transparent;
+    border: none;
+    margin: 5px 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #fff;
+}

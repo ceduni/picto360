@@ -1,0 +1,37 @@
+.lowerBar {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 50px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    border-radius: 50px 50px 0 0;
+}
+
+.buttons {
+    margin: 0 10px;
+    padding: 10px;
+    background-color: Transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-size: 1.8em;
+}
+
+.buttons:hover {
+    color: #1f76fd;
+}
+
+button {
+    background-color: Transparent;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 1.8em;
+}
