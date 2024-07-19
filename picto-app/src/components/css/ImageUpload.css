@@ -14,9 +14,9 @@
 .modal-content {
   position: relative;
   background-color: white;
-  width: 50%;
-  height: 70%;
-  padding: 40px;
+  width: 50vw;
+  height: 70vh;
+  padding: 1.5vw; 
   border-radius: 20px;
   box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -26,20 +26,18 @@
 }
 
 .drop-zone {
-  width: 75%;
-  height: 50%;
-  border-color: black;
-  border-style: dashed;
-  border-width: 2px;
+  width: 37.5vw; 
+  height: 17.5vw; 
+  border: 2px dashed black;
   border-radius: 20px;
   background-color: #f0f0f0;
-  padding: 80px;
+  padding: 3.5vw;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 100px 0 40px 0
+  margin: 10vh 0 4vh 0;
 }
 
 .drop-zone.dragging {
@@ -59,24 +57,23 @@
 }
 
 #download-icon {
-  font-size: 6em;
+  font-size: 4vw;
   color: #bbb;
 }
 
 #drop-text {
-  font-size: 2em;
+  font-size: 1vw;
   color: #585858;
   text-align: center;
 }
 
 #logo {
   position: absolute;
-  top: 30px;
+  top: 1vw;
   left: 50%;
   transform: translateX(-50%);
-  width: 15vw;
-  max-width: 100px;
-  height: auto;
+  width: 4vw;
+  height: 4vw;
 }
 
 .icon-container {
@@ -95,44 +92,42 @@
   justify-content: center;
   border-radius: 10px;
   background: #f5f5f5;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   cursor: pointer;
-  font-size: 2em;
 }
 
 .icon svg {
   width: 60%;
   height: 60%;
+}
+
+.icon:hover {
+  transform: scale(1.1);
   transition: all 0.3s ease-in-out;
 }
 
 .icon.camera:hover svg {
-  transform: scale(1.1);
   color: #585858;
   filter: drop-shadow(0 8px 16px rgba(24, 24, 24, 0.2));
 }
 
 .icon.import:hover svg {
-  transform: scale(1.1);
   color: #585858;
   filter: drop-shadow(0 8px 16px rgba(24, 24, 24 0.2));
 }
 
 .icon.drive:hover svg {
-  transform: scale(1.1);
   color: #34A853;
 
   filter: drop-shadow(0 8px 16px rgba(66, 133, 244, 0.2));
 }
 
 .icon.dropbox:hover svg {
-  transform: scale(1.1);
   color: #0061FF;
   filter: drop-shadow(0 8px 16px rgba(0, 97, 255, 0.2));
 }
 
 .icon.onedrive:hover svg {
-  transform: scale(1.1);
   color: #0078D4;
   filter: drop-shadow(0 8px 16px rgba(0, 120, 212, 0.2));
 }

@@ -1,6 +1,13 @@
 .viewer-container {
-  display: flex;
   flex-grow: 1;
+  width: 100%;
+  height: 100%;
   background-color: black;
   position: relative;
+  overflow: hidden;
+}
+
+.pnlm-about-msg {
+  /* removes Pannellum's about message */
+  display: none !important;
 }

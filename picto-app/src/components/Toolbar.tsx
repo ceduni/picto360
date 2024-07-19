@@ -50,11 +50,11 @@ const Toolbar = () => {
           </li>
         </ul>
         {showShareOptions && (
-          <div className="modal">
-            <div className="modal-content">
+          <div className="share-options">
+            <div className="share-options-content">
               <button
                 onClick={toggleShareOptions}
-                className="modal-close-button"
+                className="share-options-close-button"
                 style={{ float: "right" }}
               >
                 ×

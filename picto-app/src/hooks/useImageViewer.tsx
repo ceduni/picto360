@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 export const useImageViewer = () => {
-  const [imageSrc, setImageSrc] = useState("");
-  const [showPopup, setShowPopup] = useState(true);
+  const [imageSrc] = useState("");
+  const [showPopup] = useState(true);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -31,27 +31,6 @@ export const useImageViewer = () => {
     };
   }, []);
 
-  const handleDragOver = (event: React.DragEvent) => event.preventDefault();
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-      processFile(event.dataTransfer.files[0]);
-    }
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      processFile(event.target.files[0]);
-    }
-  };
-
-  const processFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setImageSrc(url);
-    setShowPopup(false);
-  };
-
   const handleContextMenuItemClick = (type: string) => {
     console.log("Context menu item clicked:", type);
     setContextMenu({ ...contextMenu, visible: false });
@@ -65,9 +44,6 @@ export const useImageViewer = () => {
     imageSrc,
     showPopup,
     contextMenu,
-    handleDragOver,
-    handleDrop,
-    handleImageChange,
     handleContextMenuItemClick,
     closeContextMenu,
   };

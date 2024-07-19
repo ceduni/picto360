@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import './css/FloatingMenu.css';
+import React, { useState } from "react";
+import "./css/FloatingMenu.css";
 
 const FloatingMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,9 +9,11 @@ const FloatingMenu: React.FC = () => {
   };
 
   return (
-    <div className={`floating-menu ${isOpen ? 'open' : ''}`}>
+    <div className={`floating-menu ${isOpen ? "open" : ""}`}>
       {!isOpen && (
-        <button className="menu-toggle" onClick={toggleMenu}>+</button>
+        <button className="menu-toggle" onClick={toggleMenu}>
+          +
+        </button>
       )}
       {isOpen && (
         <>

@@ -458,15 +458,33 @@
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
+            <li>Initialisation de l'application:</li>
+            <ul>
+              <li>Espace d'édition de l'image: affichage de l'image, navigation à travers celle-ci et ajout d'une annotation</li>
+              <li>Layout général (header, body, barre latérale, etc.)</li>
+              <li>Bouton flottant (optionnel)</li>
+            </ul>
           </ul>
 
           <h4 class="title">Réalisations</h4>
           <ul>
             <li>Mise à jour des DSS</li>
+            <li>Modification du diagramme de classes: <ul>
+                <li>Appliquer la rétroaction de M. Lafontant</li>
+                <li>Déterminer quelles classes sont dûes en juin et juillet</li>
+              </ul>
+            </li>
+            <li>Configuration de l'infrastructure backend et frontend: NodeJS, Fastify et MongoDB</li>
+            <li>Programmation de l'application React: <ul>
+                <li>Visionnement de l'image</li>
+                <li>Toolbar</li>
+              </ul>
+            </li>
           </ul>
 
           <h4 class="title">Notes</h4>
           <ul>
+            <li>Suggestion du maintien d'une rencontre en présentiel par semaine minimum</li>
             <li>Référence pour l'installation de l'environnement NodeJS:</li>
             <ul>
               <li><a href="https://philna.sh/blog/2019/01/10/how-to-start-a-node-js-project">https://philna.sh/blog/2019/01/10/how-to-start-a-node-js-project</a></li>
@@ -498,11 +516,21 @@
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
+            <li>Support du processus d'annotation de l'image</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
           <ul>
             <li>Mise à jour des DSS</li>
+            <li>Finalisation du diagramme de classes</li>
+            <li>Organisation de la structure des fichiers du dossier backend</li>
+            <li>Mise à jour de TypeScript ainsi que des dépendances et modules npm du projet</li>
+            <li>Programmation de l'application React:
+              <ul>
+                <li>Page de téléchargement d'image fonctionnelle</li>
+                <li>Pop-up de partage de projet</li>
+              </ul>
+            </li>
           </ul>
 
           <h4 class="title">Notes</h4>
@@ -527,14 +555,23 @@
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
+            <li>Addition des annotations textuelles</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
           <ul>
+            <li>Réunion avec Michel Perreault</li>
+            <li>Programmation de l'application React:
+              <ul>
+                <li>Menu contextuel de la page d'édition</li>
+                <li>Pop-up de partage de projet</li>
+              </ul>
+            </li>
           </ul>
 
           <h4 class="title">Notes</h4>
           <ul>
+            <li>Investiguer le problème de dépendances causé par react-scripts@5.0.1</li>
           </ul>
         </div>
       </section>
@@ -549,6 +586,7 @@
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
+            <li>Intégration de l'espace nuagique de stockage de projets: sauvegarde et récupération de l'état d'un projet </li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
@@ -556,11 +594,46 @@
             <li>Refactorisation de l'application React avec Vite</li>
             <ul>
               <li>Migration des composantes, hooks, modèles, routes et autres fichiers dans le dossier "picto-app"</li>
+              <li>Suppression du dossier "frontend" à valider</li>
+              <li>Vitesse de compilation du serveur de développement presque instantanée</li>
             </ul>
+            <li>Programmation de l'application React:
+              <ul>
+                <li>Refonte de la page de téléchargement</li>
+                <li>Logique de création des hotspots</li>
+                <li>Barre inférieure</li>
+                <li>Menu flottant</li>
+              </ul>
+            </li>
           </ul>
 
           <h4 class="title">Notes</h4>
           <ul>
+            <li>Inclusion de l'espace de prévisualisation à revoir</li>
+          </ul>
+        </div>
+      </section>
+      <section class="week">
+        <header class="week-header">
+          <h3 class="week-title">Semaine 11 &ndash;
+            <time datetime="2024-05-06">Lundi 15 juillet 2024</time>
+          </h3>
+          <p>Implémentation: Infrastructure & Développement de l'application</p>
+        </header>
+        <div class="week-content">
+          <h4 class="title">Objectifs</h4>
+          <ul>
+            <li>Préparation d'une version stable de l'application pour la "Foire aux projets 3150: Démo Alpha" de la semaine prochaine</li>
+            <li>Support de tous les types d'annotations de l'image</li>
+          </ul>
+
+          <h4 class="title">Réalisations</h4>
+          <ul>
+          </ul>
+
+          <h4 class="title">Notes</h4>
+          <ul>
+            <li>Utilité du menu contextuel à redéfinir</li>
           </ul>
         </div>
       </section>
@@ -569,7 +642,7 @@
 
   <footer class="page-footer">
     <a href="https://github.com/ceduni/picto360" target="_blank">Répertoire GitHub</a>
-    <p>Dernière mise à jour: 10 juin 2024</p>
+    <p>Dernière mise à jour: 17 juillet 2024</p>
   </footer>
 
   <script>

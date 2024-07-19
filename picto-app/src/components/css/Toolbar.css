@@ -6,9 +6,9 @@
     align-items: center;
     background-color: #000000;
     padding: 5px;
-    width: 100%; 
-    box-sizing: border-box; 
-    color: white;
+    width: 100%;
+    box-sizing: border-box;
+    /*color: white;*/
 }
 
 
@@ -25,6 +25,7 @@
 
 .right-section {
     display: flex;
+    align-items: center;
 }
 
 .toolbar-button {
@@ -46,11 +47,11 @@ ul {
     padding: 0;
 }
 
-li{
+li {
     display: inline;
 }
 
-.modal {
+.share-options {
     color: #000000;
     position: fixed;
     top: 0;
@@ -61,14 +62,38 @@ li{
     justify-content: center;
     align-items: center;
     z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    /* Slight background overlay */
 }
-  
-.modal-content {
+
+.share-options-content {
+    width: 300px;
+    max-width: 25%;
     height: auto;
+    max-height: 50%;
     background-color: white;
     border-radius: 5px;
     border-color: #000000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+.share-options-close-button {
+    border: none;
+    background-color: transparent;
+    color: #aaaaaa;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.share-options-close-button:hover {
+    color: rgb(185, 0, 0);
 }
 
 .bouton-lien {
@@ -78,25 +103,7 @@ li{
     cursor: pointer;
 }
 
-.modal-close-button {
-    border: none;
-    background-color: transparent;
-    color: #aaaaaa;
-    font-size: 1.5em;
-    cursor: pointer;
-}
-
-.modal-close-button:hover {
-    color: rgb(185, 0, 0);
-}
-
-#acces-lien {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    width: 200px;
-    cursor: pointer;
-}
-
+#acces-lien,
 #expiration-lien {
     margin-top: 5px;
     margin-bottom: 10px;

@@ -82,6 +82,7 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
       yaw: coords[1],
       type: "info",
       text: "You clicked here!",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       clickHandlerFunc: (args: any) => { //args never used issue
         alert("Missing annotation");
       },

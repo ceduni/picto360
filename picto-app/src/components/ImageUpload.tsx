@@ -1,13 +1,7 @@
 import React, { useState, useRef } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
-import {
-  FaCamera,
-  FaFileImport,
-  FaGoogleDrive,
-  FaDropbox,
-} from "react-icons/fa";
+import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
 import { GrOnedrive } from "react-icons/gr";
-
 import "./css/ImageUpload.css";
 
 interface ImageUploadProps {
@@ -67,7 +61,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
           </div>
           <input type="file" ref={fileInputRef} onChange={handleImageChange} />
           <div className="icon-container">
-            <div className="icon camera">
+            <div className="icon camera" onClick={triggerFileInput}>
               <FaCamera />
             </div>
             <div className="icon import" onClick={triggerFileInput}>

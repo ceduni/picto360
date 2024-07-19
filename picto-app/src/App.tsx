@@ -6,7 +6,7 @@ import BottomBar from "@components/BottomBar";
 import FloatingMenu from "@components/FloatingMenu";
 import "./App.css";
 
-function App() {
+const App = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleImageUpload = (imageSrc: string) => {
@@ -14,21 +14,19 @@ function App() {
   };
 
   return (
-    <>
-      <div className="App">
-        {imageSrc && <Toolbar />}
-        <div className="App-body">
-          {imageSrc ? (
-            <ImageViewer width="100%" height="100%" imageSrc={imageSrc} />
-          ) : (
-            <ImageUpload onImageUpload={handleImageUpload} />
-          )}
-        </div>
-        {imageSrc && <BottomBar />}
-        {imageSrc && <FloatingMenu />} 
+    <div className="App">
+      {imageSrc && <Toolbar />}
+      <div className="App-body">
+        {imageSrc ? (
+          <ImageViewer width="100%" height="100%" imageSrc={imageSrc} />
+        ) : (
+          <ImageUpload onImageUpload={handleImageUpload} />
+        )}
       </div>
-    </>
+      {imageSrc && <BottomBar />}
+      {imageSrc && <FloatingMenu />}
+    </div>
   );
-}
+};
 
 export default App;
