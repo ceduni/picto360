@@ -11,3 +11,88 @@
   /* removes Pannellum's about message */
   display: none !important;
 }
+
+/*Hotspots*/
+
+.label-tooltip {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*.hyperlink-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+} */
+
+
+.custom-hotspot {
+  height: 17.5px;
+  width: 17.5px;
+  background: #000;
+  border-radius: 50%;
+  border: 4px solid #E5E5E5;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-hotspot svg {
+  height: 100%;
+  width: 100%;
+  color: #fff;
+}
+
+div.custom-tooltip span {
+  visibility: hidden;
+  position: absolute;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #000;
+  text-align: center;
+  max-width: 200px;
+  padding: 5px 10px;
+  margin-left: -220px;
+  cursor: default;
+}
+
+div.custom-tooltip:hover span {
+  visibility: visible;
+}
+
+div.custom-tooltip:hover span:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-width: 10px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+  bottom: -20px;
+  left: -10px;
+  margin: 0 50%;
+}
+
+div.custom-tooltip a {
+  color: white;
+  text-decoration: underline;
+}
+
+div.custom-tooltip a:visited {
+  color: white;
+}
+
+div.custom-tooltip a:hover {
+  color: white;
+}
+
+div.custom-tooltip a:active {
+  color: white;
+}
