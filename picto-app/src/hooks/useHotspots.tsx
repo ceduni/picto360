@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import ReactDOMServer from "react-dom/server";
-import { AiOutlineLink } from "react-icons/ai";
+import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
+import { TiInfoLarge } from "react-icons/ti";
 
 interface HotSpot {
   pitch: number;
@@ -28,10 +29,28 @@ export const useHotspots = () => {
         id: hotspotId,
         pitch: coords[0],
         yaw: coords[1],
-        type: "info",
-        text: "Text annotation",
-      };
+        type: "custom",
+        cssClass: "custom-hotspot",
+        createTooltipFunc: function textHotspot(hotSpotDiv) {
+          hotSpotDiv.classList.add("custom-tooltip");
+          const icon = document.createElement("div");
+          icon.innerHTML = ReactDOMServer.renderToString(<TiInfoLarge />);
+          icon.style.display = "flex";
+          icon.style.alignItems = "center";
+          icon.style.justifyContent = "center";
+          hotSpotDiv.appendChild(icon);
 
+          const span = document.createElement("span");
+          span.innerHTML = "Text annotation";
+          span.style.width = "auto";
+          hotSpotDiv.appendChild(span);
+
+          // Adjust the vertical position after the span is added to the DOM
+          setTimeout(() => {
+            span.style.marginTop = `${-(span.offsetHeight + 20)}px`;
+          }, 0);
+        },
+      };
       viewer.addHotSpot(hotspot);
     },
     []
@@ -47,8 +66,12 @@ export const useHotspots = () => {
         yaw: coords[1],
         type: "custom",
         createTooltipFunc: function (hotSpotDiv: HTMLElement) {
-          //hotSpotDiv.classList.add("label-tooltip");
           hotSpotDiv.innerHTML = "Label annotation";
+          hotSpotDiv.contentEditable = "true";
+          hotSpotDiv.addEventListener("blur", () => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const updatedText = hotSpotDiv.innerHTML;
+          });
         },
         cssClass: "label-tooltip",
       };
@@ -72,14 +95,6 @@ export const useHotspots = () => {
         pitch: coords[0],
         yaw: coords[1],
         type: "custom",
-        /*createTooltipFunc: function (hotSpotDiv: HTMLElement) {
-          hotSpotDiv.classList.add("hyperlink-tooltip");
-
-
-          hotSpotDiv.innerHTML = `${ReactDOMServer.renderToString(
-            <AiOutlineLink />
-          )} <a href="${url}" target="_blank">${displayText}</a>`;
-        },*/
         cssClass: "custom-hotspot",
         createTooltipFunc: function hyperlinkHotspot(hotSpotDiv) {
           hotSpotDiv.classList.add("custom-tooltip");
@@ -92,11 +107,12 @@ export const useHotspots = () => {
 
           const span = document.createElement("span");
           span.innerHTML = `<a href="${url}" target="_blank">${displayText}</a>`;
+          span.style.width = "auto";
           hotSpotDiv.appendChild(span);
-          span.style.width = span.scrollWidth - 20 + "px";
-          span.style.marginLeft =
-            -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + "px";
-          span.style.marginTop = -span.scrollHeight - 12 + "px";
+
+          setTimeout(() => {
+            span.style.marginTop = `${-(span.offsetHeight + 20)}px`;
+          }, 0);
         },
       };
       viewer.addHotSpot(hotspot);
@@ -120,11 +136,25 @@ export const useHotspots = () => {
         cssClass: "custom-hotspot",
         createTooltipFunc: function imageHotspot(hotSpotDiv) {
           hotSpotDiv.classList.add("custom-tooltip");
-          const img = document.createElement("img");
+          const icon = document.createElement("div");
+          icon.innerHTML = ReactDOMServer.renderToString(<AiOutlinePicture />);
+          icon.style.display = "flex";
+          icon.style.alignItems = "center";
+          icon.style.justifyContent = "center";
+          hotSpotDiv.appendChild(icon);
+
+          const span = document.createElement("span");
+          const img = new Image();
           img.src = imageUrl;
-          img.style.maxWidth = "200px";
-          img.style.maxHeight = "200px";
-          hotSpotDiv.appendChild(img);
+          img.style.maxWidth = "500px";
+          img.style.maxHeight = "500px";
+          img.style.display = "block";
+          img.onload = () => {
+            const offsetY = -(img.height + 30);
+            span.style.marginTop = `${offsetY}px`;
+          };
+          span.appendChild(img);
+          hotSpotDiv.appendChild(span);
         },
       };
       viewer.addHotSpot(hotspot);

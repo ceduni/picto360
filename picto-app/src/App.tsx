@@ -3,7 +3,6 @@ import Toolbar from "@components/Toolbar";
 import ImageViewer from "@components/ImageViewer";
 import ImageUpload from "@components/ImageUpload";
 import BottomBar from "@components/BottomBar";
-import FloatingMenu from "@components/FloatingMenu";
 import "./App.css";
 
 const App = () => {
@@ -24,7 +23,6 @@ const App = () => {
         )}
       </div>
       {imageSrc && <BottomBar />}
-      {imageSrc && <FloatingMenu />}
     </div>
   );
 };

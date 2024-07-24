@@ -11,7 +11,12 @@ export const usePannellumViewer = (
   viewerRef: RefObject<HTMLDivElement>,
   imageSrc: string
 ) => {
-  const { addTextHotspot, addLabelHotspot, addHyperlinkHotspot, addImageHotspot } = useHotspots();
+  const {
+    addTextHotspot,
+    addLabelHotspot,
+    addHyperlinkHotspot,
+    addImageHotspot,
+  } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
 
   const setupViewer = useCallback(() => {
@@ -55,39 +60,36 @@ export const usePannellumViewer = (
 
         const url = prompt("Enter the URL for the hotspot:");
         if (url) {
-          const displayText = prompt("Enter the text to display for the hyperlink:");
+          const displayText = prompt(
+            "Enter the text to display for the hyperlink:"
+          );
           if (displayText) {
             addHyperlinkHotspot(viewer, coords, url, displayText);
           }
         }
-      }
-
-      if (event.key === "i" || event.key === "I") {
+      } else if (event.key === "i" || event.key === "I") {
         event.preventDefault();
         const coords = viewer.mouseEventToCoords({
           clientX: mouseCoordsRef.current.x,
           clientY: mouseCoordsRef.current.y,
         } as MouseEvent); // Mock MouseEvent for getting coordinates
 
-        const imageFile = await selectImageFile();
+        const imageFile = await new Promise<File | null>((resolve) => {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0] || null;
+            resolve(file);
+          };
+          input.click();
+        });
+
         if (imageFile) {
           const imageUrl = URL.createObjectURL(imageFile);
           addImageHotspot(viewer, coords, imageUrl);
         }
       }
-    };
-
-    const selectImageFile = () => {
-      return new Promise<File | null>((resolve) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = () => {
-          const file = input.files?.[0] || null;
-          resolve(file);
-        };
-        input.click();
-      });
     };
 
     viewer.on("mousedown", handleMouseDown);
@@ -102,7 +104,14 @@ export const usePannellumViewer = (
       window.removeEventListener("keydown", handleKeyDown);
       viewer.destroy();
     };
-  }, [imageSrc, viewerRef, addTextHotspot, addLabelHotspot, addHyperlinkHotspot, addImageHotspot]);
+  }, [
+    imageSrc,
+    viewerRef,
+    addTextHotspot,
+    addLabelHotspot,
+    addHyperlinkHotspot,
+    addImageHotspot,
+  ]);
 
   useEffect(() => {
     const cleanup = setupViewer();
