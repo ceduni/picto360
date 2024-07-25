@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { usePannellumViewer } from "../hooks/usePannellumViewer";
 import "./css/ImageViewer.css";
+import ContextMenu from "./ContextMenu";
 
 interface PannellumViewerProps {
   width: string;
@@ -14,7 +15,12 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
   imageSrc,
 }) => {
   const viewerRef = useRef<HTMLDivElement>(null);
-  usePannellumViewer(viewerRef, imageSrc);
+  const {
+    contextMenuVisible,
+    contextMenuPosition,
+    handleContextMenuClick,
+    hideContextMenu,
+  } = usePannellumViewer(viewerRef, imageSrc);
 
   return (
     <>
@@ -23,6 +29,15 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
         className="viewer-container"
         style={{ width, height }}
       ></div>
+      {contextMenuVisible && (
+        <ContextMenu
+          visible={contextMenuVisible}
+          x={contextMenuPosition.x}
+          y={contextMenuPosition.y}
+          onMenuItemClick={handleContextMenuClick}
+          onClose={hideContextMenu}
+        />
+      )}
     </>
   );
 };

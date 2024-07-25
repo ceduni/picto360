@@ -1,4 +1,4 @@
-import { useEffect, useCallback, RefObject, useRef } from "react";
+import { useEffect, useCallback, useState, RefObject, useRef } from "react";
 import { useHotspots } from "./useHotspots";
 
 declare global {
@@ -18,62 +18,53 @@ export const usePannellumViewer = (
     addImageHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
+  const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({
+    pitch: 0,
+    yaw: 0,
+  });
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: 0,
+    y: 0,
+  });
+  const viewerRefCallback = useRef<any>(null); // Reference to store the viewer instance
 
-  const setupViewer = useCallback(() => {
-    if (!viewerRef.current || !imageSrc) return;
+  const handleContextMenuClick = async (type: string) => {
+    if (!viewerRefCallback.current) return;
 
-    const viewer = window.pannellum.viewer(viewerRef.current, {
-      type: "equirectangular",
-      panorama: imageSrc,
-      autoLoad: true,
-      autoRotate: -2,
-      showZoomCtrl: true,
-      strings: {
-        loadingLabel: "Chargement en cours...",
-      },
-    });
+    const viewer = viewerRefCallback.current;
+    const { pitch, yaw } = contextMenuCoordsRef.current;
+    const coords = [pitch, yaw];
+    switch (type) {
+      case "Text":
+        // eslint-disable-next-line no-case-declarations
+        const hotspotText = prompt(
+          "Enter the text to display for the hotspot:"
+        );
+        if (hotspotText) {
+          addTextHotspot(viewer, coords, hotspotText);
+        }
+        break;
 
-    const handleMouseDown = (event: MouseEvent) => {
-      if (event.button === 0) {
-        const coords = viewer.mouseEventToCoords(event);
-        addTextHotspot(viewer, coords);
-      }
-    };
+      case "Label":
+        addLabelHotspot(viewer, coords);
+        break;
 
-    const handleContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-      const coords = viewer.mouseEventToCoords(event);
-      addLabelHotspot(viewer, coords);
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      mouseCoordsRef.current = { x: event.clientX, y: event.clientY };
-    };
-
-    const handleKeyDown = async (event: KeyboardEvent) => {
-      if (event.key === "h" || event.key === "H") {
-        event.preventDefault();
-        const coords = viewer.mouseEventToCoords({
-          clientX: mouseCoordsRef.current.x,
-          clientY: mouseCoordsRef.current.y,
-        } as MouseEvent); // Mock MouseEvent for getting coordinates
-
+      case "Hyperlink":
+        // eslint-disable-next-line no-case-declarations
         const url = prompt("Enter the URL for the hotspot:");
         if (url) {
-          const displayText = prompt(
+          const hyperlinkText = prompt(
             "Enter the text to display for the hyperlink:"
           );
-          if (displayText) {
-            addHyperlinkHotspot(viewer, coords, url, displayText);
+          if (hyperlinkText) {
+            addHyperlinkHotspot(viewer, coords, url, hyperlinkText);
           }
         }
-      } else if (event.key === "i" || event.key === "I") {
-        event.preventDefault();
-        const coords = viewer.mouseEventToCoords({
-          clientX: mouseCoordsRef.current.x,
-          clientY: mouseCoordsRef.current.y,
-        } as MouseEvent); // Mock MouseEvent for getting coordinates
+        break;
 
+      case "Image":
+        // eslint-disable-next-line no-case-declarations
         const imageFile = await new Promise<File | null>((resolve) => {
           const input = document.createElement("input");
           input.type = "file";
@@ -84,39 +75,75 @@ export const usePannellumViewer = (
           };
           input.click();
         });
-
         if (imageFile) {
           const imageUrl = URL.createObjectURL(imageFile);
           addImageHotspot(viewer, coords, imageUrl);
         }
-      }
+        break;
+
+      default:
+        break;
+    }
+    setContextMenuVisible(false);
+  };
+
+  const hideContextMenu = () => setContextMenuVisible(false);
+
+  const setupViewer = useCallback(() => {
+    if (!viewerRef.current || !imageSrc) return;
+
+    const viewer = window.pannellum.viewer(viewerRef.current, {
+      type: "equirectangular",
+      panorama: imageSrc,
+      autoLoad: true,
+      autoRotate: -2,
+      showZoomCtrl: true,
+      keyboardZoom: false,
+      disableKeyboardCtrl: true,
+      mouseZoom: true,
+      strings: {
+        loadingLabel: "Chargement en cours...",
+      },
+    });
+
+    viewerRefCallback.current = viewer; // Store the viewer instance
+
+    const handleContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+      mouseCoordsRef.current = { x: event.clientX, y: event.clientY };
+      setContextMenuPosition({ x: event.clientX, y: event.clientY });
+      setContextMenuVisible(true);
+
+      const coords = viewer.mouseEventToCoords({
+        clientX: event.clientX,
+        clientY: event.clientY,
+      } as MouseEvent);
+      contextMenuCoordsRef.current = { pitch: coords[0], yaw: coords[1] };
     };
 
-    viewer.on("mousedown", handleMouseDown);
+    const handleMouseMove = (event: MouseEvent) => {
+      mouseCoordsRef.current = { x: event.clientX, y: event.clientY };
+    };
+
     viewerRef.current.addEventListener("contextmenu", handleContextMenu);
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      viewer.off("mousedown", handleMouseDown);
       viewerRef.current?.removeEventListener("contextmenu", handleContextMenu);
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("keydown", handleKeyDown);
       viewer.destroy();
     };
-  }, [
-    imageSrc,
-    viewerRef,
-    addTextHotspot,
-    addLabelHotspot,
-    addHyperlinkHotspot,
-    addImageHotspot,
-  ]);
+  }, [viewerRef, imageSrc]);
 
   useEffect(() => {
     const cleanup = setupViewer();
     return cleanup;
   }, [setupViewer]);
 
-  return {};
+  return {
+    contextMenuVisible,
+    contextMenuPosition,
+    handleContextMenuClick,
+    hideContextMenu,
+  };
 };

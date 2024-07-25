@@ -21,8 +21,46 @@ interface HotSpot {
 }
 
 export const useHotspots = () => {
+  const adjustVerticalPosition = (element: HTMLElement) => {
+    setTimeout(() => {
+      element.style.marginTop = `${-(element.offsetHeight + 20)}px`;
+    }, 0);
+  };
+
+  const handleBlurOrEnter = (span: HTMLSpanElement) => {
+    const adjustPositionOnInput = () => adjustVerticalPosition(span);
+
+    const removeEmptyLineBreaks = () => {
+      const lines = span.innerHTML.split("<br>");
+      const cleanedLines = lines.filter((line) => line.trim() !== "");
+      span.innerHTML = cleanedLines.join("<br>");
+    };
+
+    span.addEventListener("blur", () => {
+      removeEmptyLineBreaks();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const updatedText = span.innerHTML;
+      adjustVerticalPosition(span);
+      span.removeEventListener("input", adjustPositionOnInput);
+    });
+
+    span.addEventListener("keydown", (event) => {
+      //stops the editing while allowing line breaks
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        span.blur();
+      }
+    });
+
+    span.addEventListener("input", adjustPositionOnInput);
+  };
+
   const addTextHotspot = useCallback(
-    (viewer: { addHotSpot: (arg0: HotSpot) => void }, coords: any[]) => {
+    (
+      viewer: { addHotSpot: (arg0: HotSpot) => void },
+      coords: any[],
+      hotspotText: string
+    ) => {
       const hotspotId = `hotspot-${Date.now()}`;
 
       const hotspot: HotSpot = {
@@ -41,14 +79,22 @@ export const useHotspots = () => {
           hotSpotDiv.appendChild(icon);
 
           const span = document.createElement("span");
-          span.innerHTML = "Text annotation";
+          span.innerHTML = hotspotText;
           span.style.width = "auto";
+          span.contentEditable = "true"; // Make the text editable
           hotSpotDiv.appendChild(span);
 
-          // Adjust the vertical position after the span is added to the DOM
-          setTimeout(() => {
-            span.style.marginTop = `${-(span.offsetHeight + 20)}px`;
-          }, 0);
+          adjustVerticalPosition(span);
+
+          span.addEventListener("focus", (event) => {
+            event.stopPropagation(); // Prevent Pannellum from handling the focus event
+          });
+
+          span.addEventListener("keydown", (event) => {
+            event.stopPropagation(); // Prevent Pannellum from handling the keydown event
+          });
+
+          handleBlurOrEnter(span);
         },
       };
       viewer.addHotSpot(hotspot);
@@ -68,10 +114,25 @@ export const useHotspots = () => {
         createTooltipFunc: function (hotSpotDiv: HTMLElement) {
           hotSpotDiv.innerHTML = "Label annotation";
           hotSpotDiv.contentEditable = "true";
+          hotSpotDiv.style.position = "absolute";
+          hotSpotDiv.style.left = `${coords[1]}px`;
+          hotSpotDiv.style.top = `${coords[0]}px`;
+
+          hotSpotDiv.addEventListener("focus", (event) => {
+            event.stopPropagation();
+          });
+
+          hotSpotDiv.addEventListener("keydown", (event) => {
+            event.stopPropagation();
+          });
+
           hotSpotDiv.addEventListener("blur", () => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const updatedText = hotSpotDiv.innerHTML;
+            adjustVerticalPosition(hotSpotDiv);
           });
+
+          adjustVerticalPosition(hotSpotDiv); // TODO: rework the initial position of the label
         },
         cssClass: "label-tooltip",
       };
@@ -86,7 +147,7 @@ export const useHotspots = () => {
       viewer: { addHotSpot: (arg0: HotSpot) => void },
       coords: any[],
       url: string,
-      displayText: string
+      hyperlinkText: string
     ) => {
       const hotspotId = `hotspot-${Date.now()}`;
 
@@ -106,13 +167,22 @@ export const useHotspots = () => {
           hotSpotDiv.appendChild(icon);
 
           const span = document.createElement("span");
-          span.innerHTML = `<a href="${url}" target="_blank">${displayText}</a>`;
+          span.innerHTML = `<a href="${url}" target="_blank">${hyperlinkText}</a>`;
           span.style.width = "auto";
+          span.contentEditable = "true";
           hotSpotDiv.appendChild(span);
 
-          setTimeout(() => {
-            span.style.marginTop = `${-(span.offsetHeight + 20)}px`;
-          }, 0);
+          adjustVerticalPosition(span);
+
+          span.addEventListener("focus", (event) => {
+            event.stopPropagation();
+          });
+
+          span.addEventListener("keydown", (event) => {
+            event.stopPropagation();
+          });
+
+          handleBlurOrEnter(span);
         },
       };
       viewer.addHotSpot(hotspot);
@@ -155,6 +225,16 @@ export const useHotspots = () => {
           };
           span.appendChild(img);
           hotSpotDiv.appendChild(span);
+
+          adjustVerticalPosition(span);
+
+          span.addEventListener("focus", (event) => {
+            event.stopPropagation();
+          });
+
+          span.addEventListener("keydown", (event) => {
+            event.stopPropagation();
+          });
         },
       };
       viewer.addHotSpot(hotspot);

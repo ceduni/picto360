@@ -140,7 +140,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         <li onClick={() => onMenuItemClick("Label")}>
           <MdOutlineLabel className="menu-icon" /> Étiquette
         </li>
-        <li onClick={() => onMenuItemClick("Link")}>
+        <li onClick={() => onMenuItemClick("Hyperlink")}>
           <AiOutlineLink className="menu-icon" /> Lien
         </li>
       </ul>
