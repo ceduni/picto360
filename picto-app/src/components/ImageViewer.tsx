@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { usePannellumViewer } from "../hooks/usePannellumViewer";
 import "./css/ImageViewer.css";
 import ContextMenu from "./ContextMenu";
+import { PiTargetBold } from "react-icons/pi";
 
 interface PannellumViewerProps {
   width: string;
@@ -19,6 +20,7 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
     contextMenuVisible,
     contextMenuPosition,
     handleContextMenuClick,
+    targetIconPosition,
     hideContextMenu,
   } = usePannellumViewer(viewerRef, imageSrc);
 
@@ -37,6 +39,17 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
           onMenuItemClick={handleContextMenuClick}
           onClose={hideContextMenu}
         />
+      )}
+      {targetIconPosition && (
+        <div
+          style={{
+            top: targetIconPosition.y,
+            left: targetIconPosition.x,
+          }}
+          className="target-icon"
+        >
+          <PiTargetBold />
+        </div>
       )}
     </>
   );

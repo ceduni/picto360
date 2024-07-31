@@ -3,35 +3,75 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    height: 50px;
-    width: 30%;
+    height: 3em;
+    min-width: 20em;
+    max-width: 90%;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-    border-radius: 50px 50px 0 0;
+    border-radius: 2em 2em 0 0;
+    transition: height 0.3s, border-radius 0.3s, transform 0.3s;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .buttons {
-    margin: 0 10px;
-    padding: 10px;
-    background-color: Transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.5em;
+    padding: 0.5em;
+    background-color: transparent;
     border: none;
-    border-radius: 5px;
+    border-radius: 0.3em;
     cursor: pointer;
     color: white;
-    font-size: 1.8em;
+    font-size: 2em;
+    transition: color 0.3s;
 }
 
 .buttons:hover {
     color: #1f76fd;
 }
 
+/* Smaller screens */
+@media (max-width: 600px) {
+    .lowerBar {
+        height: 2.5em;
+        border-radius: 1.5em 1.5em 0 0;
+    }
+
+    .buttons {
+        margin: 0 0.3em;
+        padding: 0.3em;
+        font-size: 1.5em;
+    }
+}
+
+/* Medium screens */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .lowerBar {
+        height: 2.8em;
+        border-radius: 1.8em 1.8em 0 0;
+    }
+
+    .buttons {
+        margin: 0 0.4em;
+        padding: 0.4em;
+        font-size: 1.75em;
+    }
+}
+
 button {
-    background-color: Transparent;
+    background-color: transparent;
     border: none;
     cursor: pointer;
     color: white;
-    font-size: 1.8em;
+    font-size: 1.5em;
 }

@@ -1,9 +1,8 @@
-.context-menu,
-.submenu {
+.context-menu {
     position: absolute;
     background-color: white;
     border: 1px solid #ddd;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 1000;
     min-width: 200px;
@@ -12,15 +11,13 @@
     padding: 7.5px 0;
 }
 
-.context-menu ul,
-.submenu ul {
+.context-menu ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-.context-menu ul li,
-.submenu ul li {
+.context-menu ul li {
     padding: 10px 20px;
     cursor: pointer;
     display: flex;
@@ -28,13 +25,11 @@
     position: relative;
 }
 
-.context-menu ul li:hover,
-.submenu ul li:hover {
+.context-menu ul li:hover {
     background-color: #f0f0f0;
 }
 
-.context-menu ul li:active,
-.submenu ul li:active {
+.context-menu ul li:active {
     background-color: #e0e0e0;
 }
 
@@ -43,30 +38,8 @@
     font-size: 18px;
 }
 
-.arrow-icon {
-    margin-left: auto;
-    font-size: 12px;
-}
-
-.submenu {
-    left: 200px;
-    top: 0;
-    opacity: 0;
-    animation: fade-in 0.25s;
-    display: none;
-}
-
-.context-menu ul li:hover .submenu {
-    display: block;
-    opacity: 1;
-}
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+.menu-separator {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 5px 0;
 }

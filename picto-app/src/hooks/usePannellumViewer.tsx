@@ -16,6 +16,7 @@ export const usePannellumViewer = (
     addLabelHotspot,
     addHyperlinkHotspot,
     addImageHotspot,
+    addGifHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
   const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({
@@ -27,7 +28,11 @@ export const usePannellumViewer = (
     x: 0,
     y: 0,
   });
-  const viewerRefCallback = useRef<any>(null); // Reference to store the viewer instance
+  const [targetIconPosition, setTargetIconPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const viewerRefCallback = useRef<any>(null); // reference to store the viewer instance
 
   const handleContextMenuClick = async (type: string) => {
     if (!viewerRefCallback.current) return;
@@ -38,31 +43,24 @@ export const usePannellumViewer = (
     switch (type) {
       case "Text":
         // eslint-disable-next-line no-case-declarations
-        const hotspotText = prompt(
-          "Enter the text to display for the hotspot:"
-        );
+        const hotspotText = prompt("Enter the text to display for the hotspot:");
         if (hotspotText) {
           addTextHotspot(viewer, coords, hotspotText);
         }
         break;
-
       case "Label":
         addLabelHotspot(viewer, coords);
         break;
-
       case "Hyperlink":
         // eslint-disable-next-line no-case-declarations
         const url = prompt("Enter the URL for the hotspot:");
         if (url) {
-          const hyperlinkText = prompt(
-            "Enter the text to display for the hyperlink:"
-          );
+          const hyperlinkText = prompt("Enter the text to display for the hyperlink:");
           if (hyperlinkText) {
             addHyperlinkHotspot(viewer, coords, url, hyperlinkText);
           }
         }
         break;
-
       case "Image":
         // eslint-disable-next-line no-case-declarations
         const imageFile = await new Promise<File | null>((resolve) => {
@@ -80,14 +78,24 @@ export const usePannellumViewer = (
           addImageHotspot(viewer, coords, imageUrl);
         }
         break;
-
+      case "Gif":
+        // eslint-disable-next-line no-case-declarations
+        const gifUrl = prompt("Enter the URL of the GIF:");
+        if (gifUrl) {
+          addGifHotspot(viewer, coords, gifUrl);
+        }
+        break;
       default:
         break;
     }
     setContextMenuVisible(false);
+    setTargetIconPosition(null); // remove the target icon
   };
 
-  const hideContextMenu = () => setContextMenuVisible(false);
+  const hideContextMenu = () => {
+    setContextMenuVisible(false);
+    setTargetIconPosition(null);
+  };
 
   const setupViewer = useCallback(() => {
     if (!viewerRef.current || !imageSrc) return;
@@ -99,20 +107,21 @@ export const usePannellumViewer = (
       autoRotate: -2,
       showZoomCtrl: true,
       keyboardZoom: false,
-      disableKeyboardCtrl: true,
+      disableKeyboardCtrl: false, 
       mouseZoom: true,
       strings: {
         loadingLabel: "Chargement en cours...",
       },
     });
 
-    viewerRefCallback.current = viewer; // Store the viewer instance
+    viewerRefCallback.current = viewer; // store the viewer instance
 
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault();
       mouseCoordsRef.current = { x: event.clientX, y: event.clientY };
       setContextMenuPosition({ x: event.clientX, y: event.clientY });
       setContextMenuVisible(true);
+      setTargetIconPosition({ x: event.clientX, y: event.clientY });
 
       const coords = viewer.mouseEventToCoords({
         clientX: event.clientX,
@@ -145,5 +154,6 @@ export const usePannellumViewer = (
     contextMenuPosition,
     handleContextMenuClick,
     hideContextMenu,
+    targetIconPosition,
   };
 };

@@ -5,6 +5,7 @@ import {
   IoCheckmark,
   IoSaveOutline,
   IoShareSocialSharp,
+  IoClose,
 } from "react-icons/io5";
 import { PiExport } from "react-icons/pi";
 
@@ -32,20 +33,23 @@ const Toolbar = () => {
         />
       </div>
       <div className="right-section">
-        <ul>
-          <li className="toolbar-button">
+        <ul className="toolbar-ul">
+          <li className="toolbar-li toolbar-button">
             <IoCheckmark />
           </li>
-          <li className="toolbar-button">
+          <li className="toolbar-li toolbar-button">
             <IoSettingsSharp />
           </li>
-          <li className="toolbar-button">
+          <li className="toolbar-li toolbar-button">
             <IoSaveOutline />
           </li>
-          <li className="toolbar-button">
+          <li className="toolbar-li toolbar-button">
             <PiExport />
           </li>
-          <li className="toolbar-button" onClick={toggleShareOptions}>
+          <li
+            className="toolbar-li toolbar-button"
+            onClick={toggleShareOptions}
+          >
             <IoShareSocialSharp />
           </li>
         </ul>
@@ -55,9 +59,8 @@ const Toolbar = () => {
               <button
                 onClick={toggleShareOptions}
                 className="share-options-close-button"
-                style={{ float: "right" }}
               >
-                ×
+                <IoClose />
               </button>
               <h2>Partager</h2>
               <label htmlFor="expiration-lien">Date d'expiration</label>

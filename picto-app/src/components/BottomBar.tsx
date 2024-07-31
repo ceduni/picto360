@@ -6,7 +6,7 @@ import { BiUndo, BiRedo } from "react-icons/bi";
 
 import "./css/BottomBar.css";
 
-const LowerBar: React.FC = () => {
+const BottomBar: React.FC = () => {
   const [isHandPointer, setIsHandPointer] = useState(true);
 
   const switchCursor = () => {
@@ -19,27 +19,29 @@ const LowerBar: React.FC = () => {
 
   return (
     <div className="lowerBar">
-      <button>
-        <IoLayersOutline className="buttons" />
-      </button>
-      <button>
-        <GoPlusCircle className="buttons" />
-      </button>
-      <button onClick={switchCursor}>
-        {isHandPointer ? (
-          <LiaHandPointerSolid className="buttons" />
-        ) : (
-          <LiaMousePointerSolid className="buttons" />
-        )}
-      </button>
-      <button>
-        <BiUndo className="buttons" />
-      </button>
-      <button>
-        <BiRedo className="buttons" />
-      </button>
+      <div className="button-container">
+        <button>
+          <IoLayersOutline className="buttons" />
+        </button>
+        <button>
+          <GoPlusCircle className="buttons" />
+        </button>
+        <button onClick={switchCursor}>
+          {isHandPointer ? (
+            <LiaHandPointerSolid className="buttons" />
+          ) : (
+            <LiaMousePointerSolid className="buttons" />
+          )}
+        </button>
+        <button>
+          <BiUndo className="buttons" />
+        </button>
+        <button>
+          <BiRedo className="buttons" />
+        </button>
+      </div>
     </div>
   );
 };
 
-export default LowerBar;
+export default BottomBar;

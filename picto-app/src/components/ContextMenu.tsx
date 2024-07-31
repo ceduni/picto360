@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import "./css/ContextMenu.css";
 import {
-  AiOutlineForm,
   AiOutlineUnorderedList,
   AiOutlineFileText,
   AiOutlineLink,
@@ -11,10 +10,8 @@ import {
 import { IoMdCheckboxOutline } from "react-icons/io";
 import {
   MdOutlineVideoLibrary,
-  MdOutlinePermMedia,
   MdOutlineGif,
   MdOutlineLabel,
-  MdOutlineArrowForwardIos,
 } from "react-icons/md";
 import { RiSurveyLine } from "react-icons/ri";
 import { BsCardText } from "react-icons/bs";
@@ -35,14 +32,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   onClose,
 }) => {
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const [formSubMenuVisible, setFormSubMenuVisible] = useState(false);
-  const [mediaSubMenuVisible, setMediaSubMenuVisible] = useState(false);
-  const [formHoverTimer, setFormHoverTimer] = useState<NodeJS.Timeout | null>(
-    null
-  );
-  const [mediaHoverTimer, setMediaHoverTimer] = useState<NodeJS.Timeout | null>(
-    null
-  );
+  const horizontalOffset = 30;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,23 +51,35 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [onClose]);
 
-  const handleMouseEnter = (type: "form" | "media") => {
-    if (type === "form") {
-      setFormHoverTimer(setTimeout(() => setFormSubMenuVisible(true), 500));
-    } else {
-      setMediaHoverTimer(setTimeout(() => setMediaSubMenuVisible(true), 500));
-    }
-  };
+  useEffect(() => {
+    if (contextMenuRef.current) {
+      const menu = contextMenuRef.current;
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      const menuWidth = menu.offsetWidth;
+      const menuHeight = menu.offsetHeight;
 
-  const handleMouseLeave = (type: "form" | "media") => {
-    if (type === "form") {
-      if (formHoverTimer) clearTimeout(formHoverTimer);
-      setFormSubMenuVisible(false);
-    } else {
-      if (mediaHoverTimer) clearTimeout(mediaHoverTimer);
-      setMediaSubMenuVisible(false);
+      const bottomBar = document.querySelector(".lowerBar");
+      const bottomBarHeight = bottomBar
+        ? bottomBar.getBoundingClientRect().height
+        : 0;
+
+      let adjustedX = x + horizontalOffset; // separation from the target icon
+      let adjustedY = y;
+
+      //context menu screen overflow checks
+      if (x + menuWidth + horizontalOffset > screenWidth) {
+        adjustedX = screenWidth - menuWidth;
+      }
+
+      if (y + menuHeight > screenHeight - bottomBarHeight) {
+        adjustedY = y - menuHeight;
+      }
+
+      menu.style.left = `${adjustedX}px`;
+      menu.style.top = `${adjustedY}px`;
     }
-  };
+  }, [x, y, visible, horizontalOffset]);
 
   if (!visible) return null;
 
@@ -88,52 +90,32 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       style={{ top: `${y}px`, left: `${x}px` }}
     >
       <ul>
-        <li
-          onMouseEnter={() => handleMouseEnter("form")}
-          onMouseLeave={() => handleMouseLeave("form")}
-        >
-          <AiOutlineForm className="menu-icon" /> Formulaire{" "}
-          <MdOutlineArrowForwardIos className="arrow-icon" />
-          {formSubMenuVisible && (
-            <ul className="submenu">
-              <li onClick={() => onMenuItemClick("True_or_False")}>
-                <IoMdCheckboxOutline className="menu-icon" /> Vrai ou faux
-              </li>
-              <li onClick={() => onMenuItemClick("Multiple_Choice")}>
-                <AiOutlineUnorderedList className="menu-icon" /> Choix multiples
-              </li>
-              <li onClick={() => onMenuItemClick("Poll")}>
-                <RiSurveyLine className="menu-icon" /> Sondage
-              </li>
-              <li onClick={() => onMenuItemClick("Text_Box")}>
-                <BsCardText className="menu-icon" /> Zone de texte
-              </li>
-            </ul>
-          )}
+        <li onClick={() => onMenuItemClick("True_or_False")}>
+          <IoMdCheckboxOutline className="menu-icon" /> Vrai ou faux
         </li>
-        <li
-          onMouseEnter={() => handleMouseEnter("media")}
-          onMouseLeave={() => handleMouseLeave("media")}
-        >
-          <MdOutlinePermMedia className="menu-icon" /> Média{" "}
-          <MdOutlineArrowForwardIos className="arrow-icon" />
-          {mediaSubMenuVisible && (
-            <ul className="submenu">
-              <li onClick={() => onMenuItemClick("Video")}>
-                <MdOutlineVideoLibrary className="menu-icon" /> Vidéo
-              </li>
-              <li onClick={() => onMenuItemClick("Image")}>
-                <AiOutlinePicture className="menu-icon" /> Image
-              </li>
-              <li onClick={() => onMenuItemClick("Audio")}>
-                <AiOutlineSound className="menu-icon" /> Audio
-              </li>
-              <li onClick={() => onMenuItemClick("Animation")}>
-                <MdOutlineGif className="menu-icon" /> Animation
-              </li>
-            </ul>
-          )}
+        <li onClick={() => onMenuItemClick("Multiple_Choice")}>
+          <AiOutlineUnorderedList className="menu-icon" /> Choix multiples
         </li>
+        <li onClick={() => onMenuItemClick("Poll")}>
+          <RiSurveyLine className="menu-icon" /> Sondage
+        </li>
+        <li onClick={() => onMenuItemClick("Text_Box")}>
+          <BsCardText className="menu-icon" /> Zone de texte
+        </li>
+        <hr className="menu-separator" />
+        <li onClick={() => onMenuItemClick("Video")}>
+          <MdOutlineVideoLibrary className="menu-icon" /> Vidéo
+        </li>
+        <li onClick={() => onMenuItemClick("Image")}>
+          <AiOutlinePicture className="menu-icon" /> Image
+        </li>
+        <li onClick={() => onMenuItemClick("Audio")}>
+          <AiOutlineSound className="menu-icon" /> Audio
+        </li>
+        <li onClick={() => onMenuItemClick("Gif")}>
+          <MdOutlineGif className="menu-icon" /> GIF
+        </li>
+        <hr className="menu-separator" />
         <li onClick={() => onMenuItemClick("Text")}>
           <AiOutlineFileText className="menu-icon" /> Texte
         </li>
