@@ -91,28 +91,23 @@
   box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
 }
 
-.label-tooltip,
+.custom-label-tooltip,
 div.custom-tooltip span {
   position: absolute;
   color: #FFF;
   background-color: rgba(0, 0, 0, 0.8);
-  text-align: center;
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: center;  
   white-space: pre-wrap;
   overflow-wrap: break-word;
   cursor: default;
 }
 
-.label-tooltip {
-  padding: 5px;
-  border-radius: 5px;
-}
-
 div.custom-tooltip span {
   visibility: hidden;
-  border-radius: 3px;
-  max-width: 500px;
   width: auto;
-  padding: 5px 10px;
+  /*max-width: 500px;*/
   left: 50%;
   transform: translateX(-50%);
 }

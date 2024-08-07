@@ -17,6 +17,7 @@ export const usePannellumViewer = (
     addHyperlinkHotspot,
     addImageHotspot,
     addGifHotspot,
+    addVideoHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
   const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({
@@ -32,7 +33,7 @@ export const usePannellumViewer = (
     x: number;
     y: number;
   } | null>(null);
-  const viewerRefCallback = useRef<any>(null); // reference to store the viewer instance
+  const viewerRefCallback = useRef<any>(null); // Reference to store the viewer instance
 
   const handleContextMenuClick = async (type: string) => {
     if (!viewerRefCallback.current) return;
@@ -42,24 +43,18 @@ export const usePannellumViewer = (
     const coords = [pitch, yaw];
     switch (type) {
       case "Text":
-        // eslint-disable-next-line no-case-declarations
-        const hotspotText = prompt("Enter the text to display for the hotspot:");
-        if (hotspotText) {
-          addTextHotspot(viewer, coords, hotspotText);
-        }
+        addTextHotspot(viewer, coords, "Default text content");
         break;
       case "Label":
         addLabelHotspot(viewer, coords);
         break;
       case "Hyperlink":
-        // eslint-disable-next-line no-case-declarations
-        const url = prompt("Enter the URL for the hotspot:");
-        if (url) {
-          const hyperlinkText = prompt("Enter the text to display for the hyperlink:");
-          if (hyperlinkText) {
-            addHyperlinkHotspot(viewer, coords, url, hyperlinkText);
-          }
-        }
+        addHyperlinkHotspot(
+          viewer,
+          coords,
+          "https://example.com",
+          "Default hyperlink text"
+        );
         break;
       case "Image":
         // eslint-disable-next-line no-case-declarations
@@ -85,11 +80,32 @@ export const usePannellumViewer = (
           addGifHotspot(viewer, coords, gifUrl);
         }
         break;
+      case "Video":
+        // eslint-disable-next-line no-case-declarations
+        const videoUrl = prompt("Enter the YouTube video URL:");
+        if (videoUrl) {
+          const videoId = extractYouTubeVideoId(videoUrl);
+          if (videoId) {
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            addVideoHotspot(viewer, coords, embedUrl);
+          } else {
+            alert("Invalid YouTube URL");
+          }
+        }
+        break;
       default:
         break;
     }
     setContextMenuVisible(false);
     setTargetIconPosition(null); // remove the target icon
+  };
+
+  const extractYouTubeVideoId = (url: string) => {
+    const regex =
+      // eslint-disable-next-line no-useless-escape
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
   };
 
   const hideContextMenu = () => {
@@ -107,14 +123,14 @@ export const usePannellumViewer = (
       autoRotate: -2,
       showZoomCtrl: true,
       keyboardZoom: false,
-      disableKeyboardCtrl: false, 
+      disableKeyboardCtrl: false,
       mouseZoom: true,
       strings: {
         loadingLabel: "Chargement en cours...",
       },
     });
 
-    viewerRefCallback.current = viewer; // store the viewer instance
+    viewerRefCallback.current = viewer; // Store the viewer instance
 
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault();

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineGif } from "react-icons/md";
+import { MdOutlineGif, MdOutlineVideoLibrary } from "react-icons/md";
 import { TiInfoLarge } from "react-icons/ti";
 
 interface HotSpot {
@@ -27,7 +27,14 @@ const LABEL_HYPERLINK_CHAR_LIMIT = 30; // Maximum characters allowed in label an
 export const useHotspots = () => {
   const adjustVerticalPosition = (element: HTMLElement) => {
     setTimeout(() => {
-      element.style.marginTop = `${-(element.offsetHeight + 20)}px`;
+      const lines = element.innerHTML.split("<br>");
+      const lineCount = lines.length;
+      const extraMargin = lineCount > 1 ? (lineCount - 1) * 10 : 0;
+      element.style.marginTop = `${-(
+        element.offsetHeight +
+        20 +
+        extraMargin
+      )}px`;
     }, 0);
   };
 
@@ -85,27 +92,79 @@ export const useHotspots = () => {
     icon: JSX.Element,
     content: string,
     editable: boolean,
-    charLimit: number
+    charLimit: number,
+    specialCase?: "label" | "image" | "gif" | "video"
   ) => {
     return (hotSpotDiv: HTMLElement) => {
-      hotSpotDiv.classList.add("custom-tooltip");
-      const iconDiv = document.createElement("div");
-      iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
-      iconDiv.style.display = "flex";
-      iconDiv.style.alignItems = "center";
-      iconDiv.style.justifyContent = "center";
-      hotSpotDiv.appendChild(iconDiv);
+      if (specialCase !== "label") {
+        hotSpotDiv.classList.add("custom-tooltip");
+        const iconDiv = document.createElement("div");
+        iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
+        iconDiv.style.display = "flex";
+        iconDiv.style.alignItems = "center";
+        iconDiv.style.justifyContent = "center";
+        hotSpotDiv.appendChild(iconDiv);
+      }
 
       const span = document.createElement("span");
       span.innerHTML = content;
+
       if (editable) {
         span.contentEditable = "true";
         handleBlurOrEnter(span, charLimit);
       }
+
+      if (specialCase === "image" || specialCase === "gif") {
+        const img = new Image();
+        img.src = content;
+        img.style.maxWidth = "500px";
+        img.style.maxHeight = "500px";
+        img.style.display = "block";
+        img.onload = () => {
+          const offsetY = -(img.height + 30);
+          span.style.marginTop = `${offsetY}px`;
+        };
+        span.innerHTML = "";
+        span.appendChild(img);
+      } else if (specialCase === "video") {
+        const iframe = document.createElement("iframe");
+        iframe.src = `${content}?enablejsapi=1`; // added ?enablejsapi=1 to enable YouTube iframe API
+        iframe.width = "640px";
+        iframe.height = "360px";
+        iframe.style.display = "block";
+        iframe.onload = () => {
+          const offsetY = -(iframe.height + 30);
+          span.style.marginTop = `${offsetY}px`;
+        };
+        span.innerHTML = "";
+        span.appendChild(iframe);
+
+        const postMessageToIframe = (message: any) => {
+          // sends a message to the iframe's content window to control the video
+          iframe.contentWindow?.postMessage(JSON.stringify(message), "*");
+        };
+
+        const pauseVideo = () => {
+          postMessageToIframe({ event: "command", func: "pauseVideo" });
+        };
+
+        hotSpotDiv.addEventListener("mouseleave", pauseVideo); // Added event listener to pause video on mouse leave
+      } else {
+        // default case supporting text and hyperlink hotspots
+        span.style.maxWidth = "500px";
+      }
+
       hotSpotDiv.appendChild(span);
 
       adjustVerticalPosition(span);
-      adjustWidth(span);
+
+      if (
+        specialCase !== "image" &&
+        specialCase !== "gif" &&
+        specialCase !== "video"
+      ) {
+        adjustWidth(span);
+      }
 
       span.addEventListener("focus", (event) => {
         event.stopPropagation(); // Prevent Pannellum from handling the focus event
@@ -117,89 +176,74 @@ export const useHotspots = () => {
     };
   };
 
-  const addTextHotspot = useCallback(
+  const addHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
       coords: any[],
-      hotspotText: string
+      icon: JSX.Element,
+      content: string,
+      editable: boolean,
+      charLimit: number,
+      specialCase?: "label" | "image" | "gif" | "video",
+      clickHandlerFunc?: () => void
     ) => {
+      let cssClassType;
+      if (specialCase === "label") {
+        cssClassType = "custom-label-tooltip";
+      } else {
+        cssClassType = "custom-hotspot";
+      }
       const hotspot: HotSpot = {
         id: `hotspot-${Date.now()}`,
         pitch: coords[0],
         yaw: coords[1],
         type: "custom",
-        cssClass: "custom-hotspot",
+        cssClass: cssClassType,
         createTooltipFunc: createTooltipFuncFactory(
-          <TiInfoLarge />,
-          hotspotText,
-          true,
-          TEXT_CHAR_LIMIT
+          icon,
+          content,
+          editable,
+          charLimit,
+          specialCase
         ),
+        clickHandlerFunc,
       };
       viewer.addHotSpot(hotspot);
     },
     []
   );
 
+  const addTextHotspot = useCallback(
+    (
+      viewer: { addHotSpot: (arg0: HotSpot) => void },
+      coords: any[],
+      hotspotText: string
+    ) => {
+      addHotspot(
+        viewer,
+        coords,
+        <TiInfoLarge />,
+        hotspotText,
+        true,
+        TEXT_CHAR_LIMIT
+      );
+    },
+    [addHotspot]
+  );
+
   const addLabelHotspot = useCallback(
     (viewer: { addHotSpot: (arg0: HotSpot) => void }, coords: any[]) => {
-      const hotspot: HotSpot = {
-        id: `hotspot-${Date.now()}`,
-        pitch: coords[0],
-        yaw: coords[1],
-        type: "custom",
-        cssClass: "label-tooltip",
-        createTooltipFunc: (hotSpotDiv: HTMLElement) => {
-          hotSpotDiv.innerHTML = "Label annotation";
-          hotSpotDiv.contentEditable = "true";
-          hotSpotDiv.style.top = "50px"; // functional offset
-
-          const limitText = () => {
-            if (hotSpotDiv.innerText.length > LABEL_HYPERLINK_CHAR_LIMIT) {
-              hotSpotDiv.innerText = hotSpotDiv.innerText.slice(
-                0,
-                LABEL_HYPERLINK_CHAR_LIMIT
-              );
-              alert(
-                `Maximum character limit of ${LABEL_HYPERLINK_CHAR_LIMIT} reached.`
-              );
-            }
-          };
-
-          hotSpotDiv.addEventListener("focus", (event) => {
-            event.stopPropagation();
-          });
-
-          hotSpotDiv.addEventListener("keydown", (event) => {
-            event.stopPropagation();
-          });
-
-          hotSpotDiv.addEventListener("blur", () => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const updatedText = hotSpotDiv.innerHTML;
-            adjustVerticalPosition(hotSpotDiv);
-            limitText();
-          });
-
-          hotSpotDiv.addEventListener("input", limitText);
-
-          adjustVerticalPosition(hotSpotDiv);
-        },
-      };
-
-      viewer.addHotSpot(hotspot);
-
-      const hotSpotDiv = document.querySelector(
-        `.pnlm-hotspot[data-id='${hotspot.id}']`
-      ) as HTMLElement;
-      if (hotSpotDiv) {
-        const rect = hotSpotDiv.getBoundingClientRect();
-        const offsetTop = rect.height / 2;
-        hotSpotDiv.style.top = `${coords[0] - offsetTop}px`;
-        hotSpotDiv.style.left = `${coords[1]}px`;
-      }
+      addHotspot(
+        viewer,
+        coords,
+        <></>,
+        "Label annotation",
+        true,
+        LABEL_HYPERLINK_CHAR_LIMIT,
+        "label"
+      );
     },
-    []
+    [addHotspot]
   );
 
   const addHyperlinkHotspot = useCallback(
@@ -209,46 +253,21 @@ export const useHotspots = () => {
       url: string,
       hyperlinkText: string
     ) => {
-      const hotspot: HotSpot = {
-        id: `hotspot-${Date.now()}`,
-        pitch: coords[0],
-        yaw: coords[1],
-        type: "custom",
-        cssClass: "custom-hotspot",
-        createTooltipFunc: (hotSpotDiv: HTMLElement) => {
-          hotSpotDiv.classList.add("custom-tooltip");
-          const iconDiv = document.createElement("div");
-          iconDiv.innerHTML = ReactDOMServer.renderToString(<AiOutlineLink />);
-          iconDiv.style.display = "flex";
-          iconDiv.style.alignItems = "center";
-          iconDiv.style.justifyContent = "center";
-          hotSpotDiv.appendChild(iconDiv);
-
-          const span = document.createElement("span");
-          span.innerHTML = `<a href="${url}" target="_blank">${hyperlinkText}</a>`;
-          hotSpotDiv.appendChild(span);
-
-          adjustVerticalPosition(span);
-          adjustWidth(span);
-
-          const limitText = () => {
-            if (span.innerText.length > LABEL_HYPERLINK_CHAR_LIMIT) {
-              span.innerText = span.innerText.slice(
-                0,
-                LABEL_HYPERLINK_CHAR_LIMIT
-              );
-              alert(
-                `Maximum character limit of ${LABEL_HYPERLINK_CHAR_LIMIT} reached.`
-              );
-            }
-          };
-
-          span.addEventListener("input", limitText);
-        },
-      };
-      viewer.addHotSpot(hotspot);
+      const content = `<a href="${url}" target="_blank">${hyperlinkText}</a>`;
+      addHotspot(
+        viewer,
+        coords,
+        <AiOutlineLink />,
+        content,
+        false,
+        LABEL_HYPERLINK_CHAR_LIMIT,
+        undefined,
+        () => {
+          window.open(url, "_blank");
+        }
+      );
     },
-    []
+    [addHotspot]
   );
 
   const addImageHotspot = useCallback(
@@ -257,40 +276,17 @@ export const useHotspots = () => {
       coords: any[],
       imageUrl: string
     ) => {
-      const hotspot: HotSpot = {
-        id: `hotspot-${Date.now()}`,
-        pitch: coords[0],
-        yaw: coords[1],
-        type: "custom",
-        cssClass: "custom-hotspot",
-        createTooltipFunc: (hotSpotDiv: HTMLElement) => {
-          hotSpotDiv.classList.add("custom-tooltip");
-          const icon = document.createElement("div");
-          icon.innerHTML = ReactDOMServer.renderToString(<AiOutlinePicture />);
-          icon.style.display = "flex";
-          icon.style.alignItems = "center";
-          icon.style.justifyContent = "center";
-          hotSpotDiv.appendChild(icon);
-
-          const span = document.createElement("span");
-          const img = new Image();
-          img.src = imageUrl;
-          img.style.maxWidth = "500px";
-          img.style.maxHeight = "500px";
-          img.style.display = "block";
-          img.onload = () => {
-            const offsetY = -(img.height + 30);
-            span.style.marginTop = `${offsetY}px`;
-          };
-          span.appendChild(img);
-          hotSpotDiv.appendChild(span);
-
-          adjustVerticalPosition(span);
-        },
-      };
-      viewer.addHotSpot(hotspot);
+      addHotspot(
+        viewer,
+        coords,
+        <AiOutlinePicture />,
+        imageUrl,
+        false,
+        LABEL_HYPERLINK_CHAR_LIMIT,
+        "image"
+      );
     },
-    []
+    [addHotspot]
   );
 
   const addGifHotspot = useCallback(
@@ -299,40 +295,36 @@ export const useHotspots = () => {
       coords: any[],
       gifUrl: string
     ) => {
-      const hotspot: HotSpot = {
-        id: `hotspot-${Date.now()}`,
-        pitch: coords[0],
-        yaw: coords[1],
-        type: "custom",
-        cssClass: "custom-hotspot",
-        createTooltipFunc: (hotSpotDiv: HTMLElement) => {
-          hotSpotDiv.classList.add("custom-tooltip");
-          const icon = document.createElement("div");
-          icon.innerHTML = ReactDOMServer.renderToString(<MdOutlineGif />);
-          icon.style.display = "flex";
-          icon.style.alignItems = "center";
-          icon.style.justifyContent = "center";
-          hotSpotDiv.appendChild(icon);
-
-          const span = document.createElement("span");
-          const img = new Image();
-          img.src = gifUrl;
-          img.style.maxWidth = "500px";
-          img.style.maxHeight = "500px";
-          img.style.display = "block";
-          img.onload = () => {
-            const offsetY = -(img.height + 30);
-            span.style.marginTop = `${offsetY}px`;
-          };
-          span.appendChild(img);
-          hotSpotDiv.appendChild(span);
-
-          adjustVerticalPosition(span);
-        },
-      };
-      viewer.addHotSpot(hotspot);
+      addHotspot(
+        viewer,
+        coords,
+        <MdOutlineGif />,
+        gifUrl,
+        false,
+        LABEL_HYPERLINK_CHAR_LIMIT,
+        "gif"
+      );
     },
-    []
+    [addHotspot]
+  );
+
+  const addVideoHotspot = useCallback(
+    (
+      viewer: { addHotSpot: (arg0: HotSpot) => void },
+      coords: any[],
+      videoUrl: string
+    ) => {
+      addHotspot(
+        viewer,
+        coords,
+        <MdOutlineVideoLibrary />,
+        videoUrl,
+        false,
+        LABEL_HYPERLINK_CHAR_LIMIT,
+        "video"
+      );
+    },
+    [addHotspot]
   );
 
   return {
@@ -341,5 +333,6 @@ export const useHotspots = () => {
     addHyperlinkHotspot,
     addImageHotspot,
     addGifHotspot,
+    addVideoHotspot,
   };
 };

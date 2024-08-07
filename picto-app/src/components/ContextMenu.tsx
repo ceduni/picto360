@@ -5,15 +5,12 @@ import {
   AiOutlineFileText,
   AiOutlineLink,
   AiOutlinePicture,
-  AiOutlineSound,
 } from "react-icons/ai";
-import { IoMdCheckboxOutline } from "react-icons/io";
 import {
   MdOutlineVideoLibrary,
   MdOutlineGif,
   MdOutlineLabel,
 } from "react-icons/md";
-import { RiSurveyLine } from "react-icons/ri";
 import { BsCardText } from "react-icons/bs";
 
 interface ContextMenuProps {
@@ -90,14 +87,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       style={{ top: `${y}px`, left: `${x}px` }}
     >
       <ul>
-        <li onClick={() => onMenuItemClick("True_or_False")}>
-          <IoMdCheckboxOutline className="menu-icon" /> Vrai ou faux
-        </li>
         <li onClick={() => onMenuItemClick("Multiple_Choice")}>
-          <AiOutlineUnorderedList className="menu-icon" /> Choix multiples
-        </li>
-        <li onClick={() => onMenuItemClick("Poll")}>
-          <RiSurveyLine className="menu-icon" /> Sondage
+          <AiOutlineUnorderedList className="menu-icon" /> Questionnaire
         </li>
         <li onClick={() => onMenuItemClick("Text_Box")}>
           <BsCardText className="menu-icon" /> Zone de texte
@@ -108,9 +99,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         </li>
         <li onClick={() => onMenuItemClick("Image")}>
           <AiOutlinePicture className="menu-icon" /> Image
-        </li>
-        <li onClick={() => onMenuItemClick("Audio")}>
-          <AiOutlineSound className="menu-icon" /> Audio
         </li>
         <li onClick={() => onMenuItemClick("Gif")}>
           <MdOutlineGif className="menu-icon" /> GIF
@@ -126,7 +114,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           <AiOutlineLink className="menu-icon" /> Lien
         </li>
       </ul>
-    </div>
+    </div> //Merge GIF and Image + Text and Label
   );
 };
 
