@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineGif, MdOutlineVideoLibrary } from "react-icons/md";
+import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
 import { TiInfoLarge } from "react-icons/ti";
 
 interface HotSpot {
@@ -327,6 +327,62 @@ export const useHotspots = () => {
     [addHotspot]
   );
 
+  const addQuestionnaireHotspot = useCallback(
+    (
+      viewer: { addHotSpot: (arg0: HotSpot) => void },
+      coords: any[],
+      question: string,
+      options: string[],
+      correctOption: number,
+      nbOptions: number
+    ) => {
+        
+      const hotspot: HotSpot = {
+        id: `hotspot-${Date.now()}`,
+        pitch: coords[0],
+        yaw: coords[1],
+        type: "custom",
+        cssClass: "custom-hotspot",
+        createTooltipFunc: (hotSpotDiv: HTMLElement) => {
+          hotSpotDiv.classList.add("custom-tooltip");
+          const icon = document.createElement("div");
+          icon.innerHTML = ReactDOMServer.renderToString(<MdOutlineQuestionMark />);
+          icon.style.display = "flex";
+          icon.style.alignItems = "center";
+          icon.style.justifyContent = "center";
+          hotSpotDiv.appendChild(icon);
+          
+          const span = document.createElement("span");
+          const questionElement = document.createElement("div");
+          questionElement.innerText = question;
+    
+          const optionsList = document.createElement("ul");
+          optionsList.style.listStyleType = "upper-alpha";
+          options.forEach((option, index) => {
+            const optionItem = document.createElement("li");
+            optionItem.innerText = option;
+            optionItem.style.cursor = "pointer";
+            optionItem.addEventListener("click", () => {
+              if (index === correctOption) {
+                optionItem.style.color = "green";
+              } else {
+                optionItem.style.color = "red";
+              }
+            });
+            optionsList.appendChild(optionItem);
+          });
+          span.appendChild(questionElement);
+          span.appendChild(optionsList);
+          
+          hotSpotDiv.appendChild(span);
+          adjustVerticalPosition(span);
+        },
+      };
+      viewer.addHotSpot(hotspot);
+    },
+    []
+  );
+
   return {
     addTextHotspot,
     addLabelHotspot,
@@ -334,5 +390,6 @@ export const useHotspots = () => {
     addImageHotspot,
     addGifHotspot,
     addVideoHotspot,
+    addQuestionnaireHotspot,
   };
 };

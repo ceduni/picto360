@@ -87,7 +87,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       style={{ top: `${y}px`, left: `${x}px` }}
     >
       <ul>
-        <li onClick={() => onMenuItemClick("Multiple_Choice")}>
+        <li onClick={() => onMenuItemClick("Questionnaire")}>
           <AiOutlineUnorderedList className="menu-icon" /> Questionnaire
         </li>
         <li onClick={() => onMenuItemClick("Text_Box")}>

@@ -17,6 +17,7 @@ export const usePannellumViewer = (
     addHyperlinkHotspot,
     addImageHotspot,
     addGifHotspot,
+    addQuestionnaireHotspot,
     addVideoHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
@@ -33,7 +34,7 @@ export const usePannellumViewer = (
     x: number;
     y: number;
   } | null>(null);
-  const viewerRefCallback = useRef<any>(null); // Reference to store the viewer instance
+  const viewerRefCallback = useRef<any>(null); // reference to store the viewer instance
 
   const handleContextMenuClick = async (type: string) => {
     if (!viewerRefCallback.current) return;
@@ -93,11 +94,38 @@ export const usePannellumViewer = (
           }
         }
         break;
+
+      case "Questionnaire":
+        const question = prompt("Entrez la question:");
+        const nbOptions = parseInt(prompt("Entrez le nombre d'options (minimum 2):") || "2", 10);
+        
+        const options: string[] = [];
+        for (let i = 0; i < nbOptions; i++) {
+          const option = prompt(`Entrez le texte pour le choix ${i + 1}`);
+          if (option) {
+            options.push(option);
+          } else {
+            alert("Le texte du choix ne peut pas être vide.");
+            return;
+          }
+        }
+
+        const correctOption = parseInt(prompt("Entrez le numéro de la bonne réponse :") || "1", 10) - 1;
+        console.log("Question:", question);
+        console.log("Options:", options);
+        console.log("Correct Option:", correctOption);
+        if (question && options.length >= 1 && correctOption >= 0) {
+          addQuestionnaireHotspot(viewer, coords, question, options, correctOption, nbOptions);
+        } else {
+          alert("erreur");
+        }
+        break;
+
       default:
         break;
     }
     setContextMenuVisible(false);
-    setTargetIconPosition(null); // remove the target icon
+    setTargetIconPosition(null);
   };
 
   const extractYouTubeVideoId = (url: string) => {
