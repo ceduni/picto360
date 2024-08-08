@@ -629,8 +629,11 @@
 
           <h4 class="title">Réalisations</h4>
           <ul>
-            <li>Application du "template" des custom hotspots à Picto 360</li>
-            <ul><li>Texte, étiquette et hyperliens désormais fonctionnels</li></ul>
+            <li>Refactorisation de la documentation sur les "custom hotspots" pour le contexte de Picto 360</li>
+            <ul>
+              <li>Icône (hotspot) personalisée selon le type d'annotation choisi associée à une info-bulle (tooltip) encapsulant le contenu principal de l'annotation</li>
+              <li>Version stable des hotspots de texte, étiquette et hyperliens</li>
+            </ul>
           </ul>
 
           <h4 class="title">Notes</h4>
@@ -650,15 +653,30 @@
           <h4 class="title">Objectifs</h4>
           <ul>
             <li>Préparation d'une version stable de l'application pour la "Foire aux projets 3150: Démo Alpha" de cette semaine</li>
+            <li>Support de tous les types d'annotations de l'image</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
           <ul>
+            <li>Bouton "toggle" permuttant entre le mode édition actuel et le mode prévisualisation (pas encore programmé)</li>
+            <li>Transfert de la logique du hook useImageViewer ainsi que de la création de hotspots dans des hooks séparés</li>
+            <li>Hotspots textuels (texte, étiquette, hyperlien) désormais 100% fonctionnels</li>
+            <li>Hotspots d'images et de GIFs inclus</li>
+            <ul>
+              <li>Édition dynamique des annotations textuelles prise en charge</li>
+            </ul>
+            <li>Réintégration du menu contextuel au sein du clic droit de la souris en tant qu'interface unique de création d'annotations</li>
+            <ul>
+              <li>Addition d'une nouvelle icône de cible à gauche du menu afin d'identifier la position de la future annotation</li>
+              <li>Affichage dynamique du menu contextuel sans dépasser l'écran</li>
+              <li>Retrait des sous-menus</li>
+              <li>Retrait du menu flottant jusqu'à la redéfinition de sa fonction en échange</li>
+            </ul>
           </ul>
 
           <h4 class="title">Notes</h4>
           <ul>
-            <li>Utilité du menu contextuel à redéfinir</li>
+            <li>Feedback de la foire à intégrer au sein de l'application</li>
           </ul>
         </div>
       </section>
@@ -667,37 +685,45 @@
           <h3 class="week-title">Semaine 13 &ndash;
             <time datetime="2024-05-06">Lundi 29 juillet 2024</time>
           </h3>
-          <p>Implémentation: Infrastructure & Développement de l'application</p>
+          <p>Validation: Tests & Rapports</p>
         </header>
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
-            <li>Préparation d'une version stable de l'application pour la "Foire aux projets 3150: Démo Alpha" de la semaine prochaine</li>
-            <li>Support de tous les types d'annotations de l'image</li>
+            <li>Finaliser les formulaires et annotations vidéos</li>
+            <li>Composant React d'édition d'annotation</li>
+            <li>Fonction de sauvegarde d'état du projet (backend)</li>
+            <ul>
+              <li>Cibler la mise à jour d'un élément précis en évitant d'écraser les données du projet entier</li>
+            </ul>
           </ul>
 
           <h4 class="title">Réalisations</h4>
           <ul>
+            <li>Version initiale d'un formulaire avec entrées saisies par l'invite de texte de navigateur web</li>
+            <li>Prise en charge des hotspots de vidéos</li>
+            <li>Épuration des options excédentaires du menu contextuel (audio et sondage)</li>
           </ul>
 
           <h4 class="title">Notes</h4>
           <ul>
-            <li>Utilité du menu contextuel à redéfinir</li>
+            <li>Menu flottant à réintégrer éventuellement afin de simplifier l'UX liée aux annotations</li>
           </ul>
         </div>
       </section>
       <section class="week">
         <header class="week-header">
           <h3 class="week-title">Semaine 14 &ndash;
-            <time datetime="2024-05-06">Lundi 1 août 2024</time>
+            <time datetime="2024-05-06">Lundi 5 août 2024</time>
           </h3>
-          <p>Implémentation: Infrastructure & Développement de l'application</p>
+          <p>Validation: Tests & Rapports</p>
         </header>
         <div class="week-content">
           <h4 class="title">Objectifs</h4>
           <ul>
-            <li>Préparation d'une version stable de l'application pour la "Foire aux projets 3150: Démo Alpha" de la semaine prochaine</li>
-            <li>Support de tous les types d'annotations de l'image</li>
+            <li>Rédaction complète du rapport</li>
+            <li>Composant React d'édition d'annotation</li>
+            <li>Fonction de sauvegarde d'état du projet (backend)</li>
           </ul>
 
           <h4 class="title">Réalisations</h4>
@@ -706,7 +732,7 @@
 
           <h4 class="title">Notes</h4>
           <ul>
-            <li>Utilité du menu contextuel à redéfinir</li>
+            <li></li>
           </ul>
         </div>
       </section>
@@ -715,7 +741,7 @@
 
   <footer class="page-footer">
     <a href="https://github.com/ceduni/picto360" target="_blank">Répertoire GitHub</a>
-    <p>Dernière mise à jour: 17 juillet 2024</p>
+    <p>Dernière mise à jour: 8 août 2024</p>
   </footer>
 
   <script>
