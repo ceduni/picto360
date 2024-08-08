@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="images/logo_picto360.png" width="300">
+    <img src="docs/images/logo_picto360.png" width="300">
 </p>
 
 # Picto360: Application d'annotation d'image
