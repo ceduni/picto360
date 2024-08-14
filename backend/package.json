@@ -12,10 +12,12 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/mongodb": "^8.0.0",
+    "@google-cloud/local-auth": "^2.1.0",
     "fastify": "^4.28.0",
     "fastify-cli": "^6.2.1",
     "fastify-env": "^2.2.0",
     "fastify-mongodb": "^4.2.0",
+    "googleapis": "^105.0.0",
     "ts-loader": "^9.5.1"
   },
   "devDependencies": {
