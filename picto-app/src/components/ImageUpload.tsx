@@ -5,7 +5,7 @@ import { GrOnedrive } from "react-icons/gr";
 import "./css/ImageUpload.css";
 
 interface ImageUploadProps {
-  onImageUpload: (imageSrc: string) => void;
+  onImageUpload: (imageSrc: string) => void; // Ajout du chemin de l'image
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
@@ -33,6 +33,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
 
   const processFile = (file: File) => {
     const url = URL.createObjectURL(file);
+    console.log("File uploaded: ", url);
     onImageUpload(url);
     setShowPopup(false);
   };

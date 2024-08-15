@@ -14,7 +14,7 @@ const App = () => {
 
   return (
     <div className="App">
-      {imageSrc && <Toolbar />}
+      {imageSrc && <Toolbar imageSrc={imageSrc}/>}
       <div className="App-body">
         {imageSrc ? (
           <ImageViewer width="100%" height="100%" imageSrc={imageSrc} />

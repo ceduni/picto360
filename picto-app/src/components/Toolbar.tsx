@@ -10,7 +10,12 @@ import {
 } from "react-icons/io5";
 import { PiExport } from "react-icons/pi";
 
-const Toolbar = () => {
+interface ToolbarProps {
+  imageSrc: string | null;
+}
+
+const Toolbar: React.FC<ToolbarProps> = ({ imageSrc }) => {
+
   const [isSliderEnabled, setIsSliderEnabled] = useState(true);
   const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsSliderEnabled(event.target.checked);
@@ -32,6 +37,58 @@ const Toolbar = () => {
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 1500);
   };
+
+  const handleExport = async (imageSrc: string | null) => {
+    if (!imageSrc) {
+      alert('No image to export');
+      return;
+    }
+  
+    try {
+      console.log('Starting export process...');
+  
+      // Récupérer le blob de l'image
+      const response = await fetch(imageSrc);
+      const blob = await response.blob();
+      console.log('Blob retrieved:', blob);
+  
+      const formData = new FormData();
+      formData.append('file', blob, 'image_projet_picto360.png');
+      console.log('FormData prepared:', formData);
+  
+      // Vérification que le FormData contient bien le fichier
+      for (let key of formData.keys()) {
+        console.log(key, formData.get(key));
+      }
+  
+      const exportResponse = await fetch('http://localhost:3001/export', {
+        method: 'POST',
+        body: formData,
+      });
+      console.log('Export request sent...');
+  
+      if (!exportResponse.ok) {
+        throw new Error(`Failed to export file: ${exportResponse.statusText}`);
+      }
+  
+      const data = await exportResponse.json();
+      console.log('Response received:', data);
+  
+      if (data.success) {
+        alert('File exported successfully!');
+      } else {
+        alert('Failed to export file: ' + data.error);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error exporting file:', error.message);
+        alert('An error occurred while exporting the file: ' + error.message + '. Please check your internet connection or try again later.');
+      } else {
+        console.error('Unknown error exporting file:', error);
+        alert('An unknown error occurred while exporting the file. Please try again.');
+      }
+    }
+  };    
 
   return (
     <div className="toolbar">
@@ -67,7 +124,10 @@ const Toolbar = () => {
                 <IoSaveOutline />
             )}
           </li>
-          <li className="toolbar-li toolbar-button">
+          <li 
+            className="toolbar-li toolbar-button"
+            onClick={() => handleExport(imageSrc)}
+          >
             <PiExport />
           </li>
           <li

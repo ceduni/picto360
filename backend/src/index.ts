@@ -33,6 +33,9 @@ const start = async () => {
 start();
 */
 
+import fastifyMultipart from '@fastify/multipart';
+import fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
 import { promises as fsPromises } from 'fs';
 import * as fs from 'fs';
 import path from 'path';
@@ -41,18 +44,27 @@ import { google, drive_v3 } from 'googleapis';
 import { authenticate } from '@google-cloud/local-auth';
 import { OAuth2Client } from 'google-auth-library';
 
-// If modifying these scopes, delete token.json.
+const app = fastify({
+  logger: true,
+  bodyLimit: 104857600, // 100 MB
+});
+
+app.register(fastifyCors, {
+  origin: 'http://localhost:5173', // Autoriser votre frontend
+  methods: ['GET', 'POST'], // Autoriser les méthodes GET et POST
+});
+
+app.register(fastifyMultipart, {
+  attachFieldsToBody: true,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // Limite de 50 MB
+  },
+});
+
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first time.
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
-/**
- * Reads previously authorized credentials from the save file.
- *
- * @return {Promise<OAuth2Client | null>}
- */
 async function loadSavedCredentialsIfExist(): Promise<OAuth2Client | null> {
   try {
     const content = await fsPromises.readFile(TOKEN_PATH, 'utf8');
@@ -63,12 +75,6 @@ async function loadSavedCredentialsIfExist(): Promise<OAuth2Client | null> {
   }
 }
 
-/**
- * Serializes credentials to a file compatible with GoogleAuth.fromJSON.
- *
- * @param {OAuth2Client} client
- * @return {Promise<void>}
- */
 async function saveCredentials(client: OAuth2Client): Promise<void> {
   const content = await fsPromises.readFile(CREDENTIALS_PATH, 'utf8');
   const keys = JSON.parse(content);
@@ -82,11 +88,6 @@ async function saveCredentials(client: OAuth2Client): Promise<void> {
   await fsPromises.writeFile(TOKEN_PATH, payload, 'utf8');
 }
 
-/**
- * Load or request or authorization to call APIs.
- *
- * @return {Promise<OAuth2Client>}
- */
 async function authorize(): Promise<OAuth2Client> {
   let client = await loadSavedCredentialsIfExist();
   if (client) {
@@ -102,36 +103,6 @@ async function authorize(): Promise<OAuth2Client> {
   return client;
 }
 
-/**
- * Lists the names and IDs of up to 10 files.
- * @param {OAuth2Client} authClient An authorized OAuth2 client.
- * @return {Promise<void>}
- */
-async function listFiles(authClient: OAuth2Client): Promise<void> {
-  const drive = google.drive({ version: 'v3', auth: authClient });
-  const res = await drive.files.list({
-    pageSize: 10,
-    fields: 'nextPageToken, files(id, name)',
-  });
-  const files = res.data.files;
-  if (!files || files.length === 0) {
-    console.log('No files found.');
-    return;
-  }
-
-  console.log('Files:');
-  files.map((file) => {
-    console.log(`${file.name} (${file.id})`);
-  });
-}
-
-/**
- * Uploads a file to Google Drive.
- * @param {OAuth2Client} authClient An authorized OAuth2 client.
- * @param {string} fileName The name of the file to be uploaded.
- * @param {string} filePath The path of the file to be uploaded.
- * @return {Promise<drive_v3.Schema$File>}
- */
 async function uploadFile(authClient: OAuth2Client, fileName: string, filePath: string): Promise<drive_v3.Schema$File> {
   const drive = google.drive({ version: 'v3', auth: authClient });
   const fileMetadata = {
@@ -152,13 +123,91 @@ async function uploadFile(authClient: OAuth2Client, fileName: string, filePath: 
   return file.data;
 }
 
-authorize().then(async (authClient) => {
-  // List files
-  await listFiles(authClient);
+// Définir un type pour les paramètres de requête
+interface OAuth2CallbackQuery {
+  code: string;
+}
 
-  // Upload a file
-  const fileName = 'logo_picto360.png'; // Replace with your file name
-  const filePath = '../docs/images/logo_picto360.png'; // Replace with your file path
+// Route pour gérer la redirection OAuth2
+app.get<{ Querystring: OAuth2CallbackQuery }>('/', async (request, reply) => {
+  const { code } = request.query;
 
-  await uploadFile(authClient, fileName, filePath);
-}).catch(console.error);
+  try {
+    const client = await authorize();
+    const { tokens } = await client.getToken(code);
+    client.setCredentials(tokens);
+
+    await saveCredentials(client);
+
+    reply.type('text/html').send(`
+      <html>
+        <body>
+          <script>
+            window.close();
+          </script>
+          <p>L'authentification est réussie. Vous pouvez fermer cette page.</p>
+        </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('Error during OAuth2 callback:', error);
+    reply.status(500).send('Authentication failed.');
+  }
+});
+
+// API d'exportation
+app.post('/export', async (request, reply) => {
+  try {
+    console.log('Received export request...');
+
+    // Récupérer le fichier téléchargé via la requête
+    const file = await request.file();
+    
+    if (!file) {
+      throw new Error('No file provided');
+    }
+
+    console.log('File data received:', file.filename);
+
+    // Créer un chemin pour le fichier temporaire
+    const tempFilePath = path.join(process.cwd(), file.filename || 'temp_image.png');
+    
+    // Convertir le fichier en buffer
+    const buffer = await file.toBuffer();
+    console.log('File buffer created with length:', buffer.length);
+
+    // Écrire le buffer dans un fichier temporaire
+    await fsPromises.writeFile(tempFilePath, buffer);
+    console.log('File written to temp path:', tempFilePath);
+
+    // Autorisation Google Drive
+    const authClient = await authorize();
+    console.log('Authorization successful');
+
+    // Téléverser le fichier sur Google Drive
+    const uploadedFile = await uploadFile(authClient, file.filename || 'image_projet_picto360.png', tempFilePath);
+    console.log('File uploaded to Google Drive:', uploadedFile);
+
+    // Supprimer le fichier temporaire après l'upload
+    await fsPromises.unlink(tempFilePath);
+    console.log('Temp file deleted:', tempFilePath);
+
+    reply.send({ success: true, file: uploadedFile });
+  } catch (error) {
+    console.error('Error during file upload:', (error as Error).message);
+    reply.status(500).send({ success: false, error: (error as Error).message });
+  }
+});
+
+
+const start = async () => {
+  try {
+    await app.listen({ port: 3001 });
+    app.log.info(`Server listening on http://localhost:3001`);
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();

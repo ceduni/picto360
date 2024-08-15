@@ -105,10 +105,13 @@
 }
 
 .bouton-lien {
-    margin-top: 5px;
-    margin-left: 30px;
-    width: 150px;
+    width: 200px;
     cursor: pointer;
+    background-color: #1f76fd;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border-radius: 5px;
 }
 
 #acces-lien,
@@ -124,18 +127,21 @@
     border: none;
     color: white;
 }
+
 .toggle-slider-container {
     display: flex;
     align-items: center;
-    margin-left: 5px;
+    justify-content: center;
+    height: 100%;
 }
   
 .toggle-slider {
     position: relative;
-    display: inline-block;
+    align-items: center;
+    justify-content: center;
     width: 45px;
     height: 25.5px;
-    margin-left: 5px;
+    top: 5px;
 }
   
 .toggle-slider input {
