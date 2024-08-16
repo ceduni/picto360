@@ -1,7 +1,11 @@
 import { useCallback } from "react";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
+import {
+  MdOutlineGif,
+  MdOutlineVideoLibrary,
+  MdOutlineQuestionMark,
+} from "react-icons/md";
 import { TiInfoLarge } from "react-icons/ti";
 
 interface HotSpot {
@@ -93,10 +97,10 @@ export const useHotspots = () => {
     content: string,
     editable: boolean,
     charLimit: number,
-    specialCase?: "label" | "image" | "gif" | "video"
+    annotationType?: "text" | "label" | "image" | "gif" | "video" | "form"
   ) => {
     return (hotSpotDiv: HTMLElement) => {
-      if (specialCase !== "label") {
+      if (annotationType !== "label") {
         hotSpotDiv.classList.add("custom-tooltip");
         const iconDiv = document.createElement("div");
         iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
@@ -114,7 +118,7 @@ export const useHotspots = () => {
         handleBlurOrEnter(span, charLimit);
       }
 
-      if (specialCase === "image" || specialCase === "gif") {
+      if (annotationType === "image" || annotationType === "gif") {
         const img = new Image();
         img.src = content;
         img.style.maxWidth = "500px";
@@ -126,7 +130,7 @@ export const useHotspots = () => {
         };
         span.innerHTML = "";
         span.appendChild(img);
-      } else if (specialCase === "video") {
+      } else if (annotationType === "video") {
         const iframe = document.createElement("iframe");
         iframe.src = `${content}?enablejsapi=1`; // added ?enablejsapi=1 to enable YouTube iframe API
         iframe.width = "640px";
@@ -159,9 +163,9 @@ export const useHotspots = () => {
       adjustVerticalPosition(span);
 
       if (
-        specialCase !== "image" &&
-        specialCase !== "gif" &&
-        specialCase !== "video"
+        annotationType !== "image" &&
+        annotationType !== "gif" &&
+        annotationType !== "video"
       ) {
         adjustWidth(span);
       }
@@ -184,11 +188,11 @@ export const useHotspots = () => {
       content: string,
       editable: boolean,
       charLimit: number,
-      specialCase?: "label" | "image" | "gif" | "video",
+      annotationType?: "text" | "label" | "image" | "gif" | "video" | "form",
       clickHandlerFunc?: () => void
     ) => {
       let cssClassType;
-      if (specialCase === "label") {
+      if (annotationType === "label") {
         cssClassType = "custom-label-tooltip";
       } else {
         cssClassType = "custom-hotspot";
@@ -204,7 +208,7 @@ export const useHotspots = () => {
           content,
           editable,
           charLimit,
-          specialCase
+          annotationType
         ),
         clickHandlerFunc,
       };
@@ -327,16 +331,16 @@ export const useHotspots = () => {
     [addHotspot]
   );
 
-  const addQuestionnaireHotspot = useCallback(
+  const addFormHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
       coords: any[],
       question: string,
       options: string[],
       correctOption: number,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       nbOptions: number
     ) => {
-        
       const hotspot: HotSpot = {
         id: `hotspot-${Date.now()}`,
         pitch: coords[0],
@@ -346,16 +350,18 @@ export const useHotspots = () => {
         createTooltipFunc: (hotSpotDiv: HTMLElement) => {
           hotSpotDiv.classList.add("custom-tooltip");
           const icon = document.createElement("div");
-          icon.innerHTML = ReactDOMServer.renderToString(<MdOutlineQuestionMark />);
+          icon.innerHTML = ReactDOMServer.renderToString(
+            <MdOutlineQuestionMark />
+          );
           icon.style.display = "flex";
           icon.style.alignItems = "center";
           icon.style.justifyContent = "center";
           hotSpotDiv.appendChild(icon);
-          
+
           const span = document.createElement("span");
           const questionElement = document.createElement("div");
           questionElement.innerText = question;
-    
+
           const optionsList = document.createElement("ul");
           optionsList.style.listStyleType = "upper-alpha";
           options.forEach((option, index) => {
@@ -373,7 +379,7 @@ export const useHotspots = () => {
           });
           span.appendChild(questionElement);
           span.appendChild(optionsList);
-          
+
           hotSpotDiv.appendChild(span);
           adjustVerticalPosition(span);
         },
@@ -390,6 +396,6 @@ export const useHotspots = () => {
     addImageHotspot,
     addGifHotspot,
     addVideoHotspot,
-    addQuestionnaireHotspot,
+    addFormHotspot,
   };
 };

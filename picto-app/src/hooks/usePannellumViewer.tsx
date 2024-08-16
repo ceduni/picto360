@@ -17,7 +17,7 @@ export const usePannellumViewer = (
     addHyperlinkHotspot,
     addImageHotspot,
     addGifHotspot,
-    addQuestionnaireHotspot,
+    addFormHotspot,
     addVideoHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
@@ -36,13 +36,55 @@ export const usePannellumViewer = (
   } | null>(null);
   const viewerRefCallback = useRef<any>(null); // reference to store the viewer instance
 
-  const handleContextMenuClick = async (type: string) => {
+  const handleContextMenuClick = async (annotationType: string) => {
     if (!viewerRefCallback.current) return;
 
     const viewer = viewerRefCallback.current;
     const { pitch, yaw } = contextMenuCoordsRef.current;
     const coords = [pitch, yaw];
-    switch (type) {
+    switch (annotationType) {
+      case "Form":
+        // eslint-disable-next-line no-case-declarations
+        const question = prompt("Entrez la question:");
+        // eslint-disable-next-line no-case-declarations
+        const nbOptions = parseInt(
+          prompt("Entrez le nombre d'options (minimum 2):") || "2",
+          10
+        );
+        // eslint-disable-next-line no-case-declarations
+        const options: string[] = [];
+        for (let i = 0; i < nbOptions; i++) {
+          const option = prompt(`Entrez le texte pour le choix ${i + 1}`);
+          if (option) {
+            options.push(option);
+          } else {
+            alert("Le texte du choix ne peut pas être vide.");
+            return;
+          }
+        }
+
+        // eslint-disable-next-line no-case-declarations
+        const correctOption =
+          parseInt(
+            prompt("Entrez le numéro de la bonne réponse :") || "1",
+            10
+          ) - 1;
+        console.log("Question:", question);
+        console.log("Options:", options);
+        console.log("Correct Option:", correctOption);
+        if (question && options.length >= 1 && correctOption >= 0) {
+          addFormHotspot(
+            viewer,
+            coords,
+            question,
+            options,
+            correctOption,
+            nbOptions
+          );
+        } else {
+          alert("erreur");
+        }
+        break;
       case "Text":
         addTextHotspot(viewer, coords, "Default text content");
         break;
@@ -94,33 +136,6 @@ export const usePannellumViewer = (
           }
         }
         break;
-
-      case "Questionnaire":
-        const question = prompt("Entrez la question:");
-        const nbOptions = parseInt(prompt("Entrez le nombre d'options (minimum 2):") || "2", 10);
-        
-        const options: string[] = [];
-        for (let i = 0; i < nbOptions; i++) {
-          const option = prompt(`Entrez le texte pour le choix ${i + 1}`);
-          if (option) {
-            options.push(option);
-          } else {
-            alert("Le texte du choix ne peut pas être vide.");
-            return;
-          }
-        }
-
-        const correctOption = parseInt(prompt("Entrez le numéro de la bonne réponse :") || "1", 10) - 1;
-        console.log("Question:", question);
-        console.log("Options:", options);
-        console.log("Correct Option:", correctOption);
-        if (question && options.length >= 1 && correctOption >= 0) {
-          addQuestionnaireHotspot(viewer, coords, question, options, correctOption, nbOptions);
-        } else {
-          alert("erreur");
-        }
-        break;
-
       default:
         break;
     }
@@ -158,7 +173,7 @@ export const usePannellumViewer = (
       },
     });
 
-    viewerRefCallback.current = viewer; // Store the viewer instance
+    viewerRefCallback.current = viewer; // stores the viewer instance
 
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault();
