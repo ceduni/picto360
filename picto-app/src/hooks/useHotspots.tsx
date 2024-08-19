@@ -334,7 +334,7 @@ export const useHotspots = () => {
       question: string,
       options: string[],
       correctOption: number,
-      nbOptions: number
+      //nbOptions: number
     ) => {
         
       const hotspot: HotSpot = {

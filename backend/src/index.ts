@@ -158,39 +158,13 @@ app.get<{ Querystring: OAuth2CallbackQuery }>('/', async (request, reply) => {
 // API d'exportation
 app.post('/export', async (request, reply) => {
   try {
-    console.log('Received export request...');
-
-    // Récupérer le fichier téléchargé via la requête
-    const file = await request.file();
-    
-    if (!file) {
-      throw new Error('No file provided');
-    }
-
-    console.log('File data received:', file.filename);
-
-    // Créer un chemin pour le fichier temporaire
-    const tempFilePath = path.join(process.cwd(), file.filename || 'temp_image.png');
-    
-    // Convertir le fichier en buffer
-    const buffer = await file.toBuffer();
-    console.log('File buffer created with length:', buffer.length);
-
-    // Écrire le buffer dans un fichier temporaire
-    await fsPromises.writeFile(tempFilePath, buffer);
-    console.log('File written to temp path:', tempFilePath);
-
     // Autorisation Google Drive
     const authClient = await authorize();
     console.log('Authorization successful');
 
     // Téléverser le fichier sur Google Drive
-    const uploadedFile = await uploadFile(authClient, file.filename || 'image_projet_picto360.png', tempFilePath);
+    const uploadedFile = await uploadFile(authClient,'image_projet_picto360.png', '../picto-app/public/Sommets St-Sauveur (Avila).JPG');
     console.log('File uploaded to Google Drive:', uploadedFile);
-
-    // Supprimer le fichier temporaire après l'upload
-    await fsPromises.unlink(tempFilePath);
-    console.log('Temp file deleted:', tempFilePath);
 
     reply.send({ success: true, file: uploadedFile });
   } catch (error) {

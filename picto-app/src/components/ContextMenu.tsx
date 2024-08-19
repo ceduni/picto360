@@ -90,18 +90,12 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         <li onClick={() => onMenuItemClick("Questionnaire")}>
           <AiOutlineUnorderedList className="menu-icon" /> Questionnaire
         </li>
-        <li onClick={() => onMenuItemClick("Text_Box")}>
-          <BsCardText className="menu-icon" /> Zone de texte
-        </li>
         <hr className="menu-separator" />
         <li onClick={() => onMenuItemClick("Video")}>
           <MdOutlineVideoLibrary className="menu-icon" /> Vidéo
         </li>
         <li onClick={() => onMenuItemClick("Image")}>
           <AiOutlinePicture className="menu-icon" /> Image
-        </li>
-        <li onClick={() => onMenuItemClick("Gif")}>
-          <MdOutlineGif className="menu-icon" /> GIF
         </li>
         <hr className="menu-separator" />
         <li onClick={() => onMenuItemClick("Text")}>
