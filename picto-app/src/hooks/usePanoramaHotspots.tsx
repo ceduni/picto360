@@ -18,10 +18,10 @@ interface HotSpot {
   targetYaw?: number;
   targetPitch?: number;
   cssClass?: string;
-  clickHandlerFunc?: (args: any) => void;
-  clickHandlerArgs?: any;
-  createTooltipFunc?: (hotSpotDiv: HTMLElement, args?: any) => void;
-  createTooltipArgs?: any;
+  clickHandlerFunc?: (args: never) => void;
+  clickHandlerArgs?: never;
+  createTooltipFunc?: (hotSpotDiv: HTMLElement, args?: never) => void;
+  createTooltipArgs?: never;
   id: string;
 }
 
@@ -121,6 +121,7 @@ export const useHotspots = () => {
       if (annotationType === "image" || annotationType === "gif") {
         const img = new Image();
         img.src = content;
+        img.loading = "lazy";
         img.style.maxWidth = "500px";
         img.style.maxHeight = "500px";
         img.style.display = "block";
@@ -135,6 +136,7 @@ export const useHotspots = () => {
         iframe.src = `${content}?enablejsapi=1`; // added ?enablejsapi=1 to enable YouTube iframe API
         iframe.width = "640px";
         iframe.height = "360px";
+        iframe.loading = "lazy";
         iframe.style.display = "block";
         iframe.onload = () => {
           const offsetY = -(iframe.height + 30);
@@ -143,7 +145,7 @@ export const useHotspots = () => {
         span.innerHTML = "";
         span.appendChild(iframe);
 
-        const postMessageToIframe = (message: any) => {
+        const postMessageToIframe = (message: unknown) => {
           // sends a message to the iframe's content window to control the video
           iframe.contentWindow?.postMessage(JSON.stringify(message), "*");
         };
@@ -171,11 +173,11 @@ export const useHotspots = () => {
       }
 
       span.addEventListener("focus", (event) => {
-        event.stopPropagation(); // Prevent Pannellum from handling the focus event
+        event.stopPropagation(); // prevent Pannellum from handling the focus event
       });
 
       span.addEventListener("keydown", (event) => {
-        event.stopPropagation(); // Prevent Pannellum from handling the keydown event
+        event.stopPropagation(); // prevent Pannellum from handling the keydown event
       });
     };
   };
@@ -183,7 +185,7 @@ export const useHotspots = () => {
   const addHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       icon: JSX.Element,
       content: string,
       editable: boolean,
@@ -220,7 +222,7 @@ export const useHotspots = () => {
   const addTextHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       hotspotText: string
     ) => {
       addHotspot(
@@ -236,7 +238,7 @@ export const useHotspots = () => {
   );
 
   const addLabelHotspot = useCallback(
-    (viewer: { addHotSpot: (arg0: HotSpot) => void }, coords: any[]) => {
+    (viewer: { addHotSpot: (arg0: HotSpot) => void }, coords: never[]) => {
       addHotspot(
         viewer,
         coords,
@@ -253,7 +255,7 @@ export const useHotspots = () => {
   const addHyperlinkHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       url: string,
       hyperlinkText: string
     ) => {
@@ -277,7 +279,7 @@ export const useHotspots = () => {
   const addImageHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       imageUrl: string
     ) => {
       addHotspot(
@@ -296,7 +298,7 @@ export const useHotspots = () => {
   const addGifHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       gifUrl: string
     ) => {
       addHotspot(
@@ -315,7 +317,7 @@ export const useHotspots = () => {
   const addVideoHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       videoUrl: string
     ) => {
       addHotspot(
@@ -334,12 +336,11 @@ export const useHotspots = () => {
   const addFormHotspot = useCallback(
     (
       viewer: { addHotSpot: (arg0: HotSpot) => void },
-      coords: any[],
+      coords: never[],
       question: string,
       options: string[],
       correctOption: number,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      nbOptions: number
+      //nbOptions: number
     ) => {
       const hotspot: HotSpot = {
         id: `hotspot-${Date.now()}`,

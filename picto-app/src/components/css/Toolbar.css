@@ -21,7 +21,7 @@
 }
 
 .logo {
-    width: 40px;
+    width: auto;
     height: auto;
     margin-right: 10px;
 }
@@ -44,7 +44,7 @@
 }
 
 .toolbar-button:hover {
-    color: #1f76fd;
+    color: #1c73fa;
 }
 
 .ul {
@@ -105,10 +105,13 @@
 }
 
 .bouton-lien {
-    margin-top: 5px;
-    margin-left: 30px;
-    width: 150px;
+    width: 200px;
     cursor: pointer;
+    background-color: #1f76fd;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border-radius: 5px;
 }
 
 #acces-lien,
@@ -124,26 +127,29 @@
     border: none;
     color: white;
 }
+
 .toggle-slider-container {
     display: flex;
     align-items: center;
-    margin-left: 5px;
+    justify-content: center;
+    height: 100%;
 }
-  
+
 .toggle-slider {
     position: relative;
-    display: inline-block;
+    align-items: center;
+    justify-content: center;
     width: 45px;
     height: 25.5px;
-    margin-left: 5px;
+    top: 5px;
 }
-  
+
 .toggle-slider input {
     opacity: 0;
     width: 0;
     height: 0;
 }
-  
+
 .slider {
     position: absolute;
     cursor: pointer;
@@ -173,7 +179,7 @@
     bottom: 2px;
     right: 4px;
 }
-  
+
 .slider:before {
     position: absolute;
     content: "";
@@ -189,11 +195,11 @@
     justify-content: center;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: #1f76fd;
 }
-  
-input:checked + .slider:before {
+
+input:checked+.slider:before {
     transform: translateX(19.5px);
 }
 

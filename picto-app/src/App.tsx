@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Toolbar from "@components/Toolbar";
-import ImageViewer from "@components/ImageViewer";
-import ImageUpload from "@components/ImageUpload";
+import PanoramaViewer from "@components/PanoramaViewer";
+import ImageUploader from "@components/ImageUploader";
 import BottomBar from "@components/BottomBar";
 import "./App.css";
 
@@ -14,12 +14,12 @@ const App = () => {
 
   return (
     <div className="App">
-      {imageSrc && <Toolbar />}
+      {imageSrc && <Toolbar imageSrc={imageSrc}/>}
       <div className="App-body">
         {imageSrc ? (
-          <ImageViewer width="100%" height="100%" imageSrc={imageSrc} />
+          <PanoramaViewer width="100%" height="100%" imageSrc={imageSrc} />
         ) : (
-          <ImageUpload onImageUpload={handleImageUpload} />
+          <ImageUploader onImageUpload={handleImageUpload} />
         )}
       </div>
       {imageSrc && <BottomBar />}

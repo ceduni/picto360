@@ -1,14 +1,20 @@
 import React, { useState, useRef } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
-import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
+import {
+  FaCamera,
+  FaFileImport,
+  FaGoogleDrive,
+  FaDropbox,
+} from "react-icons/fa";
 import { GrOnedrive } from "react-icons/gr";
-import "./css/ImageUpload.css";
+import ParticlesBackground from "./ui/ParticlesBackground";
+import "./css/ImageUploader.css";
 
-interface ImageUploadProps {
+interface ImageUploaderProps {
   onImageUpload: (imageSrc: string) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   const [showPopup, setShowPopup] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +39,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
 
   const processFile = (file: File) => {
     const url = URL.createObjectURL(file);
+    console.log("File uploaded: ", url);
     onImageUpload(url);
     setShowPopup(false);
   };
@@ -46,8 +53,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
   return (
     showPopup && (
       <div className="modal">
+        <ParticlesBackground />
         <div className="modal-content">
-          <img id="logo" src="/logo_picto360.png" alt="Logo" />
+          <img id="logo" src="/images/logo_picto360.png" alt="Logo" />
           <div
             className={`drop-zone ${isDragging ? "dragging" : ""}`}
             onDragOver={(event) => handleDragEvents(event, true)}
@@ -83,4 +91,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
   );
 };
 
-export default ImageUpload;
+export default React.memo(ImageUploader);

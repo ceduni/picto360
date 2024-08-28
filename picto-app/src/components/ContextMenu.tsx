@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import "./css/ContextMenu.css";
 import {
   AiOutlineUnorderedList,
@@ -11,7 +11,6 @@ import {
   MdOutlineGif,
   MdOutlineLabel,
 } from "react-icons/md";
-import { BsCardText } from "react-icons/bs";
 
 interface ContextMenuProps {
   visible: boolean;
@@ -31,22 +30,25 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const horizontalOffset = 30;
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
       if (
         contextMenuRef.current &&
         !contextMenuRef.current.contains(event.target as Node)
       ) {
         onClose();
       }
-    };
+    },
+    [onClose]
+  );
 
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [onClose]);
+  }, [handleClickOutside]);
 
   useEffect(() => {
     if (contextMenuRef.current) {
@@ -87,11 +89,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       style={{ top: `${y}px`, left: `${x}px` }}
     >
       <ul>
-        <li onClick={() => onMenuItemClick("Questionnaire")}>
+        <li onClick={() => onMenuItemClick("Form")}>
           <AiOutlineUnorderedList className="menu-icon" /> Questionnaire
-        </li>
-        <li onClick={() => onMenuItemClick("Text_Box")}>
-          <BsCardText className="menu-icon" /> Zone de texte
         </li>
         <hr className="menu-separator" />
         <li onClick={() => onMenuItemClick("Video")}>
@@ -114,8 +113,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           <AiOutlineLink className="menu-icon" /> Lien
         </li>
       </ul>
-    </div> //Merge GIF and Image + Text and Label
+    </div>
   );
 };
 
-export default ContextMenu;
+export default React.memo(ContextMenu);

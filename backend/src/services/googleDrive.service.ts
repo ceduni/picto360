@@ -16,7 +16,6 @@ async function loadSavedCredentialsIfExist(): Promise<OAuth2Client | null> {
     const content = await fsPromises.readFile(TOKEN_PATH, "utf8");
     const credentials = JSON.parse(content);
     return google.auth.fromJSON(credentials) as OAuth2Client;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return null;
   }

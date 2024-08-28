@@ -1,107 +1,324 @@
-import React, { useState } from "react";
-import "./css/Toolbar.css";
-import { LuEye, LuCheck } from "react-icons/lu";
-import { FaPencil } from "react-icons/fa6";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
-  IoSettingsSharp,
-  IoSaveOutline,
-  IoShareSocialSharp,
-  IoClose,
-} from "react-icons/io5";
-import { PiExport } from "react-icons/pi";
+  AppBar,
+  Toolbar as MUIToolbar,
+  Typography,
+  IconButton,
+  InputBase,
+  Box,
+  Tooltip,
+  Modal,
+  Fade,
+} from "@mui/material";
+import {
+  SaveOutlined as SaveIcon,
+  Share as ShareIcon,
+  Settings as SettingsIcon,
+  Cancel as CancelIcon,
+  FileUpload as ExportIcon,
+  Done as CheckIcon,
+} from "@mui/icons-material";
+import logo from "/images/logo_picto360.png";
+import CustomSwitch from "./ui/CustomSwitch";
 
-const Toolbar = () => {
+interface ToolbarProps {
+  imageSrc: string | null;
+}
+
+const Toolbar: React.FC<ToolbarProps> = ({ imageSrc }) => {
   const [isSliderEnabled, setIsSliderEnabled] = useState(true);
-  const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsSliderEnabled(event.target.checked);
-  };
-
   const [showShareOptions, setShowShareOptions] = useState(false);
-  const toggleShareOptions = () => {
-    setShowShareOptions((prev) => !prev);
-  };
-
-  const [projectTitle, setProjectTitle] = useState("Projet#1.picto");
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setProjectTitle(event.target.value);
-  };
-
-
+  const [projectTitle, setProjectTitle] = useState("Projet#1");
   const [isSaved, setIsSaved] = useState(false);
-  const handleSave = () => {
+  const titleRef = useRef<HTMLInputElement | null>(null);
+  const [titleWidth, setTitleWidth] = useState(0);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
+
+  const CHARACTER_LIMIT = 20;
+
+  const handleToggleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setIsSliderEnabled(event.target.checked);
+    },
+    []
+  );
+
+  const toggleShareOptions = useCallback(() => {
+    setShowShareOptions((prev) => !prev);
+  }, []);
+
+  const handleTitleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newTitle = event.target.value;
+      if (newTitle.length <= CHARACTER_LIMIT) {
+        setProjectTitle(newTitle);
+        setWarningMessage(null);
+      } else {
+        setWarningMessage(
+          `Le titre ne doit pas dépasser ${CHARACTER_LIMIT} caractères.`
+        );
+      }
+    },
+    [CHARACTER_LIMIT]
+  );
+
+  const adjustTitleWidth = useCallback(() => {
+    if (titleRef.current) {
+      setTitleWidth(titleRef.current.scrollWidth);
+    }
+  }, []);
+
+  const handleSave = useCallback(() => {
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 1500);
+  }, []);
+
+  const handleExport = useCallback(async (imageSrc: string | null) => {
+    if (!imageSrc) {
+      alert("No image to export");
+      return;
+    }
+
+    try {
+      const response = await fetch(imageSrc);
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("file", blob, "image_projet_picto360.png");
+
+      const exportResponse = await fetch("http://localhost:3001/export", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!exportResponse.ok) {
+        throw new Error(`Failed to export file: ${exportResponse.statusText}`);
+      }
+
+      const data = await exportResponse.json();
+
+      if (data.success) {
+        alert("File exported successfully!");
+      } else {
+        alert("Failed to export file: " + data.error);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "An unknown error occurred while exporting the file.";
+      console.error("Error exporting file:", message);
+      alert(
+        `An error occurred while exporting the file: ${message}. Please check your internet connection or try again later.`
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustTitleWidth();
+  }, [projectTitle, adjustTitleWidth]);
+
+  const iconButtonStyles = {
+    color: "#ffffff",
+    transition: "color 0.3s ease-in-out",
+    "&:hover": {
+      color: "#1c73fa",
+    },
+    "& .MuiSvgIcon-root": {
+      fontSize: "30px",
+    },
   };
 
   return (
-    <div className="toolbar">
-      <div className="left-section">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M572.5 241.4C518.3 135.6 410.9 64 288 64S57.7 135.6 3.5 241.4a32.4 32.4 0 0 0 0 29.2C57.7 376.4 165.1 448 288 448s230.3-71.6 284.5-177.4a32.4 32.4 0 0 0 0-29.2zM288 400a144 144 0 1 1 144-144 143.9 143.9 0 0 1 -144 144zm0-240a95.3 95.3 0 0 0 -25.3 3.8 47.9 47.9 0 0 1 -66.9 66.9A95.8 95.8 0 1 0 288 160z"/></svg>
-        <img src="/logo_picto360.png" alt="Logo" className="logo" />
-        <input
-          type="text"
-          value={projectTitle}
-          onChange={handleTitleChange}
-          className="project-title-input"
-        />
-</div>
-      <div className="right-section">
-        <ul>
-          <li className="toolbar-button">
-            <div className="toggle-slider-container">
-              <label className="toggle-slider">
-                <input type="checkbox" id="toggle-slider" checked={isSliderEnabled} onChange={handleToggleChange} />
-                <span className="slider">
-                  {isSliderEnabled ? <FaPencil className="icon-pen" /> : <LuEye className="icon-eye"/>}
-                </span>
-              </label>
-            </div>
-          </li>
-          <li className="toolbar-button">
-            <IoSettingsSharp />
-          </li>
-          <li className="toolbar-button" onClick={handleSave}>
-            {isSaved ? (
-                <LuCheck />
-              ) : (
-                <IoSaveOutline />
-            )}
-          </li>
-          <li className="toolbar-li toolbar-button">
-            <PiExport />
-          </li>
-          <li
-            className="toolbar-li toolbar-button"
-            onClick={toggleShareOptions}
+    <AppBar
+      position="static"
+      sx={{
+        boxShadow: "none",
+        backgroundColor: "#282828",
+        padding: "0 1rem",
+        height: "55px",
+        justifyContent: "center",
+      }}
+    >
+      <MUIToolbar
+        disableGutters
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        {/* Left Segment: Header */}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={logo}
+            alt="Picto360 Logo"
+            style={{ width: "45px", height: "auto", marginRight: "8px" }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              justifyContent: warningMessage ? "center" : "flex-end",
+              height: warningMessage ? "auto" : "100%",
+            }}
           >
-            <IoShareSocialSharp />
-          </li>
-        </ul>
-        {showShareOptions && (
-          <div className="share-options">
-            <div className="share-options-content">
-              <button
-                onClick={toggleShareOptions}
-                className="share-options-close-button"
+            <Box sx={{ display: "flex", alignItems: "center", height: "auto" }}>
+              <InputBase
+                value={projectTitle}
+                onChange={handleTitleChange}
+                onBlur={adjustTitleWidth}
+                type="string"
+                sx={{
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  color: "white",
+                  border: "none",
+                  padding: "0px",
+                  width: `${titleWidth}px`,
+                  transition: "width 0.05s ease-in-out",
+                  boxSizing: "content-box",
+                  whiteSpace: "nowrap",
+                }}
+                inputRef={titleRef}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  color: "white",
+                  marginLeft: "4px",
+                }}
               >
-                <IoClose />
-              </button>
-              <h2>Partager</h2>
-              <label htmlFor="expiration-lien">Date d'expiration</label>
-              <input type="date" name="expiration-lien" id="expiration-lien" />
-              <label htmlFor="acces-lien">Accès</label>
-              <select name="acces-lien" id="acces-lien">
-                <option value="lecture">Lecture</option>
-                <option value="ecriture">Lecture et écriture</option>
-              </select>
-              <br />
-              <button className="bouton-lien">Copier le lien</button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+                .picto
+              </Typography>
+            </Box>
+            {warningMessage && (
+              <Box sx={{ height: "15px", marginTop: "-7.5px" }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "red",
+                    fontSize: "0.75rem",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {warningMessage}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
+
+        {/* Right Segment: Toolbar Buttons */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Tooltip title={null}>
+            <CustomSwitch
+              checked={isSliderEnabled}
+              onChange={handleToggleChange}
+              sx={{ m: 1 }}
+            />
+          </Tooltip>
+
+          <Tooltip title="Sauvegarder">
+            <IconButton onClick={handleSave} sx={iconButtonStyles}>
+              {isSaved ? <CheckIcon sx={{ color: "#94d255" }} /> : <SaveIcon />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Exporter">
+            <IconButton
+              onClick={() => handleExport(imageSrc)}
+              sx={iconButtonStyles}
+            >
+              <ExportIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Partager">
+            <IconButton onClick={toggleShareOptions} sx={iconButtonStyles}>
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Paramètres">
+            <IconButton sx={iconButtonStyles}>
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </MUIToolbar>
+
+      {/* Share Options Modal */}
+      <Modal
+        open={showShareOptions}
+        onClose={toggleShareOptions}
+        closeAfterTransition
+      >
+        <Fade in={showShareOptions}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <IconButton onClick={toggleShareOptions}>
+                <CancelIcon
+                  sx={{ color: "#282828", "&:hover": { color: "red" } }}
+                />
+              </IconButton>
+            </Box>
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{ marginBottom: "1rem" }}
+            >
+              Share Project
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <InputBase
+                placeholder="Expiration Date"
+                type="date"
+                sx={{
+                  borderBottom: "1px solid gray",
+                  paddingBottom: "0.5rem",
+                  color: "#000000",
+                }}
+              />
+              <InputBase
+                placeholder="Access Level"
+                type="text"
+                sx={{
+                  borderBottom: "1px solid gray",
+                  paddingBottom: "0.5rem",
+                  color: "#000000",
+                }}
+              />
+              <IconButton
+                sx={{
+                  alignSelf: "center",
+                  padding: "0.5rem 1.5rem",
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  borderRadius: "5px",
+                }}
+              >
+                Copy Link
+              </IconButton>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+    </AppBar>
   );
 };
 
-export default Toolbar;
+export default React.memo(Toolbar);

@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { usePannellumViewer } from "../hooks/usePannellumViewer";
-import "./css/ImageViewer.css";
+import { usePannellumViewer } from "../hooks/usePanoramaViewer";
+import "./css/PanoramaViewer.css";
 import ContextMenu from "./ContextMenu";
 import { PiTargetBold } from "react-icons/pi";
 
@@ -10,7 +10,7 @@ interface PannellumViewerProps {
   imageSrc: string;
 }
 
-const ImageViewer: React.FC<PannellumViewerProps> = ({
+const PanoramaViewer: React.FC<PannellumViewerProps> = ({
   width,
   height,
   imageSrc,
@@ -55,4 +55,4 @@ const ImageViewer: React.FC<PannellumViewerProps> = ({
   );
 };
 
-export default ImageViewer;
+export default React.memo(PanoramaViewer);;

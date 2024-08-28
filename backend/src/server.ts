@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { connectToDatabase } from "./utils/db";
+//import { connectToDatabase } from "./utils/db";
 import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
 import formContentRoutes from "./routes/content/formContent.routes";
@@ -8,9 +8,9 @@ import linkContentRoutes from "./routes/content/linkContent.routes";
 import mediaContentRoutes from "./routes/content/mediaContent.routes";
 import textContentRoutes from "./routes/content/textContent.routes";
 import dimensionRoutes from "./routes/dimension.routes";
-import imageRoutes from "./routes/Image.routes";
+import imageRoutes from "./routes/image.routes";
 import projectRoutes from "./routes/project.routes";
-import sharingLinkRoutes from "./routes/sharingLink.Routes";
+import sharingLinkRoutes from "./routes/sharingLink.routes";
 
 const fastify = Fastify({ logger: true });
 
