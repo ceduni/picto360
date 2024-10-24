@@ -2,13 +2,13 @@ import { useEffect, useCallback, useState, RefObject, useRef } from "react";
 import { useHotspots } from "./usePanoramaHotspots";
 
 declare global {
-  interface Window {
+  interface Window { 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     pannellum: any;
   }
-}
+} 
 
-export const usePannellumViewer = (
+export const usePanoramaViewer = (
   viewerRef: RefObject<HTMLDivElement>,
   imageSrc: string
 ) => {
@@ -22,19 +22,10 @@ export const usePannellumViewer = (
     addVideoHotspot,
   } = useHotspots();
   const mouseCoordsRef = useRef({ x: 0, y: 0 });
-  const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({
-    pitch: 0,
-    yaw: 0,
-  });
+  const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({ pitch: 0, yaw: 0, });
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({
-    x: 0,
-    y: 0,
-  });
-  const [targetIconPosition, setTargetIconPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState({x: 0, y: 0,});
+  const [targetIconPosition, setTargetIconPosition] = useState<{ x: number; y: number; } | null>(null);
   const viewerRefCallback = useRef<unknown>(null); // reference to store the viewer instance
 
   const handleContextMenuClick = useCallback(
@@ -45,12 +36,9 @@ export const usePannellumViewer = (
       const { pitch, yaw } = contextMenuCoordsRef.current;
       const coords = [pitch, yaw];
       switch (annotationType) {
-        case "Form":
-          { const question = prompt("Entrez la question:");
-          const nbOptions = parseInt(
-            prompt("Entrez le nombre d'options (minimum 2):") || "2",
-            10
-          );
+        case "Form": {
+          const question = prompt("Entrez la question:");
+          const nbOptions = parseInt(prompt("Entrez le nombre d'options (minimum 2):") || "2", 10);
           const options: string[] = [];
           for (let i = 0; i < nbOptions; i++) {
             const option = prompt(`Entrez le texte pour le choix ${i + 1}`);
@@ -67,22 +55,23 @@ export const usePannellumViewer = (
               prompt("Entrez le numéro de la bonne réponse :") || "1",
               10
             ) - 1;
-            console.log("Question:", question);
-            console.log("Options:", options);
-            console.log("Correct Option:", correctOption);
+          console.log("Question:", question);
+          console.log("Options:", options);
+          console.log("Correct Option:", correctOption);
           if (question && options.length >= 1 && correctOption >= 0) {
             addFormHotspot(
               viewer,
               coords,
               question,
               options,
-              correctOption,
+              correctOption
               //nbOptions
             );
           } else {
             alert("erreur");
           }
-          break; }
+          break;
+        }
         case "Text":
           addTextHotspot(viewer, coords, "Default text content");
           break;
@@ -97,8 +86,8 @@ export const usePannellumViewer = (
             "Default hyperlink text"
           );
           break;
-        case "Image":
-          { const imageFile = await new Promise<File | null>((resolve) => {
+        case "Image": {
+          const imageFile = await new Promise<File | null>((resolve) => {
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
@@ -112,15 +101,17 @@ export const usePannellumViewer = (
             const imageUrl = URL.createObjectURL(imageFile);
             addImageHotspot(viewer, coords, imageUrl);
           }
-          break; }
-        case "Gif":
-          { const gifUrl = prompt("Enter the URL of the GIF:");
+          break;
+        }
+        case "Gif": {
+          const gifUrl = prompt("Enter the URL of the GIF:");
           if (gifUrl) {
             addGifHotspot(viewer, coords, gifUrl);
           }
-          break; }
-        case "Video":
-          { const videoUrl = prompt("Enter the YouTube video URL:");
+          break;
+        }
+        case "Video": {
+          const videoUrl = prompt("Enter the YouTube video URL:");
           if (videoUrl) {
             const videoId = extractYouTubeVideoId(videoUrl);
             if (videoId) {
@@ -130,7 +121,8 @@ export const usePannellumViewer = (
               alert("Invalid YouTube URL");
             }
           }
-          break; }
+          break;
+        }
         default:
           break;
       }
@@ -168,6 +160,8 @@ export const usePannellumViewer = (
       panorama: imageSrc,
       autoLoad: true,
       autoRotate: -2,
+      showControls: false,
+      showFullscreenCtrl: false,
       showZoomCtrl: true,
       keyboardZoom: false,
       disableKeyboardCtrl: false,

@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch, styled, SwitchProps } from "@mui/material";
 
-const CustomSwitch = styled((props: SwitchProps) => (
+const ToggleSwitch = styled((props: SwitchProps) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }) => ({
   width: 42,
@@ -57,4 +57,4 @@ const CustomSwitch = styled((props: SwitchProps) => (
   },
 }));
 
-export default React.memo(CustomSwitch);
+export default React.memo(ToggleSwitch);

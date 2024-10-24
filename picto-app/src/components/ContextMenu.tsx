@@ -18,6 +18,7 @@ interface ContextMenuProps {
   y: number;
   onMenuItemClick: (type: string) => void;
   onClose: () => void;
+  isEditMode: boolean;
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -26,6 +27,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   y,
   onMenuItemClick,
   onClose,
+  isEditMode,
 }) => {
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const horizontalOffset = 30;
@@ -43,12 +45,22 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   );
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isEditMode) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [handleClickOutside]);
+  }, [handleClickOutside, isEditMode]);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      onClose();
+    }
+  }, [isEditMode, onClose]);
 
   useEffect(() => {
     if (contextMenuRef.current) {
@@ -58,9 +70,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const menuWidth = menu.offsetWidth;
       const menuHeight = menu.offsetHeight;
 
-      const bottomBar = document.querySelector(".lowerBar");
-      const bottomBarHeight = bottomBar
-        ? bottomBar.getBoundingClientRect().height
+      const BottomNavbar = document.querySelector(".lowerBar");
+      const BottomNavbarHeight = BottomNavbar
+        ? BottomNavbar.getBoundingClientRect().height
         : 0;
 
       let adjustedX = x + horizontalOffset; // separation from the target icon
@@ -71,7 +83,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         adjustedX = screenWidth - menuWidth;
       }
 
-      if (y + menuHeight > screenHeight - bottomBarHeight) {
+      if (y + menuHeight > screenHeight - BottomNavbarHeight) {
         adjustedY = y - menuHeight;
       }
 
@@ -80,7 +92,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     }
   }, [x, y, visible, horizontalOffset]);
 
-  if (!visible) return null;
+  if (!visible || !isEditMode) return null;
 
   return (
     <div

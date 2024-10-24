@@ -1,19 +1,21 @@
-import React, { useRef } from "react";
-import { usePannellumViewer } from "../hooks/usePanoramaViewer";
+import React, { useRef, useEffect } from "react";
+import { usePanoramaViewer } from "../hooks/usePanoramaViewer";
 import "./css/PanoramaViewer.css";
 import ContextMenu from "./ContextMenu";
 import { PiTargetBold } from "react-icons/pi";
 
-interface PannellumViewerProps {
+interface PanoramaViewerProps {
   width: string;
   height: string;
   imageSrc: string;
+  isEditMode: boolean;
 }
 
-const PanoramaViewer: React.FC<PannellumViewerProps> = ({
+const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
   width,
   height,
   imageSrc,
+  isEditMode,
 }) => {
   const viewerRef = useRef<HTMLDivElement>(null);
   const {
@@ -22,7 +24,13 @@ const PanoramaViewer: React.FC<PannellumViewerProps> = ({
     handleContextMenuClick,
     targetIconPosition,
     hideContextMenu,
-  } = usePannellumViewer(viewerRef, imageSrc);
+  } = usePanoramaViewer(viewerRef, imageSrc);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      hideContextMenu();
+    }
+  }, [isEditMode, hideContextMenu]);
 
   return (
     <>
@@ -30,17 +38,23 @@ const PanoramaViewer: React.FC<PannellumViewerProps> = ({
         ref={viewerRef}
         className="viewer-container"
         style={{ width, height }}
+        onContextMenu={(e) => {
+          if (!isEditMode) {
+            e.preventDefault();
+          }
+        }}
       ></div>
-      {contextMenuVisible && (
+      {isEditMode && contextMenuVisible && (
         <ContextMenu
           visible={contextMenuVisible}
           x={contextMenuPosition.x}
           y={contextMenuPosition.y}
           onMenuItemClick={handleContextMenuClick}
           onClose={hideContextMenu}
+          isEditMode={isEditMode}
         />
       )}
-      {targetIconPosition && (
+      {isEditMode && targetIconPosition && (
         <div
           style={{
             top: targetIconPosition.y,
@@ -55,4 +69,4 @@ const PanoramaViewer: React.FC<PannellumViewerProps> = ({
   );
 };
 
-export default React.memo(PanoramaViewer);;
+export default React.memo(PanoramaViewer);
