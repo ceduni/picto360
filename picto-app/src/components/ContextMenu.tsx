@@ -1,131 +1,86 @@
-import React, { useRef, useEffect, useCallback } from "react";
-import "./css/ContextMenu.css";
-import {
-  AiOutlineUnorderedList,
-  AiOutlineFileText,
-  AiOutlineLink,
-  AiOutlinePicture,
-} from "react-icons/ai";
-import {
-  MdOutlineVideoLibrary,
-  MdOutlineGif,
-  MdOutlineLabel,
-} from "react-icons/md";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { Menu, MenuItem, Divider, ListItemIcon, ListItemText } from "@mui/material";
+import { styled } from "@mui/system";
+import { IconType } from "react-icons";
+import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
+import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
 
 interface ContextMenuProps {
   visible: boolean;
-  x: number;
-  y: number;
+  anchorPosition?: { x: number; y: number };
   onMenuItemClick: (type: string) => void;
   onClose: () => void;
   isEditMode: boolean;
 }
 
+const StyledMenu = styled(Menu)(() => ({
+  "& .MuiPaper-root": {
+    borderRadius: 8,
+    minWidth: 200,
+  },
+}));
+
+type MenuItemType =
+  | {
+      type: string;
+      icon: IconType;
+      label: string;
+    }
+  | { type: "divider" };
+
+const menuItems: MenuItemType[] = [
+  { type: "Form", icon: AiOutlineUnorderedList, label: "Questionnaire" },
+  { type: "divider" },
+  { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
+  { type: "Image", icon: AiOutlinePicture, label: "Image" },
+  { type: "Gif", icon: MdOutlineGif, label: "GIF" },
+  { type: "divider" },
+  { type: "Text", icon: AiOutlineFileText, label: "Texte" },
+  { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
+  { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
+];
+
 const ContextMenu: React.FC<ContextMenuProps> = ({
   visible,
-  x,
-  y,
+  anchorPosition = { x: 0, y: 0 },
   onMenuItemClick,
   onClose,
   isEditMode,
 }) => {
-  const contextMenuRef = useRef<HTMLDivElement>(null);
-  const horizontalOffset = 30;
+  const handleClose = useCallback(() => onClose(), [onClose]);
 
-  const handleClickOutside = useCallback(
-    (event: MouseEvent) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    },
-    [onClose]
+  useEffect(() => {
+    if (!isEditMode) handleClose();
+  }, [isEditMode, handleClose]);
+
+  const menuContent = useMemo(
+    () =>
+      menuItems.map((item, index) =>
+        item.type === "divider" ? (
+          // Divider rendering
+          <Divider key={`divider-${index}`} />
+        ) : (
+          <MenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
+            <ListItemIcon>
+              {/* Only render the icon if it exists in the item */}
+              {"icon" in item && <item.icon />}
+            </ListItemIcon>
+            {/* Only render the label if it exists in the item */}
+            {"label" in item && <ListItemText>{item.label}</ListItemText>}
+          </MenuItem>
+        )
+      ),
+    [onMenuItemClick]
   );
 
-  useEffect(() => {
-    if (isEditMode) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [handleClickOutside, isEditMode]);
-
-  useEffect(() => {
-    if (!isEditMode) {
-      onClose();
-    }
-  }, [isEditMode, onClose]);
-
-  useEffect(() => {
-    if (contextMenuRef.current) {
-      const menu = contextMenuRef.current;
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-      const menuWidth = menu.offsetWidth;
-      const menuHeight = menu.offsetHeight;
-
-      const BottomNavbar = document.querySelector(".lowerBar");
-      const BottomNavbarHeight = BottomNavbar
-        ? BottomNavbar.getBoundingClientRect().height
-        : 0;
-
-      let adjustedX = x + horizontalOffset; // separation from the target icon
-      let adjustedY = y;
-
-      //context menu screen overflow checks
-      if (x + menuWidth + horizontalOffset > screenWidth) {
-        adjustedX = screenWidth - menuWidth;
-      }
-
-      if (y + menuHeight > screenHeight - BottomNavbarHeight) {
-        adjustedY = y - menuHeight;
-      }
-
-      menu.style.left = `${adjustedX}px`;
-      menu.style.top = `${adjustedY}px`;
-    }
-  }, [x, y, visible, horizontalOffset]);
+  const menuPosition = useMemo(() => ({ top: anchorPosition.y, left: anchorPosition.x }), [anchorPosition]);
 
   if (!visible || !isEditMode) return null;
 
   return (
-    <div
-      ref={contextMenuRef}
-      className="context-menu"
-      style={{ top: `${y}px`, left: `${x}px` }}
-    >
-      <ul>
-        <li onClick={() => onMenuItemClick("Form")}>
-          <AiOutlineUnorderedList className="menu-icon" /> Questionnaire
-        </li>
-        <hr className="menu-separator" />
-        <li onClick={() => onMenuItemClick("Video")}>
-          <MdOutlineVideoLibrary className="menu-icon" /> Vidéo
-        </li>
-        <li onClick={() => onMenuItemClick("Image")}>
-          <AiOutlinePicture className="menu-icon" /> Image
-        </li>
-        <li onClick={() => onMenuItemClick("Gif")}>
-          <MdOutlineGif className="menu-icon" /> GIF
-        </li>
-        <hr className="menu-separator" />
-        <li onClick={() => onMenuItemClick("Text")}>
-          <AiOutlineFileText className="menu-icon" /> Texte
-        </li>
-        <li onClick={() => onMenuItemClick("Label")}>
-          <MdOutlineLabel className="menu-icon" /> Étiquette
-        </li>
-        <li onClick={() => onMenuItemClick("Hyperlink")}>
-          <AiOutlineLink className="menu-icon" /> Lien
-        </li>
-      </ul>
-    </div>
+    <StyledMenu open={visible} onClose={handleClose} anchorReference="anchorPosition" anchorPosition={menuPosition}>
+      {menuContent}
+    </StyledMenu>
   );
 };
 

@@ -1,13 +1,9 @@
 import React, { useState, useRef } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
-import {
-  FaCamera,
-  FaFileImport,
-  FaGoogleDrive,
-  FaDropbox,
-} from "react-icons/fa";
+import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
 import { GrOnedrive } from "react-icons/gr";
 import ParticlesBackground from "./ui/ParticlesBackground";
+//import WelcomeMessage from "./ui/WelcomeMessage";
 import "./css/ImageUploader.css";
 
 interface ImageUploaderProps {
@@ -15,6 +11,7 @@ interface ImageUploaderProps {
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+  //TODO: manage errors + add red color to the drop zone
   const [showPopup, setShowPopup] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,44 +47,55 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     }
   };
 
+  if (!showPopup) return null;
+
   return (
-    showPopup && (
-      <div className="modal">
-        <ParticlesBackground />
-        <div className="modal-content">
-          <img id="logo" src="/images/logo_picto360.png" alt="Logo" />
-          <div
-            className={`drop-zone ${isDragging ? "dragging" : ""}`}
-            onDragOver={(event) => handleDragEvents(event, true)}
-            onDragLeave={(event) => handleDragEvents(event, false)}
-            onDrop={handleDrop}
-          >
-            <div id="download-icon">
-              <MdOutlineFileDownload />
-            </div>
-            <div id="drop-text">Déposez une image ou un projet</div>
+    <div className="image-uploader">
+      <ParticlesBackground />
+      <div className="image-uploader__content">
+        {/*<WelcomeMessage
+          text="Votre vision, enrichie en 360°."
+          color="#ffffff"
+          fontSize="4rem"
+          fontFamily="'Courier New', sans-serif"
+          fontWeight="bold"
+          textShadow="2px 2px 4px rgba(0,0,0,0.1)"
+        />*/}
+        <img className="image-uploader__logo" src="/images/logo_picto360.png" alt="Logo" />
+        <div
+          className={`image-uploader__drop-zone ${isDragging ? "image-uploader__drop-zone--dragging" : ""}`}
+          onDragOver={(event) => handleDragEvents(event, true)}
+          onDragLeave={(event) => handleDragEvents(event, false)}
+          onDrop={handleDrop}
+        >
+          {" "}
+          {/*TODO: add clicking action*/}
+          <div className="image-uploader__download-icon">
+            <MdOutlineFileDownload />
           </div>
-          <input type="file" ref={fileInputRef} onChange={handleImageChange} />
-          <div className="icon-container">
-            <div className="icon camera" onClick={triggerFileInput}>
-              <FaCamera />
-            </div>
-            <div className="icon import" onClick={triggerFileInput}>
-              <FaFileImport />
-            </div>
-            <div className="icon drive">
-              <FaGoogleDrive />
-            </div>
-            <div className="icon dropbox">
-              <FaDropbox />
-            </div>
-            <div className="icon onedrive">
-              <GrOnedrive />
-            </div>
+          <div className="image-uploader__drop-text">Déposez une image ou un projet</div>
+          {/*TODO: mention the supported files + file size limit*/}
+        </div>
+        <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
+        <div className="image-uploader__icon-container">
+          <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
+            <FaCamera />
+          </div>
+          <div className="image-uploader__icon image-uploader__icon--import" onClick={triggerFileInput}>
+            <FaFileImport />
+          </div>
+          <div className="image-uploader__icon image-uploader__icon--drive">
+            <FaGoogleDrive />
+          </div>
+          <div className="image-uploader__icon image-uploader__icon--dropbox">
+            <FaDropbox />
+          </div>
+          <div className="image-uploader__icon image-uploader__icon--onedrive">
+            <GrOnedrive />
           </div>
         </div>
       </div>
-    )
+    </div>
   );
 };
 

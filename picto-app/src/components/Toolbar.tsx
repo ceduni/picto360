@@ -26,86 +26,67 @@ import "./css/Toolbar.css";
 interface ToolbarProps {
   imageSrc: string | null;
   isEditMode: boolean;
-  setIsEditMode: (isEditMode: boolean) => void;
+  toggleEditMode: () => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }) => {
-  const [showShareOptions, setShowShareOptions] = useState(false);
-  const [projectTitle, setProjectTitle] = useState("Projet#1");
+const CHARACTER_LIMIT = 20;
+
+const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode }) => {
+  const [projectTitle, setProjectTitle] = useState("Projet#1"); //TODO: manage project uniqueness in DB
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [showModeIndicator, setShowModeIndicator] = useState(false);
-  const titleRef = useRef<HTMLDivElement>(null);
-
-  const CHARACTER_LIMIT = 20;
-
-  const handleToggleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setIsEditMode(event.target.checked);
-      setShowModeIndicator(true);
-      setTimeout(() => setShowModeIndicator(false), 3000);
-    },
-    [setIsEditMode]
-  );
-
-  const toggleShareOptions = useCallback(() => {
-    setShowShareOptions((prev) => !prev);
-  }, []);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const projectTitleRef = useRef<HTMLDivElement>(null);
 
   const handleTitleChange = useCallback(() => {
-    if (titleRef.current) {
-      let newTitle = titleRef.current.innerText.trim();
+    if (projectTitleRef.current) {
+      const newTitle = projectTitleRef.current.innerText.trim().slice(0, CHARACTER_LIMIT);
       const selection = window.getSelection();
-      const anchorOffset = selection?.anchorOffset;
-
-      if (newTitle.length > CHARACTER_LIMIT) {
-        newTitle = newTitle.slice(0, CHARACTER_LIMIT);
-        setWarningMessage(
-          `Le titre ne doit pas dépasser ${CHARACTER_LIMIT} caractères.`
-        );
-      } else {
-        setWarningMessage(null);
-      }
+      const anchorOffset = selection?.anchorOffset ?? 0;
 
       setProjectTitle(newTitle);
-      setCursorPosition(Math.min(anchorOffset || 0, CHARACTER_LIMIT));
+      setCursorPosition(Math.min(anchorOffset, CHARACTER_LIMIT));
+      setWarningMessage(
+        newTitle.length === CHARACTER_LIMIT
+          ? `ATTENTION: Le titre ne doit pas dépasser ${CHARACTER_LIMIT} caractères.`
+          : null
+      );
     }
-  }, [CHARACTER_LIMIT]);
-
-  //prevents adding new characters when the limit is reached
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (titleRef.current) {
-      const currentLength = titleRef.current.innerText.trim().length;
-      if (currentLength >= CHARACTER_LIMIT &&
-          !event.ctrlKey &&
-          !event.metaKey &&
-          event.key !== 'Backspace' &&
-          event.key !== 'Delete' &&
-          event.key !== 'ArrowLeft' &&
-          event.key !== 'ArrowRight') {
-        event.preventDefault();
-      }
-    }
-  }, [CHARACTER_LIMIT]);
-
-  //handles Ctrl-C + Ctrl-V events to prevent pasting more than the limit
-  const handlePaste = useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (titleRef.current && titleRef.current.innerText.length < CHARACTER_LIMIT) {
-      const pastedText = event.clipboardData.getData('text/plain');
-      const availableSpace = CHARACTER_LIMIT - titleRef.current.innerText.length;
-      const textToInsert = pastedText.slice(0, availableSpace);
-      document.execCommand('insertText', false, textToInsert); //deprecated -> to replace
-      handleTitleChange();
-    }
-  }, [CHARACTER_LIMIT, handleTitleChange]);
-  
-  const handleSave = useCallback(() => {
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 1500);
   }, []);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (
+      projectTitleRef.current &&
+      projectTitleRef.current.innerText.trim().length >= CHARACTER_LIMIT &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(event.key)
+    ) {
+      event.preventDefault();
+    }
+  }, []);
+
+  const handlePaste = useCallback(
+    (event: React.ClipboardEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      if (projectTitleRef.current) {
+        const pastedText = event.clipboardData.getData("text/plain");
+        const availableSpace = CHARACTER_LIMIT - projectTitleRef.current.innerText.length;
+        const textToInsert = pastedText.slice(0, availableSpace);
+        document.execCommand("insertText", false, textToInsert); //TODO: replace deprecated method
+        handleTitleChange();
+      }
+    },
+    [handleTitleChange]
+  );
+
+  const handleSave = useCallback(() => {
+    if (isEditMode) {
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 1500);
+    }
+  }, [isEditMode]);
 
   const handleExport = useCallback(async (imageSrc: string | null) => {
     if (!imageSrc) {
@@ -116,7 +97,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
     try {
       const response = await fetch(imageSrc);
       const blob = await response.blob();
-
       const formData = new FormData();
       formData.append("file", blob, "image_projet_picto360.png");
 
@@ -130,33 +110,28 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
       }
 
       const data = await exportResponse.json();
-
-      if (data.success) {
-        alert("File exported successfully!");
-      } else {
-        alert("Failed to export file: " + data.error);
-      }
+      alert(data.success ? "File exported successfully!" : "Failed to export file: " + data.error);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "An unknown error occurred while exporting the file.";
-      console.error("Error exporting file:", message);
-      alert(
-        `An error occurred while exporting the file: ${message}. Please check your internet connection or try again later.`
-      );
+      console.error("Error exporting file:", error);
+      alert(`An error occurred while exporting the file. Please check your internet connection or try again later.`);
     }
   }, []);
 
+  const handleToggleEditMode = useCallback(() => {
+    toggleEditMode();
+  }, [toggleEditMode]);
+  const toggleShareOptions = useCallback(() => {
+    setShowShareOptions((prev) => !prev);
+  }, []);
+
   useEffect(() => {
-    if (titleRef.current) {
-      titleRef.current.innerText = projectTitle;
+    if (projectTitleRef.current) {
+      projectTitleRef.current.innerText = projectTitle;
       if (cursorPosition !== null) {
         const range = document.createRange();
         const selection = window.getSelection();
-
-        if (titleRef.current.firstChild) {
-          range.setStart(titleRef.current.firstChild, Math.min(cursorPosition, projectTitle.length));
+        if (projectTitleRef.current.firstChild) {
+          range.setStart(projectTitleRef.current.firstChild, Math.min(cursorPosition, projectTitle.length));
           range.collapse(true);
           selection?.removeAllRanges();
           selection?.addRange(range);
@@ -165,45 +140,59 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
     }
   }, [projectTitle, cursorPosition]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault();
+        if (isEditMode) {
+          handleSave();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSave, isEditMode]);
+
   const titleHoverVariants = {
     idle: { scale: 1 },
-    hover: { scale: 1.025, transition: { duration: 0.25} }
+    hover: { scale: 1.025, transition: { duration: 0.25 } },
   };
 
   return (
     <motion.div
-      className={`toolbar-container ${isEditMode ? 'edit-mode' : 'preview-mode'}`}
+      className={`toolbar-container toolbar--${isEditMode ? "edit-mode" : "preview-mode"}`}
       animate={{
         backgroundColor: isEditMode ? "#282828" : "#ffffff",
       }}
       transition={{
         type: "tween",
         ease: "easeInOut",
-        duration: 0.5
+        duration: 0.5,
       }}
     >
-      <AppBar position="static" className="toolbar" style={{ backgroundColor: 'transparent' }}>
-        <MUIToolbar disableGutters className="toolbar-content">
-          <Box className="toolbar-left">
-            <img src={logo} alt="Picto360 Logo" className="toolbar-logo" />
-            <Box className="toolbar-title-container" style={{ minHeight: warningMessage ? '65px' : '55px' }}>
-              <Box className="toolbar-title-input-container">
+      <AppBar position="static" className="toolbar" style={{ backgroundColor: "transparent" }}>
+        <MUIToolbar disableGutters className="toolbar__content">
+          <Box className="toolbar__left">
+            <img src={logo} alt="Picto360 Logo" className="toolbar__logo" />
+            <Box className="toolbar__title-container" style={{ minHeight: warningMessage ? "65px" : "55px" }}>
+              <Box className="toolbar__title-input-wrapper">
                 <motion.div
-                  ref={titleRef}
+                  ref={projectTitleRef}
                   contentEditable={isEditMode}
                   onInput={isEditMode ? handleTitleChange : undefined}
                   onBlur={isEditMode ? handleTitleChange : undefined}
                   onKeyDown={isEditMode ? handleKeyDown : undefined}
                   onPaste={isEditMode ? handlePaste : undefined}
                   onCut={isEditMode ? (e) => e.preventDefault() : undefined}
-                  className={`toolbar-title-input ${isEditMode ? 'editable' : ''}`}
+                  className={`toolbar__title-input ${isEditMode ? "toolbar__title-input--editable" : ""}`}
                   style={{
                     minWidth: "auto",
                     display: "inline-block",
                     outline: "none",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
-                    cursor: isEditMode ? 'text' : 'default',
+                    cursor: isEditMode ? "text" : "default",
                   }}
                   variants={titleHoverVariants}
                   initial="idle"
@@ -211,7 +200,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
                 >
                   {projectTitle}
                 </motion.div>
-                <Typography variant="body2" className="toolbar-title-extension">
+                <Typography variant="body2" className="toolbar__title-extension">
                   .picto
                 </Typography>
               </Box>
@@ -224,8 +213,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     style={{ overflow: "hidden" }}
                   >
-                    <Box className="toolbar-warning-message">
-                      <Typography variant="caption" className="warning-text">
+                    <Box className="toolbar__warning-message">
+                      <Typography variant="caption" className="toolbar__warning-text">
                         {warningMessage}
                       </Typography>
                     </Box>
@@ -235,45 +224,94 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
             </Box>
           </Box>
 
-          <Box className="toolbar-right">
+          <Box className="toolbar__right">
             <Tooltip title={null}>
-              <ToggleSwitch
-                checked={isEditMode}
-                onChange={handleToggleChange}
-                className="toolbar-toggle-switch"
-              />
+              <ToggleSwitch checked={isEditMode} onChange={handleToggleEditMode} className="toolbar__toggle-switch" />
             </Tooltip>
 
-            <Tooltip title={isEditMode ? "Sauvegarder" : ""}>
+            <Tooltip
+              title={isEditMode && !isSaved ? "Sauvegarder" : ""}
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
               <span>
                 <IconButton
-                  onClick={handleSave}
-                  className="toolbar-icon-button save-icon"
+                  onClick={!isSaved ? handleSave : undefined}
+                  className="toolbar__icon-button"
                   disabled={!isEditMode}
                 >
-                  {isSaved ? <CheckIcon className="icon-saved" /> : <SaveIcon />}
+                  {isSaved ? (
+                    <CheckIcon className="toolbar__check-icon" />
+                  ) : (
+                    <SaveIcon className="toolbar__save-icon" />
+                  )}
                 </IconButton>
               </span>
             </Tooltip>
-
-            <Tooltip title="Exporter">
-              <IconButton
-                onClick={() => handleExport(imageSrc)}
-                className="toolbar-icon-button"
-              >
+            <Tooltip
+              title="Exporter"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton onClick={() => handleExport(imageSrc)} className="toolbar__icon-button">
                 <ExportIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Partager">
-              <IconButton
-                onClick={toggleShareOptions}
-                className="toolbar-icon-button"
-              >
+            <Tooltip
+              title="Partager"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton onClick={toggleShareOptions} className="toolbar__icon-button">
                 <ShareIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Paramètres">
-              <IconButton className="toolbar-icon-button">
+            <Tooltip
+              title="Paramètres"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton className="toolbar__icon-button">
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
@@ -281,11 +319,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
         </MUIToolbar>
 
         {/* Share Options Modal */}
-        <Modal
-          open={showShareOptions}
-          onClose={toggleShareOptions}
-          closeAfterTransition
-        >
+        <Modal open={showShareOptions} onClose={toggleShareOptions} closeAfterTransition>
           <Fade in={showShareOptions}>
             <Box
               sx={{
@@ -302,16 +336,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, setIsEditMode }
             >
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <IconButton onClick={toggleShareOptions}>
-                  <CancelIcon
-                    sx={{ color: "#282828", "&:hover": { color: "red" } }}
-                  />
+                  <CancelIcon sx={{ color: "#282828", "&:hover": { color: "red" } }} />
                 </IconButton>
               </Box>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{ marginBottom: "1rem" }}
-              >
+              <Typography variant="h6" component="h2" sx={{ marginBottom: "1rem" }}>
                 Share Project
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>

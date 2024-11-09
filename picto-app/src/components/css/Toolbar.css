@@ -1,173 +1,168 @@
+:root {
+  --font-family: 'Inter', sans-serif;
+  --font-size: 1rem;
+  --font-weight-bold: bold;
+  --transition-color: color 0.5s ease-in-out;
+  --color-primary: #1c73fa;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-light-gray: #cccccc;
+  --color-check: #94d255;
+  --color-warning: red;
+}
+
 .toolbar {
-  box-shadow: none !important;
+  box-shadow: none;
   padding: 0 1rem;
-  height: 55px;
+  height: 100%;
   justify-content: center;
   position: relative;
   z-index: 1;
 }
 
-.toolbar-content {
+.toolbar__content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 100%;
 }
 
-.toolbar-left {
+.toolbar__left {
   display: flex;
   align-items: center;
 }
 
-.toolbar-logo {
+.toolbar__logo {
   width: 45px;
-  height: auto;
   margin-right: 8px;
 }
 
-.toolbar-title-container {
+.toolbar__title-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  height: 100%;
-  position: relative; 
+  position: relative;
+  min-height: 55px;
 }
 
-.toolbar-title-container.with-warning {
+.toolbar__title-container--with-warning {
   justify-content: center;
   height: auto;
 }
 
-.toolbar-title-input-container {
+.toolbar__title-input-wrapper {
   display: flex;
   align-items: center;
-  height: auto;
 }
 
-.toolbar-title-input,
-.toolbar-title-extension,
-.toolbar-icon-button {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 1rem !important;
-  font-weight: bold !important;
+.toolbar__title-input,
+.toolbar__title-extension {
+  font-family: var(--font-family) !important;
+  font-size: var(--font-size) !important;
+  font-weight: var(--font-weight-bold) !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
-  transition: color 0.5s ease-in-out !important; /* Match parent transition */
+  transition: var(--transition-color) !important;
 }
 
-.toolbar-title-input {
+.toolbar__title-input {
   border: none;
-  padding: 0px;
-  transition: width 0.05s ease-in-out;
-  box-sizing: content-box;
+  padding: 0;
   white-space: nowrap;
   overflow: hidden;
   outline: none;
+  box-sizing: content-box;
+  transition: width 0.05s ease-in-out;
 }
 
-.toolbar-title-extension {
+.toolbar__title-extension {
   margin-left: 4px;
 }
 
-.toolbar-warning-message {
+.toolbar__warning-message {
   top: 100%;
   left: 0;
   width: 100%;
 }
 
-.warning-text {
-  color: red !important;
-  font-size: 0.75rem !important;
+.toolbar__warning-text {
+  color: var(--color-warning);
+  font-size: 0.75rem;
 }
 
-.toolbar-right {
+.toolbar__right {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.toolbar-toggle-switch {
+.toolbar__toggle-switch {
   margin: 1rem;
-  transition: background-color 0.5s ease-in-out !important;
+  transition: background-color 0.5s ease-in-out;
 }
 
-.toolbar-icon-button {
-  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out !important;
+.toolbar__icon-button .MuiSvgIcon-root {
+  font-family: var(--font-family);
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-.toolbar-icon-button:hover {
-  color: #1c73fa !important;
+.toolbar--preview-mode .toolbar__title-input,
+.toolbar--preview-mode .toolbar__title-extension,
+.toolbar--preview-mode .toolbar__icon-button .MuiSvgIcon-root {
+  color: var(--color-black);
 }
 
-.toolbar-icon-button .MuiSvgIcon-root {
-  font-size: 30px !important;
-  transition: color 0.5s ease-in-out !important;
+.toolbar--edit-mode .toolbar__title-input,
+.toolbar--edit-mode .toolbar__title-extension,
+.toolbar--edit-mode .toolbar__icon-button .MuiSvgIcon-root {
+  color: var(--color-white);
 }
 
-.icon-saved {
-  color: #94d255 !important;
-  transition: color 0.5s ease-in-out !important; /* Match parent transition */
+.toolbar--preview-mode .toolbar__icon-button .toolbar__save-icon,
+.toolbar--preview-mode .toolbar__icon-button .toolbar__save-icon .MuiSvgIcon-root {
+  color: var(--color-light-gray) !important;
+  transition: color 0.3s ease-in-out;
 }
 
-/* Update text color styles */
-.preview-mode .toolbar-title-input,
-.preview-mode .toolbar-title-extension,
-.preview-mode .toolbar-icon-button,
-.preview-mode .toolbar-icon-button .MuiSvgIcon-root {
-  color: #000000 !important;
-  transition: color 0.5s ease-in-out !important;
+.toolbar--edit-mode .toolbar__icon-button .toolbar__save-icon,
+.toolbar--edit-mode .toolbar__icon-button .toolbar__save-icon .MuiSvgIcon-root {
+  color: var(--color-white) !important;
+  transition: color 0.3s ease-in-out;
 }
 
-.edit-mode .toolbar-title-input,
-.edit-mode .toolbar-title-extension,
-.edit-mode .toolbar-icon-button,
-.edit-mode .toolbar-icon-button .MuiSvgIcon-root {
-  color: #ffffff !important;
-  transition: color 0.5s ease-in-out !important;
+.toolbar__icon-button:hover .MuiSvgIcon-root {
+  color: var(--color-primary);
 }
 
-/* Add specific styles for the save icon in preview mode */
-.preview-mode .toolbar-icon-button.save-icon,
-.preview-mode .toolbar-icon-button.save-icon .MuiSvgIcon-root {
-  color: #cccccc !important; /* Light gray color for disabled state */
-  transition: color 0.5s ease-in-out !important;
+.toolbar__icon-button .toolbar__save-icon:hover,
+.toolbar__icon-button .toolbar__save-icon:hover .MuiSvgIcon-root {
+  color: var(--color-primary) !important;
 }
 
-/* Ensure the saved icon (check mark) also transitions properly */
-.preview-mode .toolbar-icon-button.save-icon .icon-saved {
-  color: #cccccc !important;
-  transition: color 0.5s ease-in-out !important;
+.toolbar__check-icon,
+.toolbar__check-icon .MuiSvgIcon-root {
+  color: var(--color-check) !important;
+  pointer-events: none;
 }
 
 .toolbar-container {
   position: relative;
   height: 55px;
+  width: 100%;
 }
 
-.animated-background {
+.toolbar__animated-background {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 0;
-}
-
-/* Update text color styles */
-.preview-mode .toolbar-title-input,
-.preview-mode .toolbar-title-extension,
-.preview-mode .toolbar-icon-button,
-.preview-mode .toolbar-icon-button .MuiSvgIcon-root {
-  color: #000000 !important;
-  transition: color 0.5s ease-in-out !important;
-}
-
-.edit-mode .toolbar-title-input,
-.edit-mode .toolbar-title-extension,
-.edit-mode .toolbar-icon-button,
-.edit-mode .toolbar-icon-button .MuiSvgIcon-root {
-  color: #ffffff !important;
-  transition: color 0.5s ease-in-out !important;
 }

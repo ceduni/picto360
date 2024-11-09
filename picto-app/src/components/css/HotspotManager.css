@@ -1,0 +1,74 @@
+/* Hotspots */
+
+.hotspot-manager__hotspot {
+  height: 17.5px;
+  width: 17.5px;
+  background: #000;
+  border-radius: 50%;
+  border: 4px solid #F0F0F0;
+  position: relative;
+  transition: border-color 0.1s ease;
+}
+
+.hotspot-manager__hotspot svg {
+  height: 90%;
+  width: 90%;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hotspot-manager__hotspot:hover {
+  box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
+}
+
+.hotspot-manager__label-tooltip,
+.hotspot-manager__custom-tooltip span {
+  position: absolute;
+  color: #FFF;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  cursor: default;
+}
+
+.hotspot-manager__custom-tooltip span {
+  visibility: hidden;
+  width: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/*.hotspot-manager__custom-tooltip:hover .hotspot-manager__custom-tooltip-content*/
+.hotspot-manager__custom-tooltip:hover span {
+  visibility: visible;
+}
+
+/* tooltip tip */
+.hotspot-manager__custom-tooltip:hover span:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-width: 10px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.hotspot-manager__custom-tooltip a {
+  color: white;
+  text-decoration: underline;
+}
+
+.hotspot-manager__custom-tooltip a:hover {
+  color: #94d255;
+  text-decoration: underline;
+}

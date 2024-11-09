@@ -1,32 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Toolbar from "@components/Toolbar";
 import PanoramaViewer from "@components/PanoramaViewer";
 import ImageUploader from "@components/ImageUploader";
-import BottomNavbar from "@/components/BottomNavbar"
+import BottomNavbar from "@/components/BottomNavbar";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
-const App = () => {
+const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  const handleImageUpload = (imageSrc: string) => {
-    setImageSrc(imageSrc);
-  };
+  const handleImageUpload = useCallback((newImageSrc: string) => {
+    setImageSrc(newImageSrc);
+  }, []);
+
+  const toggleEditMode = useCallback(() => {
+    setIsEditMode((prevMode) => !prevMode);
+  }, []);
 
   return (
-    <div className="App">
-      {imageSrc && (
-        <Toolbar
-          imageSrc={imageSrc}
-          isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
-        />
-      )}
-      <div className="App-body">{imageSrc ? (<PanoramaViewer width="100%" height="100%" imageSrc={imageSrc}
-            isEditMode={isEditMode}
-          />
-        ) : ( 
+    <div className="app">
+      <header className="app__header">
+        {imageSrc && <Toolbar imageSrc={imageSrc} isEditMode={isEditMode} toggleEditMode={toggleEditMode} />}
+      </header>
+      <div className="app__body">
+        {imageSrc ? (
+          <PanoramaViewer width="100%" height="100%" imageSrc={imageSrc} isEditMode={isEditMode} />
+        ) : (
           <ImageUploader onImageUpload={handleImageUpload} />
         )}
       </div>

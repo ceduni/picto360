@@ -91,4 +91,4 @@ const ParticlesBackground: React.FC = () => {
   ) : null;
 };
 
-export default ParticlesBackground;
+export default React.memo(ParticlesBackground);

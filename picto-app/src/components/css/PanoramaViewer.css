@@ -1,20 +1,18 @@
-.viewer-container {
-  flex-grow: 1;
-  width: 100%;
-  height: 100%;
-  background-color: black;
-  position: relative;
-  overflow: hidden;
-}
-
 .pnlm-about-msg {
   /* removes Pannellum's about message */
   display: none !important;
 }
 
-/*Target*/
+.panorama-viewer {
+  background-color: black;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
 
-.target-icon {
+.panorama-viewer__target-icon {
   position: absolute;
   font-size: 24px;
   color: red;
@@ -29,15 +27,15 @@
   height: 32.5px;
 }
 
-.target-icon svg {
+.panorama-viewer__target-icon svg {
   width: 100%;
   height: 100%;
 }
 
 /*animation found at https://wpdean.com/css-ripple-effect/*/
 
-.target-icon:before,
-.target-icon:after {
+.panorama-viewer__target-icon:before,
+.panorama-viewer__target-icon:after {
   position: absolute;
   content: "";
   top: 0;
@@ -48,11 +46,11 @@
   border-radius: 50%;
 }
 
-.target-icon:before {
+.panorama-viewer__target-icon:before {
   animation: ripple 2s linear infinite;
 }
 
-.target-icon:after {
+.panorama-viewer__target-icon:after {
   animation: ripple 2s 1s linear infinite;
 }
 
@@ -61,88 +59,4 @@
     transform: scale(2);
     opacity: 0;
   }
-}
-
-/*Hotspots*/
-
-.custom-hotspot {
-  height: 17.5px;
-  width: 17.5px;
-  background: #000;
-  border-radius: 50%;
-  border: 4px solid #F0F0F0;
-  position: relative;
-  transition: border-color 0.1s ease;
-}
-
-.custom-hotspot svg {
-  height: 90%;
-  width: 90%;
-  color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
-.custom-hotspot:hover {
-  box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
-}
-
-.custom-label-tooltip,
-div.custom-tooltip span {
-  position: absolute;
-  color: #FFF;
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 5px 10px;
-  border-radius: 5px;
-  text-align: center;  
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  cursor: default;
-}
-
-div.custom-tooltip span {
-  visibility: hidden;
-  width: auto;
-  /*max-width: 500px;*/
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-
-div.custom-tooltip:hover span {
-  visibility: visible;
-}
-
-/* tooltip tip */
-div.custom-tooltip:hover span:after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-width: 10px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-div.custom-tooltip a {
-  color: white;
-  text-decoration: underline;
-}
-
-div.custom-tooltip a:visited {
-  color: white;
-}
-
-div.custom-tooltip a:hover {
-  color: white;
-}
-
-div.custom-tooltip a:active {
-  color: white;
 }

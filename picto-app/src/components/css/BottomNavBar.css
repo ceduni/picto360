@@ -1,73 +1,65 @@
-.lowerBar {
+:root {
+  --bottom-bar-width: 90%;
+  --icon-size: 1.25em;
+  --bar-height: 2.5em;
+  --border-radius: 1.75em;
+  --button-size: 2em;
+}
+
+.bottom-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--bottom-bar-width);
+  height: var(--bar-height);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.bottom-navbar__toolbar {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.bottom-navbar__button {
+  flex: 0 0 auto;
+  width: var(--button-size);
+  height: var(--button-size);
+  margin: 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.button-container {
-  height: 100%;
-  width: 100%;
+.bottom-navbar__button .MuiSvgIcon-root {
+  font-size: var(--icon-size);
 }
 
-/* Smaller screens */
-@media (max-width: 600px) {
+@media (min-width: 400px) {
   :root {
-    --bottom-bar-width: 25%; 
-    --icon-size: 1.25em; 
-  }
-  .lowerBar {
-    height: 2.5em;
-    border-radius: 1.75em 1.75em 0 0;
-  }
-
-  .lowerBar .MuiIconButton-root {
-    margin: 0 0.5em;
-    padding: 0.5em;
-  }
-
-  .lowerBar .MuiSvgIcon-root {
-    font-size: 1.25em;
+    --bottom-bar-width: 80%;
+    --icon-size: 1.375em;
+    --bar-height: 3em;
+    --border-radius: 2em;
+    --button-size: 2.5em;
   }
 }
 
-/* Medium screens */
-@media (min-width: 601px) and (max-width: 1024px) {
+@media (min-width: 600px) {
   :root {
-    --bottom-bar-width: 25%; 
-    --icon-size: 1.375em; 
-  }
-  .lowerBar {
-    height: 3em;
-    border-radius: 2em 2em 0 0;
-  }
-
-  .lowerBar .MuiIconButton-root {
-    margin: 0 0.75em;
-    padding: 0.6em;
-  }
-
-  .lowerBar .MuiSvgIcon-root {
-    font-size: 1.375em;
+    --bottom-bar-width: 60%;
+    --icon-size: 1.5em;
+    --bar-height: 3.5em;
+    --border-radius: 2.25em;
+    --button-size: 3em;
   }
 }
 
-/* Larger screens */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   :root {
-    --bottom-bar-width: 25%; 
-    --icon-size: 1.5em; 
-  }
-  .lowerBar {
-    height: 3.5em;
-    border-radius: 2.25em 2.25em 0 0;
-  }
-
-  .lowerBar .MuiIconButton-root {
-    margin: 0 1em;
-    padding: 0.7em;
-  }
-
-  .lowerBar .MuiSvgIcon-root {
-    font-size: 1.5em;
+    --bottom-bar-width: 30%;
   }
 }
