@@ -15,58 +15,46 @@ const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
   const adjustElementPosition = useCallback((element: HTMLElement, isMedia = false) => {
     requestAnimationFrame(() => {
-      const lines = element.innerHTML.split("<br>");
-      const lineCount = lines.length;
-      const extraMargin = lineCount > 1 ? (lineCount - 1) * 10 : 0;
-      const offsetY = isMedia ? -(element.offsetHeight + 30) : -(element.offsetHeight + 20 + extraMargin);
+      const lines = element.innerHTML.split("<br>").length;
+      const offsetY = -(element.offsetHeight + 15 + (lines > 1 ? (lines - 1) * 10 : 0));
       element.style.marginTop = `${offsetY}px`;
-
-      if (!isMedia) {
-        element.style.width = element.scrollWidth > 500 ? "500px" : `${element.scrollWidth}px`;
-      }
+      element.style.width = !isMedia && element.scrollWidth > 500 ? "500px" : `${element.scrollWidth}px`;
     });
   }, []);
 
   const handleContentEditable = useCallback(
     (span: HTMLSpanElement, charLimit: number) => {
-      const adjustPositionOnInput = () => adjustElementPosition(span);
-      const removeEmptyLineBreaks = () => {
+      const adjustOnInput = () => adjustElementPosition(span);
+      const removeEmptyLines = () => {
         span.innerHTML = span.innerHTML
           .split("<br>")
           .filter((line) => line.trim() !== "")
           .join("<br>");
       };
-
-      const limitText = () => {
+      const enforceCharLimit = () => {
         if (span.innerText.length > charLimit) {
           span.innerText = span.innerText.slice(0, charLimit);
           alert(`Maximum character limit of ${charLimit} reached.`);
         }
       };
 
-      // Focus switch on hotspot's tooltip
       span.addEventListener("blur", () => {
-        removeEmptyLineBreaks();
-        adjustPositionOnInput();
-        span.removeEventListener("input", adjustPositionOnInput);
+        removeEmptyLines();
+        adjustOnInput();
+        span.removeEventListener("input", adjustOnInput);
       });
-
-      // Empty line breaks removal
       span.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
           span.blur();
         }
       });
-
-      // Character limit
       span.addEventListener("input", () => {
-        limitText();
-        adjustPositionOnInput();
+        enforceCharLimit();
+        adjustOnInput();
       });
-
-      span.addEventListener("focus", (event) => event.stopPropagation());
-      span.addEventListener("keydown", (event) => event.stopPropagation());
+      span.addEventListener("focus", (e) => e.stopPropagation());
+      span.addEventListener("keydown", (e) => e.stopPropagation());
     },
     [adjustElementPosition]
   );
@@ -77,16 +65,13 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       content: string,
       editable: boolean,
       charLimit: number,
-      annotationType?: "text" | "label" | "image" | "gif" | "video" | "form"
+      type?: "text" | "label" | "image" | "gif" | "video" | "form"
     ) => {
       return (hotSpotDiv: HTMLElement) => {
-        if (annotationType !== "label") {
+        if (type !== "label") {
           hotSpotDiv.classList.add("hotspot-manager__custom-tooltip");
           const iconDiv = document.createElement("div");
           iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
-          iconDiv.style.display = "flex";
-          iconDiv.style.alignItems = "center";
-          iconDiv.style.justifyContent = "center";
           hotSpotDiv.appendChild(iconDiv);
         }
 
@@ -98,39 +83,38 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           handleContentEditable(span, charLimit);
         }
 
-        if (annotationType === "image" || annotationType === "gif") {
+        if (type === "image" || type === "gif") {
           const img = new Image();
-          img.src = annotationType === "gif" ? getDirectGifUrl(content) : content;
+          img.src = type === "gif" ? getDirectGifUrl(content) : content;
           img.loading = "lazy";
           img.style.maxWidth = "500px";
           img.style.maxHeight = "500px";
-          img.style.display = "block";
           img.onload = () => adjustElementPosition(span, true);
           span.innerHTML = "";
           span.appendChild(img);
-        } else if (annotationType === "video") {
+        } else if (type === "video") {
           const iframe = document.createElement("iframe");
           iframe.src = `${content}?enablejsapi=1`;
           iframe.width = "640px";
           iframe.height = "360px";
           iframe.loading = "lazy";
-          iframe.style.display = "block";
-          iframe.onload = () => adjustElementPosition(span, true);
-          span.innerHTML = "";
-          span.appendChild(iframe);
+          //iframe.style.display = "block";
 
-          const pauseVideo = () => {
-            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo" }), "*");
+          // Adjust the tooltip position specifically for the video
+          iframe.onload = () => {
+            adjustElementPosition(span, true);
+            span.style.marginTop = `${parseFloat(span.style.marginTop) - 10}px`; // Adding an extra offset to push it higher
           };
 
-          hotSpotDiv.addEventListener("mouseleave", pauseVideo);
+          span.innerHTML = "";
+          span.appendChild(iframe);
+          hotSpotDiv.addEventListener("mouseleave", () =>
+            iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo"}', "*")
+          );
         } else {
-          span.style.maxWidth = "500px";
           adjustElementPosition(span);
         }
-
         hotSpotDiv.appendChild(span);
-        //adjustElementPosition(span);
       };
     },
     [adjustElementPosition, handleContentEditable]
@@ -142,21 +126,19 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       content: string,
       editable: boolean,
       charLimit: number,
-      annotationType?: "text" | "label" | "image" | "gif" | "video" | "form",
-      clickHandlerFunc?: () => void
+      type?: "text" | "label" | "image" | "gif" | "video" | "form",
+      clickHandler?: () => void
     ) => {
       if (!viewer) return;
-
-      const cssClass = annotationType === "label" ? "hotspot-manager__label-tooltip" : "hotspot-manager__hotspot";
 
       const hotspot = {
         id: `hotspot-${Date.now()}`,
         pitch: coords[0],
         yaw: coords[1],
         type: "custom",
-        cssClass,
-        createTooltipFunc: createTooltipContent(icon, content, editable, charLimit, annotationType),
-        clickHandlerFunc,
+        cssClass: type === "label" ? "hotspot-manager__label-tooltip" : "hotspot-manager__hotspot",
+        createTooltipFunc: createTooltipContent(icon, content, editable, charLimit, type),
+        clickHandlerFunc: clickHandler,
       };
 
       //TODO: Remove any
@@ -168,11 +150,11 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
 
   const hotspotTypes = useMemo(
     () => ({
-      text: (coords: [number, number], hotspotText = "Default text content") =>
-        addHotspot(coords, <TiInfoLarge />, hotspotText, true, TEXT_CHAR_LIMIT),
+      text: (coords: [number, number]) =>
+        addHotspot(coords, <TiInfoLarge />, "Default text content", true, TEXT_CHAR_LIMIT),
       label: (coords: [number, number]) =>
         addHotspot(coords, <></>, "Label annotation", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
-      hyperlink: (coords: [number, number], url = "https://example.com", hyperlinkText = "Default hyperlink text") =>
+      hyperlink: (coords: [number, number], url: string, hyperlinkText: string) =>
         //TODO: compress the URL into a tiny URL on a single line
         addHotspot(
           coords,
@@ -183,6 +165,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           undefined,
           () => window.open(url, "_blank")
         ),
+      //TODO: add an optional title above/under (choice) the image
       image: (coords: [number, number], imageUrl: string) =>
         addHotspot(coords, <AiOutlinePicture />, imageUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "image"),
       gif: (coords: [number, number], gifUrl: string) =>
@@ -190,50 +173,16 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       video: (coords: [number, number], videoUrl: string) =>
         addHotspot(coords, <MdOutlineVideoLibrary />, videoUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "video"),
       form: (coords: [number, number], question: string, options: string[], correctOption: number) => {
-        const hotspot = {
-          id: `hotspot-${Date.now()}`,
-          pitch: coords[0],
-          yaw: coords[1],
-          type: "custom",
-          cssClass: "hotspot-manager__hotspot",
-          createTooltipFunc: (hotSpotDiv: HTMLElement) => {
-            hotSpotDiv.classList.add("hotspot-manager__custom-tooltip");
-            const icon = document.createElement("div");
-            icon.innerHTML = ReactDOMServer.renderToString(<MdOutlineQuestionMark />);
-            icon.style.display = "flex";
-            icon.style.alignItems = "center";
-            icon.style.justifyContent = "center";
-            hotSpotDiv.appendChild(icon);
-
-            const span = document.createElement("span");
-            const questionElement = document.createElement("div");
-            questionElement.innerText = question;
-
-            const optionsList = document.createElement("ul");
-            optionsList.style.listStyleType = "upper-alpha";
-            options.forEach((option, index) => {
-              const optionItem = document.createElement("li");
-              optionItem.innerText = option;
-              optionItem.style.cursor = "pointer";
-              optionItem.addEventListener("click", () => {
-                optionItem.style.color = index === correctOption ? "green" : "red";
-              });
-              optionsList.appendChild(optionItem);
-            });
-            span.appendChild(questionElement);
-            span.appendChild(optionsList);
-
-            hotSpotDiv.appendChild(span);
-            adjustElementPosition(span);
-          },
-        };
-        //TODO: Remove any
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (viewer as any).addHotSpot(hotspot);
+        const icon = <MdOutlineQuestionMark />;
+        const content = `${question}<ul>${options
+          .map((opt, i) => `<li style="color: ${i === correctOption ? "green" : "red"}">${opt}</li>`)
+          .join("")}</ul>`;
+        addHotspot(coords, icon, content, false, LABEL_HYPERLINK_CHAR_LIMIT, "form");
       },
     }),
-    [addHotspot, adjustElementPosition]
+    [addHotspot]
   );
+
   const extractYouTubeVideoId = useCallback((url: string) => {
     const regex =
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -267,18 +216,16 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
   }, []);
 
   const handleAddHotspot = useCallback(
-    async (annotationType: string, coords: [number, number]) => {
-      switch (annotationType) {
+    async (type: string, coords: [number, number]) => {
+      switch (type) {
         case "Form": {
-          const question = prompt("Entrez la question:");
-          const nbOptions = parseInt(prompt("Entrez le nombre d'options (minimum 2):") || "2", 10);
+          const question = prompt("Saisissez la question:");
           const options = Array.from(
-            { length: nbOptions },
-            (_, i) => prompt(`Entrez le texte pour le choix ${i + 1}`) || ""
+            { length: parseInt(prompt("Saisissez le nombre d'options de réponses (minimum 2):") || "2", 10) },
+            (_, i) => prompt(`Option ${i + 1}`) || ""
           );
-          const correctOption = parseInt(prompt("Entrez le numéro de la bonne réponse :") || "1", 10) - 1;
-
-          if (question && options.length >= 2 && correctOption >= 0 && correctOption < options.length) {
+          const correctOption = parseInt(prompt("Saisissez le numéro de la bonne réponse:") || "1", 10) - 1;
+          if (question && options.length >= 2 && correctOption >= 0) {
             hotspotTypes.form(coords, question, options, correctOption);
           } else {
             alert(
@@ -293,47 +240,39 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
         case "Label":
           hotspotTypes.label(coords);
           break;
-        case "Hyperlink":
-          hotspotTypes.hyperlink(coords);
+        case "Hyperlink": {
+          const url = prompt("Soumettez le lien URL:") || "https://example.com";
+          const text = prompt("Soumettez le texte de l'hyperlien:") || "Default hyperlink text";
+          if (url) hotspotTypes.hyperlink(coords, url, text);
           break;
+        }
         case "Image": {
-          const imageFile = await new Promise<File | null>((resolve) => {
+          const file = await new Promise<File | null>((resolve) => {
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
             input.onchange = (e) => resolve((e.target as HTMLInputElement).files?.[0] || null);
             input.click();
           });
-          if (imageFile) {
-            hotspotTypes.image(coords, URL.createObjectURL(imageFile));
-          }
+          if (file) hotspotTypes.image(coords, URL.createObjectURL(file));
           break;
         }
-        case "Gif": {
-          const gifUrl = prompt("Enter the URL of the GIF:");
-          if (gifUrl) {
-            const directGifUrl = getDirectGifUrl(gifUrl);
-            hotspotTypes.gif(coords, directGifUrl);
-          }
+        case "Gif":
+          hotspotTypes.gif(coords, prompt("Saisissez le lien URL du GIF:") || "");
           break;
-        }
         case "Video": {
-          const videoUrl = prompt("Enter the YouTube video URL:");
-          if (videoUrl) {
-            const videoId = extractYouTubeVideoId(videoUrl);
-            if (videoId) {
-              hotspotTypes.video(coords, `https://www.youtube.com/embed/${videoId}`);
-            } else {
-              alert("Invalid YouTube URL");
-            }
+          const videoUrl = prompt("Saisissez le lien URL de la vidéo YouTube:");
+          const videoId = videoUrl ? extractYouTubeVideoId(videoUrl) : null;
+          if (videoId) {
+            hotspotTypes.video(coords, `https://www.youtube.com/embed/${videoId}`);
+          } else {
+            alert("Erreur: lien URL YouTube invalide.");
           }
           break;
         }
-        default:
-          break;
       }
     },
-    [hotspotTypes, extractYouTubeVideoId, getDirectGifUrl]
+    [hotspotTypes, extractYouTubeVideoId]
   );
 
   React.useEffect(() => {
