@@ -1,5 +1,4 @@
 /* Hotspots */
-
 .hotspot-manager__hotspot {
   height: 17.5px;
   width: 17.5px;
@@ -24,17 +23,26 @@
   box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
 }
 
-.hotspot-manager__label-tooltip,
-.hotspot-manager__custom-tooltip span {
+/* Tooltip and content styling */
+.hotspot-manager__custom-tooltip span,
+.hotspot-manager__label {
   position: absolute;
-  color: #FFF;
   background-color: rgba(0, 0, 0, 0.8);
+  color: #FFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
   padding: 5px 10px;
   border-radius: 5px;
   text-align: center;
   cursor: default;
-  white-space: pre-wrap;
+  white-space: normal;
   overflow-wrap: break-word;
+  max-width: 500px;
+  width: auto;
+}
+
+.hotspot-manager__label {
+  font-weight: bold;
 }
 
 .hotspot-manager__custom-tooltip span {
@@ -48,7 +56,7 @@
   visibility: visible;
 }
 
-/* tooltip tip */
+/* Tooltip's tip */
 .hotspot-manager__custom-tooltip span:after {
   content: '';
   position: absolute;
@@ -69,4 +77,16 @@
 
 .hotspot-manager__custom-tooltip a:hover {
   color: #94d255;
+}
+
+/* Media content styling */
+.hotspot-manager__graphics {
+  max-width: 500px;
+  max-height: 500px;
+}
+
+/* 16:9 ratio */
+.hotspot-manager__video {
+  width: 640px;
+  height: 360px;
 }

@@ -13,12 +13,20 @@ const TEXT_CHAR_LIMIT = 300;
 const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 
 const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
-  const adjustElementPosition = useCallback((element: HTMLElement, isMedia = false) => {
+  const adjustElementPosition = useCallback((element: HTMLElement) => {
     requestAnimationFrame(() => {
-      const lines = element.innerHTML.split("<br>").length;
-      const offsetY = -(element.offsetHeight + 15 + (lines > 1 ? (lines - 1) * 10 : 0));
-      element.style.marginTop = `${offsetY}px`;
-      element.style.width = !isMedia && element.scrollWidth > 500 ? "500px" : `${element.scrollWidth}px`;
+      element.style.width = "";
+      element.style.maxWidth = "500px";
+
+      // Anchoring the tooltip to the tip at the bottom
+      const tooltipHeight = element.offsetHeight;
+      element.style.marginTop = `-${tooltipHeight + 15}px`;
+
+      // Horizontal positioning adjustment if element overflows the screen
+      const elementRect = element.getBoundingClientRect();
+      if (elementRect.right > window.innerWidth) {
+        element.style.left = `${window.innerWidth - elementRect.width - 10}px`;
+      }
     });
   }, []);
 
@@ -86,26 +94,15 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
         if (type === "image" || type === "gif") {
           const img = new Image();
           img.src = type === "gif" ? getDirectGifUrl(content) : content;
-          img.loading = "lazy";
-          img.style.maxWidth = "500px";
-          img.style.maxHeight = "500px";
-          img.onload = () => adjustElementPosition(span, true);
+          img.classList.add("hotspot-manager__graphics");
+          img.onload = () => adjustElementPosition(span);
           span.innerHTML = "";
           span.appendChild(img);
         } else if (type === "video") {
           const iframe = document.createElement("iframe");
           iframe.src = `${content}?enablejsapi=1`;
-          iframe.width = "640px";
-          iframe.height = "360px";
-          iframe.loading = "lazy";
-          //iframe.style.display = "block";
-
-          // Adjust the tooltip position specifically for the video
-          iframe.onload = () => {
-            adjustElementPosition(span, true);
-            span.style.marginTop = `${parseFloat(span.style.marginTop) - 10}px`; // Adding an extra offset to push it higher
-          };
-
+          iframe.classList.add("hotspot-manager__video");
+          iframe.onload = () => adjustElementPosition(span);
           span.innerHTML = "";
           span.appendChild(iframe);
           hotSpotDiv.addEventListener("mouseleave", () =>
@@ -119,6 +116,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
     },
     [adjustElementPosition, handleContentEditable]
   );
+
   const addHotspot = useCallback(
     (
       coords: [number, number],
@@ -136,7 +134,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
         pitch: coords[0],
         yaw: coords[1],
         type: "custom",
-        cssClass: type === "label" ? "hotspot-manager__label-tooltip" : "hotspot-manager__hotspot",
+        cssClass: type === "label" ? "hotspot-manager__label" : "hotspot-manager__hotspot",
         createTooltipFunc: createTooltipContent(icon, content, editable, charLimit, type),
         clickHandlerFunc: clickHandler,
       };
@@ -151,7 +149,13 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
   const hotspotTypes = useMemo(
     () => ({
       text: (coords: [number, number]) =>
-        addHotspot(coords, <TiInfoLarge />, "Default text content", true, TEXT_CHAR_LIMIT),
+        addHotspot(
+          coords,
+          <TiInfoLarge />,
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id suscipit ligula, non faucibus diam. Donec lacinia placerat mollis. Nam a est et risus finibus condimentum.",
+          true,
+          TEXT_CHAR_LIMIT
+        ),
       label: (coords: [number, number]) =>
         addHotspot(coords, <></>, "Label annotation", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
       hyperlink: (coords: [number, number], url: string, hyperlinkText: string) =>
@@ -206,7 +210,6 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
         const tenorId = url.split("-").pop();
         return tenorId ? `https://media.tenor.com/${tenorId}.gif` : url;
       } else if (url.match(/\.(gifv|mp4)$/)) {
-        // Convert other .gifv or .mp4 links to .gif
         return url.replace(/\.(gifv|mp4)$/, ".gif");
       }
     } catch (error) {
@@ -242,7 +245,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           break;
         case "Hyperlink": {
           const url = prompt("Soumettez le lien URL:") || "https://example.com";
-          const text = prompt("Soumettez le texte de l'hyperlien:") || "Default hyperlink text";
+          const text = prompt("Soumettez le texte de l'hyperlien:") || "Hyperlien";
           if (url) hotspotTypes.hyperlink(coords, url, text);
           break;
         }
