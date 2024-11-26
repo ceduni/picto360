@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef, useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
@@ -13,22 +13,40 @@ const TEXT_CHAR_LIMIT = 300;
 const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 
 const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
-  const adjustElementPosition = useCallback((element: HTMLElement) => {
-    requestAnimationFrame(() => {
-      element.style.width = "";
-      element.style.maxWidth = "500px";
+  const hotspotCounter = useRef(0);
+  const debugMode = useRef(true);
 
-      // Anchoring the tooltip to the tip at the bottom
-      const tooltipHeight = element.offsetHeight;
-      element.style.marginTop = `-${tooltipHeight + 15}px`;
-
-      // Horizontal positioning adjustment if element overflows the screen
-      const elementRect = element.getBoundingClientRect();
-      if (elementRect.right > window.innerWidth) {
-        element.style.left = `${window.innerWidth - elementRect.width - 10}px`;
-      }
-    });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const debugLog = useCallback((...args: any[]) => {
+    if (debugMode.current) {
+      console.log(`HotspotManager - [HotspotManager Debug]`, ...args);
+    }
   }, []);
+
+  const adjustElementPosition = useCallback(
+    (element: HTMLElement) => {
+      debugLog("HotspotManager - Adjusting element position", element);
+      requestAnimationFrame(() => {
+        // Anchoring the tooltip to the tip at the bottom
+        const tooltipHeight = element.offsetHeight;
+        element.style.marginTop = `-${tooltipHeight + 15}px`;
+
+        // Horizontal positioning adjustment if element overflows the screen
+        const elementRect = element.getBoundingClientRect();
+        if (elementRect.right > window.innerWidth) {
+          element.style.left = `${window.innerWidth - elementRect.width - 10}px`;
+        }
+
+        debugLog("HotspotManager - Adjusted element position", {
+          width: element.style.width,
+          maxWidth: element.style.maxWidth,
+          marginTop: element.style.marginTop,
+          left: element.style.left,
+        });
+      });
+    },
+    [debugLog]
+  );
 
   const handleContentEditable = useCallback(
     (span: HTMLSpanElement, charLimit: number) => {
@@ -73,9 +91,11 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       content: string,
       editable: boolean,
       charLimit: number,
-      type?: "text" | "label" | "image" | "gif" | "video" | "form"
+      type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "form"
     ) => {
       return (hotSpotDiv: HTMLElement) => {
+        debugLog("HotspotManager - Creating tooltip content", { type, icon, content, editable, charLimit });
+
         if (type !== "label") {
           hotSpotDiv.classList.add("hotspot-manager__custom-tooltip");
           const iconDiv = document.createElement("div");
@@ -84,37 +104,53 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
         }
 
         const span = document.createElement("span");
-        span.innerHTML = content;
+        span.className = "hotspot-manager__content";
 
-        if (editable) {
-          span.contentEditable = "true";
-          handleContentEditable(span, charLimit);
+        switch (type) {
+          case "text":
+          case "label":
+            {
+              const textNode = document.createTextNode(content);
+              span.appendChild(textNode);
+              span.classList.add("hotspot-manager__content--text");
+              if (editable) {
+                span.contentEditable = "true";
+                handleContentEditable(span, charLimit);
+              }
+            }
+            break;
+          case "hyperlink":
+          case "form":
+            span.innerHTML = content;
+            break;
+          case "image":
+          case "gif": {
+            const img = new Image();
+            img.src = type === "gif" ? getDirectGifUrl(content) : content;
+            img.classList.add("hotspot-manager__graphics");
+            img.onload = () => adjustElementPosition(span);
+            span.appendChild(img);
+            break;
+          }
+          case "video": {
+            const iframe = document.createElement("iframe");
+            iframe.src = `${content}?enablejsapi=1`;
+            iframe.classList.add("hotspot-manager__video");
+            iframe.onload = () => adjustElementPosition(span);
+            span.appendChild(iframe);
+            hotSpotDiv.addEventListener("mouseleave", () =>
+              iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo"}', "*")
+            );
+            break;
+          }
         }
 
-        if (type === "image" || type === "gif") {
-          const img = new Image();
-          img.src = type === "gif" ? getDirectGifUrl(content) : content;
-          img.classList.add("hotspot-manager__graphics");
-          img.onload = () => adjustElementPosition(span);
-          span.innerHTML = "";
-          span.appendChild(img);
-        } else if (type === "video") {
-          const iframe = document.createElement("iframe");
-          iframe.src = `${content}?enablejsapi=1`;
-          iframe.classList.add("hotspot-manager__video");
-          iframe.onload = () => adjustElementPosition(span);
-          span.innerHTML = "";
-          span.appendChild(iframe);
-          hotSpotDiv.addEventListener("mouseleave", () =>
-            iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo"}', "*")
-          );
-        } else {
-          adjustElementPosition(span);
-        }
         hotSpotDiv.appendChild(span);
+        adjustElementPosition(span);
+        debugLog("HotspotManager - Tooltip adjustments completed", { span });
       };
     },
-    [adjustElementPosition, handleContentEditable]
+    [adjustElementPosition, debugLog]
   );
 
   const addHotspot = useCallback(
@@ -124,26 +160,37 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       content: string,
       editable: boolean,
       charLimit: number,
-      type?: "text" | "label" | "image" | "gif" | "video" | "form",
+      type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "form",
       clickHandler?: () => void
     ) => {
-      if (!viewer) return;
+      if (!viewer) {
+        debugLog("HotspotManager - Viewer not available, cannot add hotspot");
+        return;
+      }
+
+      const hotspotId = `hotspot-${Date.now()}-${hotspotCounter.current++}`;
+      debugLog("HotspotManager - Adding hotspot", { hotspotId, coords, type, content });
 
       const hotspot = {
-        id: `hotspot-${Date.now()}`,
+        id: hotspotId,
         pitch: coords[0],
         yaw: coords[1],
         type: "custom",
-        cssClass: type === "label" ? "hotspot-manager__label" : "hotspot-manager__hotspot",
+        cssClass: type === "label" ? "hotspot-manager__label" : "hotspot-manager__custom_hotspot",
         createTooltipFunc: createTooltipContent(icon, content, editable, charLimit, type),
         clickHandlerFunc: clickHandler,
       };
 
-      //TODO: Remove any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (viewer as any).addHotSpot(hotspot);
+      try {
+        //TODO: Replace any (if possible)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (viewer as any).addHotSpot(hotspot);
+        debugLog("HotspotManager - Hotspot added successfully", hotspotId);
+      } catch (error) {
+        console.error("HotspotManager - Failed to add hotspot", error);
+      }
     },
-    [viewer, createTooltipContent]
+    [viewer, createTooltipContent, debugLog]
   );
 
   const hotspotTypes = useMemo(
@@ -154,10 +201,11 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           <TiInfoLarge />,
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id suscipit ligula, non faucibus diam. Donec lacinia placerat mollis. Nam a est et risus finibus condimentum.",
           true,
-          TEXT_CHAR_LIMIT
+          TEXT_CHAR_LIMIT,
+          "text"
         ),
       label: (coords: [number, number]) =>
-        addHotspot(coords, <></>, "Label annotation", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
+        addHotspot(coords, <></>, "Lorem ipsum dolor sit amet.", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
       hyperlink: (coords: [number, number], url: string, hyperlinkText: string) =>
         //TODO: compress the URL into a tiny URL on a single line
         addHotspot(
@@ -166,8 +214,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           `<a href="${url}" target="_blank">${hyperlinkText}</a>`,
           false,
           LABEL_HYPERLINK_CHAR_LIMIT,
-          undefined,
-          () => window.open(url, "_blank")
+          "hyperlink"
         ),
       //TODO: add an optional title above/under (choice) the image
       image: (coords: [number, number], imageUrl: string) =>
@@ -177,11 +224,16 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
       video: (coords: [number, number], videoUrl: string) =>
         addHotspot(coords, <MdOutlineVideoLibrary />, videoUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "video"),
       form: (coords: [number, number], question: string, options: string[], correctOption: number) => {
-        const icon = <MdOutlineQuestionMark />;
-        const content = `${question}<ul>${options
-          .map((opt, i) => `<li style="color: ${i === correctOption ? "green" : "red"}">${opt}</li>`)
-          .join("")}</ul>`;
-        addHotspot(coords, icon, content, false, LABEL_HYPERLINK_CHAR_LIMIT, "form");
+        addHotspot(
+          coords,
+          <MdOutlineQuestionMark />,
+          `${question}<ul>${options
+            .map((opt, i) => `<li style="color: ${i === correctOption ? "green" : "red"}">${opt}</li>`)
+            .join("")}</ul>`,
+          false,
+          LABEL_HYPERLINK_CHAR_LIMIT,
+          "form"
+        );
       },
     }),
     [addHotspot]
@@ -193,33 +245,36 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
     return url.match(regex)?.[1] || null;
   }, []);
 
+  /*Giphy and Tenor compatibility*/
   const getDirectGifUrl = useCallback((url: string): string => {
     try {
       if (url.includes("giphy.com") || url.includes("giphy")) {
         const match = url.match(/media\/([a-zA-Z0-9]+)\/giphy\.gif/);
         const giphyId = match ? match[1] : url.split("-").pop();
         return giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
-      } else if (url.includes("imgur.com")) {
-        const imgurId = url.split("/").pop()?.split(".")[0];
-        return imgurId ? `https://i.imgur.com/${imgurId}.gif` : url;
-      } else if (url.includes("reddit.com")) {
-        return url.replace("https://preview.redd.it", "https://i.redd.it");
-      } else if (url.includes("tumblr.com")) {
-        return url.match(/\.(gif|gifv|mp4)$/) ? url.replace(/\.gifv?$/, ".gif") : `${url}.gif`;
       } else if (url.includes("tenor.com")) {
-        const tenorId = url.split("-").pop();
-        return tenorId ? `https://media.tenor.com/${tenorId}.gif` : url;
-      } else if (url.match(/\.(gifv|mp4)$/)) {
-        return url.replace(/\.(gifv|mp4)$/, ".gif");
+        if (url.includes("/view/") || url.includes("/gif/")) {
+          // Extract the numeric ID from "view" or "gif" URLs
+          const match = url.match(/-([0-9]+)$/);
+          const tenorId = match ? match[1] : null;
+          return tenorId ? `https://media.tenor.com/${tenorId}/gif` : url;
+        } else if (url.endsWith(".gif")) {
+          // Handle direct GIF links
+          const tenorId = url.split("/").pop()?.replace(".gif", "");
+          return tenorId ? `https://media.tenor.com/${tenorId}/gif` : url;
+        }
+        return url; // Return original if no valid ID is found
       }
+      return url; // Return original URL if it's not recognized
     } catch (error) {
-      console.error("Failed to parse GIF URL:", error);
+      console.error("HotspotManager - Failed to parse GIF URL:", error);
+      return url;
     }
-    return url;
   }, []);
 
   const handleAddHotspot = useCallback(
     async (type: string, coords: [number, number]) => {
+      debugLog("HotspotManager - Handling add hotspot", { type, coords });
       switch (type) {
         case "Form": {
           const question = prompt("Saisissez la question:");
@@ -274,17 +329,41 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer }) => {
           break;
         }
       }
+      debugLog("HotspotManager - Hotspot added", { type, coords });
     },
-    [hotspotTypes, extractYouTubeVideoId]
+    [hotspotTypes, extractYouTubeVideoId, debugLog]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (viewer) {
-      //TODO: Remove any
+      debugLog("HotspotManager - Setting up viewer addHotspot method");
+      //TODO: Replace any (if possible)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (viewer as any).addHotspot = handleAddHotspot;
     }
-  }, [viewer, handleAddHotspot]);
+  }, [viewer, handleAddHotspot, debugLog]);
+
+  // Debugging tools
+  useEffect(() => {
+    if (debugMode.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).toggleHotspotDebug = () => {
+        debugMode.current = !debugMode.current;
+        console.log(`HotspotManager - Hotspot debug mode ${debugMode.current ? "enabled" : "disabled"}`);
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).listHotspots = () => {
+        if (viewer) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const hotspots = (viewer as any).getHotSpots();
+          console.table(hotspots);
+        } else {
+          console.log("HotspotManager - Viewer not available");
+        }
+      };
+    }
+  }, [viewer]);
 
   return null;
 };

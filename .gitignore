@@ -1,9 +1,11 @@
 picto-app/public/images/Manhattan.jpg
 
-# dependencies
+# Node dependencies
 node_modules/
-# environment variables
+
+# Environment variables
 .env
+
 # Google OAuth credentials
 credentials.json
 token.json
@@ -17,15 +19,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Build outputs
+dist/
+dist-ssr/
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+.vscode/
+!.vscode/extensions.json   # Allow extensions.json for shared workspace extensions
+!.vscode/settings.json     # Allow workspace settings if applicable
+!.vscode/tasks.json        # Allow tasks for team consistency if needed
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -33,3 +37,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# VSCode specific workspace storage
+.vscode-test/
+.vscode-test-workspace/
+picto-app/public/images/Montagnes.jpg
+.vscode/settings.json
+.vscode/settings.json

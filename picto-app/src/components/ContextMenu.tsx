@@ -7,9 +7,10 @@ import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons
 
 interface ContextMenuProps {
   visible: boolean;
-  anchorPosition?: { x: number; y: number };
+  anchorPosition: { x: number; y: number };
   onMenuItemClick: (type: string) => void;
   onClose: () => void;
+  onRelocate: (newPosition: { x: number; y: number }) => void;
   isEditMode: boolean;
 }
 
@@ -42,9 +43,10 @@ const menuItems: MenuItemType[] = [
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
   visible,
-  anchorPosition = { x: 0, y: 0 },
+  anchorPosition,
   onMenuItemClick,
   onClose,
+  onRelocate,
   isEditMode,
 }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
@@ -53,19 +55,29 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     if (!isEditMode) handleClose();
   }, [isEditMode, handleClose]);
 
+  // Relocate the context menu when right-clicking elsewhere while it's open
+  useEffect(() => {
+    const handleRelocate = (e: MouseEvent) => {
+      if (visible) {
+        e.preventDefault();
+        onRelocate({ x: e.clientX, y: e.clientY });
+      }
+    };
+
+    document.addEventListener("contextmenu", handleRelocate);
+    return () => {
+      document.removeEventListener("contextmenu", handleRelocate);
+    };
+  }, [visible, onRelocate]);
+
   const menuContent = useMemo(
     () =>
       menuItems.map((item, index) =>
         item.type === "divider" ? (
-          // Divider rendering
           <Divider key={`divider-${index}`} />
         ) : (
           <MenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
-            <ListItemIcon>
-              {/* Only render the icon if it exists in the item */}
-              {"icon" in item && <item.icon />}
-            </ListItemIcon>
-            {/* Only render the label if it exists in the item */}
+            <ListItemIcon>{"icon" in item && <item.icon />}</ListItemIcon>
             {"label" in item && <ListItemText>{item.label}</ListItemText>}
           </MenuItem>
         )
@@ -73,12 +85,15 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     [onMenuItemClick]
   );
 
-  const menuPosition = useMemo(() => ({ top: anchorPosition.y, left: anchorPosition.x }), [anchorPosition]);
-
   if (!visible || !isEditMode) return null;
 
   return (
-    <StyledMenu open={visible} onClose={handleClose} anchorReference="anchorPosition" anchorPosition={menuPosition}>
+    <StyledMenu
+      open={visible}
+      onClose={handleClose}
+      anchorReference="anchorPosition"
+      anchorPosition={{ top: anchorPosition.y, left: anchorPosition.x }}
+    >
       {menuContent}
     </StyledMenu>
   );

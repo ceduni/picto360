@@ -1,5 +1,5 @@
 /* Hotspots */
-.hotspot-manager__hotspot {
+.hotspot-manager__custom_hotspot {
   height: 17.5px;
   width: 17.5px;
   background: #000;
@@ -9,7 +9,7 @@
   transition: border-color 0.1s ease;
 }
 
-.hotspot-manager__hotspot svg {
+.hotspot-manager__custom_hotspot svg {
   height: 90%;
   width: 90%;
   color: #fff;
@@ -19,40 +19,52 @@
   transform: translate(-50%, -50%);
 }
 
-.hotspot-manager__hotspot:hover {
+.hotspot-manager__custom_hotspot:hover {
   box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
 }
 
 /* Tooltip and content styling */
-.hotspot-manager__custom-tooltip span,
+.hotspot-manager__custom-tooltip .hotspot-manager__content,
 .hotspot-manager__label {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.8);
   color: #FFF;
   font-family: 'Inter', sans-serif;
   font-size: 20px;
-  padding: 5px 10px;
   border-radius: 5px;
-  text-align: center;
-  cursor: default;
   white-space: normal;
-  overflow-wrap: break-word;
+  word-wrap: break-word;
+  /*TODO: Handle all screen sizes */
   max-width: 500px;
-  width: auto;
+  width: max-content;
+  box-sizing: border-box;
+  display: flex;
+  /*justify-content: center;
+  align-items: center;*/
+  padding: 10px 15px;
 }
 
-.hotspot-manager__label {
-  font-weight: bold;
-}
-
-.hotspot-manager__custom-tooltip span {
+.hotspot-manager__custom-tooltip .hotspot-manager__content {
   visibility: hidden;
-  width: auto;
   left: 50%;
   transform: translateX(-50%);
 }
 
-.hotspot-manager__custom-tooltip:hover span {
+.hotspot-manager__label {
+  font-weight: bold;
+  display: flow-root;
+}
+
+.hotspot-manager__custom-tooltip .hotspot-manager__content--text {
+  text-align: left;
+}
+
+.hotspot-manager__custom-tooltip .hotspot-manager__content--text,
+.hotspot-manager__label span {
+  cursor: text;
+}
+
+.hotspot-manager__custom-tooltip:hover .hotspot-manager__content {
   visibility: visible;
 }
 
@@ -60,8 +72,6 @@
 .hotspot-manager__custom-tooltip span:after {
   content: '';
   position: absolute;
-  width: 0;
-  height: 0;
   border-width: 10px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
@@ -80,13 +90,23 @@
 }
 
 /* Media content styling */
+.hotspot-manager__graphics,
+.hotspot-manager__video {
+  object-fit: contain;
+}
+
 .hotspot-manager__graphics {
-  max-width: 500px;
-  max-height: 500px;
+  width: auto;
+  height: auto;
+  max-width: 485px;
+  max-height: 490px;
 }
 
 /* 16:9 ratio */
 .hotspot-manager__video {
   width: 640px;
   height: 360px;
+  max-width: 500px;
+  /* 16:9 aspect ratio for 500px width */
+  max-height: 281px;
 }

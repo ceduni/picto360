@@ -6,7 +6,7 @@ import "./css/PanoramaViewer.css";
 
 declare global {
   interface Window {
-    //TODO: Remove any
+    //TODO: Replace any (if possible)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     pannellum: any;
   }
@@ -21,7 +21,10 @@ interface PanoramaViewerProps {
 
 const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc, isEditMode }) => {
   const viewerRef = useRef<HTMLDivElement>(null);
-  const viewerInstanceRef = useRef<unknown>(null);
+  const viewerInstanceRef = useRef<{
+    mouseEventToCoords: (event: MouseEvent) => [number, number];
+    destroy: () => void;
+  } | null>(null);
   const [contextMenuState, setContextMenuState] = useState({
     visible: false,
     position: { x: 0, y: 0 },
@@ -48,49 +51,64 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     [imageSrc]
   );
 
-  const setupViewer = useCallback(() => {
-    if (!viewerRef.current || !imageSrc) return;
+  const initializeViewer = useCallback(() => {
+    if (!viewerRef.current || !imageSrc) {
+      console.error("PanellumViewer - Viewer ref or image source is missing.");
+      return;
+    }
 
-    const viewer = window.pannellum.viewer(viewerRef.current, viewerConfig);
-    viewerInstanceRef.current = viewer;
+    if (!viewerInstanceRef.current) {
+      console.log("PanellumViewer - Initializing Pannellum viewer...");
+      viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig);
+    }
+  }, [imageSrc, viewerConfig]);
 
-    const handleContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
+  useEffect(() => {
+    initializeViewer();
+
+    return () => {
+      if (viewerInstanceRef.current) {
+        console.log("PanellumViewer - Destroying Pannellum viewer...");
+        viewerInstanceRef.current.destroy();
+        viewerInstanceRef.current = null;
+      }
+    };
+  }, [initializeViewer]);
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault(); // Suppress the browser's native context menu
+
+      if (!isEditMode || !viewerInstanceRef.current) return;
+
       const position = { x: event.clientX, y: event.clientY };
       setContextMenuState({ visible: true, position });
       setTargetIconPosition(position);
 
-      const coords = viewer.mouseEventToCoords(event);
+      const coords = viewerInstanceRef.current.mouseEventToCoords(event.nativeEvent);
+      console.log("PanellumViewer - Mouse coords to pitch/yaw:", coords);
       contextMenuCoordsRef.current = { pitch: coords[0], yaw: coords[1] };
-    };
-
-    viewerRef.current.addEventListener("contextmenu", handleContextMenu);
-
-    return () => {
-      viewerRef.current?.removeEventListener("contextmenu", handleContextMenu);
-      viewer.destroy();
-    };
-  }, [imageSrc, viewerConfig]);
-
-  useEffect(() => {
-    const cleanup = setupViewer();
-    return cleanup;
-  }, [setupViewer]);
+    },
+    [isEditMode]
+  );
 
   const hideContextMenu = useCallback(() => {
-    setContextMenuState((prev) => ({ ...prev, visible: false }));
+    setContextMenuState({ visible: false, position: { x: 0, y: 0 } });
     setTargetIconPosition(null);
   }, []);
 
   const handleContextMenuClick = useCallback(
     (annotationType: string) => {
-      if (!viewerInstanceRef.current) return;
+      if (!viewerInstanceRef.current) {
+        console.error("PanellumViewer - Viewer instance is not ready.");
+        return;
+      }
 
       const { pitch, yaw } = contextMenuCoordsRef.current;
       const coords = [pitch, yaw];
+      console.log(`PanellumViewer - Adding annotation of type ${annotationType} at pitch=${pitch}, yaw=${yaw}`);
 
-      // Pass the annotation type and coordinates to HotspotManager
-      //TODO: Remove any
+      //TODO: Replace any (if possible)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (viewerInstanceRef.current as any).addHotspot(annotationType, coords);
       hideContextMenu();
@@ -98,30 +116,46 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     [hideContextMenu]
   );
 
+  // Clear context menu state and target position when switching to Preview Mode
   useEffect(() => {
     if (!isEditMode) {
       hideContextMenu();
     }
   }, [isEditMode, hideContextMenu]);
 
+  const handleRelocateContextMenu = useCallback(
+    (newPosition: { x: number; y: number }) => {
+      if (!isEditMode) return;
+
+      setContextMenuState((prev) => ({
+        ...prev,
+        position: newPosition,
+      }));
+
+      setTargetIconPosition(newPosition);
+
+      if (viewerInstanceRef.current) {
+        const coords = viewerInstanceRef.current.mouseEventToCoords({
+          clientX: newPosition.x,
+          clientY: newPosition.y,
+        } as MouseEvent);
+
+        contextMenuCoordsRef.current = { pitch: coords[0], yaw: coords[1] };
+      }
+    },
+    [isEditMode]
+  );
+
   return (
     <>
-      <div
-        ref={viewerRef}
-        className="panorama-viewer"
-        style={{ width, height }}
-        onContextMenu={(e) => {
-          if (!isEditMode) {
-            e.preventDefault();
-          }
-        }}
-      />
+      <div ref={viewerRef} className="panorama-viewer" style={{ width, height }} onContextMenu={handleContextMenu} />
       {isEditMode && contextMenuState.visible && (
         <ContextMenu
           visible={contextMenuState.visible}
           anchorPosition={contextMenuState.position}
           onMenuItemClick={handleContextMenuClick}
           onClose={hideContextMenu}
+          onRelocate={handleRelocateContextMenu}
           isEditMode={isEditMode}
         />
       )}
