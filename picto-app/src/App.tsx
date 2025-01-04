@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import Toolbar from "@components/Toolbar";
 import PanoramaViewer from "@components/PanoramaViewer";
 import ImageUploader from "@components/ImageUploader";
-import BottomNavbar from "@/components/BottomNavbar";
+import BottomNavBar from "@/components/BottomNavBar";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
@@ -38,7 +38,7 @@ const App: React.FC = () => {
             exit={{ y: 100, opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <BottomNavbar />
+            <BottomNavBar />
           </motion.div>
         )}
       </AnimatePresence>

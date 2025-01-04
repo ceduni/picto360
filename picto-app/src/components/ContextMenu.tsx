@@ -1,9 +1,10 @@
 import React, { useEffect, useCallback, useMemo } from "react";
-import { Menu, MenuItem, Divider, ListItemIcon, ListItemText } from "@mui/material";
+import { Menu, MenuItem, Divider, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import { IconType } from "react-icons";
 import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
+import { FaCompass } from "react-icons/fa";
 
 interface ContextMenuProps {
   visible: boolean;
@@ -21,6 +22,32 @@ const StyledMenu = styled(Menu)(() => ({
   },
 }));
 
+const StyledMenuItem = styled(MenuItem)(() => ({
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.08)", // Add a light hover background effect
+  },
+}));
+
+const StyledDivider = styled(Divider)(() => ({
+  margin: "8px 0",
+  borderColor: "rgba(0, 0, 0, 0.15)",
+  borderWidth: "1.575px",
+}));
+
+const MenuSectionTitle = styled(Typography)(() => ({
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  color: "rgba(0, 0, 0, 0.6)",
+  padding: "4px 16px",
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+}));
+
+type MenuSection = {
+  title: string;
+  items: MenuItemType[];
+};
+
 type MenuItemType =
   | {
       type: string;
@@ -29,16 +56,25 @@ type MenuItemType =
     }
   | { type: "divider" };
 
-const menuItems: MenuItemType[] = [
-  { type: "Form", icon: AiOutlineUnorderedList, label: "Questionnaire" },
-  { type: "divider" },
-  { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
-  { type: "Image", icon: AiOutlinePicture, label: "Image" },
-  { type: "Gif", icon: MdOutlineGif, label: "GIF" },
-  { type: "divider" },
-  { type: "Text", icon: AiOutlineFileText, label: "Texte" },
-  { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
-  { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
+const menuSections: MenuSection[] = [
+  {
+    title: "Annotations",
+    items: [
+      { type: "Form", icon: AiOutlineUnorderedList, label: "Questionnaire" },
+      { type: "divider" },
+      { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
+      { type: "Image", icon: AiOutlinePicture, label: "Image" },
+      { type: "Gif", icon: MdOutlineGif, label: "GIF" },
+      { type: "divider" },
+      { type: "Text", icon: AiOutlineFileText, label: "Texte" },
+      { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
+      { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
+    ],
+  },
+  {
+    title: "Actions",
+    items: [{ type: "ResetNorth", icon: FaCompass, label: "Réinitialiser le Nord" }],
+  },
 ];
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -54,7 +90,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   useEffect(() => {
     if (!isEditMode) handleClose();
   }, [isEditMode, handleClose]);
-
+  
   // Relocate the context menu when right-clicking elsewhere while it's open
   useEffect(() => {
     const handleRelocate = (e: MouseEvent) => {
@@ -72,16 +108,22 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
   const menuContent = useMemo(
     () =>
-      menuItems.map((item, index) =>
-        item.type === "divider" ? (
-          <Divider key={`divider-${index}`} />
-        ) : (
-          <MenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
-            <ListItemIcon>{"icon" in item && <item.icon />}</ListItemIcon>
-            {"label" in item && <ListItemText>{item.label}</ListItemText>}
-          </MenuItem>
-        )
-      ),
+      menuSections.map((section, sectionIndex) => (
+        <React.Fragment key={`section-${sectionIndex}`}>
+          {sectionIndex > 0 && <StyledDivider />}
+          <MenuSectionTitle variant="overline">{section.title}</MenuSectionTitle>
+          {section.items.map((item, itemIndex) =>
+            item.type === "divider" ? (
+              <Divider key={`divider-${sectionIndex}-${itemIndex}`} />
+            ) : (
+              <StyledMenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
+                <ListItemIcon>{"icon" in item && <item.icon />}</ListItemIcon>
+                {"label" in item && <ListItemText>{item.label}</ListItemText>}
+              </StyledMenuItem>
+            )
+          )}
+        </React.Fragment>
+      )),
     [onMenuItemClick]
   );
 

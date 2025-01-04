@@ -1,8 +1,15 @@
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide Pannellum's default about message */
 .pnlm-about-msg {
-  /* removes Pannellum's about message */
   display: none !important;
 }
 
+/* Panorama Viewer */
 .panorama-viewer {
   background-color: black;
   flex-grow: 1;
@@ -12,13 +19,12 @@
   overflow: hidden;
 }
 
+/* Target Icon */
 .panorama-viewer__target-icon {
   position: absolute;
   font-size: 24px;
   color: red;
-  /* Ensure it appears above other elements */
-  z-index: 1001;
-  /* Center the icon on the exact coordinates */
+  z-index: 90;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
@@ -32,8 +38,7 @@
   height: 100%;
 }
 
-/*animation found at https://wpdean.com/css-ripple-effect/*/
-
+/* Ripple Animation */
 .panorama-viewer__target-icon:before,
 .panorama-viewer__target-icon:after {
   position: absolute;
@@ -59,4 +64,8 @@
     transform: scale(2);
     opacity: 0;
   }
+}
+
+.pnlm-compass {
+  display: none !important;
 }

@@ -1,3 +1,4 @@
+/*Unused component*/
 import React, { useState } from "react";
 import "./css/FloatingMenu.css";
 
