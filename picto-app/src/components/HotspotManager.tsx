@@ -1,19 +1,14 @@
 import React, { useCallback, useMemo, useRef, useEffect, JSX } from "react";
+import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
 import { TiInfoLarge } from "react-icons/ti";
 import "./css/HotspotManager.css";
-//import { HotspotCreationEvent } from "./types";
 
 interface HotspotManagerProps {
   viewer: unknown;
   viewerElement: HTMLDivElement | null;
-}
-
-interface HotspotCreationEvent {
-  type: string;
-  coords: [number, number];
 }
 
 const TEXT_CHAR_LIMIT = 300;
@@ -266,13 +261,11 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
       console.error("HotspotManager - Failed to parse Giphy URL:", error);
       return null;
     }
-
-    return null;
   }, []);
 
-  const handleHotspotCreation = useCallback(
+  const handleHotspotEvent = useCallback(
     async (type: string, coords: [number, number]) => {
-      debugLog("HotspotManager - Handling add hotspot", { type, coords });
+      debugLog("HotspotManager - Handling hotspot event", { type, coords });
       switch (type) {
         case "Form": {
           const question = prompt("Saisissez la question:");
@@ -348,22 +341,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
     [hotspotCreators, extractYouTubeVideoIdFromUrl, debugLog]
   );
 
-  useEffect(() => {
-    if (viewer && viewerElement) {
-      debugLog("HotspotManager - Setting up hotspot creation event listener");
-
-      const handleHotspotCreationEvent = (event: Event) => {
-        const { type, coords } = (event as CustomEvent<HotspotCreationEvent>).detail;
-        handleHotspotCreation(type, coords);
-      };
-
-      viewerElement.addEventListener("hotspotCreation", handleHotspotCreationEvent);
-
-      return () => {
-        viewerElement.removeEventListener("hotspotCreation", handleHotspotCreationEvent);
-      };
-    }
-  }, [viewer, viewerElement, handleHotspotCreation, debugLog]);
+  useHotspotCreation(viewerElement, handleHotspotEvent);
 
   // Debugging tools
   useEffect(() => {

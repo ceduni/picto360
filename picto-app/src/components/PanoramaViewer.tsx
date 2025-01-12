@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState, useRef, useMemo } from "react";
+import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
 import HotspotManager from "./HotspotManager";
@@ -18,11 +19,6 @@ interface PanoramaViewerProps {
   height: string;
   imageSrc: string;
   isEditMode: boolean;
-}
-
-interface HotspotCreationEvent {
-  type: string;
-  coords: [number, number];
 }
 
 interface PannellumViewer {
@@ -190,6 +186,12 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     setTargetIconPosition(null);
   }, []);
 
+  const handleHotspotCreation = useCallback((type: string, coords: [number, number]) => {
+    console.log(`PanellumViewer - Performing action of type ${type} at pitch = ${coords[0]}, yaw = ${coords[1]}...`);
+  }, []);
+
+  const { dispatchHotspotEvent } = useHotspotCreation(viewerRef.current, handleHotspotCreation);
+
   const handleContextMenuClick = useCallback(
     (menuItemType: string) => {
       if (menuItemType === "ResetNorth") {
@@ -203,20 +205,14 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
         return;
       }
 
-      // Hotspot creation actions
       const { pitch, yaw } = contextMenuCoordsRef.current;
-      const coords = [pitch, yaw];
-      console.log(`PanellumViewer - Performing action of type ${menuItemType} at pitch = ${pitch}, yaw = ${yaw}...`);
+      const coords: [number, number] = [pitch, yaw];
 
-      // Dispatch a custom event instead of calling the method directly
-      const event = new CustomEvent<HotspotCreationEvent>("hotspotCreation", {
-        detail: { type: menuItemType, coords: coords as [number, number] },
-      });
-      viewerRef.current?.dispatchEvent(event);
+      dispatchHotspotEvent(menuItemType, coords);
 
       hideContextMenu();
     },
-    [hideContextMenu, resetCompassToNorth]
+    [hideContextMenu, resetCompassToNorth, dispatchHotspotEvent]
   );
 
   // Clear context menu state and target position when switching to Preview Mode
