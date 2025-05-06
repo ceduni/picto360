@@ -13,70 +13,79 @@ Ce projet est une collaboration avec [École en Réseau](https://eer.qc.ca/) et 
 
 👀[Exemple d'annotation de photos 360 (prise avec un drone)](https://www.thinglink.com/scene/1800248329951511396)
 
-### Problématique
-
-<!-- TODO -->
-
-### Proposition
-
-<!-- TODO -->
- 
-#### Objectifs 
-
-<!-- TODO -->
-
-#### Fonctionnalités
-
-<!-- TODO -->
-
-## 📅 Échéancier
-
-> Début du projet: 6 mai 2024  
-> Fin du projet: 19 aout 2024
-
-Le développement du projet sera divisé en plusieurs phases:
-
-### Phase 1: Élaboration des exigences
-
-- Semaine 1
-- Semaine 2
-
-### Phase 2: Prototypage et conception
-
-- Semaine 3
-- Semaine 4
-- Semaine 5
-- Semaine 6
-
-### Phase 3: Développement 
-
-- Semaine 7
-- Semaine 8
-- Semaine 9
-- Semaine 10
-- Semaine 11
-- Semaine 12
-
-### Phase 4: Tests & Rapports
-
-- Semaine 13
-- Semaine 14
-- Semaine 15
-- Semaine 16
-
-Le suivi du projet est présenté dans le fichier [**TIMELINE**](TIMELINE.md).
-
-
-## 🌐 Infrastructure
-
-L'infrastructure de l'application est basée sur...
-
-<!-- TODO -->
-
 # 📘 Documentation
 
-- [Dossier Drive](https://drive.google.com/drive/u/1/folders/12ap4jNxMDa4FnayR46Pu2auJaNviNHCZ): Contient la documentation du projet
-- [Wiki](https://github.com/ceduni/picto360/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
+> [Dossier Drive](https://drive.google.com/drive/u/1/folders/12ap4jNxMDa4FnayR46Pu2auJaNviNHCZ): Contient la documentation du projet  
+> [Wiki](https://github.com/ceduni/picto360/wiki): Contient la documentation de l'application et de l'infrastructure développée (Services, API, Base de données...)
+
+## Template de site web pour IFT3150
+
+Ce projet est un template de site web pour le cours IFT3150, construit avec [MkDocs](https://www.mkdocs.org/) et le thème [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
+
+### Prérequis
+
+Assurez-vous d’avoir les outils suivants installés :
+
+- Python **3.8** ou plus récent
+- `pip` (gestionnaire de paquets Python)
+
+### Installation
+
+1. Clonez ce dépôt :
+```bash
+git clone git@github.com:udem-diro/template-projet.git
+cd ift3150-template
+```
+
+2. Installez les dépendances :
+```bash
+pip install -r requirements.txt
+```
+
+### Utilisation
+
+#### Développement local
+
+Pour lancer un serveur de développement local :
+
+```bash
+mkdocs serve
+```
+
+Le site sera accessible à l'adresse [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+#### Construction du site
+
+Pour construire le site :
+
+```bash
+mkdocs build
+```
+
+Les fichiers générés seront dans le dossier `site/`.
+
+#### Déploiement
+
+Pour déployer sur GitHub Pages :
+
+```bash
+mkdocs gh-deploy
+```
+
+> Cette commande pousse automatiquement le contenu du site sur la branche gh-pages.
+
+### Structure du projet
+
+- `docs/` : Contient tous les fichiers Markdown du site
+- `mkdocs.yml` : Configuration de MkDocs
+- `requirements.txt` : Dépendances Python
+- `site/` : Site généré (créé lors de la construction)
+
+### Personnalisation
+
+1. Modifiez `mkdocs.yml` pour changer la configuration du site
+2. Ajoutez/modifiez les fichiers Markdown (`.md`) dans `docs/`
+3. Personnalisez le thème en modifiant les paramètres dans `mkdocs.yml`
 
 # 🗂️ Organisation
 
