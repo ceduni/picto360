@@ -1,10 +1,9 @@
 import path from "path";
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({})],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -15,4 +14,22 @@ export default defineConfig({
     APP_NAME: JSON.stringify("Picto 360"),
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
-})
+  server: {
+    host: true, // Enables LAN access
+    port: 3000, // Default port
+    open: false, // Automatically opens the browser
+    hmr: {
+      overlay: false, // Avoid HMR overlay issues on slower systems
+    },
+  },
+  build: {
+    sourcemap: false, // Disable sourcemaps for production
+    chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
+    cssCodeSplit: true, // Enable CSS code splitting
+  },
+  cacheDir: ".vite-cache", // Cache directory for faster rebuilds
+  optimizeDeps: {
+    include: ["react", "react-dom"], // Pre-bundle frequently used dependencies
+    exclude: ["@babel/runtime"], // Exclude heavy dependencies if not required
+  },
+});

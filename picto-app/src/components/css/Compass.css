@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster+Two:wght@400;700&display=swap');
+
+:root {
+    --compass-size: 5vw;
+    --inner-size: calc(var(--compass-size) * 0.85);
+    --arrow-width: calc(var(--compass-size) * 0.1);
+    --arrow-height: calc(var(--compass-size) * 0.425);
+    --label-font-size: calc(var(--compass-size) * 0.125);
+    --label-offset: calc(var(--compass-size) * 0.05);
+}
+
+.custom-compass {
+    width: var(--compass-size);
+    height: var(--compass-size);
+    background-color: #F3F3F3;
+    border-radius: 50%;
+    background-image: linear-gradient(to bottom, #F7F7F7, #ECECEC);
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.custom-compass.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.compass-inner {
+    width: var(--inner-size);
+    height: var(--inner-size);
+    background-color: #3D3D3D;
+    border-radius: 50%;
+    border: 3px solid #C5C5C5;
+    position: relative;
+}
+
+.main-arrow {
+    height: 100%;
+    width: var(--arrow-width);
+    position: absolute;
+    top: 0;
+    left: calc(47.75% - var(--arrow-width) / 4);
+    transform-origin: center;
+    /* Rotate around the center */
+    box-sizing: border-box;
+}
+
+.arrow-up {
+    width: 0;
+    height: 0;
+    border-left: calc(var(--arrow-width) / 2) solid transparent;
+    border-right: calc(var(--arrow-width) / 2) solid transparent;
+    border-bottom: var(--arrow-height) solid #EF5052;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: calc(var(--arrow-width) / 2) solid transparent;
+    border-right: calc(var(--arrow-width) / 2) solid transparent;
+    border-top: var(--arrow-height) solid #F3F3F3;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.north,
+.south,
+.east,
+.west {
+    font-size: var(--label-font-size);
+    font-family: 'Lobster Two', cursive;
+    color: #FFF;
+    position: absolute;
+}
+
+.north {
+    top: var(--label-offset);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.south {
+    bottom: var(--label-offset);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.east {
+    right: var(--label-offset);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.west {
+    left: var(--label-offset);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@media (min-width: 400px) {
+    :root {
+        --compass-size: 15vw;
+    }
+}
+
+@media (min-width: 600px) {
+    :root {
+        --compass-size: 10vw;
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --compass-size: 5vw;
+    }
+}

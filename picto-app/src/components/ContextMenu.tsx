@@ -1,133 +1,144 @@
-import React, { useRef, useEffect } from "react";
-import "./css/ContextMenu.css";
-import {
-  AiOutlineUnorderedList,
-  AiOutlineFileText,
-  AiOutlineLink,
-  AiOutlinePicture,
-  AiOutlineSound,
-} from "react-icons/ai";
-import { IoMdCheckboxOutline } from "react-icons/io";
-import {
-  MdOutlineVideoLibrary,
-  MdOutlineGif,
-  MdOutlineLabel,
-} from "react-icons/md";
-import { RiSurveyLine } from "react-icons/ri";
-import { BsCardText } from "react-icons/bs";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { Menu, MenuItem, Divider, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { styled } from "@mui/system";
+import { IconType } from "react-icons";
+import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
+import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
+import { FaCompass } from "react-icons/fa";
 
 interface ContextMenuProps {
   visible: boolean;
-  x: number;
-  y: number;
+  anchorPosition: { x: number; y: number };
   onMenuItemClick: (type: string) => void;
   onClose: () => void;
+  onRelocate: (newPosition: { x: number; y: number }) => void;
+  isEditMode: boolean;
 }
+
+const StyledMenu = styled(Menu)(() => ({
+  "& .MuiPaper-root": {
+    borderRadius: 8,
+    minWidth: 200,
+  },
+}));
+
+const StyledMenuItem = styled(MenuItem)(() => ({
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.08)", // Add a light hover background effect
+  },
+}));
+
+const StyledDivider = styled(Divider)(() => ({
+  margin: "8px 0",
+  borderColor: "rgba(0, 0, 0, 0.15)",
+  borderWidth: "1.575px",
+}));
+
+const MenuSectionTitle = styled(Typography)(() => ({
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  color: "rgba(0, 0, 0, 0.6)",
+  padding: "4px 16px",
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+}));
+
+type MenuSection = {
+  title: string;
+  items: MenuItemType[];
+};
+
+type MenuItemType =
+  | {
+      type: string;
+      icon: IconType;
+      label: string;
+    }
+  | { type: "divider" };
+
+const menuSections: MenuSection[] = [
+  {
+    title: "Annotations",
+    items: [
+      { type: "Form", icon: AiOutlineUnorderedList, label: "Questionnaire" },
+      { type: "divider" },
+      { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
+      { type: "Image", icon: AiOutlinePicture, label: "Image" },
+      { type: "Gif", icon: MdOutlineGif, label: "GIF" },
+      { type: "divider" },
+      { type: "Text", icon: AiOutlineFileText, label: "Texte" },
+      { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
+      { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
+    ],
+  },
+  {
+    title: "Actions",
+    items: [{ type: "ResetNorth", icon: FaCompass, label: "Réinitialiser le Nord" }],
+  },
+];
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
   visible,
-  x,
-  y,
+  anchorPosition,
   onMenuItemClick,
   onClose,
+  onRelocate,
+  isEditMode,
 }) => {
-  const contextMenuRef = useRef<HTMLDivElement>(null);
-  const horizontalOffset = 30;
+  const handleClose = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target as Node)
-      ) {
-        onClose();
+    if (!isEditMode) handleClose();
+  }, [isEditMode, handleClose]);
+  
+  // Relocate the context menu when right-clicking elsewhere while it's open
+  useEffect(() => {
+    const handleRelocate = (e: MouseEvent) => {
+      if (visible) {
+        e.preventDefault();
+        onRelocate({ x: e.clientX, y: e.clientY });
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-
+    document.addEventListener("contextmenu", handleRelocate);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("contextmenu", handleRelocate);
     };
-  }, [onClose]);
+  }, [visible, onRelocate]);
 
-  useEffect(() => {
-    if (contextMenuRef.current) {
-      const menu = contextMenuRef.current;
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-      const menuWidth = menu.offsetWidth;
-      const menuHeight = menu.offsetHeight;
+  const menuContent = useMemo(
+    () =>
+      menuSections.map((section, sectionIndex) => (
+        <React.Fragment key={`section-${sectionIndex}`}>
+          {sectionIndex > 0 && <StyledDivider />}
+          <MenuSectionTitle variant="overline">{section.title}</MenuSectionTitle>
+          {section.items.map((item, itemIndex) =>
+            item.type === "divider" ? (
+              <Divider key={`divider-${sectionIndex}-${itemIndex}`} />
+            ) : (
+              <StyledMenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
+                <ListItemIcon>{"icon" in item && <item.icon />}</ListItemIcon>
+                {"label" in item && <ListItemText>{item.label}</ListItemText>}
+              </StyledMenuItem>
+            )
+          )}
+        </React.Fragment>
+      )),
+    [onMenuItemClick]
+  );
 
-      const bottomBar = document.querySelector(".lowerBar");
-      const bottomBarHeight = bottomBar
-        ? bottomBar.getBoundingClientRect().height
-        : 0;
-
-      let adjustedX = x + horizontalOffset; // separation from the target icon
-      let adjustedY = y;
-
-      //context menu screen overflow checks
-      if (x + menuWidth + horizontalOffset > screenWidth) {
-        adjustedX = screenWidth - menuWidth;
-      }
-
-      if (y + menuHeight > screenHeight - bottomBarHeight) {
-        adjustedY = y - menuHeight;
-      }
-
-      menu.style.left = `${adjustedX}px`;
-      menu.style.top = `${adjustedY}px`;
-    }
-  }, [x, y, visible, horizontalOffset]);
-
-  if (!visible) return null;
+  if (!visible || !isEditMode) return null;
 
   return (
-    <div
-      ref={contextMenuRef}
-      className="context-menu"
-      style={{ top: `${y}px`, left: `${x}px` }}
+    <StyledMenu
+      open={visible}
+      onClose={handleClose}
+      anchorReference="anchorPosition"
+      anchorPosition={{ top: anchorPosition.y, left: anchorPosition.x }}
     >
-      <ul>
-        <li onClick={() => onMenuItemClick("True_or_False")}>
-          <IoMdCheckboxOutline className="menu-icon" /> Vrai ou faux
-        </li>
-        <li onClick={() => onMenuItemClick("Multiple_Choice")}>
-          <AiOutlineUnorderedList className="menu-icon" /> Choix multiples
-        </li>
-        <li onClick={() => onMenuItemClick("Poll")}>
-          <RiSurveyLine className="menu-icon" /> Sondage
-        </li>
-        <li onClick={() => onMenuItemClick("Text_Box")}>
-          <BsCardText className="menu-icon" /> Zone de texte
-        </li>
-        <hr className="menu-separator" />
-        <li onClick={() => onMenuItemClick("Video")}>
-          <MdOutlineVideoLibrary className="menu-icon" /> Vidéo
-        </li>
-        <li onClick={() => onMenuItemClick("Image")}>
-          <AiOutlinePicture className="menu-icon" /> Image
-        </li>
-        <li onClick={() => onMenuItemClick("Audio")}>
-          <AiOutlineSound className="menu-icon" /> Audio
-        </li>
-        <li onClick={() => onMenuItemClick("Gif")}>
-          <MdOutlineGif className="menu-icon" /> GIF
-        </li>
-        <hr className="menu-separator" />
-        <li onClick={() => onMenuItemClick("Text")}>
-          <AiOutlineFileText className="menu-icon" /> Texte
-        </li>
-        <li onClick={() => onMenuItemClick("Label")}>
-          <MdOutlineLabel className="menu-icon" /> Étiquette
-        </li>
-        <li onClick={() => onMenuItemClick("Hyperlink")}>
-          <AiOutlineLink className="menu-icon" /> Lien
-        </li>
-      </ul>
-    </div>
+      {menuContent}
+    </StyledMenu>
   );
 };
 
-export default ContextMenu;
+export default React.memo(ContextMenu);

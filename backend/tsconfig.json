@@ -1,15 +1,31 @@
 {
   "compilerOptions": {
-    "target": "ES2022",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "commonjs",                                /* Specify what module code is generated. */
-    "lib": ["es6"],                                      /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    "allowJs": true,                                     /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
-    "outDir": "build",                                   /* Specify an output folder for all emitted files. */
-    "rootDir": "src",                                    /* Specify the root folder within your source files. */
-    "strict": true,                                      /* Enable all strict type-checking options. */
-    "noImplicitAny": true,                               /* Enable error reporting for expressions and declarations with an implied 'any' type. */
-    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
-    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    "resolveJsonModule": true                           /* Enable importing .json files. */
-  }
+    "target": "ES2022",                                                    /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "module": "commonjs",                                                  /* Specify what module code is generated. */
+    "lib": ["ES2020"],                                                     /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    "allowJs": true,                                                       /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
+    "outDir": "build",                                                     /* Specify an output folder for all emitted files. */
+    "rootDir": "src",                                                      /* Specify the root folder within your source files. */
+    "strict": true,                                                        /* Enable all strict type-checking options. */
+    "noImplicitAny": false,                                                /* Allow implicit 'any' types but report them as warnings (this can be adjusted based on your preference). */
+    "skipLibCheck": true,                                                  /* Skip type checking all .d.ts files. */
+    "esModuleInterop": true,                                               /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "resolveJsonModule": true,                                             /* Enable importing .json files. */
+    "composite": true,                                                     /* Enable project references. */
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.backend.tsbuildinfo", /* Store build information in a temporary location for incremental builds. */
+    "allowSyntheticDefaultImports": true,                                  /* Allow default imports from modules with no default export. */
+    "isolatedModules": true,                                               /* Ensure one file per module transpilation. */
+    "noEmit": true,                                                        /* Disable emitting compiled files for faster type checking during development. */
+    "forceConsistentCasingInFileNames": true,                              /* Ensure file casing consistency across the project. */
+    "moduleResolution": "node",                                            /* Align module resolution with Node.js. */
+    "paths": {
+      "@/*": ["./src/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@services/*": ["./src/services/*"],
+      "@models/*": ["./src/models/*"],
+      "@utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
 }

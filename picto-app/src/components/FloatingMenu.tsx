@@ -1,3 +1,4 @@
+/*Unused component*/
 import React, { useState } from "react";
 import "./css/FloatingMenu.css";
 
@@ -33,4 +34,4 @@ const FloatingMenu: React.FC = () => {
   );
 };
 
-export default FloatingMenu;
+export default React.memo(FloatingMenu);

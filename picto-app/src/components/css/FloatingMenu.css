@@ -10,7 +10,6 @@
     align-items: center;
     justify-content: center;
     transition: width 0.3s, height 0.3s;
-    z-index: 10;
 }
 
 .floating-menu.open {
@@ -30,7 +29,6 @@
     cursor: pointer;
     font-size: 24px;
     color: #fff;
-    z-index: 20;
 }
 
 .close-button {

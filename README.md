@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="images/logo_picto360.png" width="300">
+    <img src="docs/images/logo_picto360.png" width="300">
 </p>
 
 # Picto360: Application d'annotation d'image
@@ -9,9 +9,9 @@
 
 ## Description du projet 
 
-Ce projet est une collaboration avec [École en Réseau](https://eer.qc.ca/) et consiste à développer une application pédagogique permettant d'enrichir des images panoramiques et 360 avec des annotations diverses et interactives.
+Picto360 est une collaboration avec [École en Réseau](https://eer.qc.ca/) visant à développer une application pédagogique qui enrichit des images panoramiques et à 360° avec des annotations interactives.
 
-👀[Exemple d'annotation de photos 360 (prise avec un drone)](https://www.thinglink.com/scene/1800248329951511396)
+👀 [Exemple d'annotation de photos 360 (prise avec un drone)](https://www.thinglink.com/scene/1800248329951511396)
 
 # 📘 Documentation
 
@@ -87,17 +87,41 @@ mkdocs gh-deploy
 2. Ajoutez/modifiez les fichiers Markdown (`.md`) dans `docs/`
 3. Personnalisez le thème en modifiant les paramètres dans `mkdocs.yml`
 
-# 🗂️ Organisation
+## 🗂️ Organisation
 
-Les dossiers du répertoire sont organisés comme suit:
+### **`backend/`**
+Code serveur et logique métier.
 
-<!-- TODO -->
+- **`models/`** : Modèles de données (Annotations, Projets, Images).
+- **`routes/`** : Endpoints API RESTful.
+- **`services/`** : Logique applicative.
+- **`utils/`** : Utilitaires généraux.
 
-# 🌟 Contribution
+### **`docs/`**
+Documentation du projet.
 
-Le projet est supervisé par [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
+- **`css/`** : Styles pour la documentation.
+- **`images/`** : Logos et illustrations.
+- **`index.html`** : Page d'accueil de la documentation.
 
-## Contributeurs
+### **`picto-app/`**
+Frontend développé avec React et TypeScript.
+
+- **`components/`** : Composants React (Barre d'outils, Menu contextuel, Visionneuse).
+- **`hooks/`** : Hooks personnalisés.
+- **`models/`** : Modèles de données pour le frontend.
+- **`assets/`** : Styles CSS et autres assets.
+- **`public/`** : Fichiers publics incluant `pannellum.js`.
+
+### **Racine du projet**
+- **`README.md`** : Description générale.
+- **`TIMELINE.md`** : Suivi hebdomadaire.
+
+## 🌟 Contribution
+
+Supervision par [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
+
+### Contributeurs
 
 - Mathis MORRA-FISCHER [@Mathiiis](https://github.com/Mathiiis)
 - Tarik BENAKEZOUH [@TBAce11](https://github.com/TBAce11)

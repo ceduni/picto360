@@ -1,0 +1,71 @@
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide Pannellum's default about message */
+.pnlm-about-msg {
+  display: none !important;
+}
+
+/* Panorama Viewer */
+.panorama-viewer {
+  background-color: black;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Target Icon */
+.panorama-viewer__target-icon {
+  position: absolute;
+  font-size: 24px;
+  color: red;
+  z-index: 90;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32.5px;
+  height: 32.5px;
+}
+
+.panorama-viewer__target-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ripple Animation */
+.panorama-viewer__target-icon:before,
+.panorama-viewer__target-icon:after {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: solid 2px red;
+  border-radius: 50%;
+}
+
+.panorama-viewer__target-icon:before {
+  animation: ripple 2s linear infinite;
+}
+
+.panorama-viewer__target-icon:after {
+  animation: ripple 2s 1s linear infinite;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.pnlm-compass {
+  display: none !important;
+}

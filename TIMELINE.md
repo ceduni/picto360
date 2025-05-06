@@ -1,162 +1,227 @@
 # 📅 Suivi
 
-<!-- ## Semaine 15 (2024-08-12)
+## 📝 Semaine 1 (2024-05-06)
 
-### Objectifs
+**Objectifs :**
+- Prendre en main les outils du projet.
+- Produire une première version de l'échéancier.
+- Déterminer les exigences du projet.
 
-### Réalisations
+**Réalisations :**
+- Rencontre avec le client.
+- Établissement des exigences du projet.
+- Création de l'échéancier.
 
-### Observations
+**Observations :**
+- Clarification des objectifs pédagogiques et techniques.
 
-### Ressources
+---
 
-## Semaine 14 (2024-08-05)
+## 📝 Semaine 2 (2024-05-13)
 
-### Objectifs
+**Objectifs :**
+- Explorer les ressources proposées.
+- Identifier des formes d’annotations pertinentes.
+- Rédiger les cas d'utilisation.
 
-### Réalisations
+**Réalisations :**
+- Test de services : H5P, Teliportme, Thinglink.
+- Collecte d'idées pour les annotations.
 
-### Observations
+**Observations :**
+- Adaptation spécifique des annotations dans le cadre pédagogique.
 
-### Ressources
+**Ressources :**
+- [H5P](https://h5p.org/virtual-tour-360)
+- [Teliportme](https://teliportme.com)
+- [Thinglink](https://www.thinglink.com)
+- [Momento](https://www.momento360.com/)
 
-## Semaine 13 (2024-07-29)
+---
 
-### Objectifs
+## 🎨 Semaine 3 (2024-05-20)
 
-### Réalisations
+**Objectifs :**
+- Formaliser les exigences fonctionnelles.
+- Commencer le prototypage.
 
-### Observations
+**Réalisations :**
+- Création d’un diagramme de cas d'utilisation.
+- Début de la modélisation des données.
 
-### Ressources
+**Observations :**
+- Simplicité et intuitivité essentielles pour l'interface utilisateur.
 
-## Semaine 12 (2024-07-22)
+---
 
-### Objectifs
+## 🎨 Semaine 4 (2024-05-27)
 
-### Réalisations
+**Objectifs :**
+- Finaliser le diagramme de cas d'utilisation.
+- Créer le diagramme de séquence système.
 
-### Observations
+**Réalisations :**
+- Diagramme de cas d'utilisation finalisé.
+- Prototype Figma couvrant les principales fonctionnalités.
 
-### Ressources
+**Observations :**
+- Sécurité et gestion des accès critiques pour le partage de contenu.
 
-## Semaine 11 (2024-07-15)
+---
 
-### Objectifs
+## 🎨 Semaine 5 (2024-06-03)
 
-### Réalisations
+**Objectifs :**
+- Continuer la modélisation des données.
+- Concevoir une application simple React en mode progressive web app.
 
-### Observations
+**Réalisations :**
+- Flux des diagrammes de séquence système.
+- Amélioration de la page d'annotation dans Figma.
 
-### Ressources
+**Observations :**
+- Modèle de données flexible pour différents types d'annotations.
 
-## Semaine 10 (2024-07-08)
+---
 
-### Objectifs
+## 🎨 Semaine 6 (2024-06-10)
 
-### Réalisations
+**Objectifs :**
+- Compléter la modélisation des données et le prototype Figma.
 
-### Observations
+**Réalisations :**
+- Prototype prêt pour présentation.
+- Finalisation du diagramme de classes.
 
-### Ressources
+**Observations :**
+- Feedback sur les diagrammes et modèles à intégrer.
 
-## Semaine 9 (2024-07-01)
+---
 
-### Objectifs
+## 🚀 Semaine 7 (2024-06-17)
 
-### Réalisations
+**Objectifs :**
+- Initialiser l'application.
+- Développer le layout général de l'application.
 
-### Observations
+**Réalisations :**
+- Configuration de l'infrastructure backend et frontend.
+- Programmation de l'application en React.
 
-### Ressources
+**Observations :**
+- Architecture robuste nécessaire pour la croissance du projet.
 
-## Semaine 8 (2024-06-24)
+**Ressources :**
+- [Démarrer un projet Node.js](https://philna.sh/blog/2019/01/10/how-to-start-a-node-js-project)
+- [Installation de Fastify](https://fastify.dev/docs/latest/Guides/Getting-Started)
+- [Installation de MongoDB](https://backend.cafe/how-to-use-fastify-and-mongodb)
+- [Configuration d'un projet React](https://create-react-app.dev)
 
-### Objectifs
+---
 
-### Réalisations
+## 🚀 Semaine 8 (2024-06-24)
 
-### Observations
+**Objectifs :**
+- Supporter le processus d'annotation des images.
 
-### Ressources
+**Réalisations :**
+- Finalisation du diagramme de classes.
+- Programmation de la page d'upload d'images et du pop-up de partage de projet.
 
-## Semaine 7 (2024-06-17)
+**Observations :**
+- Problèmes de dépendances liés à React.
 
-### Objectifs
+**Ressources :**
+- Installation de TypeScript avec Node.js:
+    - https://www.digitalocean.com/community/tutorials/setting-up-a-node-project-with-typescript
+    - https://khalilstemmler.com/blogs/typescript/node-starter-project
+    - https://medium.com/@induwara99/a-step-by-step-guide-to-setting-up-a-node-js-project-with-typescript-6df4481cb335
 
-### Réalisations
+---
 
-### Observations
+## 🚀 Semaine 9 (2024-07-01)
 
-### Ressources
+**Objectifs :**
+- Ajouter des annotations textuelles.
 
-## Semaine 6 (2024-06-10)
+**Réalisations :**
+- Avancée dans le développement du menu contextuel.
+- Programmation de la logique d'édition d'annotations.
 
-### Objectifs
+**Observations :**
+- Raffinement nécessaire de l'interface utilisateur.
 
-### Réalisations
+---
 
-### Observations
+## 🚀 Semaine 10 (2024-07-08)
 
-### Ressources
+**Objectifs :**
+- Intégrer le stockage de projet dans le cloud.
 
-## Semaine 5 (2024-06-03)
+**Réalisations :**
+- Migration de l'application vers Vite pour améliorer la performance.
 
-### Objectifs
+**Observations :**
+- Inclusion de l'espace de prévisualisation à revoir.
 
-### Réalisations
+---
 
-### Observations
+## 🚀 Semaine 11 (2024-07-15)
 
-### Ressources
+**Objectifs :**
+- Préparer pour la "Démo Alpha".
+- Finaliser le support de tous les types d'annotations.
 
-## Semaine 4 (2024-05-27)
+**Réalisations :**
+- Documentation des "custom hotspots".
+- Développement des fonctionnalités de création et gestion des annotations.
 
-### Objectifs
+**Observations :**
+- Redéfinir l'utilité du menu contextuel.
 
-### Réalisations
+---
 
-### Observations
+## 🚀 Semaine 12 (2024-07-22)
 
-### Ressources
+**Objectifs :**
+- Finaliser les annotations d’images et la prévisualisation.
 
-## Semaine 3 (2024-05-20)
+**Réalisations :**
+- Ajout de fonctionnalités pour les annotations textuelles et visuelles.
 
-### Objectifs
+**Observations :**
+- Retrait temporaire du menu flottant.
 
-### Réalisations
+---
 
-### Observations
+## 🧪 Semaine 13 (2024-07-29)
 
-### Ressources
+**Objectifs :**
+- Finaliser les formulaires et annotations vidéo.
 
-## Semaine 2 (2024-05-13)
+**Réalisations :**
+- Complétion des fonctionnalités de sauvegarde d'état du projet.
 
-### Objectifs
+**Observations :**
+- Simplification des options de menu pour se concentrer sur les fonctionnalités essentielles.
 
-### Réalisations
+---
 
-### Observations
+## 📑 Semaine 14 (2024-08-05)
 
-### Ressources -->
+**Objectifs :**
+- Compléter la rédaction du rapport de projet.
 
-## Semaine 1 (2024-05-06)
+**Réalisations :**
+- Rédaction et soumission du rapport de projet.
 
-### Objectifs
+---
 
-- Prendre en main les outils qui seront utilisés pour le projet
-- Produire une première version de l'échéancier
-- Déterminer les exigences du projet
-- Étudier le domaine, les notions et outils envisagés pour le projet
+## 🎤 Semaine 15 (2024-08-12)
 
-### Réalisations
+**Objectifs :**
+- Préparer la présentation finale.
+- Finaliser les gabarits des fichiers backend et des services d'API.
 
-<!-- Description des tâches accomplies -->
-
-### Observations
-
-<!-- Description des observations importantes (ex: remarque ou trouvaille intéressante, difficultés rencontrées) de la semaine -->
-
-### Ressources
-
-<!-- Matériels consultés (vidéo, article, documentation, livres)-->
+**Réalisations :**
+- Intégration initiale réussie entre le frontend et le backend de l'application.

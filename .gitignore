@@ -1,18 +1,45 @@
-# build output
-dist/
+picto-app/public/images/Manhattan.jpg
 
-# dependencies
+# Node dependencies
 node_modules/
 
-# logs
+# Environment variables
+.env
+
+# Google OAuth credentials
+credentials.json
+token.json
+
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# environment variables
-.env
-.env.production
+# Build outputs
+dist/
+dist-ssr/
+*.local
 
-# macOS-specific files
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json   # Allow extensions.json for shared workspace extensions
+!.vscode/settings.json     # Allow workspace settings if applicable
+!.vscode/tasks.json        # Allow tasks for team consistency if needed
+.idea/
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# VSCode specific workspace storage
+.vscode-test/
+.vscode-test-workspace/
+picto-app/public/images/Montagnes.jpg
+.vscode/settings.json
+.vscode/settings.json

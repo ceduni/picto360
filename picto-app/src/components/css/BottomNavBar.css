@@ -1,0 +1,65 @@
+:root {
+  --bottom-bar-width: 90%;
+  --icon-size: 1.25em;
+  --bar-height: 2.5em;
+  --border-radius: 1.75em;
+  --button-size: 2em;
+}
+
+.bottom-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--bottom-bar-width);
+  height: var(--bar-height);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.bottom-navbar__toolbar {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.bottom-navbar__button {
+  flex: 0 0 auto;
+  width: var(--button-size);
+  height: var(--button-size);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-navbar__button .MuiSvgIcon-root {
+  font-size: var(--icon-size);
+}
+
+@media (min-width: 400px) {
+  :root {
+    --bottom-bar-width: 50%;
+    --icon-size: 1.35em;
+    --bar-height: 3em;
+    --border-radius: em;
+    --button-size: 2em;
+  }
+}
+
+@media (min-width: 600px) {
+  :root {
+    --bottom-bar-width: 40%;
+    --icon-size: 1.5em;
+    --bar-height: 3.5em;
+    --border-radius: 2.25em;
+    --button-size: 3em;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --bottom-bar-width: 30%;
+  }
+}

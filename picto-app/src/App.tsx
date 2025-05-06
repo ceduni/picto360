@@ -1,30 +1,49 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Toolbar from "@components/Toolbar";
-import ImageViewer from "@components/ImageViewer";
-import ImageUpload from "@components/ImageUpload";
-import BottomBar from "@components/BottomBar";
+import PanoramaViewer from "@components/PanoramaViewer";
+import ImageUploader from "@components/ImageUploader";
+import BottomNavBar from "@/components/BottomNavBar";
+import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
-const App = () => {
+const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  const handleImageUpload = (imageSrc: string) => {
-    setImageSrc(imageSrc);
-  };
+  const handleImageUpload = useCallback((newImageSrc: string) => {
+    setImageSrc(newImageSrc);
+  }, []);
+
+  const toggleEditMode = useCallback(() => {
+    setIsEditMode((prevMode) => !prevMode);
+  }, []);
 
   return (
-    <div className="App">
-      {imageSrc && <Toolbar />}
-      <div className="App-body">
+    <div className="app">
+      <header className="app__header">
+        {imageSrc && <Toolbar imageSrc={imageSrc} isEditMode={isEditMode} toggleEditMode={toggleEditMode} />}
+      </header>
+      <div className="app__body">
         {imageSrc ? (
-          <ImageViewer width="100%" height="100%" imageSrc={imageSrc} />
+          <PanoramaViewer width="100%" height="100%" imageSrc={imageSrc} isEditMode={isEditMode} />
         ) : (
-          <ImageUpload onImageUpload={handleImageUpload} />
+          <ImageUploader onImageUpload={handleImageUpload} />
         )}
       </div>
-      {imageSrc && <BottomBar />}
+      <AnimatePresence>
+        {imageSrc && isEditMode && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <BottomNavBar />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default App;
+export default React.memo(App);

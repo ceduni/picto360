@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -10,23 +12,21 @@ html, body, #root {
   display: flex;
 }
 
-.App {
+.app {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
 }
 
-.App-header {
-  height: 60px;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+.app__header {
+  width: 100%;
+  /* Matching the toolbar's height*/
+  height: 55px;
+
 }
 
-.App-body {
-  display: flex;
-  flex-direction: column;
+.app__body {
   flex-grow: 1;
   width: 100%;
   overflow: hidden;
