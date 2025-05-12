@@ -1,8 +1,8 @@
 # Projet IFT3150: Picto 360
 
-> **Thèmes**: Science de données, Génie logiciel  
-> **Superviseur**: Nom du supervisuer  
-> **Collaborateurs:** Nom de(s) collaborateur(s) et partenaire(s)
+> **Thèmes**: Génie logiciel, Techno-pédagogie  
+> **Superviseur**: Louis-Edouard Lafontant  
+> **Collaborateurs:** École en réseau  
 
 ## Informations importantes
 
@@ -14,8 +14,7 @@
 
 ## Équipe
 
-- Alice Dupont: Responsable de...
-- Bob Tremblay: Responsable de...
+- **Jeff J. Pendy**
 
 ## Description du projet
 

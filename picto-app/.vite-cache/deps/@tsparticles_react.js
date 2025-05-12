@@ -1,12 +1,12 @@
 import {
+  tsParticles
+} from "./chunk-VPABUDEA.js";
+import {
   require_jsx_runtime
 } from "./chunk-O3WMLZWX.js";
 import {
   require_react
 } from "./chunk-W24JOBID.js";
-import {
-  tsParticles
-} from "./chunk-VPABUDEA.js";
 import {
   __toESM
 } from "./chunk-EWTE5DHJ.js";

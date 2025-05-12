@@ -2,24 +2,12 @@
 
 ## Semaine 1
 
-??? note "Mettre en place l'environnement"
-    - [x] Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    - [ ] Vestibulum convallis sit amet nisi a tincidunt
-        * [x] In hac habitasse platea dictumst
-        * [x] In scelerisque nibh non dolor mollis congue sed et metus
-        * [ ] Praesent sed risus massa
-    - [ ] Aenean pretium efficitur erat, donec pharetra, ligula non scelerisque
-
-!!! info "Notes"
-    - Il est possible que nous révisions les exigences après le prototypage
-
-!!! warning "Difficultés rencontrées"
-    - Le plugin Mermaid n'était pas reconnu : confusion entre `mkdocs-mermaid2-plugin` (pip) et `mermaid2` (plugin name)
-        - Résolu après nettoyage et configuration correcte dans `mkdocs.yml`
-
-!!! abstract "Prochaines étapes"
-    - Démarrer l’analyse du problème
-    - Créer la structure de `etudes_preliminaires.md`
+??? note "Introduction au projet"
+    - [x] Clarification du contexte, la problématique et du mandat
+    - [x] Lecture du rapport
+??? note "Prise en main du code"
+    - [x] Ajout au répertoire Github et clone du répertoire
+    - [x] Lecture du code
 
 ---
 

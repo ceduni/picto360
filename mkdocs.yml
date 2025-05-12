@@ -1,7 +1,7 @@
 site_name: IFT3150 - Picto 360
 site_description: Template de site web pour le cours IFT3150
 site_author: Louis-Edouard Lafontant
-site_url: https://https://ceduni.github.io/picto360
+site_url: https://ceduni.github.io/picto360
 
 theme:
   name: material

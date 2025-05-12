@@ -73,7 +73,7 @@ const menuSections: MenuSection[] = [
   },
   {
     title: "Actions",
-    items: [{ type: "ResetNorth", icon: FaCompass, label: "Réinitialiser le Nord" }],
+    items: [],
   },
 ];
 

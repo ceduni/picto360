@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
 import { GrOnedrive } from "react-icons/gr";
-import ParticlesBackground from "./ui/ParticlesBackground";
 //import WelcomeMessage from "./ui/WelcomeMessage";
 import "./css/ImageUploader.css";
 
@@ -51,7 +50,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
 
   return (
     <div className="image-uploader">
-      <ParticlesBackground />
       <div className="image-uploader__content">
         {/*<WelcomeMessage
           text="Votre vision, enrichie en 360°."
