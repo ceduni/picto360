@@ -12,6 +12,11 @@
 ---
 
 ## Semaine 2
+??? note "Analyse des besoins"
+    - [x] Propositions d'autre types d'annotations
+??? note "Clarification des fonctionalités"
+    - [x] Ajout de la création d'activités
+    - [x] Clarification des options de sauvegarde 
 
 ## Semaine 3
 

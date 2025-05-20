@@ -65,6 +65,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
           onDragOver={(event) => handleDragEvents(event, true)}
           onDragLeave={(event) => handleDragEvents(event, false)}
           onDrop={handleDrop}
+          onClick={triggerFileInput}
         >
           {" "}
           {/*TODO: add clicking action*/}

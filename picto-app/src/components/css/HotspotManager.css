@@ -98,8 +98,8 @@
 .hotspot-manager__graphics {
   width: auto;
   height: auto;
-  max-width: 485px;
-  max-height: 490px;
+  max-width: 100px;
+  max-height: 100px;
 }
 
 /* 16:9 ratio */

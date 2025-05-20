@@ -4,7 +4,7 @@ import { styled } from "@mui/system";
 import { IconType } from "react-icons";
 import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
-import { FaCompass } from "react-icons/fa";
+
 
 interface ContextMenuProps {
   visible: boolean;

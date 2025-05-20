@@ -19,11 +19,17 @@
 ## Description du projet
 
 ### Contexte
+En collaboration avec Ecole en reseau, le projet picto360 est 
+un outil académique d'annotation d'images 360, en ajoutant des 
+annotation de divers genre et des style de navigation; Permettant 
+de créer des quiz afin de tester les connaisances , mais aussi 
+utile pour approfondir son apprentissage d'un paysage ou d'un environnement.
 
 ### Problématique ou motivations
 
 ### Proposition et objectifs
-
+Poursuivre le travail déjà commencé en ajoutant des annotations dynamiques
+et des interactions pour des quiz.
 
 ## Échéancier
 
@@ -33,8 +39,8 @@
 | Jalon (*Milestone*)            | Date prévue   | Livrable                            | Statut      |
 |--------------------------------|---------------|-------------------------------------|-------------|
 | Ouverture de projet            | 1 mai         | Proposition de projet               | ✅ Terminé  |
-| Analyse des exigences          | 16 mai        | Document d'analyse                  | 🔄 En cours |
-| Prototype 1                    | 23 mai        | Maquette + Flux d'activités         | ⏳ À venir  |
+| Analyse des exigences          | 16 mai        | Document d'analyse                  | ✅ Terminé  |
+| Prototype 1                    | 23 mai        | Maquette + Flux d'activités         | 🔄 En cours |
 | Prototype 2                    | 30 mai        | Prototype finale + Flux             | ⏳ À venir  |
 | Architecture                   | 30 mai        | Diagramme UML ou modèle C4          | ⏳ À venir  |
 | Modèle de donneés              | 6 juin        | Diagramme UML ou entité-association | ⏳ À venir  |
