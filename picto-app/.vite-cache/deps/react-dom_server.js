@@ -1,12 +1,10 @@
 import {
   require_react_dom
-} from "./chunk-XVPNPNLI.js";
+} from "./chunk-PSERB7YR.js";
 import {
+  __commonJS,
   require_react
-} from "./chunk-W24JOBID.js";
-import {
-  __commonJS
-} from "./chunk-EWTE5DHJ.js";
+} from "./chunk-UCZTVSZO.js";
 
 // node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js
 var require_react_dom_server_legacy_browser_development = __commonJS({

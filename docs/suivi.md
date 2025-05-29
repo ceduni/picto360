@@ -19,7 +19,15 @@
     - [x] Clarification des options de sauvegarde 
 
 ## Semaine 3
-
+??? note "Rencontre avec Représentant d'école en réseau"
+    - [x] Clarification du mandat
+    - [x] Revision des besoins et objectifs de l'outil
+??? note "Prototypage"
+    - [x] Prototype des Activités
+    - [x] Prototype des annotations de formes
+??? note "Recherche de solution d'implémentation"
+    - [x] Type d'implémentation souhaité pour les annotations de type forme
+    
 ## Semaine 4
 
 ## Semaine 5

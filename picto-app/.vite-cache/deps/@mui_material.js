@@ -50,10 +50,7 @@ import {
   useForkRef_default,
   useId_default,
   useTheme
-} from "./chunk-J2K5GLE7.js";
-import {
-  require_react_dom
-} from "./chunk-XVPNPNLI.js";
+} from "./chunk-N6PRXBL3.js";
 import {
   ClassNameGenerator_default,
   HTMLElementType,
@@ -128,19 +125,20 @@ import {
   useThemeProps,
   useTimeout,
   visuallyHidden_default
-} from "./chunk-GOV7XVZ4.js";
-import "./chunk-UGSEDP7T.js";
+} from "./chunk-GBDL4FWC.js";
+import "./chunk-KWLGGUVY.js";
 import {
   require_jsx_runtime
-} from "./chunk-O3WMLZWX.js";
+} from "./chunk-5YTYY63Z.js";
 import {
-  require_react
-} from "./chunk-W24JOBID.js";
+  require_react_dom
+} from "./chunk-PSERB7YR.js";
 import {
   __export,
   __publicField,
-  __toESM
-} from "./chunk-EWTE5DHJ.js";
+  __toESM,
+  require_react
+} from "./chunk-UCZTVSZO.js";
 
 // node_modules/@mui/material/colors/index.js
 var colors_exports = {};
