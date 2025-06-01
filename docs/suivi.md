@@ -29,6 +29,9 @@
     - [x] Type d'implémentation souhaité pour les annotations de type forme
     
 ## Semaine 4
+??? note "Prototypage et flux"
+    - [x] Prototype Figma de l'ajout d'activités
+    - [x] Prototype des annotations de formes.
 
 ## Semaine 5
 
