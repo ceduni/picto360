@@ -25,10 +25,25 @@ Etudiants
 ## Exigences
 
 - Lister les exigences fonctionnelles et non fonctionnelles.
++ Créer une activités: les activités donnent un contexte (pédagigique)
+à l'outil, permettant aux enseignant d'avoir une vue générale centralisée.
++ Partager une activité 
++ Modifier et supprimer une activités:
+
++ Créer un groupe : Un groupe est une abstraction d'une salle de classe traditionnelle.
++ Gérer le groupe (ajouter enlever des participants)
+
++ Participer à une activiter : Les étudiants peuvent participer à une activité par lien.
++ Rejoindre un groupe : Les étudiants peuvent rejoindre un groupe par lien
+
++ Ajouter une annotation de type 'forme' (éllipse, polygone)
+
++ Naviger entre les images
 
 ## Recherche de solutions
 
 - Présenter les solutions existantes et justifier le choix retenu.
+- Solution pour les annotations de type 'forme' : Utilisation de l'api de hot-spot customisé de pannellum.
 
 ## Méthodologie
 

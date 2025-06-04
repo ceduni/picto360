@@ -8,3 +8,5 @@
 https://blog.momento360.com/introducing-annotations-58b13c4e5586
 
 - Types de formes: https://help.holobuilder.com/en/articles/2430692-adding-markups-directly-in-your-360-scene
+
+- Pannellum custom-hot-spots: https://pannellum.org/documentation/examples/custom-hot-spots/

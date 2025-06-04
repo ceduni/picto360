@@ -34,6 +34,8 @@
     - [x] Prototype des annotations de formes.
 
 ## Semaine 5
+??? note "Prototypage et flux"
+    - [x] Finalisation du prototype Figma
 
 ## Semaine 6
 
