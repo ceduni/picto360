@@ -36,8 +36,15 @@
 ## Semaine 5
 ??? note "Prototypage et flux"
     - [x] Finalisation du prototype Figma
+??? note "Recherche de solution"
+    - [x] Recherche de solution et découverte du framework Firebase
 
 ## Semaine 6
+??? note "Rencontre avec Michel d'école en Réseau"
+    - [x] Présentation et validation du prototype des activités
+??? note "Ajustement du prototype et début d'implémentation"
+    - [x] Ajout des spécifications décrite lors de la rencontre
+    - [x] Début d'implémentation du schema de donné .
 
 ## Semaine 7
 

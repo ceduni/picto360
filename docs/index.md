@@ -42,8 +42,8 @@ et des interactions pour des quiz.
 | Analyse des exigences          | 16 mai        | Document d'analyse                  | ✅ Terminé  |
 | Prototype 1                    | 23 mai        | Maquette + Flux d'activités         | ✅ Terminé  |
 | Prototype 2                    | 30 mai        | Prototype finale + Flux             | ✅ Terminé  |
-| Architecture                   | 30 mai        | Diagramme UML ou modèle C4          | 🔄 En cours |
-| Modèle de donneés              | 6 juin        | Diagramme UML ou entité-association | ⏳ À venir  |
+| Architecture                   | 30 mai        | Diagramme UML ou modèle C4          | ✅ Terminé  |
+| Modèle de donneés              | 6 juin        | Diagramme UML ou entité-association | 🔄 En cours |
 | Revue de conception            | 6 juin        | Feedback encadrant + ajustements    | ⏳ À venir  |
 | Implémentation v1              | 20 juin       | Application v1                      | ⏳ À venir  |
 | Implémentation v2 + tests      | 11 juillet    | Application v2 + Tests              | ⏳ À venir  |
