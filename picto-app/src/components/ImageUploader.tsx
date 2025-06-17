@@ -49,7 +49,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   if (!showPopup) return null;
 
   return (
-    <div className="image-uploader">
       <div className="image-uploader__content">
         {/*<WelcomeMessage
           text="Votre vision, enrichie en 360°."
@@ -59,7 +58,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
           fontWeight="bold"
           textShadow="2px 2px 4px rgba(0,0,0,0.1)"
         />*/}
-        <img className="image-uploader__logo" src="/images/logo_picto360.png" alt="Logo" />
         <div
           className={`image-uploader__drop-zone ${isDragging ? "image-uploader__drop-zone--dragging" : ""}`}
           onDragOver={(event) => handleDragEvents(event, true)}
@@ -73,7 +71,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
             <MdOutlineFileDownload />
           </div>
           <div className="image-uploader__drop-text">Déposez une image ou un projet</div>
-          {/*TODO: mention the supported files + file size limit*/}
+          {/*TODO: mention the supported files format + file size limit*/}
         </div>
         <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
         <div className="image-uploader__icon-container">
@@ -94,7 +92,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "/images/logo_picto360.png";
 import ToggleSwitch from "./ui/ToggleSwitch";
 import "./css/Toolbar.css";
+import { useNavigate } from "react-router-dom";
 
 interface ToolbarProps {
   imageSrc: string | null;
@@ -159,6 +160,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
     hover: { scale: 1.025, transition: { duration: 0.25 } },
   };
 
+  const navigate = useNavigate();
+  const redirectHomePage = useCallback(() =>
+    navigate('/'),[])
+
   return (
     <motion.div
       className={`toolbar-container toolbar--${isEditMode ? "edit-mode" : "preview-mode"}`}
@@ -174,7 +179,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
       <AppBar position="static" className="toolbar" style={{ backgroundColor: "transparent" }}>
         <MUIToolbar disableGutters className="toolbar__content">
           <Box className="toolbar__left">
-            <img src={logo} alt="Picto360 Logo" className="toolbar__logo" />
+            
+            <img src={logo} alt="Picto360 Logo" className="toolbar__logo" onClick={redirectHomePage} />
+
             <Box className="toolbar__title-container" style={{ minHeight: warningMessage ? "65px" : "55px" }}>
               <Box className="toolbar__title-input-wrapper">
                 <motion.div

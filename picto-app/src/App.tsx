@@ -1,25 +1,28 @@
 import React, { useState, useCallback } from "react";
-import Toolbar from "@components/Toolbar";
-import PanoramaViewer from "@components/PanoramaViewer";
-import ImageUploader from "@components/ImageUploader";
-import BottomNavBar from "@/components/BottomNavBar";
-import { motion, AnimatePresence } from "framer-motion";
+// import Toolbar from "@components/Toolbar";
+// import PanoramaViewer from "@components/PanoramaViewer";
+// import ImageUploader from "@components/ImageUploader";
+// import BottomNavBar from "@/components/BottomNavBar";
+// import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import VisualisationPage from "./pages/VisualisationPage";
+import LoginPage from "./pages/LoginPage";
 
 const App: React.FC = () => {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
-  const handleImageUpload = useCallback((newImageSrc: string) => {
-    setImageSrc(newImageSrc);
-  }, []);
-
-  const toggleEditMode = useCallback(() => {
-    setIsEditMode((prevMode) => !prevMode);
-  }, []);
+  const [imageSrc, setImageSrc] = useState<string >("null");
 
   return (
     <div className="app">
+
+      <Routes>
+        <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} />} />
+        <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
+        <Route  path= "/login" element= {<LoginPage />} />
+      </Routes>
+
+{/* 
       <header className="app__header">
         {imageSrc && <Toolbar imageSrc={imageSrc} isEditMode={isEditMode} toggleEditMode={toggleEditMode} />}
       </header>
@@ -41,7 +44,7 @@ const App: React.FC = () => {
             <BottomNavBar />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 };

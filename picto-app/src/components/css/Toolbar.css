@@ -33,6 +33,7 @@
 }
 
 .toolbar__logo {
+  cursor: pointer;
   width: 45px;
   margin-right: 8px;
 }
