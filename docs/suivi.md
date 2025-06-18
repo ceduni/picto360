@@ -47,6 +47,9 @@
     - [x] Début d'implémentation du schema de donné .
 
 ## Semaine 7
+??? note "Début d'implémentation"
+    - [x] Implémentation de la page d'acceuil
+    - [x] Implémentation de l'authentification avec firebase
 
 ## Semaine 8
 

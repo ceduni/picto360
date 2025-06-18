@@ -2,9 +2,9 @@
 
 .image-uploader__content {
   width: 50vw;
-  height: 80vw;
+  height: 70vw;
   position:relative;
-  padding: 0.5vw;
+  padding: 0.2vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,7 +33,7 @@
 
 .image-uploader__drop-zone {
   width: 37.5vw;
-  height: 32vh;
+  height: 35vh;
   border: 2px dashed black;
   border-radius: 20px;
   background-color: #f0f0f0;

@@ -9,18 +9,20 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
 import LoginPage from "./pages/LoginPage";
+import { AuthProvider } from "./authContext/authContext";
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string >("null");
 
   return (
     <div className="app">
-
-      <Routes>
-        <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} />} />
-        <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
-        <Route  path= "/login" element= {<LoginPage />} />
-      </Routes>
+      <AuthProvider >
+        <Routes>
+          <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} isLoggedIn={false} />} />
+          <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
+          <Route  path= "/login" element= {<LoginPage />} />
+        </Routes>
+      </AuthProvider>
 
 {/* 
       <header className="app__header">

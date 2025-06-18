@@ -1,15 +1,17 @@
   import ImageUploader from "@/components/ImageUploader";
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import "./css/HomePage.css";
-import { color } from "framer-motion";
-  
+import "./css/HomePage.css";  
+import { useAuth } from "@/authContext/authContext";
+import { doSignOut } from "@/firebase/authentification";
 
 interface HomeProps{
     setImageSrc:(newImage: string) =>void
 }
 
   const HomePage: React.FC<HomeProps> = ({setImageSrc}) => {
+   
+    const {userLoggedIn,currentUser} = useAuth();
 
     const navigate = useNavigate();
 
@@ -22,18 +24,38 @@ interface HomeProps{
         navigate('/login');
     }, []);
 
+    const onLoggOut = async (e: { preventDefault: () => void })=> {
+            e.preventDefault();
+            if(userLoggedIn){
+                await doSignOut()
+            }
+        }
+
     return(
         <div className="home_background">
             <div className="home-page__content">
                 <img className="image-uploader__logo" 
                  src="/images/logo_picto360.png" alt="Logo-picto360" />
 
-                <div className="image-uploader__login_container">
-                    <button type="button" className="image-uploader__login_button"
+                <div className="home-page__login_container">
+                    {userLoggedIn ?
+                    <button type="button" className="home-page__create_group_button" onClick={onLoggOut}>
+                        {/* Créer un groupe    */}
+                        Log out :
+                         {currentUser?.displayName}
+                    </button>
+                     : 
+                     <button type="button" className="home-page__login_button"
                         onClick={handleLogClick}>
                         Se connecter
                     </button>
+                    }
+
+                    <button type ="button" className="home-page_create_activity">
+                        Créer une activité
+                    </button>
                 </div>
+
                 <ImageUploader onImageUpload={handleImageUpload} />
             </div>
             {/* TODO : Do the css */}
@@ -44,3 +66,7 @@ interface HomeProps{
 }
 
 export default React.memo(HomePage);
+
+function setIsSigninIn(arg0: boolean) {
+    throw new Error("Function not implemented.");
+}
