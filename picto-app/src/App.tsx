@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
 import LoginPage from "./pages/LoginPage";
 import { AuthProvider } from "./authContext/authContext";
+import ProfilePage from "./pages/ProfilePage";
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string >("null");
@@ -18,9 +19,10 @@ const App: React.FC = () => {
     <div className="app">
       <AuthProvider >
         <Routes>
-          <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} isLoggedIn={false} />} />
+          <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} />} />
           <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
           <Route  path= "/login" element= {<LoginPage />} />
+          <Route  path= "/profile" element= {<ProfilePage />} />
         </Routes>
       </AuthProvider>
 

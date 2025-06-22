@@ -15,27 +15,37 @@
 .home-page__content {
   position: relative;
   background-color: #f8f9ff;
-  width: 50vw;
-  height: 80vh;
-  padding: 5vw;
+  width: 55vw;
+  height: 92vh;
+  padding: 1vw;
   padding-bottom: 1vw;
   border-radius: 20px;
   box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: space-around;
   /* above the particles */
   z-index: 1100;
 }
 
-.home-page__content>div:first-child {
+.home-page__center {
+    width: 55vw;
+  height: 75vh;
+    display: flex;
+  flex-direction: column;  
+  justify-content: center;
+  align-items: center;
+
+}
+
+/* .home-page__content>div:first-child {
   position: absolute;
-  top: -5vw;
+  top: 1vw;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-}
+} */
 
 
 .home-page__login_container{
@@ -76,8 +86,8 @@
 }
 
 .home-page__login_button:hover{
-  background-color: #D8E0FF;
-  border-color: #364A9D;
+  background-color: #fbfcff;
+  border-color: #a4b6fc;
   border-width: 0.2vh;
 }
 
@@ -93,4 +103,46 @@
   background-color: #364A9D;
   border-width: 0;
   border-radius :74px; 
+}
+
+
+.image-uploader__logo {
+  position: absolute;
+  left: 46.5%;
+  align-self: center;  
+  justify-content: center;
+  width: 4vw;
+  height: 4vw;
+}
+
+.material-icons{
+    padding-right: 0.5vw;
+}
+
+.profile-button{
+    position: relative;
+    align-items: center;
+    justify-content: space-evenly;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+}
+.profile-button:hover{
+    background-color: #D8E0FF;
+}
+
+
+
+.profil_user-name{
+    font-size: 1vw;
+    color: #364A9D;
+    font-weight: 100;
+    text-decoration: underline;
+}
+
+.top-content{
+    width:55vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
 }

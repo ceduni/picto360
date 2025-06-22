@@ -98,9 +98,8 @@
     width: 2vw;
 }
 
-.material-symbols-rounded {
+.material-icons {
   color: #364A9D;
-  padding-right: 1vw;
   font-variation-settings:
   'FILL' 0,
   'wght' 600,
@@ -123,6 +122,10 @@
     font-weight: 100;
 }
 
+.account-type_text{
+    cursor:text
+}
+
 .account-type_options{
     display: flex;
     flex-direction: row;
@@ -135,24 +138,49 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 1vw;
     width: 18vw;
     font-size: 0.8vw;
     color: #364A9D;
     font-weight: 100;
 }
 
+/* .account-type_container-inside input[type="radio"] {
+  display: none; /* 👈 hide the default radio 
+}
+
+.radio-checkmark {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #364A9D;
+  border-radius: 50%;
+  margin-right: 8px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.account-type_container-inside input[type="radio"]:checked + .radio-checkmark::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 2.5px;
+  width: 10px;
+  height: 10px;
+  background-color: #364A9D;
+  border-radius: 50%;
+} */
+
 .radio-box{
     width: 1.5vw;
     height: 1.5vw;
+    cursor: pointer;
+    accent-color: #364A9D;
 }
 
-.radio-label{
-    padding-right: 1vw;
-}
 
 .submit-button{
-  width: 20vw;
-  height: 4vw;
+  width: 14vw;
+  height: 2.9vw;
   color: #ffffff;
   cursor: pointer;
   font-family: "Inter", sans-serif;
@@ -162,4 +190,81 @@
   background-color: #364A9D;
   border-width: 0;
   border-radius :74px; 
+}
+
+.cancel-button{
+    width: 14vw;
+  height: 2.9vw;
+  color: #364A9D;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 1.2vw;
+  background-color: #D8E0FF;
+  border-width: 0;
+  border-radius :74px; 
+}
+
+.login_with_email_dialog{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    padding:0.8vw;
+}
+
+.loginWithEmailBoxes{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+input {
+  background: none;
+  border:inherit;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+}
+
+
+
+.login_dialog_box{
+    height: 6vh;
+    width: 19vw;
+    background-color: #F1F2FF;
+    border: 1vw solid #ffffff;
+    border-radius: 5px;
+    border-width: 0.2vw;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.login_dialog_box:focus {
+  border-color: #D8E0FF ;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.login_with_email_text{
+    font-size: 0.9vw;
+    color: #364A9D;
+    font-weight: 100;
+    padding-left: 0.3vw;
+}
+
+.login_with_email_hidden{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bottom-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
 }

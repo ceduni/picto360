@@ -1,7 +1,7 @@
 import { useAuth } from "@/authContext/authContext";
 import "./css/LoginPage.css"
 
-import { doSignInWithEmailAndPassword ,doSighInWithGoogle } from "@/firebase/authentification"
+import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmailAndPassword } from "@/firebase/authentification"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 
@@ -18,9 +18,10 @@ interface Props{
 
 
     const [email,setEmail]= useState('');
-    const [password,setPassword] = useState('');
+    const [password,setPassword] = useState<string>('');
     const [isSigningIn,setIsSigninIn] = useState(false);
     const [errorMessage,setErrormessage] = useState('');
+    const [loginWithEmailBoxes,setLoginInputBoxes] = useState(false);
 
     const onSubmitEmail = async (e: { preventDefault: () => void })=> {
         e.preventDefault();
@@ -34,8 +35,8 @@ interface Props{
         e.preventDefault();
         if(!isSigningIn){
             setIsSigninIn(true)
-            doSighInWithGoogle().catch((err) => {
-                setIsSigninIn(false)
+            doSighInWithGoogle(userType).catch((err) => {
+                setIsSigninIn(false);
             })
         }
     }
@@ -45,6 +46,83 @@ interface Props{
         navigate('/')
         }
     })
+
+    const onAcademicClick = () =>{
+        setLoginInputBoxes(!loginWithEmailBoxes);
+    }
+
+    const onCancelClick = () => {
+        if(!isSigningIn){
+            navigate('/');
+        }
+    }
+
+    const isValidEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleConnect = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!isValidEmail(email) || email=='') {
+            setErrormessage('Adresse email invalide.');
+            console.log(errorMessage);
+            return;
+        }
+
+        // if(password=='' ){
+        //     setErrormessage('Password invalide.');
+        //     console.log(errorMessage);
+        //     return;
+        // }
+
+        // proceed with Firebase login
+        if(!isSigningIn){
+            setIsSigninIn(true);
+
+            doCreateUserWithEmailAndPassword(email,password).catch((err) => {
+                setIsSigninIn(false);
+                if(err=="auth/email-already-exists"){
+                }
+                console.log(err);
+            });
+        }
+        handleSignInWithEmail(e);
+    };
+    
+
+    const handleSignInWithEmail = async (e: React.FormEvent) =>{
+        e.preventDefault();
+
+        if(!isSigningIn){
+
+            setIsSigninIn(true)
+
+            doSignInWithEmailAndPassword(email,password).catch((err) =>{
+                if(err == "auth/invalid-credential"){
+                    setErrormessage(err);
+                    // TODO: Manage errors (already created, wrong credential,etc)
+                }
+                setIsSigninIn(false);
+                console.log(err);
+            }
+            );
+        setErrormessage('');
+        navigate('/');
+        }
+
+
+    }
+
+    const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value); // 🔁 Store input value in state
+    };
+
+    const handleChangePassword = (pass: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("Password typed:", pass.target.value);
+        setPassword(pass.target.value);
+    };
 
     return(
         <div className="login_background">
@@ -63,34 +141,30 @@ interface Props{
                     </h2>
                     
                     <div className="account-type_options">
-                        <div className="account-type_container-inside">
-                            <label className="radio-label">
+                            <label className="account-type_container-inside">
                                 <input className="radio-box" 
                                 title ="select" 
                                 type="radio" 
                                 name="checkbox"
                                 onChange={() => setUserType('etudiant')}/>
-                            </label>
-                            {/* <img alt ="checked" className="material-icons-outlined" src="/images/check_circle_100dp_46152F.png"/> */}
-                            <h2 className="account-type_etudiant">
+                            <h2 className="account-type_text">
                                 Etudiant (e)
                             </h2>
-                        </div>
+                            </label>
+                            {/* <img alt ="checked" className="material-icons-outlined" src="/images/check_circle_100dp_46152F.png"/> */}
 
-
-                        <div className="account-type_container-inside">
-                            <label className="radio-label">
+                            <label className="account-type_container-inside">
                                 <input className="radio-box" 
                                 title ="select" 
                                 type="radio" 
                                 name="checkbox" 
                                 defaultChecked={true}
                                 onChange={() =>setUserType('prof')} />
-                            </label>
-                            <h2 className="account-type_prof">
+                            <h2 className="account-type_text">
                                 Professeur / Tuteur (trice)
                             </h2>
-                        </div>
+                            </label>
+
                     </div>
                 </div>
 
@@ -99,8 +173,10 @@ interface Props{
                  <div className="login-page_connection_options">
                     <div className="login-page_connect-baniere" onClick={onSubmitGoogle}>
                         <img src="/images/devicon_google.png" alt="google" className="login-page_option-icon"/>
-                        <h1 className="login-page_option-text">Se connecter avec google</h1>
-                        <span className="material-symbols-rounded">
+                        <h1 className="login-page_option-text">
+                            Se connecter avec google
+                        </h1>
+                        <span className="material-icons">
                             chevron_right
                         </span>
                     </div>
@@ -109,28 +185,80 @@ interface Props{
 
                     <div className="login-page_connect-baniere">
                         <img src="/images/logos_facebook.png" alt="google" className="login-page_option-icon"/>
-                        <h1 className="login-page_option-text">Se connecter avec facebook</h1>
-                        <span className="material-symbols-rounded">
+                        <h1 className="login-page_option-text">
+                            Se connecter avec facebook
+                        </h1>
+                        <span className="material-icons">
                             chevron_right
                         </span>
                     </div>
 
                     <div className="space-between-options"/>
 
-                    <div className="login-page_connect-baniere">
-                        <img src="/images/ic_twotone-connected-tv.png" alt="google" className="login-page_option-icon"/>
-                        <h1 className="login-page_option-text">Se connecter avec votre adresse académique</h1>
-                        <span className="material-symbols-rounded">
-                            chevron_right
-                        </span>
+                    <div>
+                        <div className="login-page_connect-baniere" onClick={onAcademicClick}>
+                            <img src="/images/ic_twotone-connected-tv.png" alt="google" className="login-page_option-icon"/>
+                            <h1 className="login-page_option-text">
+                                Se connecter avec votre adresse académique
+                            </h1>
+                            {
+                                loginWithEmailBoxes ?
+                                <span className="material-icons">
+                                keyboard_arrow_down
+                                </span>
+                                :
+                                <span className="material-icons">
+                                    chevron_right
+                                </span>
+                            }
+
+                        </div>
+                        {
+                            loginWithEmailBoxes &&
+                            <div className="login_with_email_hidden">
+
+                                <div className="loginWithEmailBoxes">
+                                    <div className="login_with_email_dialog">
+                                        <h2 className="login_with_email_text">Email</h2>
+                                        <input type="email" 
+                                            title="email" 
+                                            className="login_dialog_box" 
+                                            onChange={handleChangeEmail}/>
+                                    </div>
+
+
+                                    <div className="login_with_email_dialog">
+                                        <h2 className="login_with_email_text">Mot de passe</h2>
+                                        <input type="password" 
+                                            title="password" 
+                                            className="login_dialog_box"
+                                            value={password}
+                                            onChange={handleChangePassword}
+                                        />
+                                    </div>
+                                    
+                                </div>                           
+                            </div>                        
+
+                        }
+                        <div className="space-between-options"/>
+                        
+                        <div className="bottom-buttons">
+                            <button type="button" className="cancel-button" onClick={onCancelClick}>
+                                Annuler
+                            </button>
+                            {loginWithEmailBoxes && 
+                                <button type= "button" className="submit-button" onClick={handleConnect}>
+                                        Connexion
+                                </button>
+                            }
+                        </div>
+
+
                     </div>
+
                  </div>
 
-                <div className="space-between-sections"/>
-
-                 <button type= "button" className="submit-button">
-                        Se connecter
-                 </button>
             </div>
 
             {/* TODO : Create the differents buttons (options)*/}
