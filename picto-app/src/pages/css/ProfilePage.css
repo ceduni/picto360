@@ -16,8 +16,10 @@
   position: relative;
   background-color: #f8f9ff;
   width: 55vw;
-  height: 80vh;
+  height: 89+6vh;
   padding: 3vw;
+  padding-top: 1vw;
+  gap: 1vw;
   border-radius: 20px;
   box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -59,17 +61,60 @@
 .profile_context_top-right{
     display: flex;
     flex-direction: row;
-    gap:22vw;
+    gap:8vw;
+}
+
+.profile_top_right{
+    display: flex;
+    flex-direction: row;
+    gap :1.5vw
+}
+
+.profile_top_right_group{
+    display: flex;
+    flex-direction: column;
+    font-size: 1vw;
+    font-weight: 500;
+    justify-content: center;
+    align-items: center;
+}
+
+.user_name_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .user_name{
     font-weight: 800;
     font-size: 1.5vw;
+    width: 10vw;
 }
 
+.user_name_typing{
+    font-weight: 800;
+    font-size: 1.5vw;
+    width: 12vw;
+    padding: 3px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #e6f7ff; 
+    box-shadow: rgb(0 0 5px #1890ff );
+    transition: 0.3s ease
+}
+
+.edit_button{
+    cursor: pointer;
+}
+
+.edit_button:hover{
+    color:#364A9D
+}
+
+
 .user_email{
-    font-size: 0.8vw;
-    font-weight: 200
+    font-size: 0.9vw;
+    font-weight: 500
 }
 
 .profile_picture{
@@ -87,10 +132,88 @@
     flex-direction: column;
 }
 
+.profile_main_content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile_top{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1vw;
+    padding: 0.5vw;
+    font-size: 0.9vw;
+    color: #364A9D;
+    align-self: self-start;
+}
+
+
+.back_button{
+    cursor: pointer;
+}
+
+.back_button:hover{
+    color:#172148
+}
+
 .profile_context{
     height: 60vh;
     background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom-left-radius: 1vw;
+    border-bottom-right-radius: 1vw;
+    gap: 3vw;
+    box-shadow: 0 2px 3px rgba(54, 74,157,0.08) ;
 }
+
+.option_baniere{
+    width: 48vw;
+    height: 1.5vw;
+    padding: 0.6vw;
+    display: flex;
+    flex-direction: row;
+    gap :1vw;
+    align-items: center;
+    background-color: rgba(217, 217, 217, 0.15);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out
+}
+
+.option_baniere:hover{
+    background-color: rgba(217, 217, 217, 0.5);
+}
+
+.option_baniere_delete_account{
+    color: red;
+    width: 48vw;
+    height: 1.5vw;
+    padding: 0.6vw;
+    display: flex;
+    flex-direction: row;
+    gap :1vw;
+    align-items: center;
+    background-color: rgba(217, 217, 217, 0.15);
+    cursor: pointer;
+    font-weight: 500;    
+    transition: background-color 0.2s ease-in-out
+}
+
+.option_baniere_delete_account:hover{
+    background-color: rgba(217, 217, 217, 0.5);
+}
+
+.context_options{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+}
+
 
 .profile_logout-button{
     width: 9vw;
@@ -102,4 +225,9 @@
     border: 0;
     border-radius: 0.2vw;
     cursor: pointer;
+    transition: background-color 0.2s ease-in-out
+}
+
+.profile_logout-button:hover{
+    background-color:#172148
 }

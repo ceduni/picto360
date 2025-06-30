@@ -1,7 +1,7 @@
 import { useAuth } from "@/authContext/authContext";
 import "./css/LoginPage.css"
 
-import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmailAndPassword } from "@/firebase/authentification"
+import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmailAndPassword, doSignInWithFacebook } from "@/firebase/authentification"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 
@@ -22,14 +22,8 @@ interface Props{
     const [isSigningIn,setIsSigninIn] = useState(false);
     const [errorMessage,setErrormessage] = useState('');
     const [loginWithEmailBoxes,setLoginInputBoxes] = useState(false);
+    const [isSubscribing,setIsSubscribing] = useState(false);
 
-    const onSubmitEmail = async (e: { preventDefault: () => void })=> {
-        e.preventDefault();
-        if(!isSigningIn){
-            setIsSigninIn(true)
-            await doSignInWithEmailAndPassword(email,password)
-        }
-    }
 
     const onSubmitGoogle = async (e: { preventDefault: () => void }) =>{
         e.preventDefault();
@@ -38,6 +32,17 @@ interface Props{
             doSighInWithGoogle(userType).catch((err) => {
                 setIsSigninIn(false);
             })
+        }
+    }
+
+    const onSubmitFacebook = async ( e : { preventDefault:() => void } ) => {
+        e.preventDefault();
+        if(!isSigningIn){
+            setIsSigninIn(true)
+            doSignInWithFacebook().catch((err) => {
+                setIsSigninIn(false);
+            })
+
         }
     }
 
@@ -62,7 +67,7 @@ interface Props{
         return emailRegex.test(email);
     };
 
-    const handleConnect = async (e: React.FormEvent) => {
+    const handleSubscribeWithEmail = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!isValidEmail(email) || email=='') {
@@ -70,12 +75,6 @@ interface Props{
             console.log(errorMessage);
             return;
         }
-
-        // if(password=='' ){
-        //     setErrormessage('Password invalide.');
-        //     console.log(errorMessage);
-        //     return;
-        // }
 
         // proceed with Firebase login
         if(!isSigningIn){
@@ -88,7 +87,6 @@ interface Props{
                 console.log(err);
             });
         }
-        handleSignInWithEmail(e);
     };
     
 
@@ -115,12 +113,19 @@ interface Props{
 
     }
 
+    const onSubscribeClick = () =>{
+        setErrormessage('');
+        setIsSubscribing(!isSubscribing);
+    }
+
     const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setErrormessage('');
         setEmail(e.target.value); // 🔁 Store input value in state
     };
 
     const handleChangePassword = (pass: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("Password typed:", pass.target.value);
+        setErrormessage('');
+        // console.log("Password typed:", pass.target.value);
         setPassword(pass.target.value);
     };
 
@@ -174,7 +179,7 @@ interface Props{
                     <div className="login-page_connect-baniere" onClick={onSubmitGoogle}>
                         <img src="/images/devicon_google.png" alt="google" className="login-page_option-icon"/>
                         <h1 className="login-page_option-text">
-                            Se connecter avec google
+                            {isSubscribing ? "S'inscrire" : "Se connecter" }  avec google
                         </h1>
                         <span className="material-icons">
                             chevron_right
@@ -183,10 +188,10 @@ interface Props{
                     
                     <div className="space-between-options"/>
 
-                    <div className="login-page_connect-baniere">
+                    <div className="login-page_connect-baniere" onClick={onSubmitFacebook}>
                         <img src="/images/logos_facebook.png" alt="google" className="login-page_option-icon"/>
                         <h1 className="login-page_option-text">
-                            Se connecter avec facebook
+                            {isSubscribing ? "S'inscrire" : "Se connecter" }  avec facebook
                         </h1>
                         <span className="material-icons">
                             chevron_right
@@ -199,7 +204,7 @@ interface Props{
                         <div className="login-page_connect-baniere" onClick={onAcademicClick}>
                             <img src="/images/ic_twotone-connected-tv.png" alt="google" className="login-page_option-icon"/>
                             <h1 className="login-page_option-text">
-                                Se connecter avec votre adresse académique
+                                {isSubscribing ? "S'inscrire" : "Se connecter" } avec votre adresse académique
                             </h1>
                             {
                                 loginWithEmailBoxes ?
@@ -216,6 +221,12 @@ interface Props{
                         {
                             loginWithEmailBoxes &&
                             <div className="login_with_email_hidden">
+                                {errorMessage != '' &&
+                                    <div className="login_error_message">
+                                        <p> {errorMessage} </p>
+                                    </div>                                
+                                }
+
 
                                 <div className="loginWithEmailBoxes">
                                     <div className="login_with_email_dialog">
@@ -223,6 +234,7 @@ interface Props{
                                         <input type="email" 
                                             title="email" 
                                             className="login_dialog_box" 
+                                            placeholder="you@example.com"
                                             onChange={handleChangeEmail}/>
                                     </div>
 
@@ -234,10 +246,37 @@ interface Props{
                                             className="login_dialog_box"
                                             value={password}
                                             onChange={handleChangePassword}
+                                            placeholder="Entrez votre password"
                                         />
                                     </div>
                                     
-                                </div>                           
+                                </div>
+                                {isSubscribing &&
+                                    <div className="login_with_email_dialog">
+                                        <h2 className="login_with_email_text">Nom d'utilisateur</h2>
+                                        <input type="form" 
+                                            title="user_name" 
+                                            className="login_dialog_box" 
+                                            placeholder="Entrez votre nom"
+                                            />
+                                    </div>                                  
+                                }
+
+                                {
+                                    isSubscribing ?
+                                      
+                                    <div className="login_with_email_choice">
+                                        <p> Vouz avez déjà un compte ?</p>
+                                        <p className="login_with_email_subscribe" onClick={onSubscribeClick}> Se connecter </p>
+                                    </div> 
+
+                                    :
+                                    <div className="login_with_email_choice">
+                                        <p>C'est votre première fois ?</p>
+                                        <p className="login_with_email_subscribe" onClick={onSubscribeClick}> S'inscrire </p>
+                                    </div> 
+
+                                }                          
                             </div>                        
 
                         }
@@ -247,10 +286,17 @@ interface Props{
                             <button type="button" className="cancel-button" onClick={onCancelClick}>
                                 Annuler
                             </button>
-                            {loginWithEmailBoxes && 
-                                <button type= "button" className="submit-button" onClick={handleConnect}>
+                            { 
+                                isSubscribing ?
+                                loginWithEmailBoxes &&
+                                <button type= "button" className="submit-button" onClick={handleSubscribeWithEmail}>
+                                        Inscription
+                                </button> 
+                                :
+                                loginWithEmailBoxes &&
+                                <button type= "button" className="submit-button" onClick={handleSignInWithEmail}>
                                         Connexion
-                                </button>
+                                </button> 
                             }
                         </div>
 

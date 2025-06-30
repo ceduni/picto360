@@ -98,14 +98,6 @@
     width: 2vw;
 }
 
-.material-icons {
-  color: #364A9D;
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 600,
-  'GRAD' 0,
-  'opsz' 48
-}
 
 .account-type_container{
     display: flex;
@@ -210,7 +202,7 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    padding:0.8vw;
+    padding:0.3vw;
 }
 
 .loginWithEmailBoxes{
@@ -237,11 +229,20 @@ input {
 .login_dialog_box{
     height: 6vh;
     width: 19vw;
+    padding: 0.5vw;
+
     background-color: #F1F2FF;
     border: 1vw solid #ffffff;
     border-radius: 5px;
     border-width: 0.2vw;
     transition: border-color 0.2s ease-in-out;
+}
+
+.login_dialog_box::placeholder{
+    color: #364A9D;
+    opacity: 20%;
+    font-size: 15px;
+    font-family: 'Inter' sans-serif;
 }
 
 .login_dialog_box:focus {
@@ -252,19 +253,42 @@ input {
 .login_with_email_text{
     font-size: 0.9vw;
     color: #364A9D;
-    font-weight: 100;
-    padding-left: 0.3vw;
+    font-weight: 800;
+    padding-left: 0.5vw;
 }
 
 .login_with_email_hidden{
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: self-start;
+}
+
+
+.login_with_email_choice{
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    gap : 0.5vw;
+    font-weight: 100;
+    font-size: 0.9vw;
+    color: #364A9D;
+    padding: 0.3vw;
+}
+
+.login_with_email_subscribe{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.login_with_email_subscribe:hover{
+    background-color: #D8E0FF;
+    border-radius: 0.2vw;
 }
 
 .bottom-buttons{
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    gap: 2vw;
+    justify-content: center;
     align-items: center;
 }

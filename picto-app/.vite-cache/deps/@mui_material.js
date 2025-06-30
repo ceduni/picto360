@@ -52,6 +52,9 @@ import {
   useTheme
 } from "./chunk-J2K5GLE7.js";
 import {
+  require_react_dom
+} from "./chunk-XVPNPNLI.js";
+import {
   ClassNameGenerator_default,
   HTMLElementType,
   StyledEngineProvider,
@@ -130,9 +133,6 @@ import "./chunk-UGSEDP7T.js";
 import {
   require_jsx_runtime
 } from "./chunk-O3WMLZWX.js";
-import {
-  require_react_dom
-} from "./chunk-XVPNPNLI.js";
 import {
   require_react
 } from "./chunk-W24JOBID.js";
