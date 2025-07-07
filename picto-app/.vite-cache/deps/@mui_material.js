@@ -52,9 +52,6 @@ import {
   useTheme
 } from "./chunk-J2K5GLE7.js";
 import {
-  require_react_dom
-} from "./chunk-XVPNPNLI.js";
-import {
   ClassNameGenerator_default,
   HTMLElementType,
   StyledEngineProvider,
@@ -129,6 +126,9 @@ import {
   useTimeout,
   visuallyHidden_default
 } from "./chunk-GOV7XVZ4.js";
+import {
+  require_react_dom
+} from "./chunk-XVPNPNLI.js";
 import "./chunk-UGSEDP7T.js";
 import {
   require_jsx_runtime

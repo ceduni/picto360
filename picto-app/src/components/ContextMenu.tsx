@@ -4,6 +4,8 @@ import { styled } from "@mui/system";
 import { IconType } from "react-icons";
 import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
+import { IoShapesOutline } from "react-icons/io5";
+
 
 
 interface ContextMenuProps {
@@ -60,7 +62,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Annotations",
     items: [
-      { type: "Form", icon: AiOutlineUnorderedList, label: "Questionnaire" },
+      { type: "Forme", icon: IoShapesOutline, label: "Forme" },
       { type: "divider" },
       { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
       { type: "Image", icon: AiOutlinePicture, label: "Image" },

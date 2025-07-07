@@ -1,20 +1,41 @@
 import React, { useCallback, useMemo, useRef, useEffect, JSX } from "react";
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
-import ReactDOMServer from "react-dom/server";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
 import { TiInfoLarge } from "react-icons/ti";
+import { BiSolidLabel } from "react-icons/bi";
 import "./css/HotspotManager.css";
+import { createHotspotInstance, hotspotClickHandler, parseGiphyUrlToDirectGif, renderTooltipContent } from "@/utils/HotspotUtils";
 
 interface HotspotManagerProps {
   viewer: unknown;
   viewerElement: HTMLDivElement | null;
+  onHotspotClick: (hotspot: HotspotData) => void
 }
+
+export interface HotspotData {
+  id: string;
+  pitch: number;
+  yaw: number;
+  type: "info" | "scene" | "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "forme" | "custom";
+  content?: string;
+  URL?: string;
+  sceneId?: string;
+  cssClass?: string;
+  meta?: Record<string, any>; // optional metadata for custom cases
+}
+
+export interface HotspotInstance extends HotspotData {
+  createTooltipFunc?: (hotSpotDiv: HTMLElement) => void;
+  clickHandlerFunc?: (event: MouseEvent, args: HotspotData) => void;
+  clickHandlerArgs?: HotspotData;
+}
+  
 
 const TEXT_CHAR_LIMIT = 300;
 const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 
-const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }) => {
+const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,onHotspotClick}) => {
   const hotspotCounter = useRef(0);
   const debugMode = useRef(true);
 
@@ -23,135 +44,10 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
     if (debugMode.current) console.log("HotspotManager - [Debug]", ...args);
   }, []);
 
-  const adjustTooltipPosition = useCallback(
-    (element: HTMLElement) => {
-      debugLog("HotspotManager - Adjusting element position", element);
-      requestAnimationFrame(() => {
-        // Anchoring the tooltip to the tip at the bottom
-        const tooltipHeight = element.offsetHeight;
-        element.style.marginTop = `-${tooltipHeight + 15}px`;
+  const pannellumClickHandler = (event: MouseEvent, args: HotspotData) => {
+    onHotspotClick(args);
+  };
 
-        // Horizontal positioning adjustment if element overflows the screen
-        const elementRect = element.getBoundingClientRect();
-        if (elementRect.right > window.innerWidth) {
-          element.style.left = `${window.innerWidth - elementRect.width - 10}px`;
-        }
-
-        debugLog("HotspotManager - Adjusted element position", {
-          width: element.style.width,
-          maxWidth: element.style.maxWidth,
-          marginTop: element.style.marginTop,
-          left: element.style.left,
-        });
-      });
-    },
-    [debugLog]
-  );
-
-  const setupEditableContent = useCallback(
-    (span: HTMLSpanElement, charLimit: number) => {
-      const adjustOnInput = () => adjustTooltipPosition(span);
-      const removeEmptyLines = () => {
-        span.innerHTML = span.innerHTML
-          .split("<br>")
-          .filter((line) => line.trim() !== "")
-          .join("<br>");
-      };
-      const enforceCharLimit = () => {
-        if (span.innerText.length > charLimit) {
-          span.innerText = span.innerText.slice(0, charLimit);
-          alert(`Maximum character limit of ${charLimit} reached.`);
-        }
-      };
-
-      span.addEventListener("blur", () => {
-        removeEmptyLines();
-        adjustOnInput();
-        span.removeEventListener("input", adjustOnInput);
-      });
-      span.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          span.blur();
-        }
-      });
-      span.addEventListener("input", () => {
-        enforceCharLimit();
-        adjustOnInput();
-      });
-      span.addEventListener("focus", (e) => e.stopPropagation());
-      span.addEventListener("keydown", (e) => e.stopPropagation());
-    },
-    [adjustTooltipPosition]
-  );
-
-  const renderTooltipContent = useCallback(
-    (
-      icon: JSX.Element,
-      content: string,
-      editable: boolean,
-      charLimit: number,
-      type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "form"
-    ) => {
-      return (hotSpotDiv: HTMLElement) => {
-        debugLog("Generating tooltip content", { type, content, editable, charLimit });
-
-        if (type !== "label") {
-          hotSpotDiv.classList.add("hotspot-manager__custom-tooltip");
-          const iconDiv = document.createElement("div");
-          iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
-          hotSpotDiv.appendChild(iconDiv);
-        }
-
-        const span = document.createElement("span");
-        span.className = "hotspot-manager__content";
-
-        switch (type) {
-          case "text":
-          case "label":
-            {
-              const textNode = document.createTextNode(content);
-              span.appendChild(textNode);
-              span.classList.add("hotspot-manager__content--text");
-              if (editable) {
-                span.contentEditable = "true";
-                setupEditableContent(span, charLimit);
-              }
-            }
-            break;
-          case "hyperlink":
-          case "form":
-            span.innerHTML = content;
-            break;
-          case "image":
-          case "gif": {
-            const img = new Image();
-            img.src = type === "gif" ? parseGiphyUrlToDirectGif(content) ?? "" : content;
-            img.classList.add("hotspot-manager__graphics");
-            img.onload = () => adjustTooltipPosition(span);
-            span.appendChild(img);
-            break;
-          }
-          case "video": {
-            const iframe = document.createElement("iframe");
-            iframe.src = `${content}?enablejsapi=1`;
-            iframe.classList.add("hotspot-manager__video");
-            iframe.onload = () => adjustTooltipPosition(span);
-            span.appendChild(iframe);
-            hotSpotDiv.addEventListener("mouseleave", () =>
-              iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo"}', "*")
-            );
-            break;
-          }
-        }
-
-        hotSpotDiv.appendChild(span);
-        adjustTooltipPosition(span);
-        debugLog("HotspotManager - Tooltip adjustments completed", { span });
-      };
-    },
-    [adjustTooltipPosition, debugLog]
-  );
 
   const addHotspotToViewer = useCallback(
     (
@@ -160,31 +56,34 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
       content: string,
       editable: boolean,
       charLimit: number,
-      type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "form",
-      clickHandler?: () => void
+      type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "forme" | "scene" | "info",
+      clickHandler?: (event: any,args: any) => void,
     ) => {
       if (!viewer) {
         debugLog("HotspotManager - Viewer not available, cannot add hotspot");
         return;
       }
 
+      // For test purpose
+      alert("X:" + coords[0] + "Y:" + coords[1])
+
       const hotspotId = `hotspot-${Date.now()}-${hotspotCounter.current++}`;
       debugLog("HotspotManager - Adding hotspot to viewer...", { hotspotId, coords, type });
 
-      const hotspot = {
+      const baseHotspot: HotspotData = {
         id: hotspotId,
         pitch: coords[0],
         yaw: coords[1],
-        type: "custom",
+        type: type || "custom",
         cssClass: type === "label" ? "hotspot-manager__label" : "hotspot-manager__custom_hotspot",
-        createTooltipFunc: renderTooltipContent(icon, content, editable, charLimit, type),
-        clickHandlerFunc: clickHandler,
+        content:content,
       };
 
       try {
         //TODO: Replace any (if possible)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (viewer as any).addHotSpot(hotspot);
+        const hotspotInstance = createHotspotInstance(baseHotspot,pannellumClickHandler);
+        (viewer as any).addHotSpot(hotspotInstance);
         debugLog("HotspotManager - Hotspot added successfully", { hotspotId });
       } catch (error) {
         console.error("HotspotManager - Failed to add hotspot", error);
@@ -205,7 +104,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
           "text"
         ),
       label: (coords: [number, number]) =>
-        addHotspotToViewer(coords, <></>, "Lorem ipsum dolor sit amet.", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
+        addHotspotToViewer(coords, <BiSolidLabel />, "Lorem ipsum dolor sit amet.", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
       hyperlink: (coords: [number, number], url: string, hyperlinkText: string) =>
         //TODO: compress the URL into a tiny URL on a single line
         addHotspotToViewer(
@@ -214,7 +113,8 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
           `<a href="${url}" target="_blank">${hyperlinkText}</a>`,
           false,
           LABEL_HYPERLINK_CHAR_LIMIT,
-          "hyperlink"
+          "hyperlink",
+          hotspotClickHandler
         ),
       //TODO: add an optional title above/under (choice) the image
       image: (coords: [number, number], imageUrl: string) =>
@@ -229,7 +129,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
       },
       video: (coords: [number, number], videoUrl: string) =>
         addHotspotToViewer(coords, <MdOutlineVideoLibrary />, videoUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "video"),
-      form: (coords: [number, number], question: string, options: string[], correctOption: number) => {
+      forme: (coords: [number, number], question: string, options: string[], correctOption: number) => {
         addHotspotToViewer(
           coords,
           <MdOutlineQuestionMark />,
@@ -238,7 +138,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
             .join("")}</ul>`,
           false,
           LABEL_HYPERLINK_CHAR_LIMIT,
-          "form"
+          "forme"
         );
       },
     }),
@@ -251,23 +151,12 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
     return url.match(regex)?.[1] || null;
   }, []);
 
-  /*Giphy compatibility exclusively*/
-  const parseGiphyUrlToDirectGif = useCallback((url: string): string | null => {
-    try {
-      const match = url.match(/media\/([a-zA-Z0-9]+)\/giphy\.gif/);
-      const giphyId = match ? match[1] : url.split("-").pop();
-      return giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
-    } catch (error) {
-      console.error("HotspotManager - Failed to parse Giphy URL:", error);
-      return null;
-    }
-  }, []);
 
   const handleHotspotEvent = useCallback(
     async (type: string, coords: [number, number]) => {
       debugLog("HotspotManager - Handling hotspot event", { type, coords });
       switch (type) {
-        case "Form": {
+        case "Forme": {
           const question = prompt("Saisissez la question:");
           const options = Array.from(
             { length: parseInt(prompt("Saisissez le nombre d'options de réponses (minimum 2):") || "2", 10) },
@@ -275,7 +164,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement }
           );
           const correctOption = parseInt(prompt("Saisissez le numéro de la bonne réponse:") || "1", 10) - 1;
           if (question && options.length >= 2 && correctOption >= 0) {
-            hotspotCreators.form(coords, question, options, correctOption);
+            hotspotCreators.forme(coords, question, options, correctOption);
             debugLog("HotspotManager - Hotspot added successfully", { type, coords });
           } else {
             alert(

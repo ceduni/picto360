@@ -17,8 +17,6 @@ const VisualisationPage: React.FC<ViewProps> = ({imageSrc}) => {
         setIsEditMode((prevMode) => !prevMode);
     }, []);
 
-    
-
     return(
         <div>
             <header className="app__header">

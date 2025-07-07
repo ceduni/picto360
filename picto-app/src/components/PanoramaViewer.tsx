@@ -2,8 +2,11 @@ import React, { useEffect, useCallback, useState, useRef, useMemo } from "react"
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
-import HotspotManager from "./HotspotManager";
+import HotspotManager, { HotspotData, HotspotInstance } from "./HotspotManager";
 import "./css/PanoramaViewer.css";
+import EditionPannel from "./EditionPannel";
+import { createHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
+import { useNavigate } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -37,6 +40,10 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
   });
   const [targetIconPosition, setTargetIconPosition] = useState<{ x: number; y: number } | null>(null);
   const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({ pitch: 0, yaw: 0 });
+  const [isEditingHotspot,setIsEditingHotspot] = useState(false);
+  
+  const [hotspots, setHotspots] = useState<HotspotData[]>([]);
+  const [selectedHotspot, setSelectedHotspot] = useState<HotspotData | null>(null);
 
   const viewerConfig = useMemo(
     () => ({
@@ -57,20 +64,31 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     [imageSrc] // northOffset excluded as it forces the viewer to reload
   );
 
-  const initializeViewer = useCallback(() => {
+  const navigate = useNavigate()
+
+  const initializeViewer = useCallback( () => {
     if (!viewerRef.current || !imageSrc) {
       console.error("PanellumViewer - Viewer ref or image source is missing.");
       return;
     }
 
-    if (!viewerInstanceRef.current) {
-      console.log("PanellumViewer - Initializing Pannellum viewer...");
-      viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
+    if(!window.pannellum){
+      console.error("PanellumViewer - window.pannellum is not available. Check script loading.");
+      return;
     }
+    
+    console.log("PanellumViewer - Initializing Pannellum viewer...");
+    viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
+
   }, [imageSrc, viewerConfig]);
 
   useEffect(() => {
+
     initializeViewer();
+
+    // if(imageSrc!=null){
+    //   navigate("/");
+    // }
 
     return () => {
       if (viewerInstanceRef.current) {
@@ -79,7 +97,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
         viewerInstanceRef.current = null;
       }
     };
-  }, [initializeViewer]);
+  }, [imageSrc]);
 
 
   const handleContextMenu = useCallback(
@@ -159,6 +177,53 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     [isEditMode]
   );
 
+  const handleHotspotSave = (updatedHotspot: HotspotData) => {
+    setHotspots(prev =>
+      prev.map(hotS => hotS.id === updatedHotspot.id ? updatedHotspot : hotS)
+    );
+
+    // Refresh viewer hotspot:
+    if (viewerInstanceRef.current) {
+      (viewerInstanceRef.current as any).removeHotSpot(updatedHotspot.id);
+
+      const hotspotInstance = createHotspotInstance(updatedHotspot,handlePannellumClick);
+
+      (viewerInstanceRef.current as any).addHotSpot(hotspotInstance);
+    }
+  };
+
+  const handleHotspotClick = (hotspot: HotspotData) => {
+    setIsEditingHotspot(true);
+    // console.log("Selected for editing:", hotspot);
+    setSelectedHotspot(hotspot); // open edition panel
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // Skip if clicking on a hotspot or the edition panel
+      const target = e.target as HTMLElement;
+
+      // Adjust selectors depending on the class structure
+      if (
+        target.closest(".hotspot-manager__custom-tooltip") || 
+        target.closest(".edition_pannel") 
+      ) {
+        return;
+      }
+
+      // Otherwise, close the panel
+      setSelectedHotspot(null);
+    };
+
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
+
+
+  const handlePannellumClick = (event: MouseEvent, args: HotspotData) => {
+    handleHotspotClick(args);
+  };
+
   return (
     <>
       <div ref={viewerRef} className="panorama-viewer" style={{ width, height }} onContextMenu={handleContextMenu} />
@@ -184,7 +249,16 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
           <PiTargetBold />
         </div>
       )}
-      <HotspotManager viewer={viewerInstanceRef.current} viewerElement={viewerRef.current} />
+      <HotspotManager viewer={viewerInstanceRef.current} 
+                      viewerElement={viewerRef.current} 
+                      onHotspotClick={handleHotspotClick} 
+      />
+      {
+        isEditMode &&  isEditingHotspot && (
+          <EditionPannel hotspot = {selectedHotspot} onSave={handleHotspotSave} />
+        )
+      }
+
     </>
   );
 };

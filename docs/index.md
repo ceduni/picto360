@@ -44,9 +44,9 @@ et des interactions pour des quiz.
 | Prototype 2                    | 30 mai        | Prototype finale + Flux             | ✅ Terminé  |
 | Architecture                   | 30 mai        | Diagramme UML ou modèle C4          | ✅ Terminé  |
 | Modèle de donneés              | 6 juin        | Diagramme UML ou entité-association | ✅ Terminé  |
-| Revue de conception            | 6 juin        | Feedback encadrant + ajustements    | 🔄 En cours |
-| Implémentation v1              | 20 juin       | Application v1                      | ⏳ À venir  |
-| Implémentation v2 + tests      | 11 juillet    | Application v2 + Tests              | ⏳ À venir  |
+| Revue de conception            | 6 juin        | Feedback encadrant + ajustements    | ✅ Terminé  |
+| Implémentation v1              | 20 juin       | Application v1                      | ✅ Terminé  |
+| Implémentation v2 + tests      | 11 juillet    | Application v2 + Tests              | 🔄 En cours |
 | Implémentation v3              | 1er août      | Version finale                      | ⏳ À venir  |
 | Tests                          | 11-31 juillet | Plan + Résultats intermédiaires     | ⏳ À venir  |
 | Évaluation finale              | 8 août        | Analyse des résultats + Discussion  | ⏳ À venir  |

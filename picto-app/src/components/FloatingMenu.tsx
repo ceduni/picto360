@@ -23,7 +23,7 @@ const FloatingMenu: React.FC = () => {
           </button>
           <div className="menu-items">
             <button>Hotspot</button>
-            <button>Questionnaire</button>
+            <button>Forme</button>
             <button>Texte</button>
             <button>Vidéo</button>
             <button>Lien</button>
