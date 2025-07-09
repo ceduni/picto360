@@ -5,7 +5,7 @@ import ContextMenu from "./ContextMenu";
 import HotspotManager, { HotspotData, HotspotInstance } from "./HotspotManager";
 import "./css/PanoramaViewer.css";
 import EditionPannel from "./EditionPannel";
-import { createHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
+import { createHotspotInstance, deleteHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
 import { useNavigate } from "react-router-dom";
 
 declare global {
@@ -77,22 +77,31 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
       return;
     }
     
-    console.log("PanellumViewer - Initializing Pannellum viewer...");
-    viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
+    if(!viewerInstanceRef.current){
+      console.log("PanellumViewer - Initializing Pannellum viewer...");
+      viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
+    }
 
   }, [imageSrc, viewerConfig]);
 
   useEffect(() => {
 
-    initializeViewer();
+    if(imageSrc === "null" ){
+      // let imgSrc = localStorage.getItem("imageSrc");
+      // imageSrc = imgSrc || "null";
+      // if(imageSrc === "null" ){
+        navigate("/", {replace : true});
+      // }
+    }else{
+      localStorage.setItem("imageSrc",imageSrc);
+    }
 
-    // if(imageSrc!=null){
-    //   navigate("/");
-    // }
-
+    initializeViewer();    
+    
     return () => {
       if (viewerInstanceRef.current) {
         console.log("PanellumViewer - Destroying Pannellum viewer...");
+        localStorage.clear();
         viewerInstanceRef.current.destroy();
         viewerInstanceRef.current = null;
       }
@@ -192,11 +201,20 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     }
   };
 
+  const handleHotspotDelete = (toDeleteHotspot:HotspotData) => {
+    if(viewerInstanceRef.current){
+      (viewerInstanceRef.current as any).removeHotSpot(toDeleteHotspot.id);
+
+      deleteHotspotInstance(viewerInstanceRef.current,toDeleteHotspot)
+    }
+  }
+
   const handleHotspotClick = (hotspot: HotspotData) => {
     setIsEditingHotspot(true);
-    // console.log("Selected for editing:", hotspot);
+    console.log("Selected for editing:", hotspot);
     setSelectedHotspot(hotspot); // open edition panel
   };
+
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -223,6 +241,10 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
   const handlePannellumClick = (event: MouseEvent, args: HotspotData) => {
     handleHotspotClick(args);
   };
+
+  const handleClose = () => {
+    setSelectedHotspot(null);
+  }
 
   return (
     <>
@@ -255,7 +277,10 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
       />
       {
         isEditMode &&  isEditingHotspot && (
-          <EditionPannel hotspot = {selectedHotspot} onSave={handleHotspotSave} />
+          <EditionPannel  hotspot = {selectedHotspot} 
+                          onSave={handleHotspotSave} 
+                          onClose ={handleClose} 
+                          onDelete = {handleHotspotDelete}/>
         )
       }
 

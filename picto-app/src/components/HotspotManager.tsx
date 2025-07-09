@@ -1,11 +1,7 @@
-import React, { useCallback, useMemo, useRef, useEffect, JSX } from "react";
+import React, { useCallback, useMemo, useRef, useEffect} from "react";
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
-import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineGif, MdOutlineVideoLibrary, MdOutlineQuestionMark } from "react-icons/md";
-import { TiInfoLarge } from "react-icons/ti";
-import { BiSolidLabel } from "react-icons/bi";
 import "./css/HotspotManager.css";
-import { createHotspotInstance, hotspotClickHandler, parseGiphyUrlToDirectGif, renderTooltipContent } from "@/utils/HotspotUtils";
+import { createHotspotInstance, extractYouTubeVideoIdFromUrl, parseGiphyUrlToDirectGif, renderTooltipContent } from "@/utils/HotspotUtils";
 
 interface HotspotManagerProps {
   viewer: unknown;
@@ -19,7 +15,7 @@ export interface HotspotData {
   yaw: number;
   type: "info" | "scene" | "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "forme" | "custom";
   content?: string;
-  URL?: string;
+  url_text?: string;
   sceneId?: string;
   cssClass?: string;
   meta?: Record<string, any>; // optional metadata for custom cases
@@ -52,20 +48,17 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
   const addHotspotToViewer = useCallback(
     (
       coords: [number, number],
-      icon: JSX.Element,
       content: string,
       editable: boolean,
       charLimit: number,
       type?: "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "forme" | "scene" | "info",
-      clickHandler?: (event: any,args: any) => void,
+      url?:string,
+      // clickHandler?: (event: any,args: any) => void,
     ) => {
       if (!viewer) {
         debugLog("HotspotManager - Viewer not available, cannot add hotspot");
         return;
       }
-
-      // For test purpose
-      alert("X:" + coords[0] + "Y:" + coords[1])
 
       const hotspotId = `hotspot-${Date.now()}-${hotspotCounter.current++}`;
       debugLog("HotspotManager - Adding hotspot to viewer...", { hotspotId, coords, type });
@@ -74,6 +67,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
         id: hotspotId,
         pitch: coords[0],
         yaw: coords[1],
+        url_text:url,
         type: type || "custom",
         cssClass: type === "label" ? "hotspot-manager__label" : "hotspot-manager__custom_hotspot",
         content:content,
@@ -82,6 +76,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
       try {
         //TODO: Replace any (if possible)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        
         const hotspotInstance = createHotspotInstance(baseHotspot,pannellumClickHandler);
         (viewer as any).addHotSpot(hotspotInstance);
         debugLog("HotspotManager - Hotspot added successfully", { hotspotId });
@@ -97,42 +92,39 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
       text: (coords: [number, number]) =>
         addHotspotToViewer(
           coords,
-          <TiInfoLarge />,
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id suscipit ligula, non faucibus diam. Donec lacinia placerat mollis. Nam a est et risus finibus condimentum.",
           true,
           TEXT_CHAR_LIMIT,
           "text"
         ),
       label: (coords: [number, number]) =>
-        addHotspotToViewer(coords, <BiSolidLabel />, "Lorem ipsum dolor sit amet.", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
+        addHotspotToViewer(coords, "Lorem ipsum dolor sit amet.", true, LABEL_HYPERLINK_CHAR_LIMIT, "label"),
       hyperlink: (coords: [number, number], url: string, hyperlinkText: string) =>
         //TODO: compress the URL into a tiny URL on a single line
         addHotspotToViewer(
           coords,
-          <AiOutlineLink />,
-          `<a href="${url}" target="_blank">${hyperlinkText}</a>`,
-          false,
+          hyperlinkText,
+          true,
           LABEL_HYPERLINK_CHAR_LIMIT,
           "hyperlink",
-          hotspotClickHandler
+          url
         ),
       //TODO: add an optional title above/under (choice) the image
-      image: (coords: [number, number], imageUrl: string) =>
-        addHotspotToViewer(coords, <AiOutlinePicture />, imageUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "image"),
+      image: (coords: [number, number], imageUrl: string,imageText?:string) =>
+        addHotspotToViewer(coords, imageUrl, true , LABEL_HYPERLINK_CHAR_LIMIT, "image",imageText),
       gif: (coords: [number, number], gifUrl: string) => {
         const directUrl = parseGiphyUrlToDirectGif(gifUrl);
         if (directUrl) {
-          addHotspotToViewer(coords, <MdOutlineGif />, directUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "gif");
+          addHotspotToViewer(coords, directUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "gif");
         } else {
           console.error("HotspotManager - URL de gif invalide");
         }
       },
       video: (coords: [number, number], videoUrl: string) =>
-        addHotspotToViewer(coords, <MdOutlineVideoLibrary />, videoUrl, false, LABEL_HYPERLINK_CHAR_LIMIT, "video"),
+        addHotspotToViewer(coords, videoUrl, true, LABEL_HYPERLINK_CHAR_LIMIT, "video"),
       forme: (coords: [number, number], question: string, options: string[], correctOption: number) => {
         addHotspotToViewer(
           coords,
-          <MdOutlineQuestionMark />,
           `${question}<ul>${options
             .map((opt, i) => `<li style="color: ${i === correctOption ? "green" : "red"}">${opt}</li>`)
             .join("")}</ul>`,
@@ -144,12 +136,6 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
     }),
     [addHotspotToViewer]
   );
-
-  const extractYouTubeVideoIdFromUrl = useCallback((url: string) => {
-    const regex =
-      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    return url.match(regex)?.[1] || null;
-  }, []);
 
 
   const handleHotspotEvent = useCallback(
@@ -199,7 +185,8 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
             input.click();
           });
           if (file) {
-            hotspotCreators.image(coords, URL.createObjectURL(file));
+            const imageText = prompt("Entrez le texte de l'image") || "";
+            hotspotCreators.image(coords, URL.createObjectURL(file), imageText);
             debugLog("HotspotManager - Hotspot added successfully", { type, coords });
           }
           break;
@@ -216,9 +203,9 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
         }
         case "Video": {
           const videoUrl = prompt("Saisissez le lien URL de la vidéo YouTube:");
-          const videoId = videoUrl ? extractYouTubeVideoIdFromUrl(videoUrl) : null;
-          if (videoId) {
-            hotspotCreators.video(coords, `https://www.youtube.com/embed/${videoId}`);
+          // const videoId = videoUrl ? extractYouTubeVideoIdFromUrl(videoUrl) : null;
+          if (videoUrl) {
+            hotspotCreators.video(coords, videoUrl);
             debugLog("HotspotManager - Hotspot added successfully", { type, coords });
           } else {
             alert("Erreur: lien URL YouTube invalide.");

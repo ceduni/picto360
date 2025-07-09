@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useRef } from "react";
+import React, { JSX } from "react";
 import ReactDOMServer from "react-dom/server";
 import { TiInfoLarge } from "react-icons/ti";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
@@ -6,6 +6,7 @@ import { MdOutlineGif, MdOutlineVideoLibrary } from "react-icons/md";
 import { HotspotData, HotspotInstance } from "../components/HotspotManager";
 import { IoShapesOutline } from "react-icons/io5";
 import { BiSolidLabel } from "react-icons/bi";
+import ReactPlayer from "react-player";
 
 
 
@@ -85,7 +86,8 @@ export const renderTooltipContent = (
       content: string,
       editable: boolean,
       charLimit: number,
-      type?: string
+      type?: string,
+      url?:string
     ) => {
       return (hotSpotDiv: HTMLElement) => {
         // debugLog("Generating tooltip content", { type, content, editable, charLimit });
@@ -107,13 +109,11 @@ export const renderTooltipContent = (
               const textNode = document.createTextNode(content);
               span.appendChild(textNode);
               span.classList.add("hotspot-manager__content--text");
-            //   if (editable) {
-            //     span.contentEditable = "true";
-            //     setupEditableContent(span, charLimit);
-            //   }
             }
             break;
           case "hyperlink":
+            span.innerHTML = `<a href="${url}" target="_blank">${content}</a>`;
+            break
           case "forme":
             span.innerHTML = content;
             break;
@@ -127,8 +127,20 @@ export const renderTooltipContent = (
             break;
           }
           case "video": {
+            const videoId = content ? extractYouTubeVideoIdFromUrl(content) : null;
+            if (!videoId) {
+              alert("Erreur: lien URL YouTube invalide.");
+            }
+
+            // const player = React.createElement(ReactPlayer);
+            // player.props.playing = true;
+            // player.props.src = content;
+            // player.props.className = "hotspot-manager__video";
+            // player.props.onLoad = () => adjustTooltipPosition(span);
+            // const playerdiv = document.createElement("div");
+
             const iframe = document.createElement("iframe");
-            iframe.src = `${content}?enablejsapi=1`;
+            iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
             iframe.classList.add("hotspot-manager__video");
             iframe.onload = () => adjustTooltipPosition(span);
             span.appendChild(iframe);
@@ -162,23 +174,34 @@ export const renderTooltipContent = (
 
         return {
         ...hotspot,
-        createTooltipFunc: renderTooltipContent(icon, hotspot.content || "", editable, charLimit, hotspot.type),
+        createTooltipFunc: renderTooltipContent(icon, hotspot.content || "", editable, charLimit, hotspot.type,hotspot.url_text),
         clickHandlerFunc: clickHandler,
         clickHandlerArgs: hotspot
         };
     };
 
-
-    /*Giphy compatibility exclusively*/
-    export const parseGiphyUrlToDirectGif = (url: string): string | null => {
-    try {
-        const match = url.match(/media\/([a-zA-Z0-9]+)\/giphy\.gif/);
-        const giphyId = match ? match[1] : url.split("-").pop();
-        return giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
-    } catch (error) {
-        console.error("HotspotManager - Failed to parse Giphy URL:", error);
-        return null;
+    export const deleteHotspotInstance = (viewer:any,hotspot:HotspotData) => {
+      if(!viewer){
+        return
+      }
+      (viewer as any).removeHotSpot(hotspot.id);
     }
 
 
-}
+    /*Giphy compatibility exclusively*/
+    export const parseGiphyUrlToDirectGif = (url: string): string | null => {
+      try {
+          const match = url.match(/media\/([a-zA-Z0-9]+)\/giphy\.gif/);
+          const giphyId = match ? match[1] : url.split("-").pop();
+          return giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
+      } catch (error) {
+          console.error("HotspotManager - Failed to parse Giphy URL:", error);
+          return null;
+      }
+  }
+
+  export const extractYouTubeVideoIdFromUrl = (url: string) => {
+      const regex =
+        /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+      return url.match(regex)?.[1] || null;
+    };
