@@ -52,8 +52,13 @@
     - [x] Implémentation de l'authentification avec firebase
 
 ## Semaine 8
-
+??? note "Début d'implémentation"
+    - [x] Début Implémentation du panneau d'édition des annotation
 ## Semaine 9
+??? note "Implémentation"
+    - [x] Fin d'implémentation du panneau d'édition
+    - [x] Début d'implémentation des activités
+    - [x] Fin d'implémentation du flux de connexion
 
 ## Semaine 10
 
