@@ -50,7 +50,7 @@ import {
   useForkRef_default,
   useId_default,
   useTheme
-} from "./chunk-U5GRRRMV.js";
+} from "./chunk-3TCWFMBI.js";
 import {
   ClassNameGenerator_default,
   HTMLElementType,
@@ -104,7 +104,6 @@ import {
   ownerWindow,
   recomposeColor,
   refType_default,
-  require_prop_types,
   require_react_is,
   resolveBreakpointValues,
   resolveComponentProps_default,
@@ -125,7 +124,10 @@ import {
   useThemeProps,
   useTimeout,
   visuallyHidden_default
-} from "./chunk-PATGSVKY.js";
+} from "./chunk-T3DLY4BJ.js";
+import {
+  require_prop_types
+} from "./chunk-5RER3LIT.js";
 import "./chunk-6PA75XNE.js";
 import {
   require_jsx_runtime

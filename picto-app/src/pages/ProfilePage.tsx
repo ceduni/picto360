@@ -5,6 +5,7 @@ import { doSignOut } from "@/firebase/authentification";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
+import { FaArrowRightToBracket } from "react-icons/fa6";
 
 
 interface ProfileProps {
@@ -19,7 +20,7 @@ interface ProfileProps {
 
     const { userLoggedIn,currentUser } = useAuth();
 
-    const [uname,setUname] = useState(currentUser?.displayName);
+    const [uname,setUname] = useState(currentUser?.displayName );
 
     const [isTyping, setIsTyping] = useState(false);
     const [hasFocused, setHasFocused] = useState(false);
@@ -51,6 +52,12 @@ interface ProfileProps {
             setIsTyping(true);
         }
     };
+
+    const getUnameFromEmail = () =>{
+        const email = currentUser?.email;
+        let splitEmail = email?.split("@");
+        return splitEmail?.at(0);
+    }
         
 
     return(
@@ -88,7 +95,7 @@ interface ProfileProps {
                                     <label className="user_name_container">
                                         <input
                                             type="text"
-                                            value={uname}
+                                            value={uname || getUnameFromEmail()}
                                             onFocus={handleFocus}
                                             onChange={onTypingUname}
                                             onBlur={handleBlur}
@@ -116,9 +123,13 @@ interface ProfileProps {
                                         <p>Groupes</p>
                                         <h2>03</h2>
                                     </div>
-                                    <button type="button" title="Se déconnecter" className="profile_logout-button" onClick={onLoggOut}>
-                                        Déconnexion
-                                    </button>
+                                    <div title="Se déconnecter" className="profile_logout-button" onClick={onLoggOut}>
+                                        <FaArrowRightToBracket size={18}/>
+                                        <p>
+                                            Déconnexion
+                                        </p>
+                                    </div>
+
                                 </div>
 
                             </div>

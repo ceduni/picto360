@@ -33,7 +33,7 @@ interface ToolbarProps {
 const CHARACTER_LIMIT = 20;
 
 const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode }) => {
-  const [projectTitle, setProjectTitle] = useState("Projet#1"); //TODO: manage project uniqueness in DB
+  const [projectTitle, setProjectTitle] = useState("Untitled"); //TODO: manage project uniqueness in DB
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);

@@ -13,7 +13,7 @@ export interface HotspotData {
   id: string;
   pitch: number;
   yaw: number;
-  type: "info" | "scene" | "text" | "label" | "hyperlink" | "image" | "gif" | "video" | "forme" | "custom";
+  type: string;
   content?: string;
   url_text?: string;
   sceneId?: string;
@@ -32,8 +32,9 @@ const TEXT_CHAR_LIMIT = 300;
 const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 
 const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,onHotspotClick}) => {
-  const hotspotCounter = useRef(0);
   const debugMode = useRef(true);
+  const hotspotCounter = useRef(0); 
+
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const debugLog = useCallback((...args: any[]) => {
@@ -217,7 +218,7 @@ const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,
     [hotspotCreators, extractYouTubeVideoIdFromUrl, debugLog]
   );
 
-  useHotspotCreation(viewerElement, handleHotspotEvent);
+  //  useHotspotCreation(viewerElement, handleHotspotEvent);
 
   // Debugging tools
   useEffect(() => {

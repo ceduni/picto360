@@ -21,7 +21,8 @@ const VideoEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
   const [content, setContent] = useState(hotspot.content || "");
   const [videoType,setVideoType] = useState("url");
 
-    const handleSubmit = () => {
+    const handleSubmit = (e?:React.FormEvent) => {
+        e?.preventDefault();
         onSave({ url_text,content });
     };
 

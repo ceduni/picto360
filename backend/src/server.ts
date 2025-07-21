@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import cors from "@fastify/cors";
+import cors, { fastifyCors } from "@fastify/cors";
 //import { connectToDatabase } from "./utils/db";
 import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
@@ -11,38 +11,52 @@ import dimensionRoutes from "./routes/dimension.routes";
 import imageRoutes from "./routes/image.routes";
 import projectRoutes from "./routes/project.routes";
 import sharingLinkRoutes from "./routes/sharingLink.routes";
+import connectToDatabase  from "./utils/db";
+import fastifyMultipart from "@fastify/multipart";
+import oauthRoutes from "./routes/oauth.routes";
+import activityRoutes from "./routes/activity.routes";
 
 const fastify = Fastify({ logger: true });
 
+
 const setupServer = async () => {
-  //await connectToDatabase();
-
-  fastify.register(cors, {
-    origin: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  });
-
-  fastify.register(contentRoutes);
-  fastify.register(formContentRoutes);
-  fastify.register(linkContentRoutes);
-  fastify.register(mediaContentRoutes);
-  fastify.register(textContentRoutes);
-
-  fastify.register(annotationRoutes);
-  fastify.register(dimensionRoutes);
-  fastify.register(imageRoutes);
-  fastify.register(projectRoutes);
-  fastify.register(sharingLinkRoutes);
-
-  fastify.get("/", async (_request, reply) => {
-    reply.send({ message: "Welcome to Picto360 API" });
-  });
-
   try {
-    await fastify.listen({ port: 3000 });
-    fastify.log.info(`Server is running at http://localhost:3000`);
+    await connectToDatabase();
+
+    fastify.register(fastifyCors, {
+      origin: true,
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    });
+
+      fastify.register(fastifyMultipart, {
+      attachFieldsToBody: true,
+      limits: { fileSize: 50 * 1024 * 1024 }
+    });
+
+    // Register the OAuth + export routes
+    fastify.register(oauthRoutes);
+
+    fastify.register(contentRoutes);
+    fastify.register(formContentRoutes);
+    fastify.register(linkContentRoutes);
+    fastify.register(mediaContentRoutes);
+    fastify.register(textContentRoutes);
+
+    fastify.register(activityRoutes);
+    fastify.register(annotationRoutes);
+    fastify.register(dimensionRoutes);
+    fastify.register(imageRoutes);
+    fastify.register(projectRoutes);
+    fastify.register(sharingLinkRoutes);
+
+    fastify.get("/", async (_request, reply) => {
+      reply.send({ message: "Welcome to Picto360 API" });
+    });
+
+    await fastify.listen({port:5000});
+    fastify.log.info(`Server is running on port http://localhost:5000`);
   } catch (err) {
-    fastify.log.error(err);
+    fastify.log.error("❌ Server startup failed:", err);
     process.exit(1);
   }
 

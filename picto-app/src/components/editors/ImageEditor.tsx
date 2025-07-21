@@ -19,7 +19,8 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
   const [url_text, setURL] = useState(hotspot.url_text || "");
   const [content, setContent] = useState(hotspot.content || "");
 
-    const handleSubmit = () => {
+    const handleSubmit = (e?:React.FormEvent) => {
+        e?.preventDefault();
         onSave({ url_text,content });
     };
 
@@ -54,7 +55,7 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
         
         <label className="edition_pannel_field">
             <p className="edition_pannel_field_title">
-                Texte à afficher:
+                Texte de l'image:
             </p>
             <input
                 type="text"

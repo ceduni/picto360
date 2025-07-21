@@ -1,0 +1,78 @@
+.popup_background{
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+}
+
+.popup_window{
+    background-color: white;
+    height: 80vh;
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1vw;
+}
+
+.popup_window_content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:2vw;
+}
+
+.popup_close_button{
+    color: #364a9d;
+    cursor: pointer;
+    align-self: flex-start;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.popup_close_button:hover{
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.popup_partiip_number_field{
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.number_particp_field{
+    width: 15vw;
+    padding: 0.5vw;
+    background-color: #F1F2FF;
+    border-radius: 0.2vw;
+    border: 2px solid lightblue;
+}
+
+.popup_add_button{
+    all:unset;
+    color: #364a9d;
+    background-color: #F1F2FF;
+    padding: 0.5vw;
+    width: 8vw;
+    height: 2vw;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    border-radius: 2vw;
+    transition: backgrond-color 0.2s ease-in-out;
+}
+
+.popup_add_button:hover{
+    color: white;
+    background-color: #364a9d;
+}

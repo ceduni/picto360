@@ -16,7 +16,8 @@ export interface EditorRef {
 const TextEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref) => {
   const [content, setContent] = useState(hotspot.content || "");
 
-    const handleSubmit = () => {
+    const handleSubmit = (e?:React.FormEvent) => {
+        e?.preventDefault();
         onSave({ content });
     };
 

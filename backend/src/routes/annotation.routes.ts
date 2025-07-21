@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import AnnotationService from '@/services/annotation.service';
-import { AnnotationDocument } from '@/models/annotation.model';
+import AnnotationService from '../services/annotation.service';
+import { AnnotationDocument } from '../models/annotation.model';
 
 async function createAnnotation(request: FastifyRequest<{ Body: AnnotationDocument }>, reply: FastifyReply) {
   try {

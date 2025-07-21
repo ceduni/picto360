@@ -11,6 +11,7 @@ import VisualisationPage from "./pages/VisualisationPage";
 import LoginPage from "./pages/LoginPage";
 import { AuthProvider } from "./authContext/authContext";
 import ProfilePage from "./pages/ProfilePage";
+import ActivityCreationPage from "./pages/ActivityCreationPage";
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string >("null");
@@ -23,6 +24,7 @@ const App: React.FC = () => {
           <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
           <Route  path= "/login" element= {<LoginPage />} />
           <Route  path= "/profile" element= {<ProfilePage />} />
+          <Route  path="/activity_creation" element = {<ActivityCreationPage/>} />
         </Routes>
       </AuthProvider>
 

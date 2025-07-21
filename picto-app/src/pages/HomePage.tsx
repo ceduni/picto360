@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import "./css/HomePage.css";  
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import GotoProfile from "@/components/GotoProfile";
+
 
 interface HomeProps{
     setImageSrc:(newImage: string) =>void
@@ -24,9 +27,6 @@ interface HomeProps{
         navigate('/login');
     }, []);
 
-    const onProfileClick = useCallback(() =>{
-        navigate('/profile')
-    },[]);
 
     const onLoggOut = async (e: { preventDefault: () => void })=> {
             e.preventDefault();
@@ -34,6 +34,18 @@ interface HomeProps{
                 await doSignOut()
             }
         }
+
+    const onCreateActivityClick = () => {
+        if(userLoggedIn){
+            handleCreateActivity();
+        }else{
+            handleLogClick();
+        }
+    }
+
+    const handleCreateActivity = useCallback (() => {
+        navigate('/activity_creation');
+    },[])
 
     return(
         <div className="home_background">
@@ -43,26 +55,15 @@ interface HomeProps{
                 <div className="top-content">
                     <img className="image-uploader__logo" 
                         src="/images/logo_picto360.png" alt="Logo-picto360" />
-                    {
-                        userLoggedIn && 
-                        <div className="profile-button" onClick={onProfileClick}>
-                            <span className="material-icons" >
-                            account_circle
-                            </span>
-                            <h2 className="profil_user-name" >
-                                {currentUser?.displayName}
-                            </h2>
-                        </div>
-                    }
+                    <GotoProfile/>
                 </div>
 
                 <div className="home-page__center">
                     <div className="home-page__login_container">
                         {userLoggedIn ?
-                        <button type="button" className="home-page__create_group_button" onClick={onLoggOut}>
+                        <button type="button" className="home-page__create_group_button">
                             {/* Créer un groupe    */}
-                            Log out :
-                            {currentUser?.displayName}
+                            Créer un groupe
                         </button>
                         : 
                         <button type="button" className="home-page__login_button"
@@ -71,7 +72,7 @@ interface HomeProps{
                         </button>
                         }
 
-                        <button type ="button" className="home-page_create_activity">
+                        <button type ="button" className="home-page_create_activity" onClick={onCreateActivityClick}>
                             Créer une activité
                         </button>
                     </div>

@@ -1,4 +1,4 @@
-import Annotation, { AnnotationDocument } from '@/models/annotation.model';
+import Annotation, { AnnotationDocument } from '../models/annotation.model';
 
 class AnnotationService {
   async createAnnotation(annotation: AnnotationDocument) {

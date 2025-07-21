@@ -1,10 +1,24 @@
+.draggable_line{
+    width: 7vw;
+    height: 0.4vw;
+    background-color: #a7a7a7;
+    border-radius: 5vw;
+    position: absolute;
+    top: 1.5vh;
+    cursor:grab;
+    user-select: none;
+}
+
+
+
 .edition_pannel{
     min-height: 50vh;
     min-width: 23vw;
     max-height: 80vh;
+    max-width: 50vw;
 
-    top:calc(100vh - 610px);
-    right:70px;
+    top:20vh;
+    left:70vw;
     border-radius : 2vw;
     border: 3px solid white;
     font-family: "Inter",sans-serif;
@@ -68,6 +82,7 @@
     display: flex;
     flex-direction: column;
     gap: 1vw;
+    padding-bottom: 5vw;
 }
 
 .annotation_edition_pannel{
@@ -163,11 +178,14 @@
 }
 
 .edition_panel_buttons{
-    min-height: 8vw;
+    max-height: 4vw;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center; 
+    justify-content: center;
     gap:0.5vw;  
+    position:absolute;
+    bottom: 5%;
 }
 
 .bottom_pannel{
@@ -179,8 +197,6 @@
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10vw;
     padding: 0.5vw;
-    position:absolute;
-    bottom: 5%;
 }
 
 .close_icon{
@@ -189,14 +205,14 @@
 }
 
 .delete_button{
-    width: 19vw;
+    width: 3vw;
     height: 3vw;
     color: white;
     font-size: 1vw;
     font-weight: 700;
-    background-color: red;
+    background-color: rgba(255, 0, 0,01);
     border: 0;
-    border-radius: 3vw;
+    border-radius: 4vw;
     cursor: pointer;
     transition: background-color 0.01s ease-in-out;
 }

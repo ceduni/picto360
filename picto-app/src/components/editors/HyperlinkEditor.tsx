@@ -17,7 +17,8 @@ const HyperlinkEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },
   const [url_text, setURL] = useState(hotspot.url_text || "");
   const [content, setContent] = useState(hotspot.content || "");
 
-    const handleSubmit = () => {
+    const handleSubmit = (e?:React.FormEvent) => {
+        e?.preventDefault();
         onSave({ url_text,content });
     };
 

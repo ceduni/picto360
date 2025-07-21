@@ -31,6 +31,7 @@
     "react-lazy-load-image-component": "^1.6.3",
     "react-player": "^3.1.0",
     "react-router-dom": "^7.6.2",
+    "react-switch": "^7.1.0",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import React, { JSX, useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { TiInfoLarge } from "react-icons/ti";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
@@ -79,7 +79,6 @@ const setupEditableContent = (span: HTMLSpanElement, charLimit: number) => {
         // });
       });
     };
-
 
 export const renderTooltipContent = (
       icon: JSX.Element,

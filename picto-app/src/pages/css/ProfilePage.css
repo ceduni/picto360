@@ -218,6 +218,11 @@
 .profile_logout-button{
     width: 9vw;
     height: 3vw;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3vw;
     color: white;
     font-size: 1vw;
     font-weight: 600;

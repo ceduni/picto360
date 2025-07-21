@@ -34,7 +34,6 @@ import {
   private_safeEmphasize,
   private_safeLighten,
   requirePropFactory,
-  require_prop_types,
   setRef,
   styleFunctionSx_default,
   unstable_memoTheme,
@@ -46,7 +45,10 @@ import {
   useForkRef,
   useId,
   useTheme_default
-} from "./chunk-PATGSVKY.js";
+} from "./chunk-T3DLY4BJ.js";
+import {
+  require_prop_types
+} from "./chunk-5RER3LIT.js";
 import {
   require_jsx_runtime
 } from "./chunk-4DSXCL6H.js";
@@ -1885,4 +1887,4 @@ export {
   useForkRef_default,
   unstable_ClassNameGenerator
 };
-//# sourceMappingURL=chunk-U5GRRRMV.js.map
+//# sourceMappingURL=chunk-3TCWFMBI.js.map
