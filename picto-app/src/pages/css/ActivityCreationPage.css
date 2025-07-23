@@ -1,3 +1,4 @@
+/*----------------------- Page background -----------------------*/
 .activity_creation_background {
   position: fixed;
   width: 100%;
@@ -10,7 +11,6 @@
   z-index: 1000;
 }
 
-
 .activity_creation_content {
   background-color: #f8f9ff;
   width: 100%;
@@ -21,14 +21,28 @@
   align-items: center;
   font-family: "Inter", sans-serif;
   font-style: normal;
+  gap: 2vh;
 }
+/*------------------------------------------------------------*/
 
+
+/*----------------------- Page top elements -----------------------*/
 .activity_creation_top{
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     height: 5vw;
+    gap: 20vw;
+}
+
+.activity_creation_bottom{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 4vw;
+    padding-bottom: 1vw;
     gap: 20vw;
 }
 
@@ -71,15 +85,26 @@
     justify-content: center;
 }
 
+/*------------------------------------------------------------*/
+
+
+
 .activity_creation-main_content{
     display: flex;
     flex-direction: row ;
-    gap: 3vw;
     width: 90vw;
-    height: 70vh;
+    height: 82vh;
     overflow-y: scroll;
     flex-wrap: wrap;
+    justify-content: space-between;
 }
+
+.activity_creation-main_content::-webkit-scrollbar{
+    display: none;
+}
+
+
+/*----------------------- Détails de l'activité -----------------------*/
 
 .main-left{
     width: 30vw;
@@ -87,51 +112,26 @@
     flex-direction: column ;
     align-items: center;
     justify-content: center;
-    gap: 1vw;
+    gap: 1.5vw;
     background-color: white;
     border-radius: 2vw;
     padding: 1vw;
 }
 
-.main-middle{
-    width: 22vw;
-    display: flex;
-    flex-direction: column ;
-    align-items: center;
-    gap: 1vw;
-}
-
-.main-right{
-    width: 22;
-    display: flex;
-    flex-direction: column ;
-    align-items: center;
-    gap: 1vw;
-}
-
-.section_gap{
-    height: 5vh;
-}
-
-.section-card{
+.main-left_title{
     width: 28vw;
-    display: flex;
-    flex-direction: column;
-    font-weight: 600;
+    font-weight: 700;
 }
 
-
-.section-header{
-    font-size: 0.95vw;
+.main-left-fields{
     display: flex;
-    flex-direction: row;
+    flex-direction: column ;
     align-items: center;
-    gap: 0.5vw;
-    color:#444;
-    padding-left: 0.7vw;
+    justify-content: center;
+    gap: 1vw;
 }
 
-
+/*------ Titre ----*/
 .text_field-title{
     width: 28vw;
     border-radius: 5px;
@@ -141,6 +141,7 @@
     padding: 5px;
     transition: border-color 0.2s ease-in-out;
 }
+
 .text_field-title::placeholder{
     opacity: 15%;
 }
@@ -148,6 +149,7 @@
     border: 4px solid rgba(217, 217, 217, 1);
 }
 
+/*----- Tags ----*/
 .text_field-tag{
     width: 20vw;
     border-radius: 5px;
@@ -164,6 +166,41 @@
     border: 4px solid rgba(217, 217, 217, 1);
 }
 
+.tag-chips_group{
+    width: 25vw;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.5vw;
+    padding-top: 0.5vh;
+}
+
+.tag-chip{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 0.5vw;
+    gap:0.5vw;
+    height: 5vh;
+    background-color: rgba(241, 242, 255, 1);
+}
+
+.tag-chip_delete{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2vw;
+    height: 5vh;
+    border-left: 1px solid rgba(214, 217, 255, 0.5);
+    transition: background-color 0.1s ease-in-out;
+}
+.tag-chip_delete:hover{
+    background-color: rgba(214, 217, 255, 1);
+}
+
+/*----- description ----*/
 .text_field-descript{
     all:unset;
     width: 27vw;
@@ -181,6 +218,461 @@
     border: 4px solid rgba(217, 217, 217, 1);
 }
 
+
+/*----------------------------*/
+
+.edition_and_chrono_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.main-left_section-card{
+    width: 14vw;
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+}
+
+/*------ Chronomètre -------*/
+.add_clock-field{
+    cursor: pointer;
+    height: 4vh;
+
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2vw;
+
+    border-radius: 0.4vw;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.chrono-toggle_and_field{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3vw;
+}
+
+.chrono_field{
+    width: 2.5vw;
+    padding: 0.3vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(247, 247, 247, 0.6);
+    border: 3px solid rgba(217, 217, 217, 0.25);
+    transition: border-color 0.2s ease-in-out;
+}
+
+.chrono_field:focus{
+    border: 3px solid rgba(217, 217, 217, 1);
+}
+
+/* Hide spinners in Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+
+/*--------- Authorise edit --------*/
+.toggle_authorise{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 2vw;
+    gap:0.2vw;
+    font-size: 0.95vw;
+    font-weight: 600;
+}
+
+/*------------------------------------------------------------*/
+
+
+
+/*--------------- Participants de l'activité -----------------*/
+
+.main-middle{
+    width: 22vw;
+    display: flex;
+    flex-direction: column ;
+    align-items: center;
+    gap: 1vw;
+}
+
+.list_container{
+    background-color: white;
+    border-radius: 4vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:2vh;
+
+    width : 25vw;
+    height: 50vh;
+    padding: 1vh;
+}
+
+.list_parent_container{
+    width: inherit;
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center ;
+    justify-content: start;
+    gap:2vh;
+    padding: 1vh;
+}
+
+.list_parent_container_inner{
+    display: flex;
+    flex-direction: column;
+    align-items: center ;
+    gap:2vh;
+
+}
+
+/*--------- Big toggle ----------*/
+.activity_type_toggle{
+    width: 24vw;
+    height: 3.5vw;
+    display: flex;
+    font-weight: 700;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3vw;
+    background-color: #E8EBF7;
+    padding: 0vw;
+    cursor: pointer;
+}
+
+.activity_toggle-button_selected{
+    border-radius: 3vw;
+    height: 3.5vw;
+    width: 12vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: #364a9d;
+    font-size: 1.1vw;
+    transition: background-color 0.2s ease-in;
+}
+
+.activity_toggle-button{
+    height: 3.5vw;
+    width: 12vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1vw;
+    color: rgba(54, 74, 157, 0.25);
+}
+
+/*--------- Participants Board ----------*/
+.participant_numbers_board{
+    width: 25vw;
+    height: 5vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:0.5vw;
+    background-color: white;
+    border-radius: 1vw;
+}
+
+.numbers_board_container{
+    display: flex;
+    flex-direction: row;
+    width: 11vw;
+}
+
+
+/*--------- Participants list ----------*/
+.group_top{
+    font-size: 0.9vw;
+
+    display: flex;
+    flex-direction: row;
+    width: 21vw;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list_group{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
+    padding: 1vh;
+    height: 30vh;
+    width: 25vw;
+    overflow: scroll;
+}
+
+.list_group::-webkit-scrollbar{
+    display: none;
+}
+
+/*--------- Participants card ----------*/
+.participant_card{
+    background-color: rgba(241, 242, 255, 0.45);
+    height: 7vh;
+    width: 22vw;
+
+    font-weight: 600;
+    border-radius: 1vh;
+    padding-left: 1vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.delete_participant{
+    cursor: pointer;
+    background-color: #F1F2FF;
+    height: 7vh;
+    width: 3vw;
+    border-bottom-right-radius: 1vh;
+    border-top-right-radius: 1vh;
+    border-bottom-left-radius: 1vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.delete_participant:hover{
+    background-color: #364a9d;
+    color: white;
+    height: 7vh;
+    width: 3vw;
+}
+
+/*--------- Add Participants ----------*/
+.list_title{
+    width: 23vw;
+}
+
+.participants_bottom_buttons{
+    width: 20vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:1vw;
+}
+
+.add_one{
+    cursor: pointer;
+    color: white;
+    background-color: #364a9d;
+    width: 2.5vw;
+    height: 2.5vw;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 600;
+    border-radius: 20%;
+    transition: background-color 0.2s ease-in;
+}
+.add_one:hover{
+    background-color: #1e2b5f;
+}
+
+.enter_number_field{
+    width: 3vw;
+    padding: 1vh;
+    background-color: rgba(241, 242, 255, 0.45);
+    border:4px solid #F1F2FF;
+    border-radius: 0.4vw;
+    text-align: center;
+    font-weight: 700;
+    transition: border 0.2s ease-in-out;
+}
+.enter_number_field:focus{
+    border:4px solid #c3cfff;
+}
+
+
+/*--------- Remove participants ----------*/
+.remove_particip{
+    cursor: pointer;
+    color: #364a9d;
+    background-color: #F1F2FF;
+    width: 2vw;
+    height: 2vw;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+}
+
+/*--------- Group list ----------*/
+
+.teams_list_container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.teams_list{
+    display:flex;
+    flex-direction: row;
+    gap: 2vh;
+    overflow: scroll;
+    flex-wrap: wrap;
+    height: 28vh;
+    width: 25vw;
+    justify-content: center;
+}
+.teams_list::-webkit-scrollbar{
+    display: none;
+}
+
+.team_card{
+    height: 20vh;
+    width: 10vw;
+    display: flex;
+    border-radius: 2vh;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: rgba(241, 242, 255, 0.45);
+}
+
+.team_participants-number-field{
+    display: flex;
+    flex-direction: column;    
+    align-items: center;
+}
+
+.team_participants{
+    font-size: smaller;
+}
+
+.team_card_input{
+    all: unset;
+    margin-top: 2vh;
+    font-weight: 600;
+    font-size: 1.1vw;
+    width:8vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.team-card_bottom{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: inherit;
+}
+
+.delete_team{
+    cursor: pointer;
+    background-color: #F1F2FF;
+    width: 2.5vw;
+    height: 2.5vw;
+
+    border-bottom-right-radius: 2vh;
+    border-top-left-radius: 1vh;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.delete_team:hover{
+    color: white;
+    background-color: #364a9d;
+}
+
+.add-participants_to_group-button{
+    background-color: #F1F2FF;
+    width: 2.5vw;
+    height: 2.5vw;
+
+    cursor: pointer;
+    border-bottom-left-radius: 2vh;
+    border-top-right-radius: 1vh;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.add-participants_to_group-button:hover{
+    color: white;
+    background-color: #364a9d;
+}
+
+.supervised_teams-toggle{
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    align-items: flex-start;
+    justify-content: center;
+
+    font-size: 1vw;
+    color:#444;
+}
+
+
+.add_team_field{
+    display: flex;
+    align-items: center;
+    gap:0.5vw
+}
+
+.teams_bottom_buttons{
+    display: flex;
+    width: 23vw;
+    height: 8vh;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:5vw;
+}
+
+/*------------------------------------------------------------*/
+
+
+/*------------------- Tâches de l'activité -------------------*/
+
+.main-right{
+    width: 22;
+    display: flex;
+    flex-direction: column ;
+    align-items: center;
+    gap: 1vw;
+}
+
+/*------- Tasks board -------*/
+
+
+/*------- Ajout de tâches -------*/
 .text_field-task{
     width: 21.8vw;
     border-radius: 5px;
@@ -205,54 +697,7 @@
     gap: 0.3vw;
 }
 
-.add_button{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border-radius: 10%;
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.04);
-    height: 3.2vw;
-    width: 3.2vw;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.add_button:hover{
-    color: white;
-    background-color: #364a9d;
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.09);
-}
-
-.type_task_field{
-    display: flex;
-    flex-direction: row;
-    gap: 2vw;
-}
-
-.radio_type{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5vw;
-    font-weight: 100;
-    font-size: 2vh;
-}
-
-.type_radio{
-    width: 1.5vw;
-    height: 1.5vw;
-}
-
-.tag-chips_group{
-    width: 20vw;
-    display: flex;
-    flex-direction: row;
-    overflow-x:auto;
-    flex-wrap: wrap;
-    gap: 0.5VW;
-}
-
+/*------- List Tasks -------*/
 .task-chips_group{
     width: 25vw;
     height: 42.5vh;
@@ -264,29 +709,35 @@
     background-color: white;
     border-radius: 1vw;
     gap: 0.5VW;
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.06);
 }
 
-.remove_line-icon{
-    color: #4b67d6;
-    cursor: pointer;
-}
-
-.remove_line-icon:hover{
-    color: #364a9d;
-}
-
-.taks_number{
+.task-chip-group{
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    color: white;
-    font-size: 0.8vw;
-    font-weight: 600;
-    background-color: #364a9d;
-    width: 1.5vw;
-    height: 1.5vw;
+    gap:1vh;
+}
+
+.task_card{
+    width: 24vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 2vw;
+    gap:0.5vw;
+}
+.task_card:hover{
+    .drag-handle{
+        opacity: 1;
+    }
+}
+
+.drag-handle {
+    opacity: 0;
+  cursor: grab;
+  user-select: none;
 }
 
 .task-chip{
@@ -310,24 +761,7 @@
     background-color: rgba(241, 242, 255, 0.75);
 }
 
-.task-chip-group{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap:1vh;
-}
-
-.task_card{
-    width: 24vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 2vw;
-    gap:0.5vw;
-}
-
+/*---------- Delete task ----------*/
 .delete_task{
     cursor: pointer;
     background-color: #F1F2FF;
@@ -343,91 +777,69 @@
     justify-content: center;
     transition: background-color 0.2s ease-in-out;
 }
-
 .delete_task:hover{
     color: white;
     background-color: #364a9d;
 }
+/*------------------------------------------------------------*/
 
-.toggle_authorise{
+
+/*---------- Input field ------------*/
+.section-card{
+    width: 28vw;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 2vw;
-    gap:0.2vw;
-    font-size: 0.95vw;
     font-weight: 600;
 }
+
+.section-header{
+    font-size: 0.95vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5vw;
+    color:#444;
+    padding-left: 0.7vw;
+}
+
+.add_button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 10%;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.04);
+    height: 3.2vw;
+    width: 3.2vw;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+.add_button:hover{
+    color: white;
+    background-color: #364a9d;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.09);
+}
+
+/*---------- cancel and create ------------*/
 
 .add_participants_button{
     all:unset;
     background-color: #c3cfff;
     color: #364a9d;
-    padding: 1.2vw;
+    padding: 1vw;
     font-weight: 700;
     font-size: larger;
     border-radius: 3vw;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
 }
-
 .add_participants_button:hover{
     background-color: #364a9d;
     color: white;
 }
 
-.activity_type_toggle{
-    width: 24vw;
-    height: 3.5vw;
-    display: flex;
-    font-weight: 700;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3vw;
-    background-color: #E8EBF7;
-    padding: 0vw;
-    cursor: pointer;
-}
 
-.activity_toggle-button_selected{
-    border-radius: 3vw;
-    height: 3.5vw;
-    width: 12vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    background-color: #364a9d;
-    transition: background-color 0.2s ease-in;
-}
-
-.activity_toggle-button{
-    height: 3.5vw;
-    width: 12vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(54, 74, 157, 0.25);
-}
-
-.participant_numbers_board{
-    width: 25vw;
-    height: 5vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap:0.5vw;
-    background-color: white;
-    border-radius: 1vw;
-}
-
-.numbers_board_container{
-    display: flex;
-    flex-direction: row;
-    width: 11vw;
-}
+/*------- Info Board ----------*/
 
 .board_icon{
     width: 3.5vw;
@@ -461,109 +873,12 @@
     background-color: #F1F2FF;
 }
 
-.participants_list-container{
-    background-color: white;
-    border-radius: 4vh;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap:2vh;
-
-    width : 24vw;
-    height: 43vh;
-    padding: 2vh;
-}
-
 .error_board{
     font-size: large;
     font-weight: 800;
 }
 
-.participants_group{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1ch;
-    height: 35vh;
-    width: 25vw;
-    overflow: hidden;
-}
-
-.participant_card{
-    background-color: rgba(241, 242, 255, 0.45);
-    height: 7vh;
-    width: 22vw;
-
-    font-weight: 600;
-    border-radius: 1vh;
-    padding-left: 1vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 5.3vw;
-}
-
-.delete_participant{
-    cursor: pointer;
-    background-color: #F1F2FF;
-    height: 7vh;
-    width: 3vw;
-    border-bottom-right-radius: 1vh;
-    border-top-right-radius: 1vh;
-    border-bottom-left-radius: 1vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease-in-out;
-}
-.delete_participant:hover{
-    background-color: #364a9d;
-    color: white;
-    height: 7vh;
-    width: 3vw;
-}
-
-
-.participants_bottom_buttons{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap:1vw;
-}
-
-.add_particip{
-    cursor: pointer;
-    color: white;
-    background-color: #364a9d;
-    width: 2vw;
-    height: 2vw;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    border-radius: 50%;
-}
-
-.remove_particip{
-    cursor: pointer;
-    color: #364a9d;
-    background-color: #F1F2FF;
-    width: 2vw;
-    height: 2vw;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    border-radius: 50%;
-}
-
-.view_all-bitton{
+.view_all-button{
     font-weight: 600;
 
     display: flex;
@@ -571,29 +886,4 @@
     align-items: center;
     justify-content: center;
     gap:0.2vw;
-}
-
-
-.participants_group_top{
-    font-size: 0.9vw;
-
-    display: flex;
-    flex-direction: row;
-    width: 21vw;
-    justify-content: space-between;
-    align-items: center;
-
-}
-
-.enter_number_particip{
-    width: 4vw;
-    padding: 1vh;
-    background-color: rgba(241, 242, 255, 0.45);
-    border:4px solid #F1F2FF;
-    border-radius: 0.4vw;
-    transition: border 0.2s ease-in-out;
-}
-
-.enter_number_particip:focus{
-    border:4px solid #c3cfff;
 }
