@@ -1,20 +1,22 @@
-import GotoProfile from "@/components/GotoProfile";
-import React, { useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { MdDescription,MdModeEditOutline  } from "react-icons/md";
-import { FaEdit , FaMinus, FaPlus} from "react-icons/fa";
+import { FaEdit , FaPlus} from "react-icons/fa";
 import { RxDragHandleDots2, RxPerson ,RxLapTimer} from "react-icons/rx";
 import { HiTrash } from "react-icons/hi2";
-import { IoMdPricetag ,IoIosArrowForward } from "react-icons/io";
-import { LuUserRoundPlus } from "react-icons/lu";
-
-import { GoPeople, GoPersonAdd } from "react-icons/go";
+import { IoMdPricetag  } from "react-icons/io";
+import { GoPeople } from "react-icons/go";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaCheck } from "react-icons/fa6";
+import { IoClose } from "react-icons/io5";
+
 import Switch from "react-switch";
 import "./css/ActivityCreationPage.css"
 import { useNavigate } from "react-router-dom";
 import AddParticipantsPopup from "./AddParticipantsPopup";
-import { IoClose } from "react-icons/io5";
+import GotoProfile from "@/components/GotoProfile";
+import ParticipantCard from "./PageUiComponents/ParticipantCard";
+import TeamCard from "./PageUiComponents/TeamCard";
+
 import {
   DndContext,
   closestCenter,
@@ -26,49 +28,36 @@ import {
     arrayMove,
     verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { ActivityIstance, 
+    TeamsData,
+    addNewParticipants, 
+    handleAddTag, 
+    handleAddTeamsToActivity, 
+    handleChange, 
+    handleDeleteTeamFromActivity, 
+    handleTeamNameChange, 
+    TeamInstance, 
+    TaskData,
+    handleParticipantNameChange,
+    handleDeleteParticipant,
+    handleRemoveTag,
+    handleRemoveTask,
+    handleAddTask,
+    validateActivityValues} from "@/utils/ActivityCreactionUtils";
+import ErrorBanner, {  ErrorBannerRef } from "./ErrorBanner";
 
 
 interface ActivityCreationPageProps  {
 
 }
 
-type ActivityData = {
-    id:string,
-    title:string,
-    tags:string[],
-    description:string,
-    tasks:TaskData[],
-    type:string,
-    authoriseEdit:boolean;
-    participantCount:number;
-    teamsList:TeamsData[]
-}
-
-interface ActivityIstance extends ActivityData{
-    tagInput:string,
-    taskInput:string,
-    supervised_teams:boolean,
-}
-
-type TeamsData = {
-    name:string;
-    participantsNumber:number;
-    supervised:boolean;
-    participantsNames?:string[];
-    supervisor_id? : string;
-}
-
-type TaskData = {
-    id:string,
-    title:string,
-}
 
 const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     const [isPopupOpen,setIsPopupOpen] = useState(false);
     const [chronoState,setChronoState] = useState({isEnabled:false,minutes:0,seconds:0})
-    const [participantsList,setParticipantsList] = useState<string[]>([]);
     const [enteredValue,setEnteredValue] = useState(0);
-    const [teamDetails,setTeamDetails] = useState<TeamsData | null>(null);
+    const [teamsTotalParticipantsCount,setTeamsTotalParticipantsCount] = useState(0);
+    const [selectedTeam,setSelectedTeam] = useState<{indx:number,teamData:TeamInstance}>()
 
     const [formValues,setFormValues] = useState<ActivityIstance>({
         id:'',
@@ -80,14 +69,49 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         taskInput:'',
         type:"solo",
         authoriseEdit:false,
-        participantCount:0,
+        participantsList:[],
         teamsList:[],
         supervised_teams:false,
     });
 
+    useEffect(()=>{
+        let newCount = 0
+        formValues.teamsList.map((team)=>{
+            newCount += team.participantsNames.length;
+        })
+        setTeamsTotalParticipantsCount(newCount)
+
+    },[formValues.teamsList])
+
+
+    const bannerRef = useRef<ErrorBannerRef>(null);
+    // for error checking
+    const validateForm = () =>{
+        const check = validateActivityValues(formValues);
+        bannerRef.current?.trigger(check.message);
+        // setErrorState({displayed:!check.state , message:check.message});
+    }
+
+    const createActivityButtonRef = useRef<HTMLButtonElement>(null);
+    useEffect (()=>{
+        const check = validateActivityValues(formValues).state;
+        if(check){
+            if(createActivityButtonRef.current){
+                createActivityButtonRef.current.style.opacity = "1";
+            }
+        }else{
+            if(createActivityButtonRef.current){
+                createActivityButtonRef.current.style.opacity = "0.5";
+            }            
+        }
+
+    },[formValues])
+
 
     const navigate = useNavigate();
+    
 
+    // Logique pour le chronomètre
     const handleCheckedAddChrono = (nextChecked:boolean) => {
         setChronoState({...chronoState, isEnabled:nextChecked});
     };
@@ -104,9 +128,9 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                 setChronoState({...chronoState,[e.target.name]:Number(value)});
             }
         }
-
     }
 
+    // Drag and drop for tasks
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
@@ -114,13 +138,11 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
             const oldIndex = formValues.tasks.findIndex((t) => t.id === active.id);
             const newIndex = formValues.tasks.findIndex((t) => t.id === over?.id);
 
-            // const updated = [...formValues.tasks];
-            // const [moved] = updated.splice(oldIndex, 1);
-            // updated.splice(newIndex, 0, moved);
             setFormValues({...formValues,tasks:arrayMove(formValues.tasks,oldIndex,newIndex)});
         }
     };
 
+    // Create a new task item
     function TaskItem({ task }: { task: TaskData }) {
         const {
             attributes,
@@ -147,7 +169,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                 <span>
                     {task.title}
                 </span>
-                <div className="delete_task" onClick={()=>handleRemoveTask(task.title)}>
+                <div className="delete_task" onClick={()=>setFormValues(handleRemoveTask(formValues,task.title))}>
                     <HiTrash size={18}/>
                 </div>                                            
             </div>
@@ -155,102 +177,23 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         );
     }
 
-      // Update fields
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const newValues = {...formValues, [e.target.name]: e.target.value };
-        setFormValues(newValues);
-    };
-
-    const updateParticipantCount = (newCount: number) => {
-        if(formValues.participantCount<=0 && newCount<= 0) return;
-        setFormValues({...formValues,participantCount: newCount});
-        
-        setParticipantsList((prev) => {
-            if (newCount > prev.length) {
-            // Add empty strings to fill
-            const newEntries = Array.from({ length: newCount - prev.length },
-                                            (_, i) => `Participant ${prev.length + i + 1}`
-                );
-                return [...prev, ...newEntries];
-            } else {
-            // Trim the array
-                if(formValues.participantCount>0) 
-                    return prev.slice(0, newCount)
-                return prev
-            }
-        });
-    };
-
-    const handleDeleteParticipant = (toRemove:number) => {
-        if(formValues.participantCount <= 0) return;
-
-        setFormValues({...formValues,participantCount: formValues.participantCount-1 });
-        setParticipantsList((prev) =>{
-            return (prev.filter((_, index) => index !== toRemove))
-        } )
+    // props handlers for paricipant card 
+    const changeParticipantName = (idx:string,toAdd:string) =>{
+        setFormValues({...formValues,participantsList:handleParticipantNameChange(formValues.participantsList,idx,toAdd)})
+    }
+    const deleteParticipantFromActivity = (toDelete:string) =>{
+        setFormValues({...formValues,participantsList:handleDeleteParticipant(formValues.participantsList,toDelete)});
+        // setFormValues(handleDeleteParticipant(formValues,toDelete));
     }
 
-    const handleParticipantNameChange = (index: number, newName: string) => {
-        setParticipantsList((prev) => {
-            const updated = [...prev];
-            updated[index] = newName;
-            return updated;
-        });
-    };
-
-    const handleTeamNameChange = (index:number,newName:string) => {
-        const update = [...formValues.teamsList]
-        update[index].name = newName; 
-        setFormValues({...formValues,teamsList : update})        
+    // Remove a participants at the specified index in the list
+    const changeTeamName = (index:number,newName:string) => {
+        setFormValues(handleTeamNameChange(formValues,index,newName))        
     }
 
-    const handleDeleteTeam = (toRemove:number) => {
-        if (formValues.teamsList.length <= 0 || !formValues.teamsList.at(toRemove) ) return;
-
-        setFormValues({...formValues,teamsList : formValues.teamsList.filter(
-                                                                         (_,index) => index!=toRemove )})
+    const deleteTeam = (toRemove:number) => {
+        setFormValues(handleDeleteTeamFromActivity(formValues,toRemove))
     }
-
-    const handleAddTeams = (newCount: number) => {
-        // can't delete from empty array
-        if(formValues.teamsList.length <= 0 && newCount <= 0) return;
-        
-        const prev = formValues.teamsList;
-        let newEntries : TeamsData[] = [] ;
-
-        if (newCount > 0) {
-            newEntries = [...prev,...Array.from({ length: newCount },
-                                            (_, i) => ({
-                                                name:`Groupe ${prev.length + i + 1}`,
-                                                participantsNumber:0,
-                                                supervised:false})
-                )]
-        }else{
-            // Trim the array
-            if(prev.length>0) {
-               newEntries =  prev.slice(0, prev.length+newCount)
-            }
-        }
-        setFormValues({...formValues,teamsList:newEntries})
-
-    };
-
-    const handleAddTag = () => {
-        if (formValues.tagInput.trim() !== '' && !formValues.tags.includes(formValues.tagInput.trim())) {
-        setFormValues({
-            ...formValues,
-            tags: [...formValues.tags, formValues.tagInput.trim()],
-            tagInput: ''
-        });
-        }
-    };
-
-    const handleRemoveTag = (tagToRemove: string) => {
-        setFormValues({
-        ...formValues,
-        tags: formValues.tags.filter(tag => tag !== tagToRemove)
-        });
-    };
 
     const onClosePopup = () => {
         setIsPopupOpen(false);
@@ -260,6 +203,8 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         setIsPopupOpen(true);
     }
 
+
+    // Activity type("individuelle" || "equipe")
     const handleActivityTypeToSolo = () =>{
         if(formValues.type=="group") {
             setFormValues({...formValues,type:"solo"})
@@ -270,38 +215,6 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         if(formValues.type=="solo") {
             setFormValues({...formValues,type:"group"})
         }
-    }
-
-    const validTaskInput = (input:string) => { 
-        if(input.trim() == "" ) return false;
-        formValues.tasks.map((value)=>{
-            if(value.title === input.trim()){
-                return false;
-            }
-        })
-        return true;
-    }
-
-    const handleAddTask = () => {
-        const id = formValues.tasks.length.toString();
-        if (!validTaskInput(formValues.tagInput)) {
-        setFormValues({
-            ...formValues,
-            tasks: [...formValues.tasks, { id:id , title:formValues.taskInput.trim()}],
-            taskInput: ''
-        });
-        }
-    };
-
-    const handleRemoveTask = (taskToRemove: string) => {
-        setFormValues({
-        ...formValues,
-        tasks: formValues.tasks.filter(task => task.title !== taskToRemove)
-        });
-    };   
-    
-    const onSubmitNumberParticip = (participNumber:number) => {
-        setFormValues({...formValues,participantCount:participNumber});
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -335,8 +248,8 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
             <div className="activity_creation_content">
 
                 <div className="activity_creation_top">
-                    <div className="icon_route-back_container">
-                        <div className="icon_route-back">
+                    <div className="icon_route-back_container" >
+                        <div className="icon_route-back" onClick={()=>navigate(-1)}>
                             <FaAngleLeft size={22} />
                         </div>
                     </div>
@@ -345,6 +258,16 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                     </div>
                     <GotoProfile />
                 </div>
+{/* 
+                {
+                    errorState.displayed &&
+                    <div className={`error_banner ${errorState.displayed ? "visible" : ""}`}>
+                        <LuTriangleAlert size={22}/>
+                        <p>{errorState.message}</p>
+                        <LuX size={22} onClick={()=>setErrorState({...errorState,displayed:false})} style={{cursor:"pointer"}}/>
+                    </div>
+                } */}
+                <ErrorBanner ref={bannerRef} />
 
 
                 <div className="activity_creation-main_content">
@@ -364,7 +287,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                 <input  type="text" 
                                         name="title"
                                         value={formValues.title}
-                                        onChange={handleChange}
+                                        onChange={(e)=>setFormValues(handleChange(formValues,e))}
                                         maxLength={50} 
                                         placeholder="Titre de votre activité..." 
                                         className="text_field-title"/>
@@ -378,8 +301,10 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     <input  type="text" 
                                             name="tagInput"
                                             value={formValues.tagInput}
-                                            onChange={handleChange}
-                                            onKeyDown={(e)=>e.key==='Enter' && (e.preventDefault(),handleAddTag())}
+                                            onChange={(e)=>setFormValues(handleChange(formValues,e))}
+                                            onKeyDown={(e)=>e.key==='Enter' && (e.preventDefault(), 
+                                                                                setFormValues(handleAddTag(formValues)) 
+                                                                                )}
                                             maxLength={30} 
                                             placeholder="Maths, Science, etc ..." 
                                             className="text_field-tag"/>
@@ -389,11 +314,10 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                             <span key={tag} >
                                                 {tag}
                                             </span>
-                                            <div className="tag-chip_delete" onClick={() => handleRemoveTag(tag)}>
+                                            <div className="tag-chip_delete" onClick={() => setFormValues(handleRemoveTag(formValues,tag))}>
                                                 <IoClose size={20}/>                                            
                                             </div>
                                         </div>
-
                                     ))}
 
                                 </div>
@@ -408,7 +332,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                 <textarea   title="descrition" 
                                             name="description"
                                             value={formValues.description}
-                                            onChange={handleChange}
+                                            onChange={(e)=>setFormValues(handleChange(formValues,e))}
                                             className="text_field-descript" 
                                             placeholder="Décrivez votre activité ... "/>
 
@@ -487,7 +411,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     </div>
                                     <div className="board_text">
                                           <p className="board_mini_title">Participants</p> 
-                                          <h2>{formValues.type==="solo"? formValues.participantCount : "0"} </h2> 
+                                          <h2>{formValues.type==="solo"? formValues.participantsList.length : teamsTotalParticipantsCount} </h2> 
                                     </div>
                                 </div>
                                 
@@ -509,29 +433,19 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                 formValues.type === "solo" ? 
                                 <div className="list_parent_container">
                                     {
-                                        formValues.participantCount <= 0 ?
+                                        formValues.participantsList.length <= 0 ?
                                         <p className="error_board">Pas de participants</p>
                                         :
                                         <div  className="list_parent_container_inner">
                                             <h3 className="list_title">Liste des participants</h3>
 
                                             <div className="list_group">
-                                                <div className="group_top">
-                                                    <p >Nom</p>
-                                                </div>
-                                                {   participantsList.map((name,index) => (
-                                                        <div className="participant_card">
-                                                            <input key={index}
-                                                                name="particip_card_name"
-                                                                value = {name}
-                                                                placeholder={name}
-                                                                onChange={(e) => handleParticipantNameChange(index, e.target.value)}
-                                                                autoFocus
-                                                            />
-                                                            <div className="delete_participant" onClick={()=>handleDeleteParticipant(index)}>
-                                                                <HiTrash size={18}/>
-                                                            </div>
-                                                        </div>
+                                                {   formValues.participantsList.map((participant,index) => (
+                                                        <ParticipantCard id={participant.id} 
+                                                                            key={participant.id}
+                                                                            participantName={participant.name} 
+                                                                            handleParticipantNameChange={changeParticipantName}
+                                                                            handleDeleteParticipant={deleteParticipantFromActivity} />
                                                     ))
                                                 }
                                             </div>
@@ -544,11 +458,16 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                                 onChange={(e)=>setEnteredValue(e.target.valueAsNumber)}
                                                 onKeyDown={(e)=>e.key==='Enter' && (
                                                                         e.preventDefault(),
-                                                                        updateParticipantCount(formValues.participantCount+enteredValue),
+                                                                        setFormValues(
+                                                                                addNewParticipants(formValues,formValues.participantsList.length+enteredValue)
+                                                                            ),
                                                                         setEnteredValue(0))}
                                                 className="enter_number_field"/>
 
-                                        <div className="add_one" onClick={() => updateParticipantCount(formValues.participantCount + 1)}>
+                                        <div className="add_one" onClick={() => {
+                                                                            setFormValues(addNewParticipants(formValues,formValues.participantsList.length+1)),
+                                                                            setEnteredValue(0)
+                                                                        }}>
                                             <FaPlus size={14}/>
                                             <p>1</p>
                                         </div>
@@ -565,34 +484,13 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                             <div className="teams_list">
                                                 {
                                                     formValues.teamsList.map((teamData,index) => (
-                                                        <div className="team_card">
-                                                            <input key={index}
-                                                                name="team_card_name"
-                                                                value = {teamData.name}
-                                                                placeholder={teamData.name}
-                                                                onChange={(e) => handleTeamNameChange(index, e.target.value)}
-                                                                className="team_card_input"
-                                                                autoFocus
-                                                            />
-                                                            <div className="team_participants-number-field">
-                                                                <h2>{teamData.participantsNumber}</h2>
-                                                                <p className="team_participants">Participants</p>
-                                                            </div>
-                                                            <div className="team-card_bottom">
-                                                                <div className="team_add-supervisor">
-                                                                    {
-                                                                        formValues.supervised_teams && 
-                                                                        <div className="add-participants_to_group-button">
-                                                                            <LuUserRoundPlus strokeWidth={2}/>
-                                                                        </div>
-                                                                    }
-                                                                </div>
-                                                                <span className="delete_team" onClick={()=>handleDeleteTeam(index)}>
-                                                                    <HiTrash size={18} />
-                                                                </span>
-                                                            </div>
-
-                                                        </div>
+                                                        <TeamCard   index={index} 
+                                                                    key={teamData.id}
+                                                                    teamData={teamData} 
+                                                                    handleTeamNameChange={changeTeamName} 
+                                                                    setSelectedTeam={setSelectedTeam} 
+                                                                    setIsPaticipantsPopupOpen={setIsPopupOpen} 
+                                                                    handleDeleteTeam={deleteTeam} />
                                                     ))
                                                 }
                                             </div>
@@ -604,7 +502,12 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                             formValues.teamsList.length != 0  && 
                                             <div className="supervised_teams-toggle">
                                                 <label className="toggle_supervised">
-                                                    <Switch onChange={(e)=>setFormValues({...formValues,supervised_teams:e})} 
+                                                    <Switch onChange={(e)=>{
+                                                                            setFormValues({...formValues,supervised_teams:e});
+                                                                            formValues.teamsList.map((teamData)=>{
+                                                                                teamData.supervised = e;
+                                                                            })
+                                                                        }} 
                                                             checked={formValues.supervised_teams} 
                                                             onColor="#364a9d"  
                                                             />
@@ -620,11 +523,11 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                                     onChange={(e)=>setEnteredValue(e.target.valueAsNumber)}
                                                     onKeyDown={(e)=>e.key==='Enter' && (
                                                                             e.preventDefault(),
-                                                                            handleAddTeams(enteredValue),
+                                                                            setFormValues(handleAddTeamsToActivity(formValues,enteredValue)),
                                                                             setEnteredValue(0))}
                                                     className="enter_number_field"/>
 
-                                            <div className="add_one" onClick={() => handleAddTeams(1)}>
+                                            <div className="add_one" onClick={() =>setFormValues(handleAddTeamsToActivity(formValues,1))}>
                                                 <FaPlus size={14}/>
                                                 <p>1</p>
                                             </div>
@@ -657,11 +560,11 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     type="text"
                                     name="taskInput"
                                     value={formValues.taskInput}
-                                    onChange={handleChange} 
-                                    onKeyDown={(e)=>e.key==='Enter' && (e.preventDefault(),handleAddTask())}
+                                    onChange={(e)=>setFormValues(handleChange(formValues,e))} 
+                                    onKeyDown={(e)=>e.key==='Enter' && (e.preventDefault(),setFormValues(handleAddTask(formValues)))}
                                     placeholder="Ajouter une description de tâche..." 
                                     className="text_field-task"/>
-                                <div className="add_button" onClick={handleAddTask}>
+                                <div className="add_button" onClick={()=>setFormValues(handleAddTask(formValues))}>
                                     <FaCheck size={18}/>
                                 </div>
                             </div>
@@ -698,13 +601,23 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
 
                 <div className="activity_creation_bottom">
                     <button type="button" 
-                            className="add_participants_button" 
-                            onClick={onOpenPopup}>Ajouter des participants</button>
+                            className="cancel-creation_button" 
+                            onClick={()=>navigate("/")}>Annuler</button>
+                    <button type="button" 
+                            className="create-activity-button" 
+                            name="create_activity-button"
+                            onClick={validateForm}
+                            ref={createActivityButtonRef}
+                           >Create</button>
                 </div>
             </div>
             {
-                isPopupOpen && 
-                <AddParticipantsPopup onClose={onClosePopup} onSubmit={onSubmitNumberParticip}/>
+                isPopupOpen && selectedTeam!=undefined &&
+                <AddParticipantsPopup   teamIdx={selectedTeam.indx} 
+                                        teamList={formValues.teamsList} 
+                                        setFormValues={setFormValues}
+                                        onClose={onClosePopup} 
+                                         />
             }
         </div>
     )

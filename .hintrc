@@ -14,7 +14,9 @@
       "default",
       {
         "ignore": [
-          "user-select"
+          "user-select",
+          "scrollbar-gutter",
+          "scrollbar-gutter: stable overlay"
         ]
       }
     ]

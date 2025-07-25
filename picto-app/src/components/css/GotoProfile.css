@@ -1,22 +1,32 @@
 .profile-button{
     position: relative;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
     display: flex;
     flex-direction: row;
     cursor: pointer;
-    width: 10vw;
     padding: 0.5vw;
-    border-radius: 2vw;
-}
-
-.profile-button:hover{
+    border-radius: 0.5vw;
+    gap:0.5vw;
+    color: #364A9D;
     background-color: white;
 }
 
-.profil_user-name{
-    font-size: 1vw;
-    color: #364A9D;
-    font-weight: 600;
+.profile-button:hover{
+    color: white;
     text-decoration: underline;
+    background-color:#dde4ff;
+
+}
+
+.profil_user-name{
+    max-width: 8vw;
+    font-size: 1vw;
+    font-weight: 600;
+}
+
+.profile_image_card{
+    width: 2.5vw;
+    height: 2.5vw;
+    border-radius: 0.5vw;
 }

@@ -14,18 +14,31 @@
 .popup_window{
     background-color: white;
     height: 80vh;
-    width: 50vw;
+    width: 40vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1vw;
+    padding: 3vw;
+    border-radius: 4%;
 }
+
 
 .popup_window_content{
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap:2vw;
+    width: inherit;
+    height: inherit;
+    gap:3vw;
+}
+
+
+.popup_window_content-top{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: inherit;
 }
 
 .popup_close_button{
@@ -41,19 +54,71 @@
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.popup_partiip_number_field{
-    font-weight: 700;
+.popup_particip_number_field{
+    font-weight: 100;
+    font-size: 0.9vw;
+    gap:0.2vw;
+    height: 0vh;
+
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+}
+
+.team_participants_field{
+    display: flex;
+    flex-direction: column;
+    gap:1vh;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+}
+
+
+.popup-list_parent_container_inner{
+    display: flex;
+    flex-direction: column;
+
+    align-items: center ;
+    gap:1.5vh;
+    padding: 1vh;
+    height: 40vh;
+    width: 25vw;
+}
+
+.popup-list_group{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: inherit;
+    height: inherit;
+    gap: 1vh;
+    padding: 1vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable overlay;
+}
+.popup-list_group::-webkit-scrollbar-button{
+    display: none;
+}
+.popup-list_group::-webkit-scrollbar{
+    width: 10px;
+}
+.popup-list_group::-webkit-scrollbar-thumb{
+    background-color: rgba(241, 242, 255, 1);
+    border-radius: 5px;
 }
 
 .number_particp_field{
-    width: 15vw;
+    font-weight: 600;
+    font-size: 1vw;
+    width: 3vw;
     padding: 0.5vw;
     background-color: #F1F2FF;
     border-radius: 0.2vw;
     border: 2px solid lightblue;
+    text-align: center;
 }
 
 .popup_add_button{
@@ -75,4 +140,15 @@
 .popup_add_button:hover{
     color: white;
     background-color: #364a9d;
+}
+
+.add_participants_container{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5vw;
+}
+
+.list_title{
+    font-weight: 200;
+    justify-content: center;
 }

@@ -87,7 +87,7 @@ interface ProfileProps {
 
                     <div className="profile_context">
                         <div className="profile_context-top">
-                            <img src={(currentUser?.photoURL==null)? "https://picsum.photos/200/300" : currentUser?.photoURL} 
+                            <img src={(currentUser?.photoURL===null)? "https://picsum.photos/200/300" : currentUser?.photoURL} 
                                     alt="profile_pictute"
                                     className="profile_picture" />
                             <div className="profile_context_top-right">

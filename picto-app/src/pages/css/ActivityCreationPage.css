@@ -32,7 +32,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 5vw;
+    height: 10vh;
     gap: 20vw;
 }
 
@@ -41,9 +41,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 4vw;
+    height: 8.5vh;
     padding-bottom: 1vw;
-    gap: 20vw;
+    gap: 5vw;
 }
 
 .icon_route-back_container{
@@ -74,7 +74,7 @@
     box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.04); */
     /* align-self: flex-start; */
     width: 30vw;
-    height: 4.5vw;
+    height: 9vh;
     display: flex;
     font-weight: 900;
     font-size:1.6vw;
@@ -98,8 +98,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
-
-.activity_creation-main_content::-webkit-scrollbar{
+.activity_creation-main_content::-webkit-scrollbar {
     display: none;
 }
 
@@ -108,6 +107,7 @@
 
 .main-left{
     width: 30vw;
+    height: 70.6vh;
     display: flex;
     flex-direction: column ;
     align-items: center;
@@ -136,7 +136,7 @@
     width: 28vw;
     border-radius: 5px;
     background-color: rgba(247, 247, 247, 0.6);
-    height: 3vw;
+    height: 6.8vh;
     border: 4px solid rgba(217, 217, 217, 0.25);
     padding: 5px;
     transition: border-color 0.2s ease-in-out;
@@ -154,7 +154,7 @@
     width: 20vw;
     border-radius: 5px;
     background-color: rgba(247, 247, 247, 0.6);
-    height: 3vw;
+    height: 6.8vh;
     border: 4px solid rgba(217, 217, 217, 0.25);
     padding: 5px;
     transition: border-color 0.2s ease-in-out;
@@ -326,22 +326,25 @@ input[type="number"]::-webkit-outer-spin-button {
     flex-direction: column;
     align-items: center ;
     justify-content: start;
-    gap:2vh;
+    gap:1.5vh;
     padding: 1vh;
 }
 
 .list_parent_container_inner{
     display: flex;
     flex-direction: column;
+
     align-items: center ;
-    gap:2vh;
+    gap:1.5vh;
+    padding: 1vh;
+    height: 38vh;
 
 }
 
 /*--------- Big toggle ----------*/
 .activity_type_toggle{
     width: 24vw;
-    height: 3.5vw;
+    height: 7.5vh;
     display: flex;
     font-weight: 700;
     flex-direction: row;
@@ -355,7 +358,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .activity_toggle-button_selected{
     border-radius: 3vw;
-    height: 3.5vw;
+    height: 7.5vh;
     width: 12vw;
     display: flex;
     align-items: center;
@@ -367,7 +370,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .activity_toggle-button{
-    height: 3.5vw;
+    height: 7.5vh;
     width: 12vw;
     display: flex;
     align-items: center;
@@ -379,7 +382,7 @@ input[type="number"]::-webkit-outer-spin-button {
 /*--------- Participants Board ----------*/
 .participant_numbers_board{
     width: 25vw;
-    height: 5vw;
+    height: 11vh;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -399,7 +402,8 @@ input[type="number"]::-webkit-outer-spin-button {
 /*--------- Participants list ----------*/
 .group_top{
     font-size: 0.9vw;
-
+    position: fixed;
+    
     display: flex;
     flex-direction: row;
     width: 21vw;
@@ -415,14 +419,27 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     gap: 1vh;
     padding: 1vh;
-    height: 30vh;
-    width: 25vw;
-    overflow: scroll;
+    height: 29vh;
+    width: 24vw;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable overlay;
 }
-
-.list_group::-webkit-scrollbar{
+.list_group::-webkit-scrollbar-button{
     display: none;
 }
+.list_group::-webkit-scrollbar{
+    width: 10px;
+}
+.list_group::-webkit-scrollbar-thumb{
+    background-color: rgba(241, 242, 255, 1);
+    border-radius: 5px;
+}
+/* 
+.list_group::-webkit-scrollbar{
+    display: none;
+} */
 
 /*--------- Participants card ----------*/
 .participant_card{
@@ -537,27 +554,37 @@ input[type="number"]::-webkit-outer-spin-button {
     display:flex;
     flex-direction: row;
     gap: 2vh;
-    overflow: scroll;
+    overflow-y: scroll;
     flex-wrap: wrap;
     height: 28vh;
     width: 25vw;
     justify-content: center;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable overlay;
 }
-.teams_list::-webkit-scrollbar{
+.teams_list::-webkit-scrollbar-button{
     display: none;
 }
+.teams_list::-webkit-scrollbar{
+    width: 10px;
+}
+.teams_list::-webkit-scrollbar-thumb{
+    background-color: rgba(241, 242, 255, 1);
+    border-radius: 5px;
+}
+
 
 .team_card{
     height: 20vh;
     width: 10vw;
     display: flex;
     border-radius: 2vh;
+    background-color: rgba(241, 242, 255, 0.45);
 
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
 
-    background-color: rgba(241, 242, 255, 0.45);
 }
 
 .team_participants-number-field{
@@ -567,7 +594,12 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .team_participants{
+    cursor: pointer;
     font-size: smaller;
+}
+.team_participants:hover{
+    font-weight: 600;
+    text-decoration: underline;
 }
 
 .team_card_input{
@@ -677,7 +709,7 @@ input[type="number"]::-webkit-outer-spin-button {
     width: 21.8vw;
     border-radius: 5px;
     background-color: #E8EBF7;
-    height: 3.5vw;
+    height: 7.5vh;
     border: 4px solid white;
     padding: 0.5vw;
     transition: border-color 0.2s ease-in-out;
@@ -822,21 +854,52 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /*---------- cancel and create ------------*/
 
-.add_participants_button{
+.cancel-creation_button{
     all:unset;
     background-color: #c3cfff;
     color: #364a9d;
+
     padding: 1vw;
+    width: 12vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-weight: 700;
     font-size: larger;
     border-radius: 3vw;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
 }
-.add_participants_button:hover{
+.cancel-creation_button:hover{
     background-color: #364a9d;
     color: white;
 }
+
+
+.create-activity-button{
+    all:unset;
+    background-color: #364a9d;
+    color: #ffffff;
+
+    padding: 1vw;
+    width: 12vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+
+    font-weight: 700;
+    font-size: larger;
+    border-radius: 3vw;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+.create-activity-button:hover{
+    background-color: #1e2b5f;
+    color: white;
+}
+
 
 
 /*------- Info Board ----------*/
@@ -869,7 +932,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .numbers_board_separator{
     width: 1px;
-    height: 3.5vw;
+    height: 7.5vh;
     background-color: #F1F2FF;
 }
 
@@ -886,4 +949,31 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     justify-content: center;
     gap:0.2vw;
+}
+
+.error_banner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top:6vh;
+    z-index: 50;
+    width: 40vw;
+    padding: 1vh;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    color: black;
+    font-weight: 600;
+    background-color: #E9FF25;
+
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+}
+
+.error_banner.visible {
+  transform: translateY(0);
+  opacity: 1;
 }

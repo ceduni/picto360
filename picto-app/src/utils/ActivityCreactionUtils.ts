@@ -1,0 +1,255 @@
+//TODO: Move the activity global logic here
+import { v4 as uuidv4 } from "uuid";
+
+type ActivityData = {
+    id:string,
+    title:string,
+    tags:string[],
+    description:string,
+    tasks:TaskData[],
+    type:string,
+    authoriseEdit:boolean;
+    participantsList:ParticipantData[],
+    teamsList:TeamInstance[]
+}
+
+export interface ActivityIstance extends ActivityData{
+    tagInput:string,
+    taskInput:string,
+    supervised_teams:boolean,
+}
+
+export type TeamsData = {
+    id:string;
+    name:string;
+    participantsNumber:number;
+    supervised:boolean;
+    participantsNames:ParticipantData[];
+    supervisor_id? : string;
+}
+
+export interface TeamInstance extends TeamsData{
+    setTeamName? : (id:number,input:string) => void
+    addParticipants? : (id:number,numberToAdd:number) => void
+}
+
+export type TaskData = {
+    id:string,
+    title:string,
+}
+
+export type ParticipantData ={
+    id:string;
+    name:string;
+}
+
+export const createActivityInstance = () => {
+    // TODO ?
+}
+
+//Activity details change 
+export const handleChange = (formValues:ActivityIstance,e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    return {...formValues, [e.target.name]: e.target.value };
+}
+
+// Team management
+export const handleAddTeamsToActivity = (formValues:ActivityIstance,newCount: number) =>{
+        // can't delete from empty array
+        if(formValues.teamsList.length <= 0 && newCount <= 0) return formValues;
+        
+        const prev = formValues.teamsList;
+        let newEntries : TeamInstance[] = [] ;
+
+        if (newCount > 0) {
+            newEntries = [...prev,...Array.from({ length: newCount },
+                                            (_, i) => ({
+                                                id: uuidv4(),
+                                                name:`Groupe ${prev.length + i + 1}`,
+                                                participantsNumber:0,
+                                                supervised:false,
+                                                participantsNames:[],})
+                )]
+        }else{
+            // Trim the array
+            if(prev.length>0) {
+               newEntries =  prev.slice(0, prev.length+newCount)
+            }
+        }
+        return {...formValues,teamsList:newEntries}
+}
+
+export const handleDeleteTeamFromActivity = (formValues:ActivityIstance,indexToremove:number) =>{
+    if (formValues.teamsList.length <= 0 || !formValues.teamsList.at(indexToremove) ) return formValues;
+    return {...formValues,teamsList : formValues.teamsList.filter(
+                                                                             (_,index) => index!=indexToremove )}
+}
+
+export const handleTeamNameChange = (formValues:ActivityIstance,index:number,newName:string)=>{
+    const update = [...formValues.teamsList]
+    update[index].name = newName; 
+
+    return {...formValues,teamsList : update};
+}
+
+
+// Tags management
+export const handleAddTag = (formValues:ActivityIstance) =>{
+        if (formValues.tagInput.trim() !== '' && !formValues.tags.includes(formValues.tagInput.trim())) {
+            return {
+                ...formValues,
+                tags: [...formValues.tags, formValues.tagInput.trim()],
+                tagInput: ''
+            };
+        }
+        return formValues;
+}
+
+
+export const handleRemoveTag = (formValues:ActivityIstance,tagToRemove: string) => {
+    return {
+    ...formValues,
+    tags: formValues.tags.filter(tag => tag !== tagToRemove)
+    };
+};
+
+
+// Activity Participants logic
+
+    // Add newCout participants to the activity
+export const addNewParticipants = (formValues:ActivityIstance,newCount: number) => {
+    if(formValues.participantsList.length<=0 && newCount<= 0) return formValues;
+
+    const previouList = formValues.participantsList;
+    let newParticipantsList :ParticipantData[] 
+    
+        if (newCount > previouList.length) {
+        // Add empty strings to fill
+        const newEntries : ParticipantData[] = Array.from({ length: newCount - previouList.length },
+                                        (_, i) => {
+                                            const id =uuidv4();
+                                            return {id, name:`Participant ${previouList.length + i + 1}`}}
+            );
+           newParticipantsList = [...previouList, ...newEntries] ;
+        } else {
+        // Trim the array
+            if(formValues.participantsList.length>0) 
+                newParticipantsList= previouList.slice(0, newCount);
+            newParticipantsList= previouList
+        }
+
+    return {...formValues, participantCount: newCount,participantsList:newParticipantsList};
+    
+};
+
+export const handleDeleteParticipant = (participants:ParticipantData[],toRemove:string) => {
+    if(participants.length <= 0) return participants;
+
+    const newParticipantsList = (participants.filter((participant) => participant.id !== toRemove));
+
+    return newParticipantsList;
+}
+
+export const handleParticipantNameChange = (participants:ParticipantData[] , id: string, newName: string) => {
+        const updated = [...participants];
+        for(let i=0;i<participants.length;i++){
+            if(participants[i].id===id){
+                updated[i].name = newName;
+            }
+        }
+
+    return updated;
+};
+
+//Tasks Logic 
+
+const validTaskInput = (tasks:TaskData[] , input:string) => { 
+    if(input.trim() === "" ) return false;
+
+    // don't add the same task
+    for(let indx=0 ;indx<tasks.length;indx++){
+        if(tasks.at(indx)?.title===input.trim()){
+            return false;
+        }
+    }
+    return true;
+}
+
+export const handleAddTask = (formValues:ActivityIstance) => {
+    const currentTime = Date.now();
+    const id = formValues.tasks.length.toString() +currentTime;
+
+    if (validTaskInput(formValues.tasks,formValues.taskInput)) {
+        return{
+            ...formValues,
+            tasks: [...formValues.tasks, { id:id , title:formValues.taskInput.trim()}],
+            taskInput: ''
+        };
+    }
+    return formValues;
+};
+
+export const handleRemoveTask = (formValues:ActivityIstance,taskToRemove: string) => {
+    const newTasks = formValues.tasks.filter(task => task.title !== taskToRemove);
+    return {...formValues,tasks: newTasks};
+};   
+
+
+// error handlind to display to user
+export const validateActivityValues = (formValues:ActivityIstance) =>{
+        const idValue = formValues.id;
+        const titleVallue = formValues.title;
+        const tags = formValues.tags;
+        const description = formValues.description;
+        const tasks = formValues.tasks
+        const type = formValues.type;
+        const participantsList = formValues.participantsList;
+        const teamsList = formValues.teamsList;
+        const supervised_teams = formValues.supervised_teams;
+
+        let errorMessage = "";
+
+        if(!titleVallue || titleVallue===""){
+            errorMessage = "Erreure: Titre de l'activité invalid: Le titre est obligatoire.";
+        }
+        if(!tags ){
+            errorMessage = "Erreure: Tags invalides"
+        }
+        if(!description || description===""){
+            errorMessage = "Erreure: Description de l'activité invalide: une description est nécessaire."
+        }
+        if(!tasks || tasks.length===0){
+            errorMessage = "Erreure: Les taches ne sont pas définies : Veuillez rentrer les tâches";
+        }
+        if(!type){
+            errorMessage = "Erreure: Type d'activité invalid"
+        }else{
+            if(type==="solo"){
+                if (participantsList.length<=0){
+                    errorMessage = "Erreure: Vous devez rentrer au moins un participant";
+                }
+            }else if (type==="group"){
+                if(teamsList.length<=0){
+                    errorMessage = "Erreure: Vous devez rentrer au moins une équipe";
+                }
+                if(supervised_teams){
+                    teamsList.map((team)=>{
+                        if(!team.supervisor_id || team.supervisor_id===""){
+                            errorMessage = "Erreure: Vous devez ajouter le superviseur de l'équipe : " + team.name;
+                        }
+                    })
+                }else{
+                    teamsList.map((team)=>{
+                        if(!team.participantsNames || team.participantsNames.length===0){
+                            errorMessage = "Erreure: Vous devez ajouter les participants de l'équipe : " + team.name;
+                        }
+                    })
+                }
+
+            }
+        }
+
+        if(errorMessage!="") return {state:false,message:errorMessage}
+        return {state:true,message:""}
+
+        
+}
