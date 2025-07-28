@@ -1,4 +1,6 @@
 //TODO: Move the activity global logic here
+import { useAuth } from "@/authContext/authContext";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 type ActivityData = {
@@ -17,6 +19,11 @@ export interface ActivityIstance extends ActivityData{
     tagInput:string,
     taskInput:string,
     supervised_teams:boolean,
+    chrono:{isEnabled:boolean,minutes:number,seconds:number}
+}
+
+export type ActivityStatus ={
+    status : "created" | "open" | "closed";
 }
 
 export type TeamsData = {
@@ -43,9 +50,9 @@ export type ParticipantData ={
     name:string;
 }
 
-export const createActivityInstance = () => {
-    // TODO ?
-}
+
+
+
 
 //Activity details change 
 export const handleChange = (formValues:ActivityIstance,e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,7 +74,8 @@ export const handleAddTeamsToActivity = (formValues:ActivityIstance,newCount: nu
                                                 name:`Groupe ${prev.length + i + 1}`,
                                                 participantsNumber:0,
                                                 supervised:false,
-                                                participantsNames:[],})
+                                                participantsNames:[],
+                                            })
                 )]
         }else{
             // Trim the array
@@ -161,7 +169,6 @@ export const handleParticipantNameChange = (participants:ParticipantData[] , id:
 };
 
 //Tasks Logic 
-
 const validTaskInput = (tasks:TaskData[] , input:string) => { 
     if(input.trim() === "" ) return false;
 
@@ -205,18 +212,10 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
         const participantsList = formValues.participantsList;
         const teamsList = formValues.teamsList;
         const supervised_teams = formValues.supervised_teams;
+        const chrono = formValues.chrono;
 
         let errorMessage = "";
 
-        if(!titleVallue || titleVallue===""){
-            errorMessage = "Erreure: Titre de l'activité invalid: Le titre est obligatoire.";
-        }
-        if(!tags ){
-            errorMessage = "Erreure: Tags invalides"
-        }
-        if(!description || description===""){
-            errorMessage = "Erreure: Description de l'activité invalide: une description est nécessaire."
-        }
         if(!tasks || tasks.length===0){
             errorMessage = "Erreure: Les taches ne sont pas définies : Veuillez rentrer les tâches";
         }
@@ -248,8 +247,50 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
             }
         }
 
+        if(chrono.isEnabled){
+            if(chrono.minutes===0 && chrono.seconds===0){
+                errorMessage = "Erreure: Vous devez rentrer un chronomètre supérieur à 00:00"
+            }
+        }
+        
+        if(!tags ){
+            errorMessage = "Erreure: Tags invalides"
+        }
+
+        if(!description || description===""){
+            errorMessage = "Erreure: Description de l'activité invalide: une description est nécessaire."
+        }        
+
+        if(!titleVallue || titleVallue===""){
+            errorMessage = "Erreure: Titre de l'activité invalid: Le titre est obligatoire.";
+        }                
+
         if(errorMessage!="") return {state:false,message:errorMessage}
         return {state:true,message:""}
-
-        
 }
+
+const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/activities", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("✅ Activity created:", data);
+        alert("Activity created successfully!");
+      } else {
+        console.error("❌ Failed to create activity:", data);
+        alert("Something went wrong.");
+      }
+    } catch (err) {
+      console.error("🚨 Error sending request:", err);
+      alert("Network error.");
+    }
+};

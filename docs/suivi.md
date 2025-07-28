@@ -61,9 +61,29 @@
     - [x] Fin d'implémentation du flux de connexion
 
 ## Semaine 10
+??? note "Implémentation"
+    - [x] Implémentation de la page de création d'activité
+    - [x] Gestion de la logique et des érreure (user feedback)
+    - [x] Connection avec le backend
+    - [x] Implémentation du modèle se donnée pour les activité, les équipes 
+            et les utilisateurs.
 
 ## Semaine 11
+??? note "Flux de supervision d'équipe"
+    - [x] Ajouter / Retirer des participants
+    - [x] Changer le nom de l'équipe
+    - [x] Uploader les images et indices d'objets
+
+??? note "Flux de création d'activité"
+    - [x] Gestion des activité ( action de l'enseignant dans le dashboard)
+    - [x] Sécuriser les données (images et accès aux données des activités)
+    - [x] Test du flux de création d'activité complet.
 
 ## Semaine 12
-
+??? note "Implémentation flux de participant (élève)"
+    - [x] Rejoindre une activité
+    - [x] Voir les tâches
+    - [x] Compléter les tâches
+    - [x] Changement du statut du côté enseignant.
+    
 ## Semaine 13

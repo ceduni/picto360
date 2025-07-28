@@ -114,13 +114,17 @@
 
 .user_email{
     font-size: 0.9vw;
-    font-weight: 500
+    font-weight: 500;
+    width: 10vw;
+    display: inline-flex;
+    flex-wrap: wrap;
 }
 
 .profile_picture{
     position: relative;
     top: -1vw;
     height: 10vw;
+    width: 10vw;
     border-color: white;
     border: 5px solid white ;
     border-radius: 50%;    

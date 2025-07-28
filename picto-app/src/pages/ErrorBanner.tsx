@@ -11,8 +11,10 @@ const ErrorBanner = forwardRef<ErrorBannerRef>((_, ref) => {
   const [message, setMessage] = useState("");
 
   useImperativeHandle(ref, () => ({
-    trigger: (msg: string, duration = 3000) => {
-      setMessage(msg);
+    trigger: (msg: string, duration = 5000) => {
+      if(msg==="") return;
+
+        setMessage(msg);
       setVisible(true);
 
       setTimeout(() => {

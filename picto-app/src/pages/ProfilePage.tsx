@@ -29,7 +29,7 @@ interface ProfileProps {
             e.preventDefault();
             if(userLoggedIn){
                 await doSignOut();
-                navigate('/');
+                navigate('/',{replace:true});
             }
         }
 
@@ -135,15 +135,15 @@ interface ProfileProps {
                             </div>
                         </div>
                         <div className="context_options">
-                            <div className="option_baniere">
+                            <div className="option_baniere" onClick={()=>navigate("/dashboard/your-activities")}>
                                 <Icon icon="fluent:broad-activity-feed-24-filled" width="20" height="20" />
                                 <p> Voir toutes vos activité </p>
                             </div>
 
-                            <div className="option_baniere">
+                            {/* <div className="option_baniere">
                                 <Icon icon="dashicons:groups" width="22" height="22" />
                                 <p> Voir touts vos groupes </p>
-                            </div>       
+                            </div>        */}
 
                             <div className="option_baniere">
                                 <Icon icon="mdi:image-sync" width="22" height="22" />

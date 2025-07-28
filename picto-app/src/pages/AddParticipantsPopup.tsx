@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import "./css/AddParticipantsPopup.css"
 import { TeamInstance,ActivityIstance, handleParticipantNameChange, handleDeleteParticipant, ParticipantData } from "@/utils/ActivityCreactionUtils";
-import ParticipantCard from "./PageUiComponents/ParticipantCard";
+import ParticipantCard from "./PagesUiComponents/ParticipantCard";
 import { FaPlus } from "react-icons/fa";
 
 
@@ -123,7 +123,7 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
 
         setFormValues((prev)=>({...prev,teamsList:updatedTeams}))
     }
-    
+
     const deleteParticipantFromActivity = (toDelete:string) =>{
         const newParticipantsList = handleDeleteParticipant(teamToEdit.participantsNames,toDelete);
 
@@ -155,7 +155,7 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
 
                     
                     <div className="team_participants_field">
-                        <h3 className="list_title">Participants ( {teamToEdit.participantsNames.length} ) </h3>
+                        <h3 className="popup_list_title">Participants ( {teamToEdit.participantsNames.length} ) </h3>
 
 
                         {

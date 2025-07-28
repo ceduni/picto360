@@ -19,7 +19,7 @@ export function useAuth() {
 }
 
 export function AuthProvider ({ children }: { children: ReactNode }){
-    const [currentUser,setCurrentUser] = useState(null);
+    const [currentUser,setCurrentUser] = useState<User | null>(null);
     const [userLoggedIn,setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -28,9 +28,9 @@ export function AuthProvider ({ children }: { children: ReactNode }){
         return unsubscribe;
     },[])
 
-    async function initializeUser (user) {
+    async function initializeUser (user:User | null) {
         if(user){
-            setCurrentUser({ ...user });
+            setCurrentUser(user);
             setUserLoggedIn(true)
         }else{
             setCurrentUser(null);

@@ -1,0 +1,62 @@
+.dashboard_page{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: #F8F9FF;
+}
+
+.edit-activvity-main-content{
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5vw;
+}
+
+.edit-activvity-main-content_top{
+    background-color: white;
+    width: 90vw;
+    height: 10vh;
+    padding-right: 5vw;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.actitivity-title{
+    font-size: 1.2vw;
+    font-weight: 700;
+    color: #364A9D;
+    width: 30vw;
+    padding: 1vw;
+    padding-left: 3vw;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1vw;
+}
+
+.close-button{
+    cursor: pointer;
+    font-weight: 700;
+    background-color: red;
+    color: white;
+    width: 8vw;
+    height: 6.2vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 1vh;
+    transition: background-color 0.1s ease-in-out ;
+}
+
+.close-button:hover{
+    background-color: rgb(156, 0, 0);
+}

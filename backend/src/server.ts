@@ -15,6 +15,9 @@ import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
 import activityRoutes from "./routes/activity.routes";
+import { authenticate } from "./middlewares/firebaseAuth";
+import { messaging } from "firebase-admin";
+import Team from "./models/team.model";
 
 const fastify = Fastify({ logger: true });
 
@@ -51,6 +54,17 @@ const setupServer = async () => {
 
     fastify.get("/", async (_request, reply) => {
       reply.send({ message: "Welcome to Picto360 API" });
+    });
+
+    fastify.get("/teams", async (request, reply) => {
+    try{
+        const teams = await Team.find();
+        reply.send(teams);
+    }catch (err) {
+        console.error("❌ GET /activities error:", err);
+        reply.status(500).send({ error: 'Failed to fetch teams', 
+                                message: err instanceof Error ? err.message:JSON.stringify(err) });
+    }
     });
 
     await fastify.listen({port:5000});

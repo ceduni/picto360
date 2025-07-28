@@ -16,8 +16,12 @@
     color: white;
     text-decoration: underline;
     background-color:#dde4ff;
-
 }
+
+.profile-button-solo{
+    border: 2px solid rgba(152, 173, 255, 0.1);    
+}
+
 
 .profil_user-name{
     max-width: 8vw;
@@ -30,3 +34,4 @@
     height: 2.5vw;
     border-radius: 0.5vw;
 }
+

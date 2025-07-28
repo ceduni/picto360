@@ -1,0 +1,79 @@
+.dashboard-navigation_bar{
+    background-color: white;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:3vh;
+    height: 100%;
+    width: 5vw;
+    padding: 1vw;
+    top:0;
+}
+
+.nav-bar-icons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:3vh;
+    height: 68%;
+}
+
+.nav-bar_button-field{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    gap: 1vh;
+    cursor: pointer;
+    color: #364A9D;
+    font-weight: 600;
+    padding: 1vh;
+    width: 4vw;
+    height: 8vh;
+    background-color: rgba(241, 242, 255, 1);
+    border-radius: 0.7vh;
+}
+
+.nav-bar_button-field-inactive{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    gap: 1vh;
+    cursor: pointer;
+    color: #364A9D;
+    opacity: 50%;
+    font-weight: 100;
+    padding: 1vh;
+    width: 4vw;
+    height: 8vh;
+    border-radius: 0.7vh;
+    transition: background-color 0.2s ease-in-out;
+
+}
+.nav-bar_button-field-inactive:hover{
+    background-color: rgba(241, 242, 255, 1);
+}
+
+.logo-container{
+    padding-top: 1.5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-to-home{
+    width: 3.5vw;
+    /* height: 3vw; */
+    cursor: pointer;
+}
+
+.button-separator{
+    height: 0.1vh;
+    width: 4vw;
+    background-color: blueviolet;
+    opacity: 25%;
+}

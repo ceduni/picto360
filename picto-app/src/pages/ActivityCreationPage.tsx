@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {  useEffect, useRef, useState } from "react"
 import { MdDescription,MdModeEditOutline  } from "react-icons/md";
 import { FaEdit , FaPlus} from "react-icons/fa";
 import { RxDragHandleDots2, RxPerson ,RxLapTimer} from "react-icons/rx";
@@ -14,8 +14,8 @@ import "./css/ActivityCreationPage.css"
 import { useNavigate } from "react-router-dom";
 import AddParticipantsPopup from "./AddParticipantsPopup";
 import GotoProfile from "@/components/GotoProfile";
-import ParticipantCard from "./PageUiComponents/ParticipantCard";
-import TeamCard from "./PageUiComponents/TeamCard";
+import ParticipantCard from "./PagesUiComponents/ParticipantCard";
+import TeamCard from "./PagesUiComponents/TeamCard";
 
 import {
   DndContext,
@@ -29,7 +29,6 @@ import {
     verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ActivityIstance, 
-    TeamsData,
     addNewParticipants, 
     handleAddTag, 
     handleAddTeamsToActivity, 
@@ -43,8 +42,10 @@ import { ActivityIstance,
     handleRemoveTag,
     handleRemoveTask,
     handleAddTask,
-    validateActivityValues} from "@/utils/ActivityCreactionUtils";
+    validateActivityValues,} from "@/utils/ActivityCreactionUtils";
 import ErrorBanner, {  ErrorBannerRef } from "./ErrorBanner";
+import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
+import { useCreateActivity } from "@/hooks/useActivityCreation";
 
 
 interface ActivityCreationPageProps  {
@@ -54,10 +55,13 @@ interface ActivityCreationPageProps  {
 
 const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     const [isPopupOpen,setIsPopupOpen] = useState(false);
-    const [chronoState,setChronoState] = useState({isEnabled:false,minutes:0,seconds:0})
+    // const [chronoState,setChronoState] = useState({isEnabled:false,minutes:0,seconds:0})
     const [enteredValue,setEnteredValue] = useState(0);
     const [teamsTotalParticipantsCount,setTeamsTotalParticipantsCount] = useState(0);
-    const [selectedTeam,setSelectedTeam] = useState<{indx:number,teamData:TeamInstance}>()
+    const [selectedTeam,setSelectedTeam] = useState<{indx:number,teamData:TeamInstance}>();
+    const [confirmationMessage,setConfirmationMessage] = useState<{title:string,details?:string}|null>(null);
+    const { createActivity, loading, error } = useCreateActivity();
+
 
     const [formValues,setFormValues] = useState<ActivityIstance>({
         id:'',
@@ -69,11 +73,13 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         taskInput:'',
         type:"solo",
         authoriseEdit:false,
+        chrono:{isEnabled:false,minutes:0,seconds:0},
         participantsList:[],
         teamsList:[],
         supervised_teams:false,
     });
 
+    // Update the total number of participants
     useEffect(()=>{
         let newCount = 0
         formValues.teamsList.map((team)=>{
@@ -85,11 +91,27 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
 
 
     const bannerRef = useRef<ErrorBannerRef>(null);
+
     // for error checking
-    const validateForm = () =>{
+    const validateForm = async function() {
+
         const check = validateActivityValues(formValues);
-        bannerRef.current?.trigger(check.message);
-        // setErrorState({displayed:!check.state , message:check.message});
+        if(check.state){
+            //handle saving activity to localStorage
+
+            // localStorage.setItem("lastActivityData", JSON.stringify({formValues}));
+            // navigate("/dashboard/activity-editor");
+            createActivity(formValues);
+            setIsPopupOpen(true);
+            setConfirmationMessage({title:"Félicitations !!!",details:"Votre activité a été créée avec succès"});
+
+        }else{
+            bannerRef.current?.trigger(check.message);
+        }
+    }
+
+    const handleAllerClick =()=>{
+            navigate("/dashboard/activity-editor",{state:{data:formValues}});
     }
 
     const createActivityButtonRef = useRef<HTMLButtonElement>(null);
@@ -113,19 +135,24 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
 
     // Logique pour le chronomètre
     const handleCheckedAddChrono = (nextChecked:boolean) => {
-        setChronoState({...chronoState, isEnabled:nextChecked});
+        const newChrono = {...formValues.chrono,isEnabled:nextChecked};
+        setFormValues({...formValues, chrono:newChrono});
     };
 
     const onChangeChronoTime = (e:React.ChangeEvent<HTMLInputElement>) =>{
         const value = e.target.value;
 
         if(value === "") {
-            setChronoState({...chronoState,[e.target.name]:0})
+            const newChrono = {...formValues.chrono,[e.target.name]:0};            
+            setFormValues({...formValues,chrono:newChrono});
         }else{
             if ( e.target.name && Number(value)>=60) {
-                setChronoState({...chronoState,minutes:chronoState.minutes+1,seconds:Number(value) -60})
+                const newMinutes = formValues.chrono.minutes + Math.floor(Number(value)/60);
+                const newChrono = {...formValues.chrono,minutes: newMinutes,seconds:Number(value) % 60};            
+                setFormValues({...formValues,chrono:newChrono});
             }else {
-                setChronoState({...chronoState,[e.target.name]:Number(value)});
+                const newChrono = {...formValues.chrono,[e.target.name]:Number(value) };            
+                setFormValues({...formValues,chrono:newChrono});
             }
         }
     }
@@ -195,12 +222,14 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         setFormValues(handleDeleteTeamFromActivity(formValues,toRemove))
     }
 
-    const onClosePopup = () => {
+    const onCloseParticipantsPopup = () => {
         setIsPopupOpen(false);
+        setSelectedTeam(undefined);
     }
-    
-    const onOpenPopup = () => {
-        setIsPopupOpen(true);
+
+    const onCloseConfirmationPopup = ()=>{
+        setIsPopupOpen(false);
+        setConfirmationMessage(null);
     }
 
 
@@ -217,31 +246,6 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         }
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch("http://localhost:5000/activities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formValues),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        console.log("✅ Activity created:", data);
-        alert("Activity created successfully!");
-      } else {
-        console.error("❌ Failed to create activity:", data);
-        alert("Something went wrong.");
-      }
-    } catch (err) {
-      console.error("🚨 Error sending request:", err);
-      alert("Network error.");
-    }
-  };
 
     return (
         <div className="activity_creation_background">
@@ -258,15 +262,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                     </div>
                     <GotoProfile />
                 </div>
-{/* 
-                {
-                    errorState.displayed &&
-                    <div className={`error_banner ${errorState.displayed ? "visible" : ""}`}>
-                        <LuTriangleAlert size={22}/>
-                        <p>{errorState.message}</p>
-                        <LuX size={22} onClick={()=>setErrorState({...errorState,displayed:false})} style={{cursor:"pointer"}}/>
-                    </div>
-                } */}
+
                 <ErrorBanner ref={bannerRef} />
 
 
@@ -356,16 +352,16 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                         
                                         <div className="chrono-toggle_and_field">
                                             <label className="toggle_authorise">
-                                                <Switch onChange={(e)=>handleCheckedAddChrono(e)} checked={chronoState.isEnabled} />
+                                                <Switch onChange={(e)=>handleCheckedAddChrono(e)} checked={formValues.chrono.isEnabled} />
                                             </label>
                                             {
-                                                chronoState.isEnabled && 
+                                                formValues.chrono.isEnabled && 
                                                 <div className="add_clock-field">
                                                     <p>min:</p>
 
                                                     <input  type="number"
                                                             name="minutes" 
-                                                            value={chronoState.minutes}
+                                                            value={formValues.chrono.minutes}
                                                             min={0}
                                                             max={60}
                                                             onChange={(e) => onChangeChronoTime(e)}
@@ -374,7 +370,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
 
                                                     <input  type="number" 
                                                             name="seconds" 
-                                                            value={chronoState.seconds}
+                                                            value={formValues.chrono.seconds}
                                                             min={0}
                                                             max={60}
                                                             onChange={(e) => onChangeChronoTime(e)}
@@ -503,10 +499,11 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                             <div className="supervised_teams-toggle">
                                                 <label className="toggle_supervised">
                                                     <Switch onChange={(e)=>{
-                                                                            setFormValues({...formValues,supervised_teams:e});
-                                                                            formValues.teamsList.map((teamData)=>{
-                                                                                teamData.supervised = e;
-                                                                            })
+                                                                            setFormValues((prev)=>{
+                                                                                prev.supervised_teams = e;
+                                                                                prev.teamsList.map((team)=>{team.supervised = e});
+                                                                                return prev;
+                                                                            });
                                                                         }} 
                                                             checked={formValues.supervised_teams} 
                                                             onColor="#364a9d"  
@@ -616,8 +613,12 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                 <AddParticipantsPopup   teamIdx={selectedTeam.indx} 
                                         teamList={formValues.teamsList} 
                                         setFormValues={setFormValues}
-                                        onClose={onClosePopup} 
+                                        onClose={onCloseParticipantsPopup} 
                                          />
+            }
+            {
+                isPopupOpen && confirmationMessage &&
+                <ConfirmationPopup message={confirmationMessage} type="confirm" handleConfirm={handleAllerClick}/>
             }
         </div>
     )

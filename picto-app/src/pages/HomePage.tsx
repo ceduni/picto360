@@ -1,10 +1,9 @@
   import ImageUploader from "@/components/ImageUploader";
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/HomePage.css";  
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
-import { MdKeyboardArrowRight } from "react-icons/md";
 import GotoProfile from "@/components/GotoProfile";
 
 
