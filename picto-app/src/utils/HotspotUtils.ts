@@ -7,6 +7,8 @@ import { HotspotData, HotspotInstance } from "../components/HotspotManager";
 import { IoShapesOutline } from "react-icons/io5";
 import { BiSolidLabel } from "react-icons/bi";
 import ReactPlayer from "react-player";
+import { createRoot } from "react-dom/client";
+import { VideoTooltip } from "@/components/ui/VideoTooltip";
 
 
 
@@ -96,6 +98,7 @@ export const renderTooltipContent = (
           const iconDiv = document.createElement("div");
           iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
           hotSpotDiv.appendChild(iconDiv);
+
         // }
 
         const span = document.createElement("span");
@@ -127,8 +130,9 @@ export const renderTooltipContent = (
           }
           case "video": {
             const videoId = content ? extractYouTubeVideoIdFromUrl(content) : null;
-            if (!videoId) {
+            if (!content) {
               alert("Erreur: lien URL YouTube invalide.");
+              break;
             }
 
             // const player = React.createElement(ReactPlayer);
@@ -137,15 +141,15 @@ export const renderTooltipContent = (
             // player.props.className = "hotspot-manager__video";
             // player.props.onLoad = () => adjustTooltipPosition(span);
             // const playerdiv = document.createElement("div");
+            
+            const mountPoint = document.createElement("div");
 
-            const iframe = document.createElement("iframe");
-            iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
-            iframe.classList.add("hotspot-manager__video");
-            iframe.onload = () => adjustTooltipPosition(span);
-            span.appendChild(iframe);
-            hotSpotDiv.addEventListener("mouseleave", () =>
-              iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo"}', "*")
-            );
+            const root = createRoot(mountPoint);
+            root.render(React.createElement(VideoTooltip, { src: content }));
+            mountPoint.classList.add("hotspot-manager__video");
+            setTimeout(() => adjustTooltipPosition(span), 0);
+            span.appendChild(mountPoint);
+            
             break;
           }
         }
@@ -172,10 +176,10 @@ export const renderTooltipContent = (
         const charLimit = hotspot.type === "text" ? 300 : 30;
 
         return {
-        ...hotspot,
-        createTooltipFunc: renderTooltipContent(icon, hotspot.content || "", editable, charLimit, hotspot.type,hotspot.url_text),
-        clickHandlerFunc: clickHandler,
-        clickHandlerArgs: hotspot
+          ...hotspot,
+          createTooltipFunc: renderTooltipContent(icon, hotspot.content || "", editable, charLimit, hotspot.type,hotspot.url_text),
+          clickHandlerFunc: clickHandler,
+          clickHandlerArgs: hotspot
         };
     };
 

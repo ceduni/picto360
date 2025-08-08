@@ -4,7 +4,7 @@ import { getIdToken } from "firebase/auth";
 import { useAuth } from "@/authContext/authContext";
 
 
-interface FetchedActivity {
+export interface FetchedActivity {
   _id: string;
   title: string;
   description?: string;
@@ -38,6 +38,8 @@ export function useFetchActivities() {
   const [getActivitiesError,setGetActivitiesError] = useState <string|null>(null);
 
   useEffect(() => {
+    if (!currentUser ) return;
+
     const fetchActivities = async () => {
       if (!currentUser) return;
 
@@ -50,9 +52,11 @@ export function useFetchActivities() {
         });
         const data = await response.json();
         setActivities(data);
+        setGetActivitiesError(null);
       } catch (error:any) {
+        setActivities(null);
         setGetActivitiesError(error);
-        // console.error("Failed to fetch activities:", error);
+        console.error("Failed to fetch activities:", error);
       } finally {
         setLoading(false);
       }
@@ -62,4 +66,45 @@ export function useFetchActivities() {
   }, [currentUser]);
 
   return { userActivities, loading, getActivitiesError };
+}
+
+
+export function useGetActivityById(activityId: string) {
+    const [activity, setActivity] = useState<any>(null);
+    const [activityLoading, setActivityLoading] = useState(true);
+    const [activityError, setActivityError] = useState<string | null>(null);
+    const { currentUser } = useAuth();
+
+
+    useEffect ( () => {
+
+        if (!currentUser || !activityId) return;
+    const fetchActivity = async () =>{ 
+        try {
+            const token = await currentUser.getIdToken();
+            const res = await fetch(`http://localhost:5000/activities/${activityId}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || "Failed to fetch activity");
+            }
+
+            const data = await res.json();
+            // return data;
+            setActivity(data);
+        } catch (err: any) {
+            setActivityError(err.message);
+        } finally {
+            setActivityLoading(false);
+        }
+    }
+    fetchActivity();
+    },[activityId]);
+
+    return { activity, activityLoading, activityError };
 }

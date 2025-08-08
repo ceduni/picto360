@@ -31,10 +31,10 @@ const GotoProfile : React.FC<GotoProfileProps> = ({displayType}) =>{
 
         {
             (!displayType || displayType === "name") && 
-            <div>
-                <h2 className="profil_user-name" >
+            <div className="profil_user-name" >
+                <p>
                     {userLoggedIn ? currentUser?.displayName: "Se connecter"}
-                </h2>
+                </p>
                 <MdKeyboardArrowRight size={24} />
             </div>
         }

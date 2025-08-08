@@ -1,35 +1,35 @@
-import { error } from "console";
 import { auth } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, FacebookAuthProvider } from "firebase/auth";
+
 
 export const doCreateUserWithEmailAndPassword = async (email: string, password: string) => {
     return createUserWithEmailAndPassword(auth, email, password)
 }
 
 export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+      return signInWithEmailAndPassword(auth, email, password);
 }
 
-export const doSighInWithGoogle = async (acountType:any) => {
-    const provider = new GoogleAuthProvider();
-    //disable auto-connect
-    provider.setCustomParameters({
-        prompt:'select_account'
-    })
+export const doSighInWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  //disable auto-connect
+  provider.setCustomParameters({
+      prompt:'select_account'
+  })
 
-  try {
-    const result = (await signInWithPopup(auth, provider));
+      // Create a promise for a custom timeout
+  const timeoutPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error("auth/popup-timeout"));
+    }, 2000); // We will timeout after 3 seconds
+  });
 
-    return result;
-  } catch (error: any) {
-    // 👇 Handle specific error if user closed the popup
-    if (error.code === 'auth/popup-closed-by-user') {
-      console.log('Popup closed by user.');
-    } else {
-      console.error('Google Sign-In Error:', error);
-    }
-    throw error; // Let your component handle cleanup
-  }
+    const result = await Promise.race([
+      signInWithPopup(auth, provider),
+      timeoutPromise
+    ]);
+    
+    return result;    
 }
 
 export const doSignInWithFacebook = async () => {
@@ -38,14 +38,17 @@ export const doSignInWithFacebook = async () => {
     prompt:'select_account'
   })
 
-  try{
-    const result = (await signInWithPopup(auth,provider));
-    
-    return result;
-  }catch(error:any){
-    console.log(error)
-    throw error;
-  } 
+  const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error("auth/popup-timeout"));
+      }, 2000); // We will timeout after 3 seconds
+    });
+
+  const result = await Promise.race([
+    signInWithPopup(auth, provider),
+    timeoutPromise
+  ]);
+  return result;
 }
 
 export const doSignOut = () => {

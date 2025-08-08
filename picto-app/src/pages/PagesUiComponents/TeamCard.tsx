@@ -7,7 +7,7 @@ import { LuUserRoundPlus } from "react-icons/lu";
 interface TeamCardProps {
     index:number,
     teamData:TeamInstance,
-    handleTeamNameChange:(idx:number,newName: string) => void,
+    supervised:boolean,
     setSelectedTeam : React.Dispatch<React.SetStateAction<{
                             indx: number;
                             teamData: TeamInstance;
@@ -17,27 +17,23 @@ interface TeamCardProps {
     
 }
 
-const TeamCard : React.FC<TeamCardProps> = ({index,teamData,handleTeamNameChange,setSelectedTeam,setIsPaticipantsPopupOpen,handleDeleteTeam}) =>{
+const TeamCard : React.FC<TeamCardProps> = ({index,teamData,supervised,setSelectedTeam,setIsPaticipantsPopupOpen,handleDeleteTeam}) =>{
     return (
-        <div className="team_card">
-            <input key={index}
-                name="team_card_name"
-                value = {teamData.name}
-                placeholder={teamData.name}
-                onChange={(e) => handleTeamNameChange(index, e.target.value)}
-                className="team_card_input"
-                autoFocus
-            />
+        <div className="team_card" >
+            <p className="team_card_name" onClick={()=>{
+                                                setSelectedTeam({indx:index,teamData});
+                                                setIsPaticipantsPopupOpen(true)}}>
+                            {teamData.name}
+            </p>
+
             <div className="team_participants-number-field">
                 <h2>{teamData.participantsNames.length}</h2>
-                <p className="team_participants" onClick={()=>{
-                                                            setSelectedTeam({indx:index,teamData});
-                                                            setIsPaticipantsPopupOpen(true)}}>Participants</p>
+                <p className="team_participants">Participants</p>
             </div>
             <div className="team-card_bottom">
                 <div className="team_add-supervisor">
                     {
-                        teamData.supervised && 
+                        supervised && 
                         <div className="add-participants_to_group-button">
                             <LuUserRoundPlus strokeWidth={2}/>
                         </div>

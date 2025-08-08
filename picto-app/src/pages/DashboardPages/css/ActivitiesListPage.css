@@ -37,36 +37,52 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     padding: 5vh;
     gap:2vh
 }
 
+.activities-list-content-values{
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr;
+    column-gap: 3rem;
+    align-items: start;
+    width: 50vw;
+    padding-left: 2vw;
+}
+
+.activities-list-content-header{
+    align-items: flex-start;
+    font-size: 0.9vw;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.579);
+}
+
+/*--------Activity Card --------------*/
+
 .activity-card{
-    background-color: #F1F2FF;
 
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    width: 50vw;
-    height: 10vh;
-    border-radius: 1vh;
+    width: 59vw;
 }
 
 .activity-card-text-fields{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 40vw;
+    background-color: #F1F2FF;
     height: 10vh;
-    padding-left: 2vw;
-    gap: 3vw;    
+    border-top-left-radius: 1vh;
+    border-bottom-left-radius: 1vh;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 }
+.activity-card-text-fields:hover{
+    background-color: #e4eaff;
+}
+
 .activity-card-title{
     font-weight: 800;
     font-size: 1.2vw;
-    width: 13vw;
 }
 
 .activity-card-subtitle{

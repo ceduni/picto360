@@ -24,7 +24,8 @@
 
 
 .profil_user-name{
-    max-width: 8vw;
+    display: flex;
+    flex-direction: row;
     font-size: 1vw;
     font-weight: 600;
 }

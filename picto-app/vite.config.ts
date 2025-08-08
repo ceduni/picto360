@@ -15,9 +15,13 @@ export default defineConfig({
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
   server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'unsafe-none',
+      'Cross-Origin-Embedder-Policy': 'unsafe-none', // Also good to add this one
+    },    
     host: true, // Enables LAN access
     port: 3000, // Default port
-    open: false, // Automatically opens the browser
+    open: true, // Automatically opens the browser
     hmr: {
       overlay: false, // Avoid HMR overlay issues on slower systems
     },

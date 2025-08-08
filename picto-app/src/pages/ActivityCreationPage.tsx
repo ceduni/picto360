@@ -4,9 +4,9 @@ import { FaEdit , FaPlus} from "react-icons/fa";
 import { RxDragHandleDots2, RxPerson ,RxLapTimer} from "react-icons/rx";
 import { HiTrash } from "react-icons/hi2";
 import { IoMdPricetag  } from "react-icons/io";
-import { GoPeople } from "react-icons/go";
+import { GoPeople, GoTasklist } from "react-icons/go";
 import { FaAngleLeft } from "react-icons/fa6";
-import { FaCheck } from "react-icons/fa6";
+import  { Tooltip } from "react-tooltip"
 import { IoClose } from "react-icons/io5";
 
 import Switch from "react-switch";
@@ -46,6 +46,8 @@ import { ActivityIstance,
 import ErrorBanner, {  ErrorBannerRef } from "./ErrorBanner";
 import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
 import { useCreateActivity } from "@/hooks/useActivityCreation";
+import { LuInfo } from "react-icons/lu";
+import { TiInfoLarge } from "react-icons/ti";
 
 
 interface ActivityCreationPageProps  {
@@ -60,8 +62,8 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     const [teamsTotalParticipantsCount,setTeamsTotalParticipantsCount] = useState(0);
     const [selectedTeam,setSelectedTeam] = useState<{indx:number,teamData:TeamInstance}>();
     const [confirmationMessage,setConfirmationMessage] = useState<{title:string,details?:string}|null>(null);
-    const { createActivity, loading, error } = useCreateActivity();
 
+    const { createActivity, loading, error ,activityId} = useCreateActivity();
 
     const [formValues,setFormValues] = useState<ActivityIstance>({
         id:'',
@@ -97,10 +99,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
 
         const check = validateActivityValues(formValues);
         if(check.state){
-            //handle saving activity to localStorage
 
-            // localStorage.setItem("lastActivityData", JSON.stringify({formValues}));
-            // navigate("/dashboard/activity-editor");
             createActivity(formValues);
             setIsPopupOpen(true);
             setConfirmationMessage({title:"Félicitations !!!",details:"Votre activité a été créée avec succès"});
@@ -111,7 +110,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     }
 
     const handleAllerClick =()=>{
-            navigate("/dashboard/activity-editor",{state:{data:formValues}});
+        navigate(`/dashboard/activity-editor/${activityId}`);
     }
 
     const createActivityButtonRef = useRef<HTMLButtonElement>(null);
@@ -423,31 +422,32 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     </div>
                                 </div>  
                         </div>
+                        {
+                            formValues.type === "group" && 
+                            <div className="supervised_teams-toggle">
+                                    <Switch onChange={(e)=>{
+                                                            setFormValues({...formValues,supervised_teams:e});
+                                                        }} 
+                                            checked={formValues.supervised_teams} 
+                                            onColor="#364a9d"  
+                                            className="toggle_supervised" />
+                                <p>Équipes supervisées ?</p>
+                            </div>
+                        }                    
 
-                        <div className="list_container">
+                        <div className ={(formValues.type === "solo") ? "list_container" : " list_container list_container-team"}>
+                          
                             {
                                 formValues.type === "solo" ? 
                                 <div className="list_parent_container">
-                                    {
-                                        formValues.participantsList.length <= 0 ?
-                                        <p className="error_board">Pas de participants</p>
-                                        :
-                                        <div  className="list_parent_container_inner">
+
+                                    <div className="add_to-list_field">
+                                        {
+                                            formValues.participantsList.length > 0 &&    
                                             <h3 className="list_title">Liste des participants</h3>
 
-                                            <div className="list_group">
-                                                {   formValues.participantsList.map((participant,index) => (
-                                                        <ParticipantCard id={participant.id} 
-                                                                            key={participant.id}
-                                                                            participantName={participant.name} 
-                                                                            handleParticipantNameChange={changeParticipantName}
-                                                                            handleDeleteParticipant={deleteParticipantFromActivity} />
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    }
-                                    <div className="participants_bottom_buttons">
+                                        }
+
                                         <input  type="number"
                                                 name="entered_value" 
                                                 value={enteredValue} 
@@ -467,23 +467,65 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                             <FaPlus size={14}/>
                                             <p>1</p>
                                         </div>
-                                    </div>
+                                    </div>                                      
+                                    {
+                                        formValues.participantsList.length <= 0 ?
+                                        <p className="error_board">Pas de participants</p>
+                                        :
+                                        <div  className="list_parent_container_inner">
+
+                                            <div className="list_group">
+                                                {   formValues.participantsList.map((participant) => (
+                                                        <ParticipantCard id={participant.id} 
+                                                                            key={participant.id}
+                                                                            participantName={participant.name} 
+                                                                            handleParticipantNameChange={changeParticipantName}
+                                                                            handleDeleteParticipant={deleteParticipantFromActivity} />
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
                                 </div>
                                 :
                                 <div  className="list_parent_container">
+                                    <div className="add_to-list_field">
+                                        {
+                                            formValues.teamsList.length > 0 &&    
+                                            <h3 className="list_title">Liste des équipes</h3>
+                                        }
+
+                                        <input  type="number"
+                                                name="entered_value"
+                                                value={enteredValue} 
+                                                onChange={(e)=>setEnteredValue(e.target.valueAsNumber)}
+                                                onKeyDown={(e)=>e.key==='Enter' && (
+                                                                        e.preventDefault(),
+                                                                        setFormValues(handleAddTeamsToActivity(formValues,enteredValue)),
+                                                                        setEnteredValue(0))}
+                                                className="enter_number_field"/>
+
+                                        <div className="add_one" onClick={() =>setFormValues(handleAddTeamsToActivity(formValues,1))}>
+                                            <FaPlus size={14}/>
+                                            <p>1</p>
+                                        </div>
+                                    </div>                                    
                                     {
                                         formValues.teamsList.length <= 0 ?
                                         <p className="error_board">Pas d'équipes</p>
                                         :
+                                        
                                         <div  className="list_parent_container_inner">
-                                            <h3 className="list_title">Liste des équipes</h3>
+
                                             <div className="teams_list">
                                                 {
                                                     formValues.teamsList.map((teamData,index) => (
                                                         <TeamCard   index={index} 
                                                                     key={teamData.id}
                                                                     teamData={teamData} 
-                                                                    handleTeamNameChange={changeTeamName} 
+                                                                    supervised = {formValues.supervised_teams}
+                                                                    
                                                                     setSelectedTeam={setSelectedTeam} 
                                                                     setIsPaticipantsPopupOpen={setIsPopupOpen} 
                                                                     handleDeleteTeam={deleteTeam} />
@@ -493,43 +535,6 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                         </div>
                                         
                                     }
-                                    <div className="teams_bottom_buttons">
-                                        {
-                                            formValues.teamsList.length != 0  && 
-                                            <div className="supervised_teams-toggle">
-                                                <label className="toggle_supervised">
-                                                    <Switch onChange={(e)=>{
-                                                                            setFormValues((prev)=>{
-                                                                                prev.supervised_teams = e;
-                                                                                prev.teamsList.map((team)=>{team.supervised = e});
-                                                                                return prev;
-                                                                            });
-                                                                        }} 
-                                                            checked={formValues.supervised_teams} 
-                                                            onColor="#364a9d"  
-                                                            />
-                                                </label>
-                                                <p>Équipes supervisées ?</p>
-                                            </div>
-                                        }
-
-                                        <div className="add_team_field">
-                                            <input  type="number"
-                                                    name="entered_value"
-                                                    value={enteredValue} 
-                                                    onChange={(e)=>setEnteredValue(e.target.valueAsNumber)}
-                                                    onKeyDown={(e)=>e.key==='Enter' && (
-                                                                            e.preventDefault(),
-                                                                            setFormValues(handleAddTeamsToActivity(formValues,enteredValue)),
-                                                                            setEnteredValue(0))}
-                                                    className="enter_number_field"/>
-
-                                            <div className="add_one" onClick={() =>setFormValues(handleAddTeamsToActivity(formValues,1))}>
-                                                <FaPlus size={14}/>
-                                                <p>1</p>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             }
 
@@ -542,7 +547,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                         <div className="participant_numbers_board">
                                 <div className="numbers_board_container">
                                     <div className="board_icon">
-                                        <RxPerson size={20}/>
+                                        <GoTasklist size={22}/>
                                     </div>
                                     <div className="board_text">
                                           <p className="board_mini_title">Tâches</p> 
@@ -562,7 +567,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     placeholder="Ajouter une description de tâche..." 
                                     className="text_field-task"/>
                                 <div className="add_button" onClick={()=>setFormValues(handleAddTask(formValues))}>
-                                    <FaCheck size={18}/>
+                                    <FaPlus size={15} />
                                 </div>
                             </div>
                         </div>
@@ -574,6 +579,16 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                     <h3 className="list_title">
                                         Tâches à effectuer
                                     </h3>
+                                    
+                                    <div className="tool-tip-tasks"
+                                        data-tooltip-id="task-tooltip" 
+                                        data-tooltip-content="Vous pouvez re-ordonner vos tache avec un drag"
+                                    >
+                                        <TiInfoLarge className="tool-tip_content"/>
+                                        <Tooltip id="task-tooltip"/>
+
+                                    </div>
+
                                     
                                     <div className="list_group">
                                         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -614,6 +629,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
                                         teamList={formValues.teamsList} 
                                         setFormValues={setFormValues}
                                         onClose={onCloseParticipantsPopup} 
+                                        handleTeamNameChange={changeTeamName}
                                          />
             }
             {

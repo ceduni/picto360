@@ -73,8 +73,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
           <div className="image-uploader__drop-text">Déposez une image ou un projet</div>
           {/*TODO: mention the supported files format + file size limit*/}
         </div>
+
         <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
-        <div className="image-uploader__icon-container">
+        {/* <div className="image-uploader__icon-container">
           <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
             <FaCamera />
           </div>
@@ -90,7 +91,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
           <div className="image-uploader__icon image-uploader__icon--onedrive">
             <GrOnedrive />
           </div>
-        </div>
+        </div> */}
       </div>
   );
 };

@@ -4,46 +4,39 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: #f8f9ff;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* behind everything else */
-  z-index: 1000;
 }
 
 .profile_page-content{
   position: relative;
-  background-color: #f8f9ff;
-  width: 55vw;
-  height: 89+6vh;
+  width: 75vw;
+  height: 85vh;
   padding: 3vw;
   padding-top: 1vw;
   gap: 1vw;
   border-radius: 20px;
-  box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-family: "Inter",sans-serif;
-
-  /* above the particles */
-  z-index: 1100;
 }
 
 .profile_background{
-    width: 55vw;
-    height: 7vw;
+    width: 75vw;
+    height: 8vw;
     align-items: center;
     justify-content: center;
 }
 
 .profile_background_image{
     width: 100%;
-  height: 100%;
-  object-fit: cover;
-      border-top-left-radius: 1vw;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 1vw;
     border-top-right-radius: 1vw;
 }
 
@@ -54,20 +47,21 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1vw;
+    gap: 2vw;
     height: 6vw;
 }
 
-.profile_context_top-right{
-    display: flex;
-    flex-direction: row;
-    gap:8vw;
+.profile_context_top-content{
+
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    padding: 2rem 1rem;
 }
 
 .profile_top_right{
-    display: flex;
-    flex-direction: row;
-    gap :1.5vw
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 4rem;
 }
 
 .profile_top_right_group{
@@ -83,6 +77,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 0.5vw;
 }
 
 .user_name{
@@ -147,7 +142,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1vw;
+    gap: 30vw;
     padding: 0.5vw;
     font-size: 0.9vw;
     color: #364A9D;
@@ -156,35 +151,41 @@
 
 
 .back_button{
+    display: flex;
+    align-items: center;
+    gap:0.5vw;
     cursor: pointer;
 }
 
 .back_button:hover{
+    text-decoration: underline;
     color:#172148
 }
 
 .profile_context{
-    height: 60vh;
+    height: 65vh;
     background-color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     border-bottom-left-radius: 1vw;
     border-bottom-right-radius: 1vw;
-    gap: 3vw;
+    gap: 4vw;
     box-shadow: 0 2px 3px rgba(54, 74,157,0.08) ;
 }
 
 .option_baniere{
-    width: 48vw;
+    width: 50vw;
     height: 1.5vw;
-    padding: 0.6vw;
+    padding: 1vw;
+    border-radius: 0.5vh;
     display: flex;
     flex-direction: row;
     gap :1vw;
     align-items: center;
     background-color: rgba(217, 217, 217, 0.15);
     cursor: pointer;
+    font-size: 1.1vw;;
     font-weight: 500;
     transition: background-color 0.2s ease-in-out
 }
@@ -195,21 +196,24 @@
 
 .option_baniere_delete_account{
     color: red;
-    width: 48vw;
+    width: 28vw;
     height: 1.5vw;
-    padding: 0.6vw;
+    padding: 1vw;
     display: flex;
     flex-direction: row;
     gap :1vw;
     align-items: center;
+    justify-content: center;
     background-color: rgba(217, 217, 217, 0.15);
+    border-radius: 2vw;
     cursor: pointer;
     font-weight: 500;    
     transition: background-color 0.2s ease-in-out
 }
 
 .option_baniere_delete_account:hover{
-    background-color: rgba(217, 217, 217, 0.5);
+    color: white;
+    background-color: red;
 }
 
 .context_options{
@@ -239,4 +243,21 @@
 
 .profile_logout-button:hover{
     background-color:#172148
+}
+
+.icons-name-change-container{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5vw;
+    padding: 1vh;
+}
+
+.icon-name-change{
+    cursor: pointer;
+    border: 1pt solid black;
+    padding: 0.5vh;
+    border-radius: 10%;
+}
+.icon-name-change:hover{
+    background-color: rgba(217, 217, 217, 0.85);
 }

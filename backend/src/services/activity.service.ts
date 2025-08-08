@@ -5,6 +5,7 @@ import { authenticate } from "@/middlewares/firebaseAuth";
 import { User } from "@/models/user.model";
 import Team,{ITeam} from "@/models/team.model";
 import mongoose from "mongoose";
+import { request } from "http";
 
 interface IncomingTeam {
   id: string;
@@ -31,18 +32,13 @@ interface CreateActivityBody {
 export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityBody}>, reply:FastifyReply) => {
     await authenticate(request, reply);
     const userData = (request as any).user;
-    if(!userData) return;
+    if (!userData) return reply.status(401).send({ message: "Unauthorized" });
 
-    const {uid,email,name,picture} = userData;
+    const {uid} = userData;
 
     let user = await User.findOne({firebaseUid:uid});
     if(!user) {
-        user = await User.create({
-            firebaseUid:uid,
-            email,
-            displayName:name,
-            photoUrl:picture,
-        })
+        return reply.status(404).send({message:"User Acount not found"});
     }
 
     try{
@@ -162,5 +158,59 @@ export const getActivities = async ( request: FastifyRequest , reply:FastifyRepl
         reply.status(500).send({ error: 'Failed to fetch activities', 
                                 message: err instanceof Error ? err.message:JSON.stringify(err) });
     }
+  }
+
+  export const getActivityById = async (request,reply)=>{
+    await authenticate(request, reply);
+    const firebaseUser = (request as any).user;
+    if (!firebaseUser) return reply.status(401).send({ message: "Unauthorized" });
+
+    const { id } = request.params as { id: string };
+
+    try {
+        const mongoUser = await User.findOne({ firebaseUid: firebaseUser.uid });
+        if (!mongoUser) return reply.status(404).send({ message: "User not found" });
+
+        const activity = await Activity.findById(id)
+        .populate({
+            path: "teams",
+            populate: [
+            { path: "participantsList" },
+            // {
+            //     path: "objectsAndImage.imageWithObjects",
+            //     model: "Image", // ensure this model is registered
+            // },
+            ],
+        })
+        .populate("createdBy")
+        .lean();
+
+        if (!activity) {
+        return reply.status(404).send({ message: "Activity not found" });
+        }
+
+        const isCreator = String(activity.createdBy._id) === String(mongoUser._id);
+        const isSupervisor = activity.teams.some(
+        (team: any) => team.supervisorId === firebaseUser.uid
+        );
+
+        if (!isCreator && !isSupervisor) {
+        return reply.status(403).send({ message: "Access denied" });
+        }
+
+        const totalParticipants = activity.teams.reduce((sum, team: any) => {
+        return sum + (team.participantsList?.length || 0);
+        }, 0);
+
+        return reply.send({
+        ...activity,
+        ownership: isCreator ? "creator" : "supervisor",
+        totalParticipants,
+        });
+    } catch (err) {
+        console.error("Error fetching activity:", err);
+        return reply.status(500).send({ message: "Server error" });
+    }
+    
   }
 

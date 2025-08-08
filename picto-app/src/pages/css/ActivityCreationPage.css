@@ -315,18 +315,23 @@ input[type="number"]::-webkit-outer-spin-button {
     gap:2vh;
 
     width : 25vw;
-    height: 50vh;
-    padding: 1vh;
+    height: 48vh;
+    padding: 2vh;
+}
+
+.list_container-team{
+    padding-top: 2vh;
+    height: 42vh;
 }
 
 .list_parent_container{
-    width: inherit;
-    height: 45vh;
+    max-height: 50vh;
+    min-height: 42vh;
     display: flex;
     flex-direction: column;
     align-items: center ;
     justify-content: start;
-    gap:1.5vh;
+    gap:2vh;
     padding: 1vh;
 }
 
@@ -337,7 +342,7 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center ;
     gap:1.5vh;
     padding: 1vh;
-    height: 38vh;
+    height: 35vh;
 
 }
 
@@ -419,7 +424,7 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     gap: 1vh;
     padding: 1vh;
-    height: 29vh;
+    height: 35vh;
     width: 24vw;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -480,7 +485,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /*--------- Add Participants ----------*/
 .list_title{
-    width: 23vw;
+    min-width: 15vw;
+    max-width: 16vw;
 }
 
 .participants_bottom_buttons{
@@ -556,7 +562,7 @@ input[type="number"]::-webkit-outer-spin-button {
     gap: 2vh;
     overflow-y: scroll;
     flex-wrap: wrap;
-    height: 28vh;
+    height: 33vh;
     width: 25vw;
     justify-content: center;
     scroll-behavior: smooth;
@@ -594,25 +600,26 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .team_participants{
-    cursor: pointer;
-    font-size: smaller;
+    font-size: 0.9vw;
 }
-.team_participants:hover{
+
+
+.team_card_name{
+    margin-top: 2vh;
     font-weight: 600;
+    font-size: 1.2vw;
+    max-width:8vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #364a9d; 
+    cursor: pointer;
+}
+.team_card_name:hover{
+    font-weight: 800;
     text-decoration: underline;
 }
 
-.team_card_input{
-    all: unset;
-    margin-top: 2vh;
-    font-weight: 600;
-    font-size: 1.1vw;
-    width:8vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
 
 .team-card_bottom{
     display: flex;
@@ -627,6 +634,7 @@ input[type="number"]::-webkit-outer-spin-button {
     background-color: #F1F2FF;
     width: 2.5vw;
     height: 2.5vw;
+    z-index: 1200;
 
     border-bottom-right-radius: 2vh;
     border-top-left-radius: 1vh;
@@ -662,30 +670,21 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .supervised_teams-toggle{
     display: flex;
-    flex-direction: column;
+    flex-direction: row-reverse;
     font-weight: 600;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
+    gap: 1vw;
 
     font-size: 1vw;
     color:#444;
 }
 
 
-.add_team_field{
+.add_to-list_field{
     display: flex;
     align-items: center;
-    gap:0.5vw
-}
-
-.teams_bottom_buttons{
-    display: flex;
-    width: 23vw;
-    height: 8vh;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap:5vw;
+    gap:0.5vw;
 }
 
 /*------------------------------------------------------------*/
@@ -727,6 +726,70 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     justify-content: center;
     gap: 0.3vw;
+}
+
+/* .tool-tip-tasks{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+} */
+/* .tool-tip-tasks:hover{
+    color: white;
+    background-color: #d8e0ff;
+} */
+
+.tool-tip-tasks {
+    cursor: pointer;
+  position: relative;
+    width: 1.4vw;
+    height: 1.5vw;
+}
+
+.tool-tip_content {
+    position: relative;
+    z-index: 2;
+    width: 1.4vw;
+    height: 1.5vw;
+    border-radius: 50%;
+    color: #364a9d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ripple effect with pseudo-elements */
+.tool-tip-tasks::before,
+.tool-tip-tasks::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.4vw;
+    height: 1.5vw;
+    border: 2px solid #a9ddff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: ripple 2s infinite;
+}
+
+.tool-tip-tasks::after {
+  animation-delay: 1s; /* Second wave */
+}
+
+@keyframes ripple {
+  0% {
+    width: 1.4vw;
+    height: 1.5vw;
+    opacity: 0.5;
+  }
+  100% {
+    width: 3vw;
+    height: 3vw;
+    opacity: 0;
+  }
 }
 
 /*------- List Tasks -------*/
@@ -845,6 +908,7 @@ input[type="number"]::-webkit-outer-spin-button {
     width: 3.2vw;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    color: #364a9d;
 }
 .add_button:hover{
     color: white;

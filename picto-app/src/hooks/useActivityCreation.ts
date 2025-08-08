@@ -8,6 +8,7 @@ export function useCreateActivity () {
     const {userLoggedIn,currentUser} = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [activityId,setActivityId] = useState("");
 
     const createActivity = async (formValues:ActivityIstance) => {
         if (!currentUser || ! userLoggedIn) {
@@ -78,6 +79,7 @@ export function useCreateActivity () {
                 return;
             } else {
                 const created = await response.json();
+                setActivityId(created._id);
                 console.log("Activity created successfully:", created);
             }
         } catch (err:any) {
@@ -87,5 +89,5 @@ export function useCreateActivity () {
                 setLoading (false);
         }
     }
-    return { createActivity, loading, error };
+    return { createActivity, loading, error ,activityId};
 };

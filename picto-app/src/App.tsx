@@ -27,7 +27,7 @@ const App: React.FC = () => {
           <Route  path= "/login" element= {<LoginPage />} />
           <Route  path= "/profile" element= {<ProfilePage />} />
           <Route  path="/activity_creation" element = {<ActivityCreationPage/>} />
-          <Route path="/dashboard/activity-editor" element = {<EditActivityPage />}/>
+          <Route path="/dashboard/activity-editor/:id" element = {<EditActivityPage />}/>
           <Route path="/dashboard/your-activities" element = {<ActivitiesListPage />}/> 
         </Routes>
       </AuthProvider>

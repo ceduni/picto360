@@ -118,6 +118,15 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
 
       if (!isEditMode || !viewerInstanceRef.current) return;
 
+      const target = event.target as HTMLElement;
+      if (target.closest(".hotspot-manager__custom-tooltip")) {
+        event.preventDefault();
+        event.stopPropagation();
+        // change the error message to the banner
+        console.log("Context menu disabled on hotspots");
+        return;
+      }
+
       const position = { x: event.clientX, y: event.clientY };
       setContextMenuState({ visible: true, position });
       setTargetIconPosition(position);
@@ -279,7 +288,9 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
 
 
   const handlePannellumClick = (event: MouseEvent, args: HotspotData) => {
-    handleHotspotClick(args);
+    event.preventDefault();
+
+      handleHotspotClick(args);
   };
 
   const handleClose = () => {

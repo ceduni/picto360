@@ -3,7 +3,8 @@ import NavigationBar from "./NavigationBar"
 import UseAnimations from "react-useanimations";
 import loading2 from 'react-useanimations/lib/loading2';
 import ActivityCard from "./ActivityCard"
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useFetchActivities, useGetActivityById } from "@/hooks/useGetUserActivities";
+import { useNavigate } from "react-router-dom";
 
 
 interface ActivitiesListProps {
@@ -13,15 +14,11 @@ interface ActivitiesListProps {
 const ActivitiesListPage :React.FC<ActivitiesListProps> = ()=>{
     const { userActivities, loading , getActivitiesError} =  useFetchActivities();
 
-
-    const now :Date = new Date();
-    const activityTestData = {
-        title:"Jeff Activity",
-        creationdate : now,
-        participantsCount : 3,        
-    }
-
-
+    const navigate = useNavigate();
+    
+    const goToActivity = (activityId: string) => {
+        navigate(`/dashboard/activity-editor/${activityId}`);
+    };
 
     return(
         <div className="dashboard_page">
@@ -39,16 +36,27 @@ const ActivitiesListPage :React.FC<ActivitiesListProps> = ()=>{
                             <p>Toutes vos activités</p>
                         </div>
                         <div className="activities-list-content-main">
+                            
+                            <div className="activity-card">
+                                <div className="activities-list-content-values activities-list-content-header">
+                                    <p >Titre</p>
+                                    <p >Créé le</p>
+                                    <p >Participants</p>
+                                    <p >ownership</p>
+                                </div>
+                                <div className="space-evener"/>
+                            </div>
                             {
-                                (getActivitiesError!=null && userActivities) ?
+                                (getActivitiesError === null && userActivities) ?
                                     userActivities.map((activity)=>{
                                         const activityToDisplay = {
+                                            id:activity._id,
                                             title:activity.title,
                                             creationdate: activity.createdAt,
                                             totalParticipants:activity.totalParticipants,
                                             ownership:activity.ownership
                                         }
-                                        return <ActivityCard activityData={activityToDisplay}/>
+                                        return <ActivityCard activityData={activityToDisplay} handleGotoActivity = {goToActivity}/>
                                     })
                                 :
                                 <p>Aucune acitivités trouvées</p>

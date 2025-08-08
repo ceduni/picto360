@@ -6,25 +6,22 @@
     background-color: #F8F9FF;
 }
 
-.edit-activvity-main-content{
-    width: 90vw;
+.edit-activity-content-container{
+    width: 94vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 5vw;
 }
 
-.edit-activvity-main-content_top{
+.edit-activity-main-content_top{
     background-color: white;
-    width: 90vw;
-    height: 10vh;
-    padding-right: 5vw;
+    width: 92vw;
+    height: 8vh;
+    padding: 1vw;
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 7fr 1fr;
+    column-gap: 3rem;
 }
 
 .actitivity-title{
@@ -33,7 +30,6 @@
     color: #364A9D;
     width: 30vw;
     padding: 1vw;
-    padding-left: 3vw;
 
     display: flex;
     flex-direction: row;
@@ -59,4 +55,8 @@
 
 .close-button:hover{
     background-color: rgb(156, 0, 0);
+}
+
+.edit-activity-main-content{
+
 }

@@ -2,20 +2,15 @@ import { useAuth } from "@/authContext/authContext";
 import "./css/LoginPage.css"
 
 import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmailAndPassword, doSignInWithFacebook } from "@/firebase/authentification"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
-
-interface Props{
-
-}
+import { LuChevronDown, LuChevronRight } from "react-icons/lu";
+import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
 
  const LoginPage = () => {
 
-    const { userLoggedIn } = useAuth();
+    const { currentUser,userLoggedIn } = useAuth();
     const navigate = useNavigate();
-
-    const [userType, setUserType] = useState<'etudiant' | 'prof'>('prof'); // default
-
 
     const [email,setEmail]= useState('');
     const [password,setPassword] = useState<string>('');
@@ -23,15 +18,23 @@ interface Props{
     const [errorMessage,setErrormessage] = useState('');
     const [loginWithEmailBoxes,setLoginInputBoxes] = useState(false);
     const [isSubscribing,setIsSubscribing] = useState(false);
+    const bannerRef = useRef<ErrorBannerRef>(null);
 
 
     const onSubmitGoogle = async (e: { preventDefault: () => void }) =>{
         e.preventDefault();
         if(!isSigningIn){
             setIsSigninIn(true)
-            doSighInWithGoogle(userType).catch((err) => {
+            try{
+                await doSighInWithGoogle();
+            }catch (err: any) {
+
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    setErrormessage('Google Sign-In Error:'+ err.message);
+                }
+            }finally{
                 setIsSigninIn(false);
-            })
+            }
         }
     }
 
@@ -39,16 +42,21 @@ interface Props{
         e.preventDefault();
         if(!isSigningIn){
             setIsSigninIn(true)
-            doSignInWithFacebook().catch((err) => {
+            try{
+                await doSignInWithFacebook();
+            }catch (err: any) {
+                if (err.code != 'auth/popup-closed-by-user') {
+                    setErrormessage('Facebook Sign-In Error:'+ err.message);
+                }
+            }finally{
                 setIsSigninIn(false);
-            })
-
+            }
         }
     }
 
     useEffect(()=>{
         if(userLoggedIn){
-        navigate('/')
+            navigate('/',{replace:true})
         }
     })
 
@@ -71,10 +79,17 @@ interface Props{
         e.preventDefault();
 
         if (!isValidEmail(email) || email=='') {
-            setErrormessage('Adresse email invalide.');
+            setErrormessage("Format de l'adresse email invalide");
             console.log(errorMessage);
+            bannerRef.current?.trigger(errorMessage);
             return;
         }
+        if(password===""){
+            setErrormessage("Veuillez rentrer un mot de passe");
+            console.log(errorMessage);
+            bannerRef.current?.trigger(errorMessage);
+            return;            
+        }        
 
         // proceed with Firebase login
         if(!isSigningIn){
@@ -82,9 +97,8 @@ interface Props{
 
             doCreateUserWithEmailAndPassword(email,password).catch((err) => {
                 setIsSigninIn(false);
-                if(err=="auth/email-already-exists"){
-                }
-                console.log(err);
+                setErrormessage(err);
+                bannerRef.current?.trigger(errorMessage);
             });
         }
     };
@@ -93,33 +107,41 @@ interface Props{
     const handleSignInWithEmail = async (e: React.FormEvent) =>{
         e.preventDefault();
 
+        if (!isValidEmail(email) || email=='') {
+            setErrormessage("Format de l'adresse email invalide.");
+            console.log(errorMessage);
+            bannerRef.current?.trigger(errorMessage);
+            return;
+        }
+        if(password===""){
+            setErrormessage("Veuillez rentrer un mot de passe");
+            console.log(errorMessage);
+            bannerRef.current?.trigger(errorMessage);
+            return;            
+        }
+        
         if(!isSigningIn){
 
             setIsSigninIn(true)
-
-            doSignInWithEmailAndPassword(email,password).catch((err) =>{
-                if(err == "auth/invalid-credential"){
-                    setErrormessage(err);
-                    // TODO: Manage errors (already created, wrong credential,etc)
-                }
+            try{
+                doSignInWithEmailAndPassword(email,password);
+            }catch(err:any){
+                setIsSigninIn(false);
+                setErrormessage(err.message);
+                bannerRef.current?.trigger(errorMessage);
                 setIsSigninIn(false);
                 console.log(err);
-            }
-            );
-        setErrormessage('');
-        navigate('/');
+            };
         }
 
 
     }
 
     const onSubscribeClick = () =>{
-        setErrormessage('');
         setIsSubscribing(!isSubscribing);
     }
 
     const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setErrormessage('');
         setEmail(e.target.value); // 🔁 Store input value in state
     };
 
@@ -129,18 +151,35 @@ interface Props{
         setPassword(pass.target.value);
     };
 
+    useEffect(()=>{
+        if(errorMessage!=""){
+            bannerRef.current?.trigger(errorMessage);
+        }
+    },[errorMessage])
+
     return(
         <div className="login_background">
+            
+
             <div className="login-page__content">
+
                  <div className="login-page_top_container">
-                <img className="login-page__logo" 
-                 src="/images/logo_picto360.png" alt="Logo-picto360" />
-                    <h1 className="login-page_seConnecter">Se connecter à un compte</h1>
-                    <h2 className="login-page_info">Connectez vous avec vos comptes déjà existants. </h2>
+                    <ErrorBanner ref={bannerRef}/>
+
+                    <img className="login-page__logo" 
+                    src="/images/logo_picto360.png" alt="Logo-picto360" />
+
+                    <h1 className="login-page_seConnecter">
+                        Se connecter à un compte
+                    </h1>
+                    
+                    <h2 className="login-page_info">
+                        Connectez vous avec vos comptes déjà existants. 
+                    </h2>
                  </div>
 
                 
-                <div className="account-type_container">
+                {/* <div className="account-type_container">
                     <h2 className="account-type_title">
                         Type d'utilisateur (trice)
                     </h2>
@@ -156,7 +195,6 @@ interface Props{
                                 Etudiant (e)
                             </h2>
                             </label>
-                            {/* <img alt ="checked" className="material-icons-outlined" src="/images/check_circle_100dp_46152F.png"/> */}
 
                             <label className="account-type_container-inside">
                                 <input className="radio-box" 
@@ -171,34 +209,28 @@ interface Props{
                             </label>
 
                     </div>
-                </div>
+                </div> */}
 
-                <div className="space-between-options"/>
         
-                 <div className="login-page_connection_options">
-                    <div className="login-page_connect-baniere" onClick={onSubmitGoogle}>
+                <div className= {loginWithEmailBoxes ? "login-page_connection_options-open" : "login-page_connection_options"}>
+
+                    <div className="login-page_connect-baniere" onClick={onSubmitGoogle} >
                         <img src="/images/devicon_google.png" alt="google" className="login-page_option-icon"/>
                         <h1 className="login-page_option-text">
                             {isSubscribing ? "S'inscrire" : "Se connecter" }  avec google
                         </h1>
-                        <span className="material-icons">
-                            chevron_right
-                        </span>
+                        <LuChevronRight size={24} strokeWidth={2.5}/>
                     </div>
                     
-                    <div className="space-between-options"/>
 
                     <div className="login-page_connect-baniere" onClick={onSubmitFacebook}>
                         <img src="/images/logos_facebook.png" alt="google" className="login-page_option-icon"/>
                         <h1 className="login-page_option-text">
                             {isSubscribing ? "S'inscrire" : "Se connecter" }  avec facebook
                         </h1>
-                        <span className="material-icons">
-                            chevron_right
-                        </span>
+                        <LuChevronRight size={24} strokeWidth={2.5}/>
                     </div>
 
-                    <div className="space-between-options"/>
 
                     <div>
                         <div className="login-page_connect-baniere" onClick={onAcademicClick}>
@@ -208,24 +240,15 @@ interface Props{
                             </h1>
                             {
                                 loginWithEmailBoxes ?
-                                <span className="material-icons">
-                                keyboard_arrow_down
-                                </span>
+                                <LuChevronDown size={24} strokeWidth={2.5}/>
                                 :
-                                <span className="material-icons">
-                                    chevron_right
-                                </span>
+                                <LuChevronRight size={24} strokeWidth={2.5}/>
                             }
 
                         </div>
                         {
                             loginWithEmailBoxes &&
                             <div className="login_with_email_hidden">
-                                {errorMessage != '' &&
-                                    <div className="login_error_message">
-                                        <p> {errorMessage} </p>
-                                    </div>                                
-                                }
 
 
                                 <div className="loginWithEmailBoxes">
@@ -233,6 +256,7 @@ interface Props{
                                         <h2 className="login_with_email_text">Email</h2>
                                         <input type="email" 
                                             title="email" 
+                                            value={email}
                                             className="login_dialog_box" 
                                             placeholder="you@example.com"
                                             onChange={handleChangeEmail}/>
@@ -251,7 +275,8 @@ interface Props{
                                     </div>
                                     
                                 </div>
-                                {isSubscribing &&
+                                {/* {
+                                isSubscribing &&
                                     <div className="login_with_email_dialog">
                                         <h2 className="login_with_email_text">Nom d'utilisateur</h2>
                                         <input type="form" 
@@ -260,7 +285,7 @@ interface Props{
                                             placeholder="Entrez votre nom"
                                             />
                                     </div>                                  
-                                }
+                                } */}
 
                                 {
                                     isSubscribing ?
@@ -280,31 +305,28 @@ interface Props{
                             </div>                        
 
                         }
-                        <div className="space-between-options"/>
-                        
-                        <div className="bottom-buttons">
-                            <button type="button" className="cancel-button" onClick={onCancelClick}>
-                                Annuler
-                            </button>
-                            { 
-                                isSubscribing ?
-                                loginWithEmailBoxes &&
-                                <button type= "button" className="submit-button" onClick={handleSubscribeWithEmail}>
-                                        Inscription
-                                </button> 
-                                :
-                                loginWithEmailBoxes &&
-                                <button type= "button" className="submit-button" onClick={handleSignInWithEmail}>
-                                        Connexion
-                                </button> 
-                            }
-                        </div>
 
-
-                    </div>
+                    </div>                   
 
                  </div>
 
+                <div className="bottom-buttons">
+                    <button type="button" className="cancel-button" onClick={onCancelClick}>
+                        Annuler
+                    </button>
+                    { 
+                        isSubscribing ?
+                        loginWithEmailBoxes &&
+                        <button type= "button" className="submit-button" onClick={handleSubscribeWithEmail}>
+                                Inscription
+                        </button> 
+                        :
+                        loginWithEmailBoxes &&
+                        <button type= "button" className="submit-button" onClick={handleSignInWithEmail}>
+                                Connexion
+                        </button> 
+                    }
+                </div> 
             </div>
 
             {/* TODO : Create the differents buttons (options)*/}

@@ -3,7 +3,7 @@ import { IoIosClose } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 
 import "./css/AddParticipantsPopup.css"
-import { TeamInstance,ActivityIstance, handleParticipantNameChange, handleDeleteParticipant, ParticipantData } from "@/utils/ActivityCreactionUtils";
+import { TeamInstance,ActivityIstance, handleParticipantNameChange, handleDeleteParticipant, ParticipantData, handleAddParticipToTeam } from "@/utils/ActivityCreactionUtils";
 import ParticipantCard from "./PagesUiComponents/ParticipantCard";
 import { FaPlus } from "react-icons/fa";
 
@@ -12,12 +12,12 @@ interface AddParticipantsPopupProps{
     teamIdx:number;
     teamList:TeamInstance[];
     setFormValues:React.Dispatch<React.SetStateAction<ActivityIstance>>;
+    handleTeamNameChange:(idx:number,newName: string) => void,
 
-    // onSubmit:(participNumber:number) => void;
     onClose: () => void ;
 }
 
-const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,teamIdx,teamList,setFormValues}) =>{
+const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,teamIdx,teamList,setFormValues,handleTeamNameChange}) =>{
     const [updatedTeams,setUpdatedTeams] = useState([...teamList]);
     const [newTeamDetails,setNewTeamDetails] = useState({
         name:"",
@@ -31,65 +31,33 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
     // if skip participants add process is allowed , un-comment all the parts with addLater
     // const [addLater,setAddLater] = useState(true);
 
-
     const teamToEdit = teamList[teamIdx];
 
     const handleChangePartiNumber = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setNewTeamDetails({...newTeamDetails,participantsNumberToAdd : e.target.valueAsNumber});
     }
-
     
-    const createNewTeamParticipants = (toCreate:number) =>{
-        const oldParticipantsList = teamList[teamIdx].participantsNames;
-        if (toCreate > 0) {
-        const newEntries :ParticipantData[] = Array.from({ length: toCreate },
-                                        (_, i) => {
-                                            const id =uuidv4();
-                                            return {id, name:`Participant ${oldParticipantsList.length + i + 1}`}
-                                            }
-                                        
-            );
-            return [...oldParticipantsList, ...newEntries];
-        } else {
-            if(oldParticipantsList.length>0) 
-                return oldParticipantsList.slice(0, toCreate)
-            return oldParticipantsList
-        }
-    }
+    const onAddParticipToTeam = (toAdd:number) => {
 
-    const handleAddParticipToTeam = (toAdd:number) => {
-
-        if(toAdd<0) {
+        if(toAdd<=0) {
             setErrorMessagePopup({err:"Nombre de participants invalide, doit être >= 0 ",isDisplayed:true})
             return
         };
 
-        // if(toAdd === 0){
-        //     if(!addLater){
-        //         setErrorMessagePopup({err:"Nombre de participants invalide, voulez vous en ajouter plus tard ?",isDisplayed:true})
-        //         return;
-        //     }
-        // }
+        // const newTeams = [...updatedTeams];
 
-        if(toAdd===0) {
-            return
-        };
-
-        const newTeams = [...updatedTeams];
-
-        if (!newTeams[teamIdx] ) {
+        if (!updatedTeams[teamIdx] ) {
             console.log("Erreur de création 2"); 
             return 
         };
 
-        if (newTeams[teamIdx].participantsNames.length <= 0 && toAdd <= 0) {
-            console.log("Erreur de création 3"); 
-            return 
-        };
+        const modifiedTeam = handleAddParticipToTeam(toAdd,updatedTeams[teamIdx]); 
+        
+        if(modifiedTeam===undefined) return;
 
-        newTeams[teamIdx].participantsNames = createNewTeamParticipants(toAdd);
+        updatedTeams[teamIdx] = modifiedTeam;
 
-        setUpdatedTeams(newTeams);
+        setUpdatedTeams(updatedTeams);
         setNewTeamDetails({...newTeamDetails,participantsNumberToAdd:0})
     }
 
@@ -101,7 +69,6 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
     const onCloseError = () =>{
         setErrorMessagePopup({err:"",isDisplayed:false})
     }
-    
 
     // const onAddLater = () =>{
     //     setAddLater(!addLater)
@@ -148,16 +115,23 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
                         <div className="popup_close_button" onClick={onClose}>
                             <IoIosClose size={45} />
                         </div>
-                         <h2>{teamToEdit?.name}</h2>
-                         <div/>
+                        <input key={teamIdx}
+                                name="team_card_name"
+                                value = {teamToEdit.name}
+                                placeholder={teamToEdit.name}
+                                onChange={(e) => handleTeamNameChange(teamIdx, e.target.value)}
+                                autoFocus
+                                className="team-title-input"
+                            />
+                    <div/>
 
                     </div>
 
                     
                     <div className="team_participants_field">
-                        <h3 className="popup_list_title">Participants ( {teamToEdit.participantsNames.length} ) </h3>
-
-
+                        <h3 className="popup_list_title">
+                            Participants ( {teamToEdit.participantsNames.length} ) 
+                        </h3>
                         {
                             teamToEdit.participantsNames.length <= 0 ?
                             <p className="error_board">Pas de participants</p>
@@ -182,12 +156,12 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
                         <div className="add_participants_container">
                             <input  type="number"
                                     onChange={handleChangePartiNumber}
-                                    onKeyDown={(e)=>e.key==="Enter" && handleAddParticipToTeam(newTeamDetails.participantsNumberToAdd) }
+                                    onKeyDown={(e)=>e.key==="Enter" && onAddParticipToTeam(newTeamDetails.participantsNumberToAdd) }
                                     value={newTeamDetails.participantsNumberToAdd}
                                     className="number_particp_field"
                                     min={0}
                                     max={50}/>
-                            <div className="add_one" onClick={()=>handleAddParticipToTeam(1)}>
+                            <div className="add_one" onClick={()=>onAddParticipToTeam(1)}>
                                 <FaPlus size={14} />
                                 <p>1</p>
                             </div>
@@ -199,7 +173,7 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
                         type="button" 
                         className="popup_add_button"
                         onClick={handleConfirmation}>
-                            Terminer
+                            Enrégistrer
                     </button>
                     {/* <div>
                         <p>Ajouter plus tard</p>

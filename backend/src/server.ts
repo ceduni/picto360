@@ -18,6 +18,7 @@ import activityRoutes from "./routes/activity.routes";
 import { authenticate } from "./middlewares/firebaseAuth";
 import { messaging } from "firebase-admin";
 import Team from "./models/team.model";
+import userRoutes from "./routes/user.route";
 
 const fastify = Fastify({ logger: true });
 
@@ -46,6 +47,8 @@ const setupServer = async () => {
     fastify.register(textContentRoutes);
 
     fastify.register(activityRoutes);
+    fastify.register(userRoutes);
+    
     fastify.register(annotationRoutes);
     fastify.register(dimensionRoutes);
     fastify.register(imageRoutes);

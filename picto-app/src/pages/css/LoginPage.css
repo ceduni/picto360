@@ -4,31 +4,22 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: #f8f9ff;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  /* behind everything else */
-  z-index: 1000;
 }
 
 .login-page__content {
-  position: relative;
-  background-color: #f8f9ff;
-  width: 50vw;
-  height: 80vh;
+  height: 90vh;
   padding: 5vw;
+  gap: 2vh;
   padding-top: 1vw;
-  border-radius: 20px;
-  box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-rows: 1fr 2fr 1fr;
   align-items: center;
   font-family: "Inter",sans-serif;
-
-  /* above the particles */
-  z-index: 1100;
 }
 
 .login-page__logo {
@@ -56,8 +47,16 @@
 }
 
 .login-page_connection_options{
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    row-gap: 1rem;
+    align-items: center;
+}
+
+.login-page_connection_options-open{
+    display: grid;
+    grid-template-rows: 1fr 1fr 2fr;
+    row-gap: 1rem;
     align-items: center;
 }
 
@@ -66,7 +65,9 @@
     flex-direction: row;
     align-items: center;
     background-color: #F1F2FF;
-    height: 3vw;
+    height: 6vh;
+    padding: 2vh;
+    border-radius: 0.5rem;
     cursor: pointer;
 }
 
@@ -84,10 +85,10 @@
 }
 
 .login-page_option-text{
-    font-size: 0.9vw;
+    font-size: 1.1vw;
     font-weight: 900;
     color: #364A9D;
-    width:35vw;
+    width:50vw;
 }
 
 .space-between-options{
@@ -102,9 +103,9 @@
 .account-type_container{
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
-    width: 40vw;
+    justify-content: center;
+    align-items: center;
+    width: 70vw;
 }
 
 .account-type_title{
@@ -137,30 +138,6 @@
     font-weight: 100;
 }
 
-/* .account-type_container-inside input[type="radio"] {
-  display: none; /* 👈 hide the default radio 
-}
-
-.radio-checkmark {
-  width: 20px;
-  height: 20px;
-  border: 3px solid #364A9D;
-  border-radius: 50%;
-  margin-right: 8px;
-  position: relative;
-  box-sizing: border-box;
-}
-
-.account-type_container-inside input[type="radio"]:checked + .radio-checkmark::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 2.5px;
-  width: 10px;
-  height: 10px;
-  background-color: #364A9D;
-  border-radius: 50%;
-} */
 
 .radio-box{
     width: 1.5vw;
@@ -171,8 +148,8 @@
 
 
 .submit-button{
-  width: 14vw;
-  height: 2.9vw;
+    width: 14vw;
+    height: 8vh;
   color: #ffffff;
   cursor: pointer;
   font-family: "Inter", sans-serif;
@@ -183,19 +160,27 @@
   border-width: 0;
   border-radius :74px; 
 }
+.submit-button:hover{
+      background-color: #00125a
+}
 
 .cancel-button{
     width: 14vw;
-  height: 2.9vw;
-  color: #364A9D;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-  font-size: 1.2vw;
-  background-color: #D8E0FF;
-  border-width: 0;
-  border-radius :74px; 
+    height: 8vh;
+    color: #364A9D;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+    font-size: 1.2vw;
+    background-color: #D8E0FF;
+    border-width: 0;
+    border-radius :74px; 
+    transition: background-color 0.2s ease-in-out;
+}
+.cancel-button:hover{
+    background-color: #b2c1ff;
+    color: white;
 }
 
 .login_with_email_dialog{
@@ -216,8 +201,6 @@ input {
   background: none;
   border:inherit;
   outline: none;
-  padding: 0;
-  margin: 0;
   box-shadow: none;
   box-sizing: border-box;
   font: inherit;
@@ -260,7 +243,7 @@ input {
 .login_with_email_hidden{
     display: flex;
     flex-direction: column;
-    align-items: self-start;
+    align-items: center;
 }
 
 

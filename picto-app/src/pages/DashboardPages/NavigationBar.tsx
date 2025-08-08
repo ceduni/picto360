@@ -21,7 +21,11 @@ const NavigationBar :React.FC<NavigationBarProps> = ({selected}) =>{
 
     const handleEditiActivityClick = () =>{
         setSelectedIcon("edit")
-        navigate("/dashboard/activity-editor")
+        
+        // retrieve last activity Id from localStorage
+        const data = localStorage.getItem("lastActivityId");   
+
+        navigate(`/dashboard/activity-editor/${data}`)
     }
 
     return (

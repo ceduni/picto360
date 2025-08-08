@@ -294,3 +294,40 @@ const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
       alert("Network error.");
     }
 };
+
+
+    const createNewTeamParticipants = (toCreate:number,team:TeamInstance) =>{
+        const oldParticipantsList = team.participantsNames;
+        if (toCreate > 0) {
+        const newEntries :ParticipantData[] = Array.from({ length: toCreate },
+                                        (_, i) => {
+                                            const id =uuidv4();
+                                            return {id, name:`Participant ${oldParticipantsList.length + i + 1}`}
+                                            }
+                                        
+            );
+            return [...oldParticipantsList, ...newEntries];
+        } else {
+            if(oldParticipantsList.length>0) 
+                return oldParticipantsList.slice(0, toCreate)
+            return oldParticipantsList
+        }
+    }
+
+export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
+
+        if (!team ) {
+            console.log("Erreur de création 2"); 
+            return 
+        };
+        const newTeam = team;
+
+        if (team.participantsNames.length <= 0 && toAdd <= 0) {
+            console.log("Erreur de création 3"); 
+            return 
+        };
+
+        newTeam.participantsNames = createNewTeamParticipants(toAdd,newTeam);
+        
+        return newTeam;
+    }

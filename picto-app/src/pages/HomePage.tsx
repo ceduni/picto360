@@ -54,7 +54,7 @@ interface HomeProps{
                 <div className="top-content">
                     <img className="image-uploader__logo" 
                         src="/images/logo_picto360.png" alt="Logo-picto360" />
-                    <GotoProfile/>
+                    <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
                 </div>
 
                 <div className="home-page__center">

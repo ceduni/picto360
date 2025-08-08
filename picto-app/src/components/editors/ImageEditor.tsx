@@ -55,7 +55,7 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
         
         <label className="edition_pannel_field">
             <p className="edition_pannel_field_title">
-                Texte de l'image:
+                Titre ou description de l'image:
             </p>
             <input
                 type="text"
@@ -64,7 +64,7 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
                     setURL(e.target.value)
                 }
                 className="dialog_field"
-                placeholder="Tapez le nouvel texte ici ..."
+                placeholder="Entrez le titre ici ..."
             />
 
             <p className="edition_pannel_field_title">
