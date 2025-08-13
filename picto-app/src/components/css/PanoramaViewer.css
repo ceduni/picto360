@@ -9,6 +9,11 @@
   display: none !important;
 }
 
+.pnlm-load-box {
+  position: absolute !important;
+  top: 25% !important;
+}
+
 /* Panorama Viewer */
 .panorama-viewer {
   background-color: black;

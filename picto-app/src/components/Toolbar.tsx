@@ -101,7 +101,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
       const formData = new FormData();
       formData.append("file", blob, "image_projet_picto360.png");
 
-      const exportResponse = await fetch("http://localhost:3001/export", {
+      const exportResponse = await fetch("http://localhost:5000/export", {
         method: "POST",
         body: formData,
       });

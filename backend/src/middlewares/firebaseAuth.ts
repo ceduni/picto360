@@ -15,7 +15,7 @@ export const authenticate = async (request, response) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    console.log("✅ Decoded Firebase user:", decodedToken);
+    // console.log("✅ Decoded Firebase user:", decodedToken);
     request.user = decodedToken;
   } catch (err) {
     console.log("❌ Token verification failed:", err);
