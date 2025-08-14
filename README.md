@@ -9,7 +9,8 @@
 
 ## Description du projet 
 
-Picto360 est une collaboration avec [École en Réseau](https://eer.qc.ca/) visant à développer une application pédagogique qui enrichit des images panoramiques et à 360° avec des annotations interactives.
+Picto360 est une collaboration avec [École en Réseau](https://eer.qc.ca/) visant à développer une application pédagogique qui enrichit des images panoramiques et à 360° avec des annotations interactives et permet la création 
+d'activités académiques.
 
 👀 [Exemple d'annotation de photos 360 (prise avec un drone)](https://www.thinglink.com/scene/1800248329951511396)
 
@@ -96,6 +97,7 @@ Code serveur et logique métier.
 - **`routes/`** : Endpoints API RESTful.
 - **`services/`** : Logique applicative.
 - **`utils/`** : Utilitaires généraux.
+- **`middlewares/`** : Vérifications avant l'exécution de la logique .
 
 ### **`docs/`**
 Documentation du projet.
@@ -106,11 +108,13 @@ Documentation du projet.
 
 ### **`picto-app/`**
 Frontend développé avec React et TypeScript.
-
-- **`components/`** : Composants React (Barre d'outils, Menu contextuel, Visionneuse).
-- **`hooks/`** : Hooks personnalisés.
-- **`models/`** : Modèles de données pour le frontend.
 - **`assets/`** : Styles CSS et autres assets.
+- **`authContext/`** : Contexte d'authentification avec une scope générale.  
+- **`components/`** : Composants React (Barre d'outils, Menu contextuel, Visionneuse).
+- **`firebase/`** : Gestion des configurations de firebase. 
+- **`hooks/`** : Hooks personnalisés.
+- **`pages/`** : Pages principages de l'application.
+- **`utils/`** : Outils. 
 - **`public/`** : Fichiers publics incluant `pannellum.js`.
 
 ### **Racine du projet**
