@@ -5,8 +5,6 @@
 
 # Picto360: Application d'annotation d'image
 
-> **Page web du projet (IFT3150):** https://ceduni.github.io/picto360
-
 ## Description du projet 
 
 Picto360 est une collaboration avec [École en Réseau](https://eer.qc.ca/) visant à développer une application pédagogique qui enrichit des images panoramiques et à 360° avec des annotations interactives et permet la création 
