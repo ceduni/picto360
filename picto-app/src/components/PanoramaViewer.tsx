@@ -6,7 +6,8 @@ import HotspotManager, { HotspotData, HotspotInstance } from "./HotspotManager";
 import "./css/PanoramaViewer.css";
 import EditionPannel from "./EditionPannel";
 import { createHotspotInstance, deleteHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
+import { getAnnotations, getBlob, putAnnotations } from "@/utils/storedImageData";
 
 declare global {
   interface Window {
@@ -19,7 +20,7 @@ declare global {
 interface PanoramaViewerProps {
   width: string;
   height: string;
-  imageSrc: string;
+  viewerId: string;
   isEditMode: boolean;
 }
 
@@ -31,9 +32,10 @@ interface PannellumViewer {
   getHfov: () => number;
 }
 
-const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc, isEditMode }) => {
+const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode }) => {
   const viewerRef = useRef<HTMLDivElement>(null);
   const hotspotCounter = useRef(0);
+  const [imageSource,setImageSource] = useState<string|null>(null);
 
   const viewerInstanceRef = useRef<PannellumViewer | null>(null);
   const [contextMenuState, setContextMenuState] = useState({
@@ -55,7 +57,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
   const viewerConfig = useMemo(
     () => ({
       type: "equirectangular",
-      panorama: imageSrc,
+      panorama: imageSource,
       autoLoad: true,
       autoRotate: -2,
       showControls: false,
@@ -68,14 +70,15 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
         loadingLabel: "Chargement en cours...",
       },
     }),
-    [imageSrc] // northOffset excluded as it forces the viewer to reload
+    [imageSource] // northOffset excluded as it forces the viewer to reload
   );
 
   const navigate = useNavigate()
 
   const initializeViewer = useCallback( () => {
-    if (!viewerRef.current || !imageSrc) {
-      console.error("PanellumViewer - Viewer ref or image source is missing.");
+
+    if (!viewerRef.current || !imageSource) {
+      console.error("PanellumViewer - Viewer ref or image source is missing.:", imageSource);
       return;
     }
 
@@ -85,21 +88,34 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     }
     
     if(!viewerInstanceRef.current){
-      console.log("PanellumViewer - Initializing Pannellum viewer...");
+      console.log("PanellumViewer - Initializing Pannellum viewer...:", viewerConfig.panorama);
       viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
     }
 
-  }, [imageSrc, viewerConfig]);
+  }, [viewerId, viewerConfig,imageSource]);
 
   useEffect(() => {
 
-    if(imageSrc === "null" ){
+    if(viewerId === "null" || !viewerId ){
         navigate("/", {replace : true});
-    }else{
-      localStorage.setItem("imageSrc",imageSrc);
     }
 
-    initializeViewer();    
+    let objectUrl: string | undefined;
+
+    ( async () => {
+        if (!viewerId) return;
+        const blob = await getBlob(viewerId);
+        const annotations = await getAnnotations(viewerId);
+        if (!blob) {
+            navigate("/");
+            return;
+        }
+        objectUrl = URL.createObjectURL(blob);
+        setImageSource(objectUrl);
+        if(annotations) {
+          setHotspots(annotations)
+        };
+    })();
     
     return () => {
       if (viewerInstanceRef.current) {
@@ -108,8 +124,24 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
         viewerInstanceRef.current.destroy();
         viewerInstanceRef.current = null;
       }
+      // cleanup: revoke the previous object URL when viewerId changes/unmounts
+      if (imageSource) URL.revokeObjectURL(imageSource); 
     };
-  }, [imageSrc]);
+  }, [viewerId,navigate]);
+
+  useEffect(() => {
+    if (imageSource) {
+      initializeViewer();
+
+      // if(hotspots.length>0) {
+      //   hotspots.map((hotspot)=>{
+      //     if(hotspot!=undefined) addHotspotToViewer(hotspot)
+      //   })
+      // };
+
+    }
+  }, [imageSource]);
+  
 
 
   const handleContextMenu = useCallback(
@@ -217,26 +249,39 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     [isEditMode]
   );
 
-  const handleHotspotCreate = (hotspotData: HotspotData) => {
 
-    // handle errors
-    if (!hotspotData.content) return;
+  const handleHotspotCreate =  async (hotspotData: HotspotData) => {
+    addHotspotToViewer(hotspotData);
 
+    const newHotspotList = [...hotspots,hotspotData];
+
+    await putAnnotations(viewerId,newHotspotList);
     // Add to list
-    setHotspots(prev => [...prev, hotspotData]);
+    setHotspots(newHotspotList);
+
+    setTargetIconPosition(null);
+  }
+
+  const addHotspotToViewer = (hotspotData: HotspotData)=> {
+    if (!hotspotData.content || hotspotData===undefined) return;
 
     // Render to viewer
     (viewerInstanceRef.current as any)?.addHotSpot(
       createHotspotInstance(hotspotData, handlePannellumClick)
     );
+    hotspotCounter.current++;
 
-    setTargetIconPosition(null);
+    console.log("put hotspot in db")
+
   }
 
-  const handleHotspotSave = (updatedHotspot: HotspotData) => {
-    setHotspots(prev =>
-      prev.map(hotS => hotS.id === updatedHotspot.id ? updatedHotspot : hotS)
-    );
+  const handleHotspotSave = async (updatedHotspot: HotspotData) => {
+
+    const newHotspotList = hotspots.map(hotS => hotS.id === updatedHotspot.id ? updatedHotspot : hotS);
+
+    await putAnnotations(viewerId,newHotspotList);
+
+    setHotspots(newHotspotList);
 
     // Refresh viewer hotspot:
     if (viewerInstanceRef.current) {
@@ -248,14 +293,21 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, imageSrc
     }
   };
 
-  const handleHotspotDelete = (toDeleteHotspot:HotspotData) => {
+  const handleHotspotDelete = async (toDeleteHotspot:HotspotData) => {
     if(viewerInstanceRef.current){
+      const newHotspotList = hotspots.filter(hotS => hotS.id != toDeleteHotspot.id );
+
+      await putAnnotations(viewerId,newHotspotList);
+
+      setHotspots(newHotspotList);
+
       (viewerInstanceRef.current as any).removeHotSpot(toDeleteHotspot.id);
 
       deleteHotspotInstance(viewerInstanceRef.current,toDeleteHotspot)
       hotspotCounter.current--;
 
     }
+
   }
 
   const handleHotspotClick = (hotspot: HotspotData) => {

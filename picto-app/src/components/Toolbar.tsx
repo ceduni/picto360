@@ -4,17 +4,13 @@ import {
   Toolbar as MUIToolbar,
   Typography,
   IconButton,
-  InputBase,
   Box,
   Tooltip,
-  Modal,
-  Fade,
 } from "@mui/material";
 import {
   SaveOutlined as SaveIcon,
   Share as ShareIcon,
   Settings as SettingsIcon,
-  Cancel as CancelIcon,
   FileUpload as ExportIcon,
   Done as CheckIcon,
 } from "@mui/icons-material";
@@ -23,23 +19,29 @@ import logo from "/images/logo_picto360.png";
 import ToggleSwitch from "./ui/ToggleSwitch";
 import "./css/Toolbar.css";
 import { useNavigate } from "react-router-dom";
+import ExportPopupWindow from "./ui/ExportPopupWindow";
+import SharePopupWindow from "./ui/SharePopupWindow";
 
 interface ToolbarProps {
-  imageSrc: string | null;
   isEditMode: boolean;
   toggleEditMode: () => void;
+  viewerId?:string;
+  authStatus:string|null;
 }
 
 const CHARACTER_LIMIT = 20;
 
-const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,authStatus}) => {
+
   const [projectTitle, setProjectTitle] = useState("Untitled"); //TODO: manage project uniqueness in DB
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
   const projectTitleRef = useRef<HTMLDivElement>(null);
 
+  // Change the project title
   const handleTitleChange = useCallback(() => {
     if (projectTitleRef.current) {
       const newTitle = projectTitleRef.current.innerText.trim().slice(0, CHARACTER_LIMIT);
@@ -89,41 +91,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
     }
   }, [isEditMode]);
 
-  const handleExport = useCallback(async (imageSrc: string | null) => {
-    if (!imageSrc) {
-      alert("No image to export");
-      return;
-    }
-
-    try {
-      const response = await fetch(imageSrc);
-      const blob = await response.blob();
-      const formData = new FormData();
-      formData.append("file", blob, "image_projet_picto360.png");
-
-      const exportResponse = await fetch("http://localhost:5000/export", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!exportResponse.ok) {
-        throw new Error(`Failed to export file: ${exportResponse.statusText}`);
-      }
-
-      const data = await exportResponse.json();
-      alert(data.success ? "File exported successfully!" : "Failed to export file: " + data.error);
-    } catch (error) {
-      console.error("Error exporting file:", error);
-      alert(`An error occurred while exporting the file. Please check your internet connection or try again later.`);
-    }
-  }, []);
 
   const handleToggleEditMode = useCallback(() => {
     toggleEditMode();
   }, [toggleEditMode]);
-  const toggleShareOptions = useCallback(() => {
-    setShowShareOptions((prev) => !prev);
-  }, []);
+
 
   useEffect(() => {
     if (projectTitleRef.current) {
@@ -162,7 +134,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
 
   const navigate = useNavigate();
   const redirectHomePage = useCallback(() =>
-    navigate('/'),[])
+    navigate('/')
+  ,[])
+ 
 
   return (
     <motion.div
@@ -265,6 +239,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
                 </IconButton>
               </span>
             </Tooltip>
+            
             <Tooltip
               title="Exporter"
               slotProps={{
@@ -280,10 +255,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
                 },
               }}
             >
-              <IconButton onClick={() => handleExport(imageSrc)} className="toolbar__icon-button">
-                <ExportIcon />
-              </IconButton>
+            <IconButton onClick={()=>{ console.log("Auth stat :" , authStatus===null); setShowExportOptions(true)}} className="toolbar__icon-button">
+              <ExportIcon />
+            </IconButton>
             </Tooltip>
+
             <Tooltip
               title="Partager"
               slotProps={{
@@ -299,7 +275,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
                 },
               }}
             >
-              <IconButton onClick={toggleShareOptions} className="toolbar__icon-button">
+              <IconButton onClick={()=>{console.log("Clicked"); setShowShareOptions(true)}} className="toolbar__icon-button">
                 <ShareIcon />
               </IconButton>
             </Tooltip>
@@ -326,63 +302,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ imageSrc, isEditMode, toggleEditMode 
         </MUIToolbar>
 
         {/* Share Options Modal */}
-        <Modal open={showShareOptions} onClose={toggleShareOptions} closeAfterTransition>
-          <Fade in={showShareOptions}>
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: 400,
-                bgcolor: "background.paper",
-                boxShadow: 24,
-                p: 4,
-                borderRadius: 2,
-              }}
-            >
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <IconButton onClick={toggleShareOptions}>
-                  <CancelIcon sx={{ color: "#282828", "&:hover": { color: "red" } }} />
-                </IconButton>
-              </Box>
-              <Typography variant="h6" component="h2" sx={{ marginBottom: "1rem" }}>
-                Share Project
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <InputBase
-                  placeholder="Expiration Date"
-                  type="date"
-                  sx={{
-                    borderBottom: "1px solid gray",
-                    paddingBottom: "0.5rem",
-                    color: "#000000",
-                  }}
-                />
-                <InputBase
-                  placeholder="Access Level"
-                  type="text"
-                  sx={{
-                    borderBottom: "1px solid gray",
-                    paddingBottom: "0.5rem",
-                    color: "#000000",
-                  }}
-                />
-                <IconButton
-                  sx={{
-                    alignSelf: "center",
-                    padding: "0.5rem 1.5rem",
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Copy Link
-                </IconButton>
-              </Box>
-            </Box>
-          </Fade>
-        </Modal>
+        <SharePopupWindow isOpen={showShareOptions} setIsPopupOpen={setShowShareOptions}/>
+        <ExportPopupWindow  isOpen={showExportOptions} 
+                            setIsPopupOpen={setShowExportOptions} 
+                            viewerId = {viewerId}
+                            authStatus = {authStatus}/>
       </AppBar>
     </motion.div>
   );

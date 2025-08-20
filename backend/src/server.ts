@@ -1,6 +1,5 @@
 import Fastify from "fastify";
-import cors, { fastifyCors } from "@fastify/cors";
-//import { connectToDatabase } from "./utils/db";
+import  { fastifyCors } from "@fastify/cors";
 import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
 import formContentRoutes from "./routes/content/formContent.routes";
@@ -15,30 +14,55 @@ import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
 import activityRoutes from "./routes/activity.routes";
-import { authenticate } from "./middlewares/firebaseAuth";
-import { messaging } from "firebase-admin";
 import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
+import exportRoutes from "./routes/export.routes";
+import fastifyCookie  from "@fastify/cookie";
+import fastifySession from "@fastify/session";
+
+import 'dotenv/config';
 
 const fastify = Fastify({ logger: true });
-
 
 const setupServer = async () => {
   try {
     await connectToDatabase();
 
-    fastify.register(fastifyCors, {
-      origin: true,
-      methods: ["GET", "POST", "PUT", "DELETE"],
+    await fastify.register(fastifyCors, {
+      origin: (origin, cb) => {
+        const allowed = ["http://localhost:3000"];
+        if (!origin || allowed.includes(origin)) cb(null, true);
+        else cb(new Error("Not allowed by CORS"), false);
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true, // <-- critical when using credentials: 'include'
+      maxAge: 86400,
     });
 
-      fastify.register(fastifyMultipart, {
-      attachFieldsToBody: true,
+    const SESSION_SECRET = process.env.FASTIFY_SESSION_SECRET;
+    if (!SESSION_SECRET || SESSION_SECRET.length<32) {
+      throw new Error("FASTIFY_SESSION_SECRET must be defined");
+    }
+
+    await fastify.register(fastifyCookie);
+    await fastify.register(fastifySession,{
+      secret: SESSION_SECRET,               
+      cookie: {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: "auto",                     // false on HTTP, true on HTTPS
+      },
+    });
+
+    await fastify.register(fastifyMultipart, {
       limits: { fileSize: 50 * 1024 * 1024 }
     });
 
     // Register the OAuth + export routes
     fastify.register(oauthRoutes);
+    fastify.register(exportRoutes);
 
     fastify.register(contentRoutes);
     fastify.register(formContentRoutes);

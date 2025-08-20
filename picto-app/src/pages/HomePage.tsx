@@ -5,21 +5,23 @@ import "./css/HomePage.css";
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
 import GotoProfile from "@/components/GotoProfile";
+import { putBlob } from "@/utils/storedImageData";
 
 
 interface HomeProps{
-    setImageSrc:(newImage: string) =>void
+
 }
 
-  const HomePage: React.FC<HomeProps> = ({setImageSrc}) => {
+  const HomePage: React.FC<HomeProps> = () => {
    
     const {userLoggedIn,currentUser} = useAuth();
 
     const navigate = useNavigate();
 
-    const handleImageUpload = useCallback((newImageSrc: string) => {
-        setImageSrc(newImageSrc);
-        navigate('/view');
+    const handleImageUpload = useCallback(async (newImageSrc: File) => {
+        const viewerId = crypto.randomUUID();
+        await putBlob(viewerId,newImageSrc);
+        navigate(`/view/${viewerId}`);
     }, []);
 
     const handleLogClick = useCallback(() => {

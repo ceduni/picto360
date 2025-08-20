@@ -6,12 +6,11 @@ import { GrOnedrive } from "react-icons/gr";
 import "./css/ImageUploader.css";
 
 interface ImageUploaderProps {
-  onImageUpload: (imageSrc: string) => void;
+  onImageUpload: (imageSrc: File) => void;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   //TODO: manage errors + add red color to the drop zone
-  const [showPopup, setShowPopup] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,10 +33,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   };
 
   const processFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    console.log("File uploaded: ", url);
-    onImageUpload(url);
-    setShowPopup(false);
+    // const url = URL.createObjectURL(file);
+    onImageUpload(file);
+    console.log("File uploaded: ", file);
   };
 
   const triggerFileInput = () => {
@@ -45,8 +43,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
       fileInputRef.current.click();
     }
   };
-
-  if (!showPopup) return null;
 
   return (
       <div className="image-uploader__content">
@@ -75,6 +71,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
         </div>
 
         <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
+
         {/* <div className="image-uploader__icon-container">
           <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
             <FaCamera />

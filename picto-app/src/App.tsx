@@ -16,14 +16,13 @@ import EditActivityPage from "./pages/DashboardPages/EditActivityPage";
 import ActivitiesListPage from "./pages/DashboardPages/ActivitiesListPage";
 
 const App: React.FC = () => {
-  const [imageSrc, setImageSrc] = useState<string >("null");
 
   return (
     <div className="app">
       <AuthProvider >
         <Routes>
-          <Route  path= "/" element= {<HomePage setImageSrc={setImageSrc} />} />
-          <Route  path= "/view" element= {<VisualisationPage imageSrc={imageSrc} />} />
+          <Route  path= "/" element= {<HomePage />} />
+          <Route  path= "/view/:viewerId" element= {<VisualisationPage />} />
           <Route  path= "/login" element= {<LoginPage />} />
           <Route  path= "/profile" element= {<ProfilePage />} />
           <Route  path="/activity_creation" element = {<ActivityCreationPage/>} />
