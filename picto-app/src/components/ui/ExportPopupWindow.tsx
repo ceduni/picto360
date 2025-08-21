@@ -10,7 +10,7 @@ import { getGoogleDriveService } from "@/utils/GoogleDriveUtils";
 import { HotspotData } from "../HotspotManager";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { PiExportBold } from "react-icons/pi";
-import { getBlob } from "@/utils/storedImageData";
+import { getAnnotations, getBlob } from "@/utils/storedImageData";
 import { blob } from "stream/consumers";
 
 interface ExportPopupProps {
@@ -70,6 +70,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         // Get your app's current image and annotations
         if (!viewerId) return null;
         const imageBlob = await getBlob(viewerId); 
+        const annotations = await getAnnotations(viewerId);
         
         // const annotations = getCurrentAnnotations(); // Implement this
         
@@ -82,6 +83,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             return null;
         }
 
+
         setIsExporting(true);
         setExportStatus('Exporting to Google Drive...');
         console.log("Exporting to Google Drive...");
@@ -89,7 +91,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         try {
             const result = await driveService.exportToGoogleDrive(
                 imageBlob,
-                // annotations,
+                annotations || [],
                 {
                     imageName: 'my_360_image',
                     folderName: '360° Annotations',

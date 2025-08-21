@@ -134,14 +134,7 @@ export const renderTooltipContent = (
               alert("Erreur: lien URL YouTube invalide.");
               break;
             }
-
-            // const player = React.createElement(ReactPlayer);
-            // player.props.playing = true;
-            // player.props.src = content;
-            // player.props.className = "hotspot-manager__video";
-            // player.props.onLoad = () => adjustTooltipPosition(span);
-            // const playerdiv = document.createElement("div");
-            
+                      
             const mountPoint = document.createElement("div");
 
             const root = createRoot(mountPoint);

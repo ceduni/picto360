@@ -11,7 +11,6 @@ import { getBlob } from "@/utils/storedImageData";
 const VisualisationPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const { viewerId } = useParams<{ viewerId: string }>();
-    const [imageUrl, setImageUrl] = useState<string>("");
     const navigate =  useNavigate();
 
     const toggleEditMode = useCallback(() => {
@@ -27,7 +26,7 @@ const VisualisationPage: React.FC = () => {
     const message = query.get("message");
 
 
-    const hasImage = Boolean(viewerId);
+    const hasViewerId = Boolean(viewerId);
 
     return(
         
@@ -40,7 +39,7 @@ const VisualisationPage: React.FC = () => {
                             authStatus = {authStatus}/>
             </header>
             {/* ⬇️ Don't mount until ready */}
-            {hasImage ? (
+            {hasViewerId ? (
                 <PanoramaViewer
                 key={viewerId!}       // force remount when url changes (if your viewer needs it)
                 viewerId={viewerId!}
@@ -55,7 +54,7 @@ const VisualisationPage: React.FC = () => {
             )}
             
             <AnimatePresence>
-            {imageUrl && isEditMode && (
+            {viewerId && isEditMode && (
                 <motion.div
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}

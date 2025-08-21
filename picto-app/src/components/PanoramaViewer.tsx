@@ -2,8 +2,9 @@ import React, { useEffect, useCallback, useState, useRef, useMemo } from "react"
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
-import HotspotManager, { HotspotData, HotspotInstance } from "./HotspotManager";
+import { HotspotData } from "./HotspotManager";
 import "./css/PanoramaViewer.css";
+
 import EditionPannel from "./EditionPannel";
 import { createHotspotInstance, deleteHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
 import { replace, useNavigate } from "react-router-dom";
@@ -30,6 +31,7 @@ interface PannellumViewer {
   getYaw: () => number;
   getPitch: () => number;
   getHfov: () => number;
+  onLoad:()=>void;
 }
 
 const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode }) => {
@@ -46,10 +48,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({ pitch: 0, yaw: 0 });
 
   const [editingPannelState,setEditingPannelState] = useState<{ isOpen: boolean ; state: string} | null>(null);
-
-  // for hotspot creation
-  // const [pendingHotspotType, setPendingHotspotType] = useState<string | null>(null);
-  // const [pendingHotspotCoords, setPendingHotspotCoords] = useState<[number, number] | null>(null);
   
   const [hotspots, setHotspots] = useState<HotspotData[]>([]);
   const [selectedHotspot, setSelectedHotspot] = useState<HotspotData | null>(null);
@@ -89,7 +87,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     
     if(!viewerInstanceRef.current){
       console.log("PanellumViewer - Initializing Pannellum viewer...:", viewerConfig.panorama);
-      viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;
+      viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;    
     }
 
   }, [viewerId, viewerConfig,imageSource]);
@@ -132,15 +130,25 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   useEffect(() => {
     if (imageSource) {
       initializeViewer();
-
-      // if(hotspots.length>0) {
-      //   hotspots.map((hotspot)=>{
-      //     if(hotspot!=undefined) addHotspotToViewer(hotspot)
-      //   })
-      // };
-
     }
   }, [imageSource]);
+
+  useEffect(() => {
+    if (viewerInstanceRef.current && hotspots.length > 0) {
+      const handler = () => {
+        console.log("hotspots: ", hotspots)
+
+        hotspots.forEach(hs => {
+          if (hs) addHotspotToViewer(hs);
+        });
+      };
+
+      // wait until panorama is fully loaded
+      (viewerInstanceRef.current as any).on("load", handler);
+
+
+    }
+}, [viewerInstanceRef.current,hotspots]);
   
 
 
@@ -251,6 +259,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
 
 
   const handleHotspotCreate =  async (hotspotData: HotspotData) => {
+
     addHotspotToViewer(hotspotData);
 
     const newHotspotList = [...hotspots,hotspotData];
@@ -266,12 +275,17 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     if (!hotspotData.content || hotspotData===undefined) return;
 
     // Render to viewer
-    (viewerInstanceRef.current as any)?.addHotSpot(
-      createHotspotInstance(hotspotData, handlePannellumClick)
-    );
+    if (viewerInstanceRef.current) {
+      (viewerInstanceRef.current as any).removeHotSpot(hotspotData.id);
+
+      const hotspotInstance = createHotspotInstance(hotspotData,handlePannellumClick);
+
+      (viewerInstanceRef.current as any).addHotSpot(hotspotInstance);
+    }    
+
     hotspotCounter.current++;
 
-    console.log("put hotspot in db")
+    console.log("put hotspot in viewer")
 
   }
 
@@ -342,7 +356,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   const handlePannellumClick = (event: MouseEvent, args: HotspotData) => {
     event.preventDefault();
 
-      handleHotspotClick(args);
+    handleHotspotClick(args);
   };
 
   const handleClose = () => {
@@ -379,10 +393,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
           <PiTargetBold />
         </div>
       )}
-      <HotspotManager viewer={viewerInstanceRef.current} 
-                      viewerElement={viewerRef.current} 
-                      onHotspotClick={handleHotspotClick} 
-      />
       {
         isEditMode &&  (editingPannelState?.isOpen ) && (
           <EditionPannel  hotspot = {selectedHotspot} 

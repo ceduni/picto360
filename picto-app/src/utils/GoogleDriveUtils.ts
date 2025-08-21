@@ -1,3 +1,5 @@
+import { HotspotData } from "@/components/HotspotManager";
+
  class GoogleDriveService {
   private baseUrl: string;
   private accessToken: string | null = null;
@@ -77,7 +79,7 @@
   // Export to Google Drive via backend
   async exportToGoogleDrive(
     imageBlob: Blob,
-    // annotations: HotspotData[],
+    annotations: HotspotData[],
     options: {
       imageName?: string;
       folderName?: string;
@@ -91,7 +93,7 @@
       const formData = new FormData();
       formData.append("file", new File([imageBlob], options.imageName || "panorama.jpg", 
                       { type: imageBlob.type || "image/jpeg" }));
-      // formData.append('annotations', JSON.stringify(annotations));
+      formData.append('annotations', JSON.stringify(annotations));
       
       if (options.imageName) {
         formData.append('imageName', options.imageName);
@@ -101,7 +103,7 @@
       }
       formData.append('includeMetadata', String(options.includeMetadata ?? true));
 
-      console.log("Request Body: ", formData);
+      console.log("Request Body: ", JSON.stringify(formData));
 
       const response = await fetch(`${this.baseUrl}/api/drive/export`, {
         method: 'POST',

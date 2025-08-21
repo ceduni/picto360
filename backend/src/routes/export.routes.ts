@@ -24,28 +24,40 @@ export default async function exportRoutes(app: FastifyInstance) {
         if (!data) {
             return reply.status(400).send({ error: `Image file required: ${data}` });
         }
-
-        // for await (const part of request.parts()) {
-        //   if (part.type === "file") {
-        //     console.log({ name: part.fieldname, filename: part.filename }, "got file");
-        //   } else {
-        //     console.log({ name: part.fieldname, value: part.value }, "got field");
-        //   }
-        // }        
-        // return reply.send("ok");
         
         // Get form fields
         const imageBuffer = await data.toBuffer();
         // typed view of fields: key -> MultipartValue[] (or undefined)
-        const fields = data.fields as Record<string, MultipartValue[] | undefined>;
+        const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
 
         const formFields = Object.fromEntries(
-          Object.entries(fields).map(([key, arr]) => [key, arr?.[0]?.value])
+            Object.entries(fields).map(([key, field]) => {
+              if (!field) return [key, undefined];
+
+              // Case: single object
+              if (!Array.isArray(field)) {
+                return [key, field.value?.toString()];
+              }
+
+              // Case: array of values (multiple form entries with same name)
+              return [key, field[0]?.value?.toString()];
+            })
+
         );
 
-        const annotations: HotspotData[] = formFields.annotations 
-            ? JSON.parse(formFields.annotations as string) 
-            : [];
+        let annotations: HotspotData[] = [];
+        if (formFields.annotations) {
+          try {
+            annotations = JSON.parse(formFields.annotations);
+          } catch (err) {
+            console.error("❌ Failed to parse annotations:", formFields.annotations, err);
+          }
+        }             
+
+
+        if(annotations.length<=0){
+          return reply.code(400).send(`Error: The annotations array is empty : ${JSON.stringify(annotations)}`)
+        }
 
         const options = {
             imageName: formFields.imageName as string || undefined,

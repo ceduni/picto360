@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect} from "react";
+import React, { useRef, useEffect} from "react";
 // import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import "./css/HotspotManager.css";
 // import { createHotspotInstance, extractYouTubeVideoIdFromUrl, parseGiphyUrlToDirectGif, renderTooltipContent } from "@/utils/HotspotUtils";
@@ -33,17 +33,17 @@ const LABEL_HYPERLINK_CHAR_LIMIT = 30;
 
 const HotspotManager: React.FC<HotspotManagerProps> = ({ viewer, viewerElement ,onHotspotClick}) => {
   const debugMode = useRef(true);
-  const hotspotCounter = useRef(0); 
+  // const hotspotCounter = useRef(0); 
 
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const debugLog = useCallback((...args: any[]) => {
-    if (debugMode.current) console.log("HotspotManager - [Debug]", ...args);
-  }, []);
+  // const debugLog = useCallback((...args: any[]) => {
+  //   if (debugMode.current) console.log("HotspotManager - [Debug]", ...args);
+  // }, []);
 
-  const pannellumClickHandler = (event: MouseEvent, args: HotspotData) => {
-    onHotspotClick(args);
-  };
+  // const pannellumClickHandler = (event: MouseEvent, args: HotspotData) => {
+  //   onHotspotClick(args);
+  // };
 
 
   // const addHotspotToViewer = useCallback(
