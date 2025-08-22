@@ -3,7 +3,7 @@ picto-app/public/images/Manhattan.jpg
 # Node dependencies
 node_modules/
 
-.vite-cache
+.vite-cache/
 
 # Environment variables
 .env
