@@ -99,7 +99,7 @@ function objectWithoutProperties(obj, exclude) {
   for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k) && exclude.indexOf(k) === -1) target[k] = obj[k];
   return target;
 }
-var ReactSwitch = function(Component2) {
+var ReactSwitch = (function(Component2) {
   function ReactSwitch2(props) {
     Component2.call(this, props);
     var height = props.height;
@@ -446,7 +446,7 @@ var ReactSwitch = function(Component2) {
     })));
   };
   return ReactSwitch2;
-}(import_react.Component);
+})(import_react.Component);
 ReactSwitch.propTypes = {
   checked: import_prop_types.default.bool.isRequired,
   onChange: import_prop_types.default.func.isRequired,

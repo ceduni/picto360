@@ -1,32 +1,36 @@
-import { Box, Fade, IconButton, Modal, Typography } from "@mui/material"
+import { Box, CircularProgress, Fade, IconButton, Modal, Typography } from "@mui/material"
 import {
   Cancel as CancelIcon,
 } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
-import "./ExportPopupWindow.css"
+import "@components/css/ExportPopupWindow.css"
 import { FaGoogleDrive } from "react-icons/fa";
 import { IoFileTrayFull } from "react-icons/io5";
-import { getGoogleDriveService } from "@/utils/GoogleDriveUtils";
-import { HotspotData } from "../HotspotManager";
+import { getExportService } from "@/utils/ExportFileUtils";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { PiExportBold } from "react-icons/pi";
-import { getAnnotations, getBlob } from "@/utils/storedImageData";
-import { blob } from "stream/consumers";
+import { getViewerItem } from "@/utils/storedImageData";
 
 interface ExportPopupProps {
     isOpen:boolean;
     setIsPopupOpen:React.Dispatch<React.SetStateAction<boolean>>;
     viewerId?:string;
     authStatus:string|null;
+    titleState:{
+        projectTitle:string,
+        setProjectTitle: (e:React.ChangeEvent<HTMLInputElement>)=>void,
+        saveProjectTitleToDB:()=>void
+    }
 }
 
-const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, authStatus}) => {
+const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, authStatus, titleState}) => {
     const { startDriveAuth } = useDriveAuth();
-    const [driveService] = useState(getGoogleDriveService()); // for file export
+    const driveService = getExportService(); // for file export
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [exportStatus, setExportStatus] = useState<string>('');
+    const [showWessage,setShowMessage] = useState(false);
 
     const handlePopupClose = () =>{
         setIsPopupOpen(false);
@@ -46,15 +50,14 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             setIsAuthenticated(true);
             setIsPopupOpen(true);
         }
-        
-        
     },[authStatus]);
 
-    // useEffect(()=>{
-    //     if(isOpen){
-    //         setIsAuthenticated(false);
-    //     }
-    // },[isOpen])
+    useEffect(()=>{
+        if (exportStatus) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    },[exportStatus])
 
 
     const handleAuthenticate = async () => {
@@ -66,17 +69,15 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         }
     };
 
-    const handleExport = async () => {
+    const handleExportToDrive = async () => {
         // Get your app's current image and annotations
         if (!viewerId) return null;
-        const imageBlob = await getBlob(viewerId); 
-        const annotations = await getAnnotations(viewerId);
-        
-        // const annotations = getCurrentAnnotations(); // Implement this
-        
-        console.log("Strarting export ...")
-        
-        // if (!imageBlob || !annotations) {
+        const viewerItem = await getViewerItem(viewerId);
+
+        const imageBlob = viewerItem?.blob; 
+        const annotations = viewerItem?.annotations;
+        const fileName = viewerItem?.name;
+                        
         if (!imageBlob || imageBlob === undefined) {
             setExportStatus('Please select an image and add annotations');
             console.log(exportStatus);
@@ -86,7 +87,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
         setIsExporting(true);
         setExportStatus('Exporting to Google Drive...');
-        console.log("Exporting to Google Drive...");
 
         try {
             const result = await driveService.exportToGoogleDrive(
@@ -94,15 +94,16 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 annotations || [],
                 {
                     imageName: 'my_360_image',
-                    folderName: '360° Annotations',
+                    folderName: fileName || 'Picto360° Annotations',
                     includeMetadata: true
                 }
             );
 
-            setExportStatus(`Export successful! View files: ${result.driveUrl}`);
             if (result.success) {
-                console.log(`Export successful! View files: ${result.driveUrl}`);
+                setExportStatus("Export successful! \n"  +`View files: ${result.driveUrl}`);
             } else {
+                const {logoutFromDrive} = useDriveAuth();
+                logoutFromDrive();
                 console.log(result.error);
                 throw new Error(result.error);
             }
@@ -114,81 +115,150 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         }
     };
 
-    const handleSignOut = () => {
-        driveService.signOut();
-        setIsAuthenticated(false);
-        setExportStatus('Signed out from Google Drive');
-    };
+    const handleExportToDisk = async()=>{
+        // Get your app's current image and annotations
+        if (!viewerId) return null;
+        const viewerItem = await getViewerItem(viewerId);
 
-    // // Placeholder functions - implement based on your app
-    // const getCurrentImageBlob = (): Blob | null => {
-    //     // Return current 360° image as Blob
+        const imageBlob = viewerItem?.blob; 
+        const annotations = viewerItem?.annotations;
+        const fileName = viewerItem?.name || "Untitled";
+                        
+        if (!imageBlob || imageBlob === undefined) {
+            setExportStatus('Please select an image');
+            console.log(exportStatus);
+            return null;
+        }
 
-    //     if (!blob  || blob === undefined) {
-    //         return null;
-    //     }
-    //     return blob;
-    // };
 
+        setIsExporting(true);
+        setExportStatus('Exporting to Disk...');
+        console.log("Exporting to Disk...");
 
-    const getCurrentAnnotations = (): HotspotData[] => {
-        // Return current annotations
-        return [];
-    };
+        try{
+            await driveService.exportFileToDisk(imageBlob,fileName);
+            setTimeout(()=>{},1000)
+
+        } catch (error) {
+            setExportStatus(`Export failed: ${error}`);
+        } finally {
+            setIsExporting(false);
+        }        
+    }
+
     
     return (
-        <Modal open={isOpen} onClose={handlePopupClose} closeAfterTransition>
+        <Modal open={isOpen} onClose={handlePopupClose} closeAfterTransition >
             <Fade in={isOpen}>
-            <Box
-                sx={{
+            <div className="popup-export-content"
+                style={{
                 position: "absolute",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 400,
-                bgcolor: "background.paper",
-                boxShadow: 24,
-                p: 4,
-                borderRadius: 2,
-                }}
-            >
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <IconButton onClick={handlePopupClose}>
-                    <CancelIcon sx={{ color: "#282828", "&:hover": { color: "red" } }} />
-                </IconButton>
-                </Box>
+                background: "white",
+                padding: "16px",
+                borderRadius: "8px",
+                outline: "none",       // remove focus ring
+                alignContent:"center",
+                width:400,
+            }}>
+                <div className="popup_window-header">
+                    <p className="popup_window-title">
+                        {isAuthenticated ? 
+                        "Confirmer l'export"
+                        :
+                        "Exporter vers"
+                        }
+                    </p>
+
+                    <IconButton onClick={handlePopupClose}>
+                        <CancelIcon sx={{ color: "#282828", "&:hover": { color: "red" } }} />
+                    </IconButton>
+                </div>
                 {isAuthenticated ?
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <Typography variant="h6" component="h2" sx={{ marginBottom: "1rem" }}>
-                        Confirmer l'export
-                    </Typography>
-                    <input
-                        type="text"/>
+                <div className="popup-export-main-content">
+                    <div className="popup-field-container">
+                        <input type="text" 
+                                maxLength={20}
+                                value={titleState.projectTitle}
+                                onChange={(e)=>{titleState.setProjectTitle(e)}}
+                                placeholder="Titre du fichier" 
+                                className="popup-text-field"
+                                onBlur={titleState.saveProjectTitleToDB}
+                                onKeyDown={(event:React.KeyboardEvent<HTMLInputElement>)=>{
+                                    if(event.key==="Enter"){
+                                        event.preventDefault(); // avoid submitting forms
+                                        titleState.saveProjectTitleToDB()
+                                        event.currentTarget.blur();                                        
+                                    }
+                                    }
+                                }
+                                />
+                        <p>.picto</p>
+                    </div>
+                    { showWessage &&
+                        <div className="popup-message">
+                            <p className="popup-message-text">{exportStatus}</p>
+                        </div>
+                    }
                     <div className="export_options">
-                        <div className="export-single_options" onClick={handleExport}>
-                            <PiExportBold size={20}/>
-                            <p>Exporter</p>
+                        <button type="button" 
+                                className="export-single_options" 
+                                onClick={()=>{
+                                    handleExportToDrive();
+                                    setIsPopupOpen(false);
+                                }}
+                                disabled= {isExporting}>
+                                <PiExportBold size={20}/>
+                            {
+                                isExporting ?
+                                <CircularProgress/>
+                                :
+                                <p>Exporter</p>                                
+                            }
+
+                        </button>
+                        <div  >
+
                         </div>
                     </div>
-                </Box>                    
+                </div>                    
                 :
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <Typography variant="h6" component="h2" sx={{ marginBottom: "1rem" }}>
-                        Exporter vers
-                    </Typography>
+                <div className="popup-export-content">
+                    { showWessage &&
+                        <div className="popup-message">
+                            <p className="popup-message-text">{exportStatus}</p>
+                        </div>
+                    }
                     <div className="export_options">
-                        <div className="export-single_options" onClick={handleAuthenticate}>
+                        <button type="button" 
+                                className="export-single_options" 
+                                onClick={handleAuthenticate}
+                                disabled={isExporting}>
                             <FaGoogleDrive size={20}/>
                             <p>Google Drive</p>
-                        </div>
-                        <div className="export-single_options">
+                        </button>
+                        <button type="button" 
+                                className="export-single_options"
+                                disabled={isExporting}
+                                onClick={()=>{
+                                    handleExportToDisk();
+                                    setIsPopupOpen(false);
+                                }}                                
+                                >
                             <IoFileTrayFull size={20}/>
-                            <p>Ordinateur</p>
-                        </div>
+                            {
+                                isExporting ?
+                                <CircularProgress/>
+                                :
+                                <p>Ordinateur</p>
+                            }                            
+                        </button>
                     </div>
-                </Box>
+                </div>
                 }
-            </Box>
+            </div>
             </Fade>
         </Modal>
     )

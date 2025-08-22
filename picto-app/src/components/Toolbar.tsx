@@ -13,6 +13,7 @@ import {
   Settings as SettingsIcon,
   FileUpload as ExportIcon,
   Done as CheckIcon,
+  LogoutOutlined,
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "/images/logo_picto360.png";
@@ -21,6 +22,8 @@ import "./css/Toolbar.css";
 import { useNavigate } from "react-router-dom";
 import ExportPopupWindow from "./ui/ExportPopupWindow";
 import SharePopupWindow from "./ui/SharePopupWindow";
+import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
+import { useDriveAuth } from "@/hooks/useDriveAuth";
 
 interface ToolbarProps {
   isEditMode: boolean;
@@ -33,30 +36,40 @@ const CHARACTER_LIMIT = 20;
 
 const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,authStatus}) => {
 
-  const [projectTitle, setProjectTitle] = useState("Untitled"); //TODO: manage project uniqueness in DB
-  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
+  const [projectTitle, setProjectTitle] = useState(""); //TODO: manage project uniqueness in DB
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [showExportOptions, setShowExportOptions] = useState(false);
   const projectTitleRef = useRef<HTMLDivElement>(null);
 
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const [titleWidth, setTitleWidth] = useState(1);
+
+  const {checkDriveAuth,logoutFromDrive} = useDriveAuth()
+
+  useEffect(() => {
+    if (spanRef.current) {
+      projectTitle.length>"Untitled".length ? 
+        setTitleWidth(spanRef.current.offsetWidth + 5)
+      :
+        setTitleWidth("Untitled".length + 5)
+      ; 
+    }
+  }, [projectTitle]);
+
   // Change the project title
-  const handleTitleChange = useCallback(() => {
-    if (projectTitleRef.current) {
-      const newTitle = projectTitleRef.current.innerText.trim().slice(0, CHARACTER_LIMIT);
-      const selection = window.getSelection();
-      const anchorOffset = selection?.anchorOffset ?? 0;
+  const handleTitleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
 
       setProjectTitle(newTitle);
-      setCursorPosition(Math.min(anchorOffset, CHARACTER_LIMIT));
       setWarningMessage(
         newTitle.length === CHARACTER_LIMIT
           ? `ATTENTION: Le titre ne doit pas dépasser ${CHARACTER_LIMIT} caractères.`
           : null
       );
-    }
-  }, []);
+
+  };
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (
@@ -64,25 +77,17 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
       projectTitleRef.current.innerText.trim().length >= CHARACTER_LIMIT &&
       !event.ctrlKey &&
       !event.metaKey &&
-      !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(event.key)
+      !["Backspace", "Delete", "ArrowLeft", "ArrowRight" ].includes(event.key)
     ) {
       event.preventDefault();
     }
-  }, []);
 
-  const handlePaste = useCallback(
-    (event: React.ClipboardEvent<HTMLDivElement>) => {
+    if(event.key==="Enter"){
       event.preventDefault();
-      if (projectTitleRef.current) {
-        const pastedText = event.clipboardData.getData("text/plain");
-        const availableSpace = CHARACTER_LIMIT - projectTitleRef.current.innerText.length;
-        const textToInsert = pastedText.slice(0, availableSpace);
-        document.execCommand("insertText", false, textToInsert); //TODO: replace deprecated method
-        handleTitleChange();
-      }
-    },
-    [handleTitleChange]
-  );
+      saveProjectTitleToDB();
+      event.currentTarget.blur()
+    }
+  }, []);
 
   const handleSave = useCallback(() => {
     if (isEditMode) {
@@ -96,22 +101,28 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
     toggleEditMode();
   }, [toggleEditMode]);
 
-
-  useEffect(() => {
-    if (projectTitleRef.current) {
-      projectTitleRef.current.innerText = projectTitle;
-      if (cursorPosition !== null) {
-        const range = document.createRange();
-        const selection = window.getSelection();
-        if (projectTitleRef.current.firstChild) {
-          range.setStart(projectTitleRef.current.firstChild, Math.min(cursorPosition, projectTitle.length));
-          range.collapse(true);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-        }
-      }
+  
+  const getViewerFromDB = async()=> {
+    if(viewerId === "null" || !viewerId ){
+        navigate("/", {replace : true});
+        return;
     }
-  }, [projectTitle, cursorPosition]);
+    const viewerItem = await getViewerItem(viewerId);
+
+    const name = viewerItem?.name;
+    if(name) {
+      setProjectTitle(name)
+    };
+  }
+
+  const saveProjectTitleToDB = async () =>{
+    if(viewerId === "null" || !viewerId ){
+        return;
+    }
+      await putViewerItem(viewerId,projectTitle);
+  }
+
+
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -126,11 +137,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleSave, isEditMode]);
-
-  const titleHoverVariants = {
-    idle: { scale: 1 },
-    hover: { scale: 1.025, transition: { duration: 0.25 } },
-  };
 
   const navigate = useNavigate();
   const redirectHomePage = useCallback(() =>
@@ -149,38 +155,50 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
         ease: "easeInOut",
         duration: 0.5,
       }}
+      onLoad={getViewerFromDB}
     >
-      <AppBar position="static" className="toolbar" style={{ backgroundColor: "transparent" }}>
-        <MUIToolbar disableGutters className="toolbar__content">
+      <AppBar position="static" className="toolbar" 
+              style={{ backgroundColor: "transparent" }}
+              >
+        <MUIToolbar disableGutters className="toolbar__content" >
           <Box className="toolbar__left">
             
             <img src={logo} alt="Picto360 Logo" className="toolbar__logo" onClick={redirectHomePage} />
 
             <Box className="toolbar__title-container" style={{ minHeight: warningMessage ? "65px" : "55px" }}>
               <Box className="toolbar__title-input-wrapper">
-                <motion.div
-                  ref={projectTitleRef}
-                  contentEditable={isEditMode}
-                  onInput={isEditMode ? handleTitleChange : undefined}
-                  onBlur={isEditMode ? handleTitleChange : undefined}
-                  onKeyDown={isEditMode ? handleKeyDown : undefined}
-                  onPaste={isEditMode ? handlePaste : undefined}
-                  onCut={isEditMode ? (e) => e.preventDefault() : undefined}
-                  className={`toolbar__title-input ${isEditMode ? "toolbar__title-input--editable" : ""}`}
+                  {/* Invisible span to measure text */}
+                <span
+                  ref={spanRef}
                   style={{
-                    minWidth: "auto",
-                    display: "inline-block",
-                    outline: "none",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    cursor: isEditMode ? "text" : "default",
+                    position: "absolute",
+                    visibility: "hidden",
+                    whiteSpace: "pre", // preserve spaces
+                    fontSize: "16px",
+                    fontFamily: "inherit",
                   }}
-                  variants={titleHoverVariants}
-                  initial="idle"
-                  whileHover={isEditMode ? "hover" : "idle"}
                 >
-                  {projectTitle}
-                </motion.div>
+                  {projectTitle || " "} {/* add placeholder space for empty input */}
+                </span>
+                <input type="text" 
+                        maxLength={CHARACTER_LIMIT}
+                        value={projectTitle}
+                        onChange={(e)=>{
+                          handleTitleChange(e)
+                        }}
+                        onBlur={()=>{
+                            saveProjectTitleToDB()
+                          }
+                        }
+                        onKeyDown={handleKeyDown}
+                        disabled={!isEditMode}
+                        className={`toolbar__title-input ${isEditMode ? "toolbar__title-input_editable" : ""}`}
+                        placeholder="Untitled"
+                        style={{
+                          width:`${titleWidth}px`,
+                          cursor: isEditMode ? "text" : "default",
+                        }}
+                        />
                 <Typography variant="body2" className="toolbar__title-extension">
                   .picto
                 </Typography>
@@ -255,12 +273,12 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                 },
               }}
             >
-            <IconButton onClick={()=>{ console.log("Auth stat :" , authStatus===null); setShowExportOptions(true)}} className="toolbar__icon-button">
+            <IconButton onClick={()=>{setShowExportOptions(true)}} className="toolbar__icon-button">
               <ExportIcon />
             </IconButton>
             </Tooltip>
 
-            <Tooltip
+            {/* <Tooltip
               title="Partager"
               slotProps={{
                 popper: {
@@ -275,10 +293,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                 },
               }}
             >
-              <IconButton onClick={()=>{console.log("Clicked"); setShowShareOptions(true)}} className="toolbar__icon-button">
+              <IconButton onClick={()=>{ setShowShareOptions(true)}} className="toolbar__icon-button">
                 <ShareIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
+
             <Tooltip
               title="Paramètres"
               slotProps={{
@@ -298,6 +317,32 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
+            {
+              authStatus &&
+            <Tooltip
+              title="Déconnexion"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton className="toolbar__icon-button" onClick={async()=>{
+                  await logoutFromDrive();
+                  await checkDriveAuth();
+                  window.location.reload()
+                }}>
+                <LogoutOutlined />
+              </IconButton>
+            </Tooltip>
+            }
           </Box>
         </MUIToolbar>
 
@@ -306,7 +351,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
         <ExportPopupWindow  isOpen={showExportOptions} 
                             setIsPopupOpen={setShowExportOptions} 
                             viewerId = {viewerId}
-                            authStatus = {authStatus}/>
+                            authStatus = {authStatus}
+                            titleState = {{projectTitle,setProjectTitle: handleTitleChange,saveProjectTitleToDB}}/>
       </AppBar>
     </motion.div>
   );

@@ -164,7 +164,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerHls' */
-        "./react-CTPHTRKF.js"
+        "./react-2ZT2G6FQ.js"
       )
     )
   },
@@ -176,7 +176,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerDash' */
-        "./react-UWHLEQ7J.js"
+        "./react-QP2GB75S.js"
       )
     )
   },
@@ -188,7 +188,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerMux' */
-        "./dist-AQWEVF4U.js"
+        "./dist-EOAVDDQR.js"
       )
     )
   },
@@ -210,7 +210,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerVimeo' */
-        "./react-HVY3J7SE.js"
+        "./react-JVDOYN6W.js"
       )
     )
   },

@@ -85,5 +85,44 @@ export default async function oauthRoutes(app: FastifyInstance) {
       reply.redirect(`http://localhost:3000/?auth=error&message=oauth_failed`)
     }
   });
+
+  app.get("/api/auth-status",async(request:FastifyRequest,reply:FastifyReply)=>{
+    try{
+      const driveService = getGoogleDriveService();
+      const token = await driveService.ensureAccessToken(request);
+      reply.code(200).send({authStatus:"success"})
+    }catch(error){
+      reply.code(500).send(`Error on auth status load ${error}`)
+    }
+  })
+
+  app.post("/api/auth/logout", async (req, reply) => {
+    if (!req.session.google?.access_token && !req.session.google?.refresh_token) {
+      return reply.code(401).send("Not authenticated with Google");
+    }
+    try{    
+      // To revoke Google's token first
+      const driveService = getGoogleDriveService();
+      const g = req.session.google;
+
+      if (g?.refresh_token) {
+        await driveService.revokeGoogleToken(g.refresh_token);
+      } else if (g?.access_token) {
+        await driveService.revokeGoogleToken(g.access_token);
+      }
+
+      delete req.session.google;
+      delete req.session.oauth; // if you stored a nonce
+      await req.session.save?.();  // optional
+
+      // destroy the whole session (cookie invalidation)
+      await req.session.destroy();
+
+      return reply.send({ ok: true });
+    }catch(error){
+      return reply.code(500).send(`Error on Drive logout ${error}`);
+    }
+  });
+
 }
 

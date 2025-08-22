@@ -50,7 +50,7 @@ import {
   useForkRef_default,
   useId_default,
   useTheme
-} from "./chunk-3TCWFMBI.js";
+} from "./chunk-PS4O2WUS.js";
 import {
   ClassNameGenerator_default,
   HTMLElementType,
@@ -124,7 +124,7 @@ import {
   useThemeProps,
   useTimeout,
   visuallyHidden_default
-} from "./chunk-T3DLY4BJ.js";
+} from "./chunk-HYTCD5VM.js";
 import {
   require_prop_types
 } from "./chunk-5RER3LIT.js";
@@ -873,7 +873,7 @@ var EXITED = "exited";
 var ENTERING = "entering";
 var ENTERED = "entered";
 var EXITING = "exiting";
-var Transition = function(_React$Component) {
+var Transition = (function(_React$Component) {
   _inheritsLoose(Transition2, _React$Component);
   function Transition2(props, context) {
     var _this;
@@ -1081,7 +1081,7 @@ var Transition = function(_React$Component) {
     );
   };
   return Transition2;
-}(import_react2.default.Component);
+})(import_react2.default.Component);
 Transition.contextType = TransitionGroupContext_default;
 Transition.propTypes = true ? {
   /**
@@ -1287,7 +1287,7 @@ var removeClass2 = function removeClass3(node, classes) {
     return removeClass(node, c);
   });
 };
-var CSSTransition = function(_React$Component) {
+var CSSTransition = (function(_React$Component) {
   _inheritsLoose2(CSSTransition2, _React$Component);
   function CSSTransition2() {
     var _this;
@@ -1407,7 +1407,7 @@ var CSSTransition = function(_React$Component) {
     }));
   };
   return CSSTransition2;
-}(import_react3.default.Component);
+})(import_react3.default.Component);
 CSSTransition.defaultProps = {
   classNames: ""
 };
@@ -1658,7 +1658,7 @@ var defaultProps = {
     return child;
   }
 };
-var TransitionGroup = function(_React$Component) {
+var TransitionGroup = (function(_React$Component) {
   _inheritsLoose3(TransitionGroup2, _React$Component);
   function TransitionGroup2(props, context) {
     var _this;
@@ -1725,7 +1725,7 @@ var TransitionGroup = function(_React$Component) {
     }, import_react5.default.createElement(Component, props, children2));
   };
   return TransitionGroup2;
-}(import_react5.default.Component);
+})(import_react5.default.Component);
 TransitionGroup.propTypes = true ? {
   /**
    * `<TransitionGroup>` renders a `<div>` by default. You can change this
@@ -1783,7 +1783,7 @@ TransitionGroup.defaultProps = defaultProps;
 var TransitionGroup_default = TransitionGroup;
 
 // node_modules/react-transition-group/esm/ReplaceTransition.js
-var ReplaceTransition = function(_React$Component) {
+var ReplaceTransition = (function(_React$Component) {
   _inheritsLoose4(ReplaceTransition2, _React$Component);
   function ReplaceTransition2() {
     var _this;
@@ -1862,7 +1862,7 @@ var ReplaceTransition = function(_React$Component) {
     }));
   };
   return ReplaceTransition2;
-}(import_react6.default.Component);
+})(import_react6.default.Component);
 ReplaceTransition.propTypes = true ? {
   in: import_prop_types5.default.bool.isRequired,
   children: function children(props, propName) {
@@ -1935,7 +1935,7 @@ var enterRenders = (_enterRenders = {}, _enterRenders[modes.out] = function(_ref
     in: true
   })];
 }, _enterRenders);
-var SwitchTransition = function(_React$Component) {
+var SwitchTransition = (function(_React$Component) {
   _inheritsLoose5(SwitchTransition2, _React$Component);
   function SwitchTransition2() {
     var _this;
@@ -2011,7 +2011,7 @@ var SwitchTransition = function(_React$Component) {
     }, component);
   };
   return SwitchTransition2;
-}(import_react7.default.Component);
+})(import_react7.default.Component);
 SwitchTransition.propTypes = true ? {
   /**
    * Transition modes.

@@ -1489,7 +1489,7 @@ var E = async ({ elementReference: e2 = null, tooltipReference: t2 = null, toolt
   if (!e2) return { tooltipStyles: {}, tooltipArrowStyles: {}, place: l2 };
   if (null === t2) return { tooltipStyles: {}, tooltipArrowStyles: {}, place: l2 };
   const a2 = i2;
-  return o2 ? (a2.push(arrow2({ element: o2, padding: 5 })), computePosition2(e2, t2, { placement: l2, strategy: n2, middleware: a2 }).then(({ x: e3, y: t3, placement: o3, middlewareData: l3 }) => {
+  return o2 ? (a2.push(arrow2({ element: o2, padding: 5 })), computePosition2(e2, t2, { placement: l2, strategy: n2, middleware: a2 }).then((({ x: e3, y: t3, placement: o3, middlewareData: l3 }) => {
     var r3, n3;
     const i3 = { left: `${e3}px`, top: `${t3}px`, border: c2 }, { x: a3, y: u } = null !== (r3 = l3.arrow) && void 0 !== r3 ? r3 : { x: 0, y: 0 }, d = null !== (n3 = { top: "bottom", right: "left", bottom: "top", left: "right" }[o3.split("-")[0]]) && void 0 !== n3 ? n3 : "bottom", p = c2 && { borderBottom: c2, borderRight: c2 };
     let v = 0;
@@ -1498,7 +1498,7 @@ var E = async ({ elementReference: e2 = null, tooltipReference: t2 = null, toolt
       v = (null == e4 ? void 0 : e4[1]) ? Number(e4[1]) : 1;
     }
     return { tooltipStyles: i3, tooltipArrowStyles: { left: null != a3 ? `${a3}px` : "", top: null != u ? `${u}px` : "", right: "", bottom: "", ...p, [d]: `-${s2 / 2 + v}px` }, place: o3 };
-  })) : computePosition2(e2, t2, { placement: "bottom", strategy: n2, middleware: a2 }).then(({ x: e3, y: t3, placement: o3 }) => ({ tooltipStyles: { left: `${e3}px`, top: `${t3}px` }, tooltipArrowStyles: {}, place: o3 }));
+  }))) : computePosition2(e2, t2, { placement: "bottom", strategy: n2, middleware: a2 }).then((({ x: e3, y: t3, placement: o3 }) => ({ tooltipStyles: { left: `${e3}px`, top: `${t3}px` }, tooltipArrowStyles: {}, place: o3 })));
 };
 var A = (e2, t2) => !("CSS" in window && "supports" in window.CSS) || window.CSS.supports(e2, t2);
 var _ = (e2, t2, o2) => {
@@ -1516,19 +1516,19 @@ var _ = (e2, t2, o2) => {
 var O = (e2) => null !== e2 && !Array.isArray(e2) && "object" == typeof e2;
 var k = (e2, t2) => {
   if (e2 === t2) return true;
-  if (Array.isArray(e2) && Array.isArray(t2)) return e2.length === t2.length && e2.every((e3, o3) => k(e3, t2[o3]));
+  if (Array.isArray(e2) && Array.isArray(t2)) return e2.length === t2.length && e2.every(((e3, o3) => k(e3, t2[o3])));
   if (Array.isArray(e2) !== Array.isArray(t2)) return false;
   if (!O(e2) || !O(t2)) return e2 === t2;
   const o2 = Object.keys(e2), l2 = Object.keys(t2);
-  return o2.length === l2.length && o2.every((o3) => k(e2[o3], t2[o3]));
+  return o2.length === l2.length && o2.every(((o3) => k(e2[o3], t2[o3])));
 };
 var T = (e2) => {
   if (!(e2 instanceof HTMLElement || e2 instanceof SVGElement)) return false;
   const t2 = getComputedStyle(e2);
-  return ["overflow", "overflow-x", "overflow-y"].some((e3) => {
+  return ["overflow", "overflow-x", "overflow-y"].some(((e3) => {
     const o2 = t2.getPropertyValue(e3);
     return "auto" === o2 || "scroll" === o2;
-  });
+  }));
 };
 var L = (e2) => {
   if (!e2) return null;
@@ -1551,25 +1551,25 @@ var N = { anchorRefs: /* @__PURE__ */ new Set(), activeAnchor: { current: null }
 var $ = (0, import_react.createContext)({ getTooltipData: () => N });
 var I = ({ children: t2 }) => {
   const [o2, l2] = (0, import_react.useState)({ [x]: /* @__PURE__ */ new Set() }), [c2, s2] = (0, import_react.useState)({ [x]: { current: null } }), a2 = (e2, ...t3) => {
-    l2((o3) => {
+    l2(((o3) => {
       var l3;
       const r2 = null !== (l3 = o3[e2]) && void 0 !== l3 ? l3 : /* @__PURE__ */ new Set();
-      return t3.forEach((e3) => r2.add(e3)), { ...o3, [e2]: new Set(r2) };
-    });
+      return t3.forEach(((e3) => r2.add(e3))), { ...o3, [e2]: new Set(r2) };
+    }));
   }, u = (e2, ...t3) => {
-    l2((o3) => {
+    l2(((o3) => {
       const l3 = o3[e2];
-      return l3 ? (t3.forEach((e3) => l3.delete(e3)), { ...o3 }) : o3;
-    });
-  }, d = (0, import_react.useCallback)((e2 = x) => {
+      return l3 ? (t3.forEach(((e3) => l3.delete(e3))), { ...o3 }) : o3;
+    }));
+  }, d = (0, import_react.useCallback)(((e2 = x) => {
     var t3, l3;
     return { anchorRefs: null !== (t3 = o2[e2]) && void 0 !== t3 ? t3 : /* @__PURE__ */ new Set(), activeAnchor: null !== (l3 = c2[e2]) && void 0 !== l3 ? l3 : { current: null }, attach: (...t4) => a2(e2, ...t4), detach: (...t4) => u(e2, ...t4), setActiveAnchor: (t4) => ((e3, t5) => {
-      s2((o3) => {
+      s2(((o3) => {
         var l4;
         return (null === (l4 = o3[e3]) || void 0 === l4 ? void 0 : l4.current) === t5.current ? o3 : { ...o3, [e3]: t5 };
-      });
+      }));
     })(e2, t4) };
-  }, [o2, c2, a2, u]), p = (0, import_react.useMemo)(() => ({ getTooltipData: d }), [d]);
+  }), [o2, c2, a2, u]), p = (0, import_react.useMemo)((() => ({ getTooltipData: d })), [d]);
   return import_react.default.createElement($.Provider, { value: p }, t2);
 };
 function z(e2 = x) {
@@ -1577,9 +1577,9 @@ function z(e2 = x) {
 }
 var j = ({ tooltipId: t2, children: l2, className: r2, place: n2, content: i2, html: c2, variant: a2, offset: u, wrapper: d, events: p, positionStrategy: v, delayShow: m, delayHide: f }) => {
   const { attach: h2, detach: w2 } = z(t2), b2 = (0, import_react.useRef)(null);
-  return (0, import_react.useEffect)(() => (h2(b2), () => {
+  return (0, import_react.useEffect)((() => (h2(b2), () => {
     w2(b2);
-  }), []), import_react.default.createElement("span", { ref: b2, className: (0, import_classnames.default)("react-tooltip-wrapper", r2), "data-tooltip-place": n2, "data-tooltip-content": i2, "data-tooltip-html": c2, "data-tooltip-variant": a2, "data-tooltip-offset": u, "data-tooltip-wrapper": d, "data-tooltip-events": p, "data-tooltip-position-strategy": v, "data-tooltip-delay-show": m, "data-tooltip-delay-hide": f }, l2);
+  })), []), import_react.default.createElement("span", { ref: b2, className: (0, import_classnames.default)("react-tooltip-wrapper", r2), "data-tooltip-place": n2, "data-tooltip-content": i2, "data-tooltip-html": c2, "data-tooltip-variant": a2, "data-tooltip-offset": u, "data-tooltip-wrapper": d, "data-tooltip-events": p, "data-tooltip-position-strategy": v, "data-tooltip-delay-show": m, "data-tooltip-delay-hide": f }, l2);
 };
 var B = { tooltip: "core-styles-module_tooltip__3vRRp", fixed: "core-styles-module_fixed__pcSol", arrow: "core-styles-module_arrow__cvMwQ", noArrow: "core-styles-module_noArrow__xock6", clickable: "core-styles-module_clickable__ZuTTB", show: "core-styles-module_show__Nt9eE", closing: "core-styles-module_closing__sGnxF" };
 var D = { tooltip: "styles-module_tooltip__mnnfp", arrow: "styles-module_arrow__K0L3T", dark: "styles-module_dark__xNqje", light: "styles-module_light__Z6W-X", success: "styles-module_success__A2AKt", warning: "styles-module_warning__SCK0X", error: "styles-module_error__JvumD", info: "styles-module_info__BWdHW" };
@@ -1590,24 +1590,24 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
   const Ne = M2 ? { ...M2 } : { mouseout: true, blur: true, mouseleave: false, click: false, dblclick: false, mouseup: false };
   !M2 && Ce && Object.assign(Ne, { mouseleave: false, blur: false, mouseout: false });
   const $e = W ? { ...W } : { escape: I2 || false, scroll: j2 || false, resize: q2 || false, clickOutsideAnchor: Re || false };
-  P && (Object.assign(xe, { mouseover: false, focus: false, mouseenter: false, click: false, dblclick: false, mousedown: false }), Object.assign(Ne, { mouseout: false, blur: false, mouseleave: false, click: false, dblclick: false, mouseup: false }), Object.assign($e, { escape: false, scroll: false, resize: false, clickOutsideAnchor: false })), C(() => (Le.current = true, () => {
+  P && (Object.assign(xe, { mouseover: false, focus: false, mouseenter: false, click: false, dblclick: false, mousedown: false }), Object.assign(Ne, { mouseout: false, blur: false, mouseleave: false, click: false, dblclick: false, mouseup: false }), Object.assign($e, { escape: false, scroll: false, resize: false, clickOutsideAnchor: false })), C((() => (Le.current = true, () => {
     Le.current = false;
-  }), []);
+  })), []);
   const Ie = (e2) => {
-    Le.current && (e2 && we(true), setTimeout(() => {
+    Le.current && (e2 && we(true), setTimeout((() => {
       Le.current && (null == Q || Q(e2), void 0 === Z && ye(e2));
-    }, 10));
+    }), 10));
   };
-  (0, import_react.useEffect)(() => {
+  (0, import_react.useEffect)((() => {
     if (void 0 === Z) return () => null;
     Z && we(true);
-    const e2 = setTimeout(() => {
+    const e2 = setTimeout((() => {
       ye(Z);
-    }, 10);
+    }), 10);
     return () => {
       clearTimeout(e2);
     };
-  }, [Z]), (0, import_react.useEffect)(() => {
+  }), [Z]), (0, import_react.useEffect)((() => {
     if (fe !== ge.current) if (R(pe), ge.current = fe, fe) null == K || K();
     else {
       const e2 = ((e3) => {
@@ -1616,21 +1616,21 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
         const [, o2, l3] = t3;
         return Number(o2) * ("ms" === l3 ? 1 : 1e3);
       })(getComputedStyle(document.body).getPropertyValue("--rt-transition-show-delay"));
-      pe.current = setTimeout(() => {
+      pe.current = setTimeout((() => {
         we(false), Se(null), null == U || U();
-      }, e2 + 25);
+      }), e2 + 25);
     }
-  }, [fe]);
+  }), [fe]);
   const ze = (e2) => {
-    me((t3) => k(t3, e2) ? t3 : e2);
+    me(((t3) => k(t3, e2) ? t3 : e2));
   }, je = (e2 = A2) => {
-    R(ue), he ? Ie(true) : ue.current = setTimeout(() => {
+    R(ue), he ? Ie(true) : ue.current = setTimeout((() => {
       Ie(true);
-    }, e2);
+    }), e2);
   }, Be = (e2 = O2) => {
-    R(de), de.current = setTimeout(() => {
+    R(de), de.current = setTimeout((() => {
       Oe.current || Ie(false);
-    }, e2);
+    }), e2);
   }, De = (e2) => {
     var t3;
     if (!e2) return;
@@ -1642,9 +1642,9 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
   }, He = ({ x: e2, y: t3 }) => {
     var o2;
     const l3 = { getBoundingClientRect: () => ({ x: e2, y: t3, width: 0, height: 0, top: t3, left: e2, right: e2, bottom: t3 }) };
-    E({ place: null !== (o2 = null == be ? void 0 : be.place) && void 0 !== o2 ? o2 : v, offset: m, elementReference: l3, tooltipReference: se.current, tooltipArrowReference: ae.current, strategy: b2, middlewares: S2, border: oe, arrowSize: ne }).then((e3) => {
+    E({ place: null !== (o2 = null == be ? void 0 : be.place) && void 0 !== o2 ? o2 : v, offset: m, elementReference: l3, tooltipReference: se.current, tooltipArrowReference: ae.current, strategy: b2, middlewares: S2, border: oe, arrowSize: ne }).then(((e3) => {
       ze(e3);
-    });
+    }));
   }, Me = (e2) => {
     if (!e2) return;
     const t3 = e2, o2 = { x: t3.clientX, y: t3.clientY };
@@ -1655,24 +1655,24 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
     const o2 = e2.target;
     if (!o2.isConnected) return;
     if (null === (t3 = se.current) || void 0 === t3 ? void 0 : t3.contains(o2)) return;
-    [document.querySelector(`[id='${d}']`), ...ke].some((e3) => null == e3 ? void 0 : e3.contains(o2)) || (Ie(false), R(ue));
+    [document.querySelector(`[id='${d}']`), ...ke].some(((e3) => null == e3 ? void 0 : e3.contains(o2))) || (Ie(false), R(ue));
   }, Pe = _(De, 50, true), Ve = _(qe, 50, true), Fe = (e2) => {
     Ve.cancel(), Pe(e2);
   }, Ke = () => {
     Pe.cancel(), Ve();
-  }, Ue = (0, import_react.useCallback)(() => {
+  }, Ue = (0, import_react.useCallback)((() => {
     var e2, t3;
     const o2 = null !== (e2 = null == be ? void 0 : be.position) && void 0 !== e2 ? e2 : F;
-    o2 ? He(o2) : T2 ? Ee.current && He(Ee.current) : (null == ee ? void 0 : ee.isConnected) && E({ place: null !== (t3 = null == be ? void 0 : be.place) && void 0 !== t3 ? t3 : v, offset: m, elementReference: ee, tooltipReference: se.current, tooltipArrowReference: ae.current, strategy: b2, middlewares: S2, border: oe, arrowSize: ne }).then((e3) => {
+    o2 ? He(o2) : T2 ? Ee.current && He(Ee.current) : (null == ee ? void 0 : ee.isConnected) && E({ place: null !== (t3 = null == be ? void 0 : be.place) && void 0 !== t3 ? t3 : v, offset: m, elementReference: ee, tooltipReference: se.current, tooltipArrowReference: ae.current, strategy: b2, middlewares: S2, border: oe, arrowSize: ne }).then(((e3) => {
       Le.current && ze(e3);
-    });
-  }, [fe, ee, Y, V, v, null == be ? void 0 : be.place, m, b2, F, null == be ? void 0 : be.position, T2, ne]);
-  (0, import_react.useEffect)(() => {
+    }));
+  }), [fe, ee, Y, V, v, null == be ? void 0 : be.place, m, b2, F, null == be ? void 0 : be.position, T2, ne]);
+  (0, import_react.useEffect)((() => {
     var e2, t3;
     const o2 = new Set(Ae);
-    ke.forEach((e3) => {
+    ke.forEach(((e3) => {
       (null == X ? void 0 : X(e3)) || o2.add({ current: e3 });
-    });
+    }));
     const l3 = document.querySelector(`[id='${d}']`);
     l3 && !(null == X ? void 0 : X(l3)) && o2.add({ current: l3 });
     const r2 = () => {
@@ -1690,80 +1690,80 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
     }, v2 = (e3) => {
       fe && u2(e3) && qe();
     }, m2 = ["mouseover", "mouseout", "mouseenter", "mouseleave", "focus", "blur"], y2 = ["click", "dblclick", "mousedown", "mouseup"];
-    Object.entries(xe).forEach(([e3, t4]) => {
+    Object.entries(xe).forEach((([e3, t4]) => {
       t4 && (m2.includes(e3) ? a2.push({ event: e3, listener: Fe }) : y2.includes(e3) && a2.push({ event: e3, listener: p2 }));
-    }), Object.entries(Ne).forEach(([e3, t4]) => {
+    })), Object.entries(Ne).forEach((([e3, t4]) => {
       t4 && (m2.includes(e3) ? a2.push({ event: e3, listener: Ke }) : y2.includes(e3) && a2.push({ event: e3, listener: v2 }));
-    }), T2 && a2.push({ event: "pointermove", listener: Me });
+    })), T2 && a2.push({ event: "pointermove", listener: Me });
     const h3 = () => {
       Oe.current = true;
     }, w3 = () => {
       Oe.current = false, qe();
     }, b3 = $2 && (Ne.mouseout || Ne.mouseleave);
-    return b3 && (null === (e2 = se.current) || void 0 === e2 || e2.addEventListener("mouseover", h3), null === (t3 = se.current) || void 0 === t3 || t3.addEventListener("mouseout", w3)), a2.forEach(({ event: e3, listener: t4 }) => {
-      o2.forEach((o3) => {
+    return b3 && (null === (e2 = se.current) || void 0 === e2 || e2.addEventListener("mouseover", h3), null === (t3 = se.current) || void 0 === t3 || t3.addEventListener("mouseout", w3)), a2.forEach((({ event: e3, listener: t4 }) => {
+      o2.forEach(((o3) => {
         var l4;
         null === (l4 = o3.current) || void 0 === l4 || l4.addEventListener(e3, t4);
-      });
-    }), () => {
+      }));
+    })), () => {
       var e3, t4;
-      $e.scroll && (window.removeEventListener("scroll", r2), null == n2 || n2.removeEventListener("scroll", r2), null == i3 || i3.removeEventListener("scroll", r2)), $e.resize ? window.removeEventListener("resize", r2) : null == c3 || c3(), $e.clickOutsideAnchor && window.removeEventListener("click", We), $e.escape && window.removeEventListener("keydown", s2), b3 && (null === (e3 = se.current) || void 0 === e3 || e3.removeEventListener("mouseover", h3), null === (t4 = se.current) || void 0 === t4 || t4.removeEventListener("mouseout", w3)), a2.forEach(({ event: e4, listener: t5 }) => {
-        o2.forEach((o3) => {
+      $e.scroll && (window.removeEventListener("scroll", r2), null == n2 || n2.removeEventListener("scroll", r2), null == i3 || i3.removeEventListener("scroll", r2)), $e.resize ? window.removeEventListener("resize", r2) : null == c3 || c3(), $e.clickOutsideAnchor && window.removeEventListener("click", We), $e.escape && window.removeEventListener("keydown", s2), b3 && (null === (e3 = se.current) || void 0 === e3 || e3.removeEventListener("mouseover", h3), null === (t4 = se.current) || void 0 === t4 || t4.removeEventListener("mouseout", w3)), a2.forEach((({ event: e4, listener: t5 }) => {
+        o2.forEach(((o3) => {
           var l4;
           null === (l4 = o3.current) || void 0 === l4 || l4.removeEventListener(e4, t5);
-        });
-      });
+        }));
+      }));
     };
-  }, [ee, Ue, he, Ae, ke, H2, M2, W, Ce, A2, O2]), (0, import_react.useEffect)(() => {
+  }), [ee, Ue, he, Ae, ke, H2, M2, W, Ce, A2, O2]), (0, import_react.useEffect)((() => {
     var e2, t3;
     let o2 = null !== (t3 = null !== (e2 = null == be ? void 0 : be.anchorSelect) && void 0 !== e2 ? e2 : p) && void 0 !== t3 ? t3 : "";
     !o2 && l2 && (o2 = `[data-tooltip-id='${l2.replace(/'/g, "\\'")}']`);
-    const r2 = new MutationObserver((e3) => {
+    const r2 = new MutationObserver(((e3) => {
       const t4 = [], r3 = [];
-      e3.forEach((e4) => {
+      e3.forEach(((e4) => {
         if ("attributes" === e4.type && "data-tooltip-id" === e4.attributeName) {
           e4.target.getAttribute("data-tooltip-id") === l2 ? t4.push(e4.target) : e4.oldValue === l2 && r3.push(e4.target);
         }
         if ("childList" === e4.type) {
           if (ee) {
-            const t5 = [...e4.removedNodes].filter((e5) => 1 === e5.nodeType);
+            const t5 = [...e4.removedNodes].filter(((e5) => 1 === e5.nodeType));
             if (o2) try {
-              r3.push(...t5.filter((e5) => e5.matches(o2))), r3.push(...t5.flatMap((e5) => [...e5.querySelectorAll(o2)]));
+              r3.push(...t5.filter(((e5) => e5.matches(o2)))), r3.push(...t5.flatMap(((e5) => [...e5.querySelectorAll(o2)])));
             } catch (e5) {
             }
-            t5.some((e5) => {
+            t5.some(((e5) => {
               var t6;
               return !!(null === (t6 = null == e5 ? void 0 : e5.contains) || void 0 === t6 ? void 0 : t6.call(e5, ee)) && (we(false), Ie(false), te(null), R(ue), R(de), true);
-            });
+            }));
           }
           if (o2) try {
-            const l3 = [...e4.addedNodes].filter((e5) => 1 === e5.nodeType);
-            t4.push(...l3.filter((e5) => e5.matches(o2))), t4.push(...l3.flatMap((e5) => [...e5.querySelectorAll(o2)]));
+            const l3 = [...e4.addedNodes].filter(((e5) => 1 === e5.nodeType));
+            t4.push(...l3.filter(((e5) => e5.matches(o2)))), t4.push(...l3.flatMap(((e5) => [...e5.querySelectorAll(o2)])));
           } catch (e5) {
           }
         }
-      }), (t4.length || r3.length) && Te((e4) => [...e4.filter((e5) => !r3.includes(e5)), ...t4]);
-    });
+      })), (t4.length || r3.length) && Te(((e4) => [...e4.filter(((e5) => !r3.includes(e5))), ...t4]));
+    }));
     return r2.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-tooltip-id"], attributeOldValue: true }), () => {
       r2.disconnect();
     };
-  }, [l2, p, null == be ? void 0 : be.anchorSelect, ee]), (0, import_react.useEffect)(() => {
+  }), [l2, p, null == be ? void 0 : be.anchorSelect, ee]), (0, import_react.useEffect)((() => {
     Ue();
-  }, [Ue]), (0, import_react.useEffect)(() => {
+  }), [Ue]), (0, import_react.useEffect)((() => {
     if (!(null == G ? void 0 : G.current)) return () => null;
-    const e2 = new ResizeObserver(() => {
-      setTimeout(() => Ue());
-    });
+    const e2 = new ResizeObserver((() => {
+      setTimeout((() => Ue()));
+    }));
     return e2.observe(G.current), () => {
       e2.disconnect();
     };
-  }, [Y, null == G ? void 0 : G.current]), (0, import_react.useEffect)(() => {
+  }), [Y, null == G ? void 0 : G.current]), (0, import_react.useEffect)((() => {
     var e2;
     const t3 = document.querySelector(`[id='${d}']`), o2 = [...ke, t3];
     ee && o2.includes(ee) || te(null !== (e2 = ke[0]) && void 0 !== e2 ? e2 : t3);
-  }, [d, ke, ee]), (0, import_react.useEffect)(() => (J && Ie(true), () => {
+  }), [d, ke, ee]), (0, import_react.useEffect)((() => (J && Ie(true), () => {
     R(ue), R(de);
-  }), []), (0, import_react.useEffect)(() => {
+  })), []), (0, import_react.useEffect)((() => {
     var e2;
     let t3 = null !== (e2 = null == be ? void 0 : be.anchorSelect) && void 0 !== e2 ? e2 : p;
     if (!t3 && l2 && (t3 = `[data-tooltip-id='${l2.replace(/'/g, "\\'")}']`), t3) try {
@@ -1772,11 +1772,11 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
     } catch (e3) {
       Te([]);
     }
-  }, [l2, p, null == be ? void 0 : be.anchorSelect]), (0, import_react.useEffect)(() => {
+  }), [l2, p, null == be ? void 0 : be.anchorSelect]), (0, import_react.useEffect)((() => {
     ue.current && (R(ue), je(A2));
-  }, [A2]);
+  }), [A2]);
   const Xe = null !== (ce = null == be ? void 0 : be.content) && void 0 !== ce ? ce : Y, Ye = fe && Object.keys(ve.tooltipStyles).length > 0;
-  return (0, import_react.useImperativeHandle)(t2, () => ({ open: (e2) => {
+  return (0, import_react.useImperativeHandle)(t2, (() => ({ open: (e2) => {
     if (null == e2 ? void 0 : e2.anchorSelect) try {
       document.querySelector(e2.anchorSelect);
     } catch (t3) {
@@ -1785,19 +1785,19 @@ var q = ({ forwardRef: t2, id: l2, className: i2, classNameArrow: c2, variant: u
     Se(null != e2 ? e2 : null), (null == e2 ? void 0 : e2.delay) ? je(e2.delay) : Ie(true);
   }, close: (e2) => {
     (null == e2 ? void 0 : e2.delay) ? Be(e2.delay) : Ie(false);
-  }, activeAnchor: ee, place: ve.place, isOpen: Boolean(he && !x2 && Xe && Ye) })), he && !x2 && Xe ? import_react.default.createElement(g2, { id: l2, role: ie, className: (0, import_classnames.default)("react-tooltip", B.tooltip, D.tooltip, D[u], i2, `react-tooltip__place-${ve.place}`, B[Ye ? "show" : "closing"], Ye ? "react-tooltip__show" : "react-tooltip__closing", "fixed" === b2 && B.fixed, $2 && B.clickable), onTransitionEnd: (e2) => {
+  }, activeAnchor: ee, place: ve.place, isOpen: Boolean(he && !x2 && Xe && Ye) }))), he && !x2 && Xe ? import_react.default.createElement(g2, { id: l2, role: ie, className: (0, import_classnames.default)("react-tooltip", B.tooltip, D.tooltip, D[u], i2, `react-tooltip__place-${ve.place}`, B[Ye ? "show" : "closing"], Ye ? "react-tooltip__show" : "react-tooltip__closing", "fixed" === b2 && B.fixed, $2 && B.clickable), onTransitionEnd: (e2) => {
     R(pe), fe || "opacity" !== e2.propertyName || (we(false), Se(null), null == U || U());
   }, style: { ...V, ...ve.tooltipStyles, opacity: void 0 !== le && Ye ? le : void 0 }, ref: se }, Xe, import_react.default.createElement(g2, { className: (0, import_classnames.default)("react-tooltip-arrow", B.arrow, D.arrow, c2, N2 && B.noArrow), style: { ...ve.tooltipArrowStyles, background: re ? `linear-gradient(to right bottom, transparent 50%, ${re} 50%)` : void 0, "--rt-arrow-size": `${ne}px` }, ref: ae })) : null;
 };
 var H = ({ content: t2 }) => import_react.default.createElement("span", { dangerouslySetInnerHTML: { __html: t2 } });
-var M = import_react.default.forwardRef(({ id: t2, anchorId: l2, anchorSelect: n2, content: i2, html: c2, render: a2, className: u, classNameArrow: d, variant: p = "dark", place: v = "top", offset: m = 10, wrapper: f = "div", children: h2 = null, events: w2 = ["hover"], openOnClick: b2 = false, positionStrategy: S2 = "absolute", middlewares: g2, delayShow: E2 = 0, delayHide: _2 = 0, float: O2 = false, hidden: k2 = false, noArrow: T2 = false, clickable: L2 = false, closeOnEsc: C2 = false, closeOnScroll: R2 = false, closeOnResize: x2 = false, openEvents: N2, closeEvents: $2, globalCloseEvents: I2, imperativeModeOnly: j2 = false, style: B2, position: D2, isOpen: M2, defaultIsOpen: W = false, disableStyleInjection: P = false, border: V, opacity: F, arrowColor: K, arrowSize: U, setIsOpen: X, afterShow: Y, afterHide: G, disableTooltip: Z, role: J = "tooltip" }, Q) => {
-  const [ee, te] = (0, import_react.useState)(i2), [oe, le] = (0, import_react.useState)(c2), [re, ne] = (0, import_react.useState)(v), [ie, ce] = (0, import_react.useState)(p), [se, ae] = (0, import_react.useState)(m), [ue, de] = (0, import_react.useState)(E2), [pe, ve] = (0, import_react.useState)(_2), [me, fe] = (0, import_react.useState)(O2), [ye, he] = (0, import_react.useState)(k2), [we, be] = (0, import_react.useState)(f), [Se, ge] = (0, import_react.useState)(w2), [Ee, Ae] = (0, import_react.useState)(S2), [_e, Oe] = (0, import_react.useState)(null), [ke, Te] = (0, import_react.useState)(null), Le = (0, import_react.useRef)(P), { anchorRefs: Ce, activeAnchor: Re } = z(t2), xe = (e2) => null == e2 ? void 0 : e2.getAttributeNames().reduce((t3, o2) => {
+var M = import_react.default.forwardRef((({ id: t2, anchorId: l2, anchorSelect: n2, content: i2, html: c2, render: a2, className: u, classNameArrow: d, variant: p = "dark", place: v = "top", offset: m = 10, wrapper: f = "div", children: h2 = null, events: w2 = ["hover"], openOnClick: b2 = false, positionStrategy: S2 = "absolute", middlewares: g2, delayShow: E2 = 0, delayHide: _2 = 0, float: O2 = false, hidden: k2 = false, noArrow: T2 = false, clickable: L2 = false, closeOnEsc: C2 = false, closeOnScroll: R2 = false, closeOnResize: x2 = false, openEvents: N2, closeEvents: $2, globalCloseEvents: I2, imperativeModeOnly: j2 = false, style: B2, position: D2, isOpen: M2, defaultIsOpen: W = false, disableStyleInjection: P = false, border: V, opacity: F, arrowColor: K, arrowSize: U, setIsOpen: X, afterShow: Y, afterHide: G, disableTooltip: Z, role: J = "tooltip" }, Q) => {
+  const [ee, te] = (0, import_react.useState)(i2), [oe, le] = (0, import_react.useState)(c2), [re, ne] = (0, import_react.useState)(v), [ie, ce] = (0, import_react.useState)(p), [se, ae] = (0, import_react.useState)(m), [ue, de] = (0, import_react.useState)(E2), [pe, ve] = (0, import_react.useState)(_2), [me, fe] = (0, import_react.useState)(O2), [ye, he] = (0, import_react.useState)(k2), [we, be] = (0, import_react.useState)(f), [Se, ge] = (0, import_react.useState)(w2), [Ee, Ae] = (0, import_react.useState)(S2), [_e, Oe] = (0, import_react.useState)(null), [ke, Te] = (0, import_react.useState)(null), Le = (0, import_react.useRef)(P), { anchorRefs: Ce, activeAnchor: Re } = z(t2), xe = (e2) => null == e2 ? void 0 : e2.getAttributeNames().reduce(((t3, o2) => {
     var l3;
     if (o2.startsWith("data-tooltip-")) {
       t3[o2.replace(/^data-tooltip-/, "")] = null !== (l3 = null == e2 ? void 0 : e2.getAttribute(o2)) && void 0 !== l3 ? l3 : null;
     }
     return t3;
-  }, {}), Ne = (e2) => {
+  }), {}), Ne = (e2) => {
     const t3 = { place: (e3) => {
       var t4;
       ne(null !== (t4 = e3) && void 0 !== t4 ? t4 : v);
@@ -1830,56 +1830,56 @@ var M = import_react.default.forwardRef(({ id: t2, anchorId: l2, anchorSelect: n
     }, "class-name": (e3) => {
       Oe(e3);
     } };
-    Object.values(t3).forEach((e3) => e3(null)), Object.entries(e2).forEach(([e3, o2]) => {
+    Object.values(t3).forEach(((e3) => e3(null))), Object.entries(e2).forEach((([e3, o2]) => {
       var l3;
       null === (l3 = t3[e3]) || void 0 === l3 || l3.call(t3, o2);
-    });
+    }));
   };
-  (0, import_react.useEffect)(() => {
+  (0, import_react.useEffect)((() => {
     te(i2);
-  }, [i2]), (0, import_react.useEffect)(() => {
+  }), [i2]), (0, import_react.useEffect)((() => {
     le(c2);
-  }, [c2]), (0, import_react.useEffect)(() => {
+  }), [c2]), (0, import_react.useEffect)((() => {
     ne(v);
-  }, [v]), (0, import_react.useEffect)(() => {
+  }), [v]), (0, import_react.useEffect)((() => {
     ce(p);
-  }, [p]), (0, import_react.useEffect)(() => {
+  }), [p]), (0, import_react.useEffect)((() => {
     ae(m);
-  }, [m]), (0, import_react.useEffect)(() => {
+  }), [m]), (0, import_react.useEffect)((() => {
     de(E2);
-  }, [E2]), (0, import_react.useEffect)(() => {
+  }), [E2]), (0, import_react.useEffect)((() => {
     ve(_2);
-  }, [_2]), (0, import_react.useEffect)(() => {
+  }), [_2]), (0, import_react.useEffect)((() => {
     fe(O2);
-  }, [O2]), (0, import_react.useEffect)(() => {
+  }), [O2]), (0, import_react.useEffect)((() => {
     he(k2);
-  }, [k2]), (0, import_react.useEffect)(() => {
+  }), [k2]), (0, import_react.useEffect)((() => {
     Ae(S2);
-  }, [S2]), (0, import_react.useEffect)(() => {
+  }), [S2]), (0, import_react.useEffect)((() => {
     Le.current !== P && console.warn("[react-tooltip] Do not change `disableStyleInjection` dynamically.");
-  }, [P]), (0, import_react.useEffect)(() => {
+  }), [P]), (0, import_react.useEffect)((() => {
     "undefined" != typeof window && window.dispatchEvent(new CustomEvent("react-tooltip-inject-styles", { detail: { disableCore: "core" === P, disableBase: P } }));
-  }, []), (0, import_react.useEffect)(() => {
+  }), []), (0, import_react.useEffect)((() => {
     var e2;
     const o2 = new Set(Ce);
     let r2 = n2;
     if (!r2 && t2 && (r2 = `[data-tooltip-id='${t2.replace(/'/g, "\\'")}']`), r2) try {
-      document.querySelectorAll(r2).forEach((e3) => {
+      document.querySelectorAll(r2).forEach(((e3) => {
         o2.add({ current: e3 });
-      });
+      }));
     } catch (e3) {
       console.warn(`[react-tooltip] "${r2}" is not a valid CSS selector`);
     }
     const i3 = document.querySelector(`[id='${l2}']`);
     if (i3 && o2.add({ current: i3 }), !o2.size) return () => null;
-    const c3 = null !== (e2 = null != ke ? ke : i3) && void 0 !== e2 ? e2 : Re.current, s2 = new MutationObserver((e3) => {
-      e3.forEach((e4) => {
+    const c3 = null !== (e2 = null != ke ? ke : i3) && void 0 !== e2 ? e2 : Re.current, s2 = new MutationObserver(((e3) => {
+      e3.forEach(((e4) => {
         var t3;
         if (!c3 || "attributes" !== e4.type || !(null === (t3 = e4.attributeName) || void 0 === t3 ? void 0 : t3.startsWith("data-tooltip-"))) return;
         const o3 = xe(c3);
         Ne(o3);
-      });
-    }), a3 = { attributes: true, childList: false, subtree: false };
+      }));
+    })), a3 = { attributes: true, childList: false, subtree: false };
     if (c3) {
       const e3 = xe(c3);
       Ne(e3), s2.observe(c3, a3);
@@ -1887,9 +1887,9 @@ var M = import_react.default.forwardRef(({ id: t2, anchorId: l2, anchorSelect: n
     return () => {
       s2.disconnect();
     };
-  }, [Ce, Re, ke, l2, n2]), (0, import_react.useEffect)(() => {
+  }), [Ce, Re, ke, l2, n2]), (0, import_react.useEffect)((() => {
     (null == B2 ? void 0 : B2.border) && console.warn("[react-tooltip] Do not set `style.border`. Use `border` prop instead."), V && !A("border", `${V}`) && console.warn(`[react-tooltip] "${V}" is not a valid \`border\`.`), (null == B2 ? void 0 : B2.opacity) && console.warn("[react-tooltip] Do not set `style.opacity`. Use `opacity` prop instead."), F && !A("opacity", `${F}`) && console.warn(`[react-tooltip] "${F}" is not a valid \`opacity\`.`);
-  }, []);
+  }), []);
   let $e = h2;
   const Ie = (0, import_react.useRef)(null);
   if (a2) {
@@ -1899,11 +1899,11 @@ var M = import_react.default.forwardRef(({ id: t2, anchorId: l2, anchorSelect: n
   oe && ($e = import_react.default.createElement(H, { content: oe }));
   const ze = { forwardRef: Q, id: t2, anchorId: l2, anchorSelect: n2, className: (0, import_classnames.default)(u, _e), classNameArrow: d, content: $e, contentWrapperRef: Ie, place: re, variant: ie, offset: se, wrapper: we, events: Se, openOnClick: b2, positionStrategy: Ee, middlewares: g2, delayShow: ue, delayHide: pe, float: me, hidden: ye, noArrow: T2, clickable: L2, closeOnEsc: C2, closeOnScroll: R2, closeOnResize: x2, openEvents: N2, closeEvents: $2, globalCloseEvents: I2, imperativeModeOnly: j2, style: B2, position: D2, isOpen: M2, defaultIsOpen: W, border: V, opacity: F, arrowColor: K, arrowSize: U, setIsOpen: X, afterShow: Y, afterHide: G, disableTooltip: Z, activeAnchor: ke, setActiveAnchor: (e2) => Te(e2), role: J };
   return import_react.default.createElement(q, { ...ze });
-});
-"undefined" != typeof window && window.addEventListener("react-tooltip-inject-styles", (e2) => {
+}));
+"undefined" != typeof window && window.addEventListener("react-tooltip-inject-styles", ((e2) => {
   e2.detail.disableCore || S({ css: `:root{--rt-color-white:#fff;--rt-color-dark:#222;--rt-color-success:#8dc572;--rt-color-error:#be6464;--rt-color-warning:#f0ad4e;--rt-color-info:#337ab7;--rt-opacity:0.9;--rt-transition-show-delay:0.15s;--rt-transition-closing-delay:0.15s;--rt-arrow-size:8px}.core-styles-module_tooltip__3vRRp{position:absolute;top:0;left:0;pointer-events:none;opacity:0;will-change:opacity}.core-styles-module_fixed__pcSol{position:fixed}.core-styles-module_arrow__cvMwQ{position:absolute;background:inherit;z-index:-1}.core-styles-module_noArrow__xock6{display:none}.core-styles-module_clickable__ZuTTB{pointer-events:auto}.core-styles-module_show__Nt9eE{opacity:var(--rt-opacity);transition:opacity var(--rt-transition-show-delay)ease-out}.core-styles-module_closing__sGnxF{opacity:0;transition:opacity var(--rt-transition-closing-delay)ease-in}`, type: "core" }), e2.detail.disableBase || S({ css: `
 .styles-module_tooltip__mnnfp{padding:8px 16px;border-radius:3px;font-size:90%;width:max-content}.styles-module_arrow__K0L3T{width:var(--rt-arrow-size);height:var(--rt-arrow-size)}[class*='react-tooltip__place-top']>.styles-module_arrow__K0L3T{transform:rotate(45deg)}[class*='react-tooltip__place-right']>.styles-module_arrow__K0L3T{transform:rotate(135deg)}[class*='react-tooltip__place-bottom']>.styles-module_arrow__K0L3T{transform:rotate(225deg)}[class*='react-tooltip__place-left']>.styles-module_arrow__K0L3T{transform:rotate(315deg)}.styles-module_dark__xNqje{background:var(--rt-color-dark);color:var(--rt-color-white)}.styles-module_light__Z6W-X{background-color:var(--rt-color-white);color:var(--rt-color-dark)}.styles-module_success__A2AKt{background-color:var(--rt-color-success);color:var(--rt-color-white)}.styles-module_warning__SCK0X{background-color:var(--rt-color-warning);color:var(--rt-color-white)}.styles-module_error__JvumD{background-color:var(--rt-color-error);color:var(--rt-color-white)}.styles-module_info__BWdHW{background-color:var(--rt-color-info);color:var(--rt-color-white)}`, type: "base" });
-});
+}));
 export {
   M as Tooltip,
   I as TooltipProvider,

@@ -6,9 +6,9 @@ import { HotspotData } from "./HotspotManager";
 import "./css/PanoramaViewer.css";
 
 import EditionPannel from "./EditionPannel";
-import { createHotspotInstance, deleteHotspotInstance, hotspotClickHandler } from "@/utils/HotspotUtils";
-import { replace, useNavigate } from "react-router-dom";
-import { getAnnotations, getBlob, putAnnotations } from "@/utils/storedImageData";
+import { createHotspotInstance, deleteHotspotInstance } from "@/utils/HotspotUtils";
+import { useNavigate } from "react-router-dom";
+import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
 
 declare global {
   interface Window {
@@ -96,19 +96,21 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
 
     if(viewerId === "null" || !viewerId ){
         navigate("/", {replace : true});
+        return;
     }
 
     let objectUrl: string | undefined;
 
     ( async () => {
         if (!viewerId) return;
-        const blob = await getBlob(viewerId);
-        const annotations = await getAnnotations(viewerId);
-        if (!blob) {
+        const viewerItem = await getViewerItem(viewerId);
+        const compressedImage = viewerItem?.blob;
+        const annotations = viewerItem?.annotations;
+        if (!compressedImage) {
             navigate("/");
             return;
         }
-        objectUrl = URL.createObjectURL(blob);
+        objectUrl = URL.createObjectURL(compressedImage);
         setImageSource(objectUrl);
         if(annotations) {
           setHotspots(annotations)
@@ -118,7 +120,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     return () => {
       if (viewerInstanceRef.current) {
         console.log("PanellumViewer - Destroying Pannellum viewer...");
-        localStorage.clear();
         viewerInstanceRef.current.destroy();
         viewerInstanceRef.current = null;
       }
@@ -133,6 +134,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     }
   }, [imageSource]);
 
+
+  // Fetch the existing hotpots on reload
   useEffect(() => {
     if (viewerInstanceRef.current && hotspots.length > 0) {
       const handler = () => {
@@ -259,12 +262,13 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
 
 
   const handleHotspotCreate =  async (hotspotData: HotspotData) => {
+    if (!hotspotData.content || hotspotData===undefined) return;
 
     addHotspotToViewer(hotspotData);
 
     const newHotspotList = [...hotspots,hotspotData];
 
-    await putAnnotations(viewerId,newHotspotList);
+    await putViewerItem(viewerId,undefined,undefined,newHotspotList);
     // Add to list
     setHotspots(newHotspotList);
 
@@ -292,8 +296,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   const handleHotspotSave = async (updatedHotspot: HotspotData) => {
 
     const newHotspotList = hotspots.map(hotS => hotS.id === updatedHotspot.id ? updatedHotspot : hotS);
-
-    await putAnnotations(viewerId,newHotspotList);
+    await putViewerItem(viewerId,undefined,undefined,newHotspotList);
 
     setHotspots(newHotspotList);
 
@@ -310,8 +313,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   const handleHotspotDelete = async (toDeleteHotspot:HotspotData) => {
     if(viewerInstanceRef.current){
       const newHotspotList = hotspots.filter(hotS => hotS.id != toDeleteHotspot.id );
-
-      await putAnnotations(viewerId,newHotspotList);
+      await putViewerItem(viewerId,undefined,undefined,newHotspotList);
 
       setHotspots(newHotspotList);
 

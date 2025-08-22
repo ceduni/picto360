@@ -5,11 +5,13 @@ import BottomNavBar from "@/components/BottomNavBar";
 import { motion, AnimatePresence } from "framer-motion";
 import "../App.css";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { getBlob } from "@/utils/storedImageData"; 
+import { auth } from "@/firebase/firebase";
+import { useDriveAuth } from "@/hooks/useDriveAuth";
 
 
 const VisualisationPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
     const { viewerId } = useParams<{ viewerId: string }>();
     const navigate =  useNavigate();
 
@@ -22,8 +24,12 @@ const VisualisationPage: React.FC = () => {
     }
 
     const query = useQuery();
-    const authStatus = query.get("auth");
     const message = query.get("message");
+    const {checkDriveAuth,authStatus} =  useDriveAuth()
+    
+    useEffect(()=>{
+        checkDriveAuth()
+    },[authStatus])
 
 
     const hasViewerId = Boolean(viewerId);
@@ -31,12 +37,11 @@ const VisualisationPage: React.FC = () => {
     return(
         
         <div>
-            <header className="app__header">
-                    <Toolbar 
-                            isEditMode={isEditMode} 
-                            toggleEditMode={toggleEditMode} 
-                            viewerId = {viewerId}
-                            authStatus = {authStatus}/>
+            <header className="app__header" onClick={checkDriveAuth}>
+                <Toolbar isEditMode={isEditMode} 
+                        toggleEditMode={toggleEditMode} 
+                        viewerId = {viewerId}
+                        authStatus = {authStatus}/>
             </header>
             {/* ⬇️ Don't mount until ready */}
             {hasViewerId ? (
@@ -49,7 +54,7 @@ const VisualisationPage: React.FC = () => {
                 />
             ) : (
                 <div style={{ height: "100vh", display: "grid", placeItems: "center" }}>
-                Chargement de l’image…
+                    Pas d'images uploadées 
                 </div>
             )}
             

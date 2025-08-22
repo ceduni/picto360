@@ -72,7 +72,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
 
         <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
 
-        {/* <div className="image-uploader__icon-container">
+        
+        {/* 
+        Othe ways to import images or picto files
+
+        <div className="image-uploader__icon-container">
           <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
             <FaCamera />
           </div>

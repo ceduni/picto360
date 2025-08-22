@@ -29,7 +29,7 @@ import {
   querystringDecode,
   registerVersion,
   updateEmulatorBanner
-} from "./chunk-2CLRFT34.js";
+} from "./chunk-7DYKWC54.js";
 import "./chunk-HFZ37CMS.js";
 
 // node_modules/tslib/tslib.es6.mjs
@@ -5553,7 +5553,7 @@ var CookiePersistence = class {
     }
     const name2 = getCookieName(key);
     if (window.cookieStore) {
-      const cb = (event) => {
+      const cb = ((event) => {
         const changedCookie = event.changed.find((change) => change.name === name2);
         if (changedCookie) {
           listener(changedCookie.value);
@@ -5562,7 +5562,7 @@ var CookiePersistence = class {
         if (deletedCookie) {
           listener(null);
         }
-      };
+      });
       const unsubscribe2 = () => window.cookieStore.removeEventListener("change", cb);
       this.listenerUnsubscribes.set(listener, unsubscribe2);
       return window.cookieStore.addEventListener("change", cb);

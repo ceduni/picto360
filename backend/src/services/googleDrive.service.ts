@@ -1,21 +1,14 @@
-import { promises as fsPromises } from "fs";
-import * as fs from "fs";
-import path from "path";
 import process from "process";
 import dotenv from "dotenv";
 dotenv.config();
 
 import { google, drive_v3 } from "googleapis";
 
-import { authenticate } from "@google-cloud/local-auth";
-
 import { OAuth2Client } from "google-auth-library";
 import { FastifyRequest } from "fastify";
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
-const TOKEN_PATH = path.join(process.cwd(), "token.json");
-const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 
 export interface HotspotData {
   id: string;
@@ -84,6 +77,19 @@ class GoogleDriveBackendService {
   // Set access token for requests
   setAccessToken(accessToken: string) {
     this.oauth2Client.setCredentials({ access_token: accessToken });
+  }
+
+  async revokeGoogleToken(token: string) {
+    try{
+      const res = await fetch("https://oauth2.googleapis.com/revoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ token }),
+      });
+    }catch(err){
+      throw new Error(`Failes to revoke Token ${err}`)
+    }
+
   }
 
   // Create folder in Google Drive

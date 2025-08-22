@@ -1,0 +1,91 @@
+.popup-export-content{
+    font-family: 'Inter', sans-serif;
+    border-radius: 2vh;
+    display: flex;
+    flex-direction: column;
+    gap:2vh;
+}
+
+
+.popup-export-main-content{
+    display: flex;
+    flex-direction: column;
+    gap:2vh;
+}
+
+.export_options{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:1vw;
+}
+
+.export-single_options{
+    all:unset;
+    padding: 2vh;
+    background-color: aliceblue;
+    border-radius: 1vh;
+    font-weight: 700;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:0.5vw;
+
+    cursor: pointer;
+}
+
+.export-single_options:disabled{
+    background-color: aliceblue;
+    opacity: 20%;
+}
+
+.export-single_options:hover{
+    background-color: aqua;
+}
+
+.popup_window-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.popup_window-title{
+    font-weight: 600;
+    font-size: large;
+}
+
+.popup-field-container{
+    font-weight: 500;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.popup-text-field{
+    border: 4px solid rgba(250, 248, 255, 1);
+    padding: 1vh;
+    border-radius: 4px;
+    width: 30vw;
+
+    transition: border 0.2s ease-in-out;
+}
+
+.popup-text-field:focus{
+    border: 5px solid rgba(200, 240, 255, 1);
+}
+
+.popup-message{
+    color: #364A9D;
+    font-size: 12px;
+    max-width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.popup-message-text{
+    text-overflow: clip;
+    width: 25vw;
+}

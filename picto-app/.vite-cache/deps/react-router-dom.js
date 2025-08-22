@@ -12085,29 +12085,7 @@ export {
 /*! Bundled license information:
 
 react-router/dist/development/chunk-NL6KNZEE.mjs:
-  (**
-   * react-router v7.6.2
-   *
-   * Copyright (c) Remix Software Inc.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE.md file in the root directory of this source tree.
-   *
-   * @license MIT
-   *)
-
 react-router/dist/development/dom-export.mjs:
-  (**
-   * react-router v7.6.2
-   *
-   * Copyright (c) Remix Software Inc.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE.md file in the root directory of this source tree.
-   *
-   * @license MIT
-   *)
-
 react-router/dist/development/index.mjs:
   (**
    * react-router v7.6.2

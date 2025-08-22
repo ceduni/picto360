@@ -5,7 +5,7 @@ import "./css/HomePage.css";
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
 import GotoProfile from "@/components/GotoProfile";
-import { putBlob } from "@/utils/storedImageData";
+import { putViewerItem,compressBeforeUpload } from "@/utils/storedImageData";
 
 
 interface HomeProps{
@@ -19,9 +19,21 @@ interface HomeProps{
     const navigate = useNavigate();
 
     const handleImageUpload = useCallback(async (newImageSrc: File) => {
+        if(!ImageUploader) return;
+
         const viewerId = crypto.randomUUID();
-        await putBlob(viewerId,newImageSrc);
-        navigate(`/view/${viewerId}`);
+
+        await putViewerItem(viewerId,undefined,newImageSrc,undefined);
+        
+        await navigate(`/view/${viewerId}`);
+
+        await fetch("http://localhost:3000",{
+            
+        })
+        
+        // const compressedImage = await compressBeforeUpload(newImageSrc);
+        // await putViewerItem(viewerId,undefined,undefined,undefined,compressedImage);
+
     }, []);
 
     const handleLogClick = useCallback(() => {

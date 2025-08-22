@@ -69,13 +69,21 @@
 }
 
 .toolbar__title-input {
+  width: auto;
   border: none;
-  padding: 0;
-  white-space: nowrap;
+  padding: 2px;
   overflow: hidden;
   outline: none;
   box-sizing: content-box;
-  transition: width 0.05s ease-in-out;
+}
+
+.toolbar__title-input_editable{
+  transition: border 0.8s ease-in-out;
+}
+
+.toolbar__title-input_editable:focus{
+  border: 1px solid white;
+  border-radius: 2px;
 }
 
 .toolbar__title-extension {

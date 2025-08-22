@@ -11,7 +11,7 @@
 
 .pnlm-load-box {
   position: absolute !important;
-  top: 25% !important;
+  top: 50% !important;
 }
 
 /* Panorama Viewer */
@@ -141,7 +141,7 @@
 
 .hotspot-manager__custom-tooltip .hotspot-manager__content--text,
 .hotspot-manager__label span {
-  cursor: text;
+  cursor: pointer;
 }
 
 .hotspot-manager__custom-tooltip:hover .hotspot-manager__content {
