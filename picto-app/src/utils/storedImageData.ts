@@ -56,7 +56,7 @@ export async function putViewerItem(
 
       const updated: ViewerItem = {
         id,
-        name: name ?? existing?.name ?? "0",
+        name: name ?? existing?.name ?? "Untitled",
         blob: blob ?? existing!.blob,   // guaranteed safe if existing or blob provided
         compressedBlob: compressedBlob ?? existing?.compressedBlob ?? blob ?? existing!.blob ,
         annotations: annotations ?? existing?.annotations ?? [],

@@ -136,7 +136,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         console.log("Exporting to Disk...");
 
         try{
-            await driveService.exportFileToDisk(imageBlob,fileName);
+            await driveService.exportFileToDisk(imageBlob,  
+                                                fileName,  
+                                                annotations && annotations?.length>0 ? annotations: undefined
+                                    );
             setTimeout(()=>{},1000)
 
         } catch (error) {

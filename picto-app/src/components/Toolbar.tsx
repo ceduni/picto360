@@ -50,11 +50,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
 
   useEffect(() => {
     if (spanRef.current) {
-      projectTitle.length>"Untitled".length ? 
-        setTitleWidth(spanRef.current.offsetWidth + 5)
-      :
-        setTitleWidth("Untitled".length + 5)
-      ; 
+        setTitleWidth(spanRef.current.offsetWidth + 8)
     }
   }, [projectTitle]);
 
@@ -178,7 +174,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                     fontFamily: "inherit",
                   }}
                 >
-                  {projectTitle || " "} {/* add placeholder space for empty input */}
+                  {projectTitle.length>"Untitled".length ? 
+                  projectTitle || " "
+                  :
+                  "Untitled"} {/* add placeholder space for empty input */}
                 </span>
                 <input type="text" 
                         maxLength={CHARACTER_LIMIT}

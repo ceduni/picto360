@@ -78,7 +78,13 @@
 }
 
 .toolbar__title-input_editable{
-  transition: border 0.8s ease-in-out;
+  border-radius: 2px;
+  border: 1px solid #282828;
+  transition: border 0.3s ease !important;
+}
+
+.toolbar__title-input_editable:hover{
+  border: 1px solid white;
 }
 
 .toolbar__title-input_editable:focus{
