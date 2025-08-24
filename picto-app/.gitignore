@@ -1,3 +1,2 @@
 # vite mudules cache
-
-picto-app\.vite-cache
+.vite-cache/
