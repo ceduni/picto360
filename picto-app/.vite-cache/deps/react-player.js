@@ -1,11 +1,11 @@
 "use client";
 import {
   require_react
-} from "./chunk-W3JLIZXR.js";
+} from "./chunk-K57FUMGK.js";
 import {
   __commonJS,
   __toESM
-} from "./chunk-HFZ37CMS.js";
+} from "./chunk-BFCEFRYA.js";
 
 // node_modules/deepmerge/dist/cjs.js
 var require_cjs = __commonJS({
@@ -164,7 +164,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerHls' */
-        "./react-2ZT2G6FQ.js"
+        "./react-WVFCJNBR.js"
       )
     )
   },
@@ -176,7 +176,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerDash' */
-        "./react-QP2GB75S.js"
+        "./react-UUQ3WKXC.js"
       )
     )
   },
@@ -188,7 +188,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerMux' */
-        "./dist-EOAVDDQR.js"
+        "./dist-7QVKE7JG.js"
       )
     )
   },
@@ -199,7 +199,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerYouTube' */
-        "./react-7EFFMFGE.js"
+        "./react-TQTRAVF3.js"
       )
     )
   },
@@ -210,7 +210,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerVimeo' */
-        "./react-JVDOYN6W.js"
+        "./react-57HD7PKQ.js"
       )
     )
   },
@@ -222,7 +222,7 @@ var Players = [
     player: (0, import_react2.lazy)(
       () => import(
         /* webpackChunkName: 'reactPlayerWistia' */
-        "./react-5CDULC6F.js"
+        "./react-C7KRBPYJ.js"
       )
     )
   },
@@ -366,7 +366,7 @@ var Player_default = Player;
 // node_modules/react-player/dist/ReactPlayer.js
 var Preview = (0, import_react4.lazy)(() => import(
   /* webpackChunkName: 'reactPlayerPreview' */
-  "./Preview-BUVGW2TP.js"
+  "./Preview-AIMV2EC2.js"
 ));
 var customPlayers = [];
 var createReactPlayer = (players, playerFallback) => {

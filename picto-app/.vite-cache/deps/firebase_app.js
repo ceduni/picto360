@@ -22,7 +22,7 @@ import {
   registerVersion,
   setLogLevel
 } from "./chunk-7DYKWC54.js";
-import "./chunk-HFZ37CMS.js";
+import "./chunk-BFCEFRYA.js";
 
 // node_modules/firebase/app/dist/esm/index.esm.js
 var name = "firebase";

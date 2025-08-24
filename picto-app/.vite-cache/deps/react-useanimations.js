@@ -1,9 +1,9 @@
 import {
   require_react
-} from "./chunk-W3JLIZXR.js";
+} from "./chunk-K57FUMGK.js";
 import {
   __commonJS
-} from "./chunk-HFZ37CMS.js";
+} from "./chunk-BFCEFRYA.js";
 
 // node_modules/lottie-web/build/player/lottie.js
 var require_lottie = __commonJS({

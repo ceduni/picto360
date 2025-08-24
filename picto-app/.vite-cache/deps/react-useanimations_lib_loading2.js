@@ -1,6 +1,6 @@
 import {
   __commonJS
-} from "./chunk-HFZ37CMS.js";
+} from "./chunk-BFCEFRYA.js";
 
 // node_modules/react-useanimations/lib/loading2/loading2.json
 var require_loading2 = __commonJS({

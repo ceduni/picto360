@@ -27,6 +27,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     const { startDriveAuth } = useDriveAuth();
     const driveService = getExportService(); // for file export
 
+    const [exportFormat,setExportFormat] = useState<"picto" | "separated">("picto")
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [exportStatus, setExportStatus] = useState<string>('');
@@ -58,6 +59,11 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             setTimeout(() => setShowMessage(false), 5000);
         }
     },[exportStatus])
+
+    const handleSelectFormat = (select : HTMLSelectElement)=>{
+        if(!select.value) return;
+        setExportFormat(select.value as "picto"|"separated");
+    }
 
 
     const handleAuthenticate = async () => {
@@ -93,10 +99,11 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 imageBlob,
                 annotations || [],
                 {
-                    imageName: 'my_360_image',
-                    folderName: fileName || 'Picto360° Annotations',
+                    imageName: fileName,
+                    folderName: 'Picto360° '+ fileName +' Annotations',
                     includeMetadata: true
-                }
+                },
+                // format: exportFormat
             );
 
             if (result.success) {
@@ -138,7 +145,8 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         try{
             await driveService.exportFileToDisk(imageBlob,  
                                                 fileName,  
-                                                annotations && annotations?.length>0 ? annotations: undefined
+                                                exportFormat,
+                                                annotations && annotations?.length>0 ? annotations: undefined,                                                
                                     );
             setTimeout(()=>{},1000)
 
@@ -208,8 +216,8 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                     <div className="export_options">
                         <button type="button" 
                                 className="export-single_options" 
-                                onClick={()=>{
-                                    handleExportToDrive();
+                                onClick={async ()=>{
+                                    await handleExportToDrive();
                                     setIsPopupOpen(false);
                                 }}
                                 disabled= {isExporting}>
@@ -229,6 +237,15 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 </div>                    
                 :
                 <div className="popup-export-content">
+                    <div className="popup-select-export_format">
+
+                        <p>Type d'export </p>
+                        <select title="export_format" name="formats" id="format-select" onSelect={(e)=>handleSelectFormat(e.currentTarget)}>
+                            <option selected value="picto">.picto</option>
+                            <option value="separated">Fichiers séparés</option>
+                        </select>
+
+                    </div>
                     { showWessage &&
                         <div className="popup-message">
                             <p className="popup-message-text">{exportStatus}</p>
@@ -245,8 +262,8 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         <button type="button" 
                                 className="export-single_options"
                                 disabled={isExporting}
-                                onClick={()=>{
-                                    handleExportToDisk();
+                                onClick={async ()=>{
+                                    await handleExportToDisk();
                                     setIsPopupOpen(false);
                                 }}                                
                                 >

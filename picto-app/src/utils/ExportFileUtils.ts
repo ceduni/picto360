@@ -1,69 +1,80 @@
 import { HotspotData } from "@/components/HotspotManager";
+import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
  
- class ExportService {
-   private baseUrl: string;
+class ExportService {
+    private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:5000' ) {
-    this.baseUrl = baseUrl;
-  }
-
-  // Export to Google Drive via backend
-  async exportToGoogleDrive(
-    imageBlob: Blob,
-    annotations: HotspotData[],
-    options: {
-      imageName?: string;
-      folderName?: string;
-      includeMetadata?: boolean;
-    } = {}
-  ): Promise<any> {
-    try {
-
-      console.log("Blob:" , imageBlob)
-
-      const formData = new FormData();
-      formData.append("file", new File([imageBlob], options.imageName || "panorama.jpg", 
-                      { type: imageBlob.type || "image/jpeg" }));
-      formData.append('annotations', JSON.stringify(annotations));
-      
-      if (options.imageName) {
-        formData.append('imageName', options.imageName);
-      }
-      if (options.folderName) {
-        formData.append('folderName', options.folderName);
-      }
-      formData.append('includeMetadata', String(options.includeMetadata ?? true));
-
-      console.log("Request Body: ", JSON.stringify(formData.get("file")));
-
-      const response = await fetch(`${this.baseUrl}/api/drive/export`, {
-        method: 'POST',
-        body: formData,
-        credentials:"include",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Export failed');
-      }
-      return result;
-
-    } catch (error) {
-      throw new Error(`Export failed: ${error}`);
+    constructor(baseUrl: string = 'http://localhost:5000' ) {
+        this.baseUrl = baseUrl;
     }
-  }  
+
+    // Export to Google Drive via backend
+    async exportToGoogleDrive(
+        imageBlob: Blob,
+        annotations: HotspotData[],
+        options: {
+            imageName?: string;
+            folderName?: string;
+            includeMetadata?: boolean;
+        } = {}
+    ): Promise<any> {
+        try {
+
+        console.log("Blob:" , imageBlob)
+
+        const formData = new FormData();
+        formData.append("file", new File([imageBlob], options.imageName || "panorama.jpg", 
+                        { type: imageBlob.type || "image/jpeg" }));
+        formData.append('annotations', JSON.stringify(annotations));
+        
+        if (options.imageName) {
+            formData.append('imageName', options.imageName);
+        }
+        if (options.folderName) {
+            formData.append('folderName', options.folderName);
+        }
+        formData.append('includeMetadata', String(options.includeMetadata ?? true));
+
+        console.log("Request Body: ", JSON.stringify(formData.get("file")));
+
+        const response = await fetch(`${this.baseUrl}/api/drive/export`, {
+            method: 'POST',
+            body: formData,
+            credentials:"include",
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Export failed');
+        }
+        return result;
+
+        } catch (error) {
+        throw new Error(`Export failed: ${error}`);
+        }
+    }  
 
 
 
     // Export to Disk
-    async exportFileToDisk(blob: Blob, fileName: string,annotations?:HotspotData[] ) {
+    async exportFileToDisk(blob: Blob, fileName: string, format:string ,annotations?:HotspotData[]) {
         // Check if File System Access API is available
         const canUseFileSystemAPI =
             "showSaveFilePicker" in window && typeof window.showSaveFilePicker === "function";
 
         const annotationsJSON = JSON.stringify(annotations,null,2);
         const jsonBlob = new Blob([annotationsJSON], { type: "application/json" });
+
+        let files : {name:string,blob:Blob}[]  = [
+                                                    {name:fileName,blob},
+                                                    {name:fileName+"_annotations",blob:jsonBlob}
+                                                ]          
+        if(files && format==="picto"){
+            const fileExporter =await  CustomFileExporter.createPictoFile (blob,annotations,{filename:fileName});
+            files = [{name:fileName+".picto",blob:fileExporter}]
+        }
+      
 
         if (canUseFileSystemAPI) {
             try {
@@ -72,55 +83,64 @@ import { HotspotData } from "@/components/HotspotManager";
             // Ask the user to select a folder
             const dirHandle = await (window as any).showDirectoryPicker();
 
-            const files = [
-                    {name:fileName,blob},
-                    {name:fileName+"_annotations",blob:jsonBlob}
-                ]
-
             for (const file of files) {
-                const fileName = file.name.includes(".") ? file.name
-                : file.name + "." + (file.blob.type.split("/")[1] || "bin");
-                // Create (or overwrite) each file in the folder
-                const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-                const writable = await fileHandle.createWritable();
-                if( file.blob.type==="application/json"){
-                      annotations && await writable.write(file.blob);
-                }else{
-                    await writable.write(file.blob);
+                if( file.blob.type==="application/json" && !annotations){
+                      continue;
                 }
-                await writable.close();
-                console.log(`✅ Saved ${file.name}`);
+                await this.exportToDiskWithSave(dirHandle,file.blob,file.name);
             }
+            console.log(`✅ Export completed `);
+
             return;
             } catch (err) {
-                console.warn("File System API save canceled or failed, falling back:", err);
+                console.warn("Falling back... :", err);
             }
         }
 
         // Fallback: <a download> method
-        const url = URL.createObjectURL(blob);
-        const jsonUrl = URL.createObjectURL(jsonBlob);
+        for (const file of files) {
+            if( file.blob.type==="application/json" && !annotations){
+                continue;
+            }
+            await this.exportToDiskWithLink(file.blob,file.name);
+            console.log(`✅ Saved ${file.name}`);
+        }  
 
-        const imageLink =  document.createElement("a");
-        const jsonLink =  document.createElement("a");
+    }
 
-        imageLink.href = url;
-        jsonLink.href = jsonUrl;
 
-        imageLink.download = fileName;
-        jsonLink.download = fileName+"_annotations";
 
-        document.body.appendChild(imageLink);
-        document.body.appendChild(jsonLink);
+    private async exportToDiskWithSave (dirHandle:any,file:Blob,fileName:string){
+        try {
+            // Modern way: always open Save As dialog
+            const newName = fileName.includes(".") ? fileName
+            : fileName + "." + (file.type.split("/")[1] || "bin");
+            // Create (or overwrite) each file in the folder
+            const fileHandle = await dirHandle.getFileHandle(newName, { create: true });
+            const writable = await fileHandle.createWritable();
+            
+            await writable.write(file);
+            await writable.close();
+            console.log(`✅ Saved ${newName}`);
+        } catch (err) {
+            throw new Error(`"File System API save canceled or failed:", ${err}`)
+        }        
+    }
 
-        annotations && jsonLink.click();
-        imageLink.click();
+    private async exportToDiskWithLink (file:Blob,fileName:string){
 
-        document.body.removeChild(jsonLink);
-        document.body.removeChild(imageLink);
-        
-        URL.revokeObjectURL(jsonUrl);
+        // Fallback: <a download> method
+        const url = URL.createObjectURL(file);        
+        const fileLink =  document.createElement("a");   
+        fileLink.href = url;   
+        fileLink.download = fileName;
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+
+        document.body.removeChild(fileLink);
         URL.revokeObjectURL(url);
+
     }
 
 

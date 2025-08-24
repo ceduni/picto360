@@ -1,4 +1,4 @@
-import "./chunk-HFZ37CMS.js";
+import "./chunk-BFCEFRYA.js";
 
 // node_modules/browser-image-compression/dist/browser-image-compression.mjs
 function _mergeNamespaces(e2, t2) {

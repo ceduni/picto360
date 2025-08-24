@@ -30,7 +30,7 @@ import {
   registerVersion,
   updateEmulatorBanner
 } from "./chunk-7DYKWC54.js";
-import "./chunk-HFZ37CMS.js";
+import "./chunk-BFCEFRYA.js";
 
 // node_modules/tslib/tslib.es6.mjs
 function __rest(s, e) {
