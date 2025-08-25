@@ -1,4 +1,4 @@
-import { HotspotData } from "@/components/HotspotManager";
+import { HotspotData } from "@/utils/Types";
 import JSZip from 'jszip';
 
 type imageFormat = "picto"  ; // add supported format here
@@ -118,6 +118,9 @@ export class CustomFileExporter {
 
     return zipBlob;
   }
+
+
+
 
   /**
    * Extract contents from custom 360 file

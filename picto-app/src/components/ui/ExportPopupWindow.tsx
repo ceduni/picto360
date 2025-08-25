@@ -10,6 +10,8 @@ import { getExportService } from "@/utils/ExportFileUtils";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { PiExportBold } from "react-icons/pi";
 import { getViewerItem } from "@/utils/storedImageData";
+import { ExportDestination, ExportFormat, HotspotData } from "../../utils/Types";
+
 
 interface ExportPopupProps {
     isOpen:boolean;
@@ -27,7 +29,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     const { startDriveAuth } = useDriveAuth();
     const driveService = getExportService(); // for file export
 
-    const [exportFormat,setExportFormat] = useState<"picto" | "separated">("picto")
+    const [exportFormat,setExportFormat] = useState<ExportFormat>("picto")
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [exportStatus, setExportStatus] = useState<string>('');
@@ -62,7 +64,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
     const handleSelectFormat = (select : HTMLSelectElement)=>{
         if(!select.value) return;
-        setExportFormat(select.value as "picto"|"separated");
+        setExportFormat(select.value as "picto"|"raw");
     }
 
 
@@ -75,35 +77,17 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         }
     };
 
-    const handleExportToDrive = async () => {
-        // Get your app's current image and annotations
-        if (!viewerId) return null;
-        const viewerItem = await getViewerItem(viewerId);
-
-        const imageBlob = viewerItem?.blob; 
-        const annotations = viewerItem?.annotations;
-        const fileName = viewerItem?.name;
-                        
-        if (!imageBlob || imageBlob === undefined) {
-            setExportStatus('Please select an image and add annotations');
-            console.log(exportStatus);
-            return null;
-        }
-
-
-        setIsExporting(true);
-        setExportStatus('Exporting to Google Drive...');
-
+    const exportToDrive = async (imageBlob:Blob,annotations?:HotspotData[],fileName?:string) => {
         try {
             const result = await driveService.exportToGoogleDrive(
                 imageBlob,
                 annotations || [],
+                exportFormat ,
                 {
-                    imageName: fileName,
+                    fileName: fileName || "Untitled",
                     folderName: 'Picto360° '+ fileName +' Annotations',
-                    includeMetadata: true
+                    includeMetadata: true,
                 },
-                // format: exportFormat
             );
 
             if (result.success) {
@@ -115,14 +99,30 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 throw new Error(result.error);
             }
         } catch (error) {
-            
             setExportStatus(`Export failed: ${error}`);
         } finally {
             setIsExporting(false);
         }
     };
 
-    const handleExportToDisk = async()=>{
+    const exportToDisk = async(imageBlob:Blob,annotations?:HotspotData[],fileName?:string)=>{
+
+        try{
+            await driveService.exportFileToDisk(imageBlob,  
+                                                fileName || "Untitled",  
+                                                exportFormat,
+                                                annotations && annotations?.length>0 ? annotations: undefined,                                                
+                                    );
+            setTimeout(()=>{},1000)
+
+        } catch (error) {
+            setExportStatus(`Export failed: ${error}`);
+        } finally {
+            setIsExporting(false);
+        }        
+    }
+
+    const handleExportTo  = async(destination:ExportDestination)=>{
         // Get your app's current image and annotations
         if (!viewerId) return null;
         const viewerItem = await getViewerItem(viewerId);
@@ -137,25 +137,24 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             return null;
         }
 
-
         setIsExporting(true);
-        setExportStatus('Exporting to Disk...');
-        console.log("Exporting to Disk...");
 
-        try{
-            await driveService.exportFileToDisk(imageBlob,  
-                                                fileName,  
-                                                exportFormat,
-                                                annotations && annotations?.length>0 ? annotations: undefined,                                                
-                                    );
-            setTimeout(()=>{},1000)
-
-        } catch (error) {
-            setExportStatus(`Export failed: ${error}`);
-        } finally {
-            setIsExporting(false);
-        }        
+        switch(destination){
+            case "drive":
+                setExportStatus('Exporting to Google Drive...');
+                exportToDrive(imageBlob,annotations,fileName);
+                break
+            case "disk":
+            default:
+                setExportStatus('Exporting to Disk...');
+                exportToDisk(imageBlob,annotations,fileName)
+                
+        }
     }
+
+    useEffect(()=>{
+        setIsPopupOpen(isExporting);
+    },[isExporting])
 
     
     return (
@@ -189,6 +188,11 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 </div>
                 {isAuthenticated ?
                 <div className="popup-export-main-content">
+                    { showWessage &&
+                        <div className="popup-message">
+                            <p className="popup-message-text">{exportStatus}</p>
+                        </div>
+                    }                    
                     <div className="popup-field-container">
                         <input type="text" 
                                 maxLength={20}
@@ -208,17 +212,12 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                                 />
                         <p>.picto</p>
                     </div>
-                    { showWessage &&
-                        <div className="popup-message">
-                            <p className="popup-message-text">{exportStatus}</p>
-                        </div>
-                    }
+
                     <div className="export_options">
                         <button type="button" 
                                 className="export-single_options" 
                                 onClick={async ()=>{
-                                    await handleExportToDrive();
-                                    setIsPopupOpen(false);
+                                    await handleExportTo("drive");
                                 }}
                                 disabled= {isExporting}>
                                 <PiExportBold size={20}/>
@@ -242,7 +241,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         <p>Type d'export </p>
                         <select title="export_format" name="formats" id="format-select" onSelect={(e)=>handleSelectFormat(e.currentTarget)}>
                             <option selected value="picto">.picto</option>
-                            <option value="separated">Fichiers séparés</option>
+                            <option value="raw">Fichiers séparés</option>
                         </select>
 
                     </div>
@@ -263,7 +262,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                                 className="export-single_options"
                                 disabled={isExporting}
                                 onClick={async ()=>{
-                                    await handleExportToDisk();
+                                    await handleExportTo("disk");
                                     setIsPopupOpen(false);
                                 }}                                
                                 >

@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { HotspotData } from "../HotspotManager";
+import { EditorRef, HotspotData } from "../../utils/Types";
 import { IoAddOutline } from "react-icons/io5";
 import ReactPlayer from "react-player";
 
@@ -9,10 +9,6 @@ import "../css/EditionPannel.css"
 interface EditorProps {
   hotspot: HotspotData;
   onSave: (changes: Partial<HotspotData>) => void;
-}
-
-export interface EditorRef {
-  submit: () => void;
 }
 
 

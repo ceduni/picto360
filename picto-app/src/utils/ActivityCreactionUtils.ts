@@ -2,55 +2,7 @@
 import { useAuth } from "@/authContext/authContext";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-type ActivityData = {
-    id:string,
-    title:string,
-    tags:string[],
-    description:string,
-    tasks:TaskData[],
-    type:string,
-    authoriseEdit:boolean;
-    participantsList:ParticipantData[],
-    teamsList:TeamInstance[]
-}
-
-export interface ActivityIstance extends ActivityData{
-    tagInput:string,
-    taskInput:string,
-    supervised_teams:boolean,
-    chrono:{isEnabled:boolean,minutes:number,seconds:number}
-}
-
-export type ActivityStatus ={
-    status : "created" | "open" | "closed";
-}
-
-export type TeamsData = {
-    id:string;
-    name:string;
-    participantsNumber:number;
-    supervised:boolean;
-    participantsNames:ParticipantData[];
-    supervisor_id? : string;
-}
-
-export interface TeamInstance extends TeamsData{
-    setTeamName? : (id:number,input:string) => void
-    addParticipants? : (id:number,numberToAdd:number) => void
-}
-
-export type TaskData = {
-    id:string,
-    title:string,
-}
-
-export type ParticipantData ={
-    id:string;
-    name:string;
-}
-
-
+import { ActivityIstance, ParticipantData, TaskData, TeamInstance } from "./Types";
 
 
 

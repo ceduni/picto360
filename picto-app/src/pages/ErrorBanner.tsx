@@ -1,10 +1,6 @@
+import { ErrorBannerRef } from "@/utils/Types";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { LuTriangleAlert, LuX } from "react-icons/lu";
-
-export type ErrorBannerRef = {
-  trigger: (message: string, duration?: number) => void;
-};
-
 
 const ErrorBanner = forwardRef<ErrorBannerRef>((_, ref) => {
   const [visible, setVisible] = useState(false);

@@ -4,6 +4,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getGoogleDriveService, HotspotData } from "@/services/googleDrive.service";
 import { MultipartValue } from "@fastify/multipart";
 
+type ExportFormat  = "raw" | "picto";
+
 interface ExportRequest {
   annotations: HotspotData[];
   imageName?: string;
@@ -26,7 +28,7 @@ export default async function exportRoutes(app: FastifyInstance) {
         }
         
         // Get form fields
-        const imageBuffer = await data.toBuffer();
+        const fileBuffer = await data.toBuffer();
         // typed view of fields: key -> MultipartValue[] (or undefined)
         const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
 
@@ -45,29 +47,33 @@ export default async function exportRoutes(app: FastifyInstance) {
 
         );
 
-        let annotations: HotspotData[] = [];
-        if (formFields.annotations) {
+        const format = formFields.format as ExportFormat|undefined;
+
+        let annotations: HotspotData[]|undefined = undefined;
+
+        if (format==="raw" && formFields.annotations) {
+
           try {
             annotations = JSON.parse(formFields.annotations);
           } catch (err) {
             console.error("❌ Failed to parse annotations:", formFields.annotations, err);
           }
-        }             
 
-
-        if(annotations.length<=0){
-          return reply.code(400).send(`Error: The annotations array is empty : ${JSON.stringify(annotations)}`)
-        }
+          if(annotations && annotations.length<=0){
+            return reply.code(400).send(`Error: The annotations array is empty : ${JSON.stringify(annotations)}`)
+          }   
+        }            
 
         const options = {
-            imageName: formFields.imageName as string || undefined,
+            format: format || "picto" ,
+            fileName: formFields.fileName as string || undefined,
             folderName: formFields.folderName as string || undefined,
             includeMetadata: formFields.includeMetadata === 'true'
         };
 
         // Export to Google Drive
         const result = await driveService.exportToGoogleDrive(
-            imageBuffer,
+            fileBuffer,
             annotations,
             options
         );

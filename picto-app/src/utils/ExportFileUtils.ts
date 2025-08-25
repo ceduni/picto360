@@ -1,4 +1,4 @@
-import { HotspotData } from "@/components/HotspotManager";
+import { ExportFormat, HotspotData } from "@/utils/Types";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
  
 class ExportService {
@@ -12,28 +12,40 @@ class ExportService {
     async exportToGoogleDrive(
         imageBlob: Blob,
         annotations: HotspotData[],
+        format:ExportFormat,
         options: {
-            imageName?: string;
+            fileName?: string;
             folderName?: string;
             includeMetadata?: boolean;
-        } = {}
+        } = {},
     ): Promise<any> {
         try {
 
         console.log("Blob:" , imageBlob)
 
         const formData = new FormData();
-        formData.append("file", new File([imageBlob], options.imageName || "panorama.jpg", 
-                        { type: imageBlob.type || "image/jpeg" }));
-        formData.append('annotations', JSON.stringify(annotations));
+        formData.append("format", format );
+
+        switch(format){
+            case "raw":
+                formData.append("file", new File([imageBlob], options.fileName || "Untitled", 
+                                { type: imageBlob.type || "image/jpeg" }));
+                formData.append('annotations', JSON.stringify(annotations)); 
+                formData.append('includeMetadata', String(options.includeMetadata ?? true));
+                break;           
+            case "picto":
+            default:
+                const fileExporter = await CustomFileExporter.createPictoFile (imageBlob,annotations,{filename:options.fileName});
+                formData.append("file",fileExporter);
+                formData.append('includeMetadata', String( false));
+        }
         
-        if (options.imageName) {
-            formData.append('imageName', options.imageName);
+        if (options.fileName) {
+            formData.append('fileName', options.fileName);
         }
         if (options.folderName) {
             formData.append('folderName', options.folderName);
         }
-        formData.append('includeMetadata', String(options.includeMetadata ?? true));
 
         console.log("Request Body: ", JSON.stringify(formData.get("file")));
 
@@ -65,17 +77,13 @@ class ExportService {
 
         const annotationsJSON = JSON.stringify(annotations,null,2);
         const jsonBlob = new Blob([annotationsJSON], { type: "application/json" });
+        let exportCompleted = false;
 
         let files : {name:string,blob:Blob}[]  = [
                                                     {name:fileName,blob},
                                                     {name:fileName+"_annotations",blob:jsonBlob}
-                                                ]          
-        if(files && format==="picto"){
-            const fileExporter =await  CustomFileExporter.createPictoFile (blob,annotations,{filename:fileName});
-            files = [{name:fileName+".picto",blob:fileExporter}]
-        }
+                                                ]    
       
-
         if (canUseFileSystemAPI) {
             try {
             // Modern way: always open Save As dialog
@@ -83,7 +91,15 @@ class ExportService {
             // Ask the user to select a folder
             const dirHandle = await (window as any).showDirectoryPicker();
 
+            // change files to export according to the format choosed                                                      
+            if(files && format==="picto"){
+                const fileExporter = await CustomFileExporter.createPictoFile (blob,annotations,{filename:fileName});
+                files = [{name:fileName+".picto",blob:fileExporter}]
+            }            
+
             for (const file of files) {
+                console.log(`✅ Exporting ... `);
+
                 if( file.blob.type==="application/json" && !annotations){
                       continue;
                 }
@@ -92,10 +108,21 @@ class ExportService {
             console.log(`✅ Export completed `);
 
             return;
-            } catch (err) {
+            } catch (err:any) {
+                if (err.name === "AbortError") {
+                    console.log("User cancelled the directory picker.");
+                    return;
+                }
                 console.warn("Falling back... :", err);
             }
         }
+
+
+        // change files to export according to the format choosed                                                      
+        if(files && format==="picto"){
+            const fileExporter = await CustomFileExporter.createPictoFile (blob,annotations,{filename:fileName});
+            files = [{name:fileName+".picto",blob:fileExporter}]
+        }               
 
         // Fallback: <a download> method
         for (const file of files) {

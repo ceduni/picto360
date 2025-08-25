@@ -1,15 +1,11 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { HotspotData } from "../HotspotManager";
+import { EditorRef, HotspotData } from "../../utils/Types";
 import "../css/EditionPannel.css"
 
 
 interface EditorProps {
   hotspot: HotspotData;
   onSave: (changes: Partial<HotspotData>) => void;
-}
-
-export interface EditorRef {
-  submit: () => void;
 }
 
 

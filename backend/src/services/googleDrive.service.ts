@@ -173,77 +173,102 @@ class GoogleDriveBackendService {
 
   // Main export function
   async exportToGoogleDrive(
-    imageBuffer: Buffer,
-    annotations: HotspotData[],
+    fileBuffer: Buffer,
+    annotations: HotspotData[]|undefined,
     options: {
-      imageName?: string;
+      format: "raw" | "picto" ;
+      fileName?: string;
       folderName?: string;
       includeMetadata?: boolean;
     }
   ) {
     const {
-      imageName = 'annotated_360_image',
+      fileName = 'annotated_360_image',
       folderName = '360° Image Annotations',
       includeMetadata = true
     } = options;
 
     try {
-
       
       // Create export folder
       const folderId = await this.createFolder(folderName);
 
-      // Upload image
+      // Upload first file (image or picto accordingly)
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const imageFileName = `${imageName}_${timestamp}.jpg`;
-      
-      const imageMetadata : Record<string, string> = includeMetadata ? {
-        app: 'picto360',
-        annotationCount: annotations.length.toString(),
-        exportDate: timestamp,
-        imageType: '360degree'
-      } : { app: 'picto360' };
 
-      const imageResult = await this.uploadFile(
-        imageBuffer,
-        imageFileName,
-        'image/jpeg',
-        folderId,
-        imageMetadata
-      );
+      let imageFileName = "Untitled";
+      let imageMetadata :Record<string,string> | undefined
 
-      // Upload annotations
-      const annotationData = {
-        version: '1.0',
-        imageFileId: imageResult.id,
-        exportDate: new Date().toISOString(),
-        annotations: annotations,
-        metadata: {
-          totalAnnotations: annotations.length,
-          annotationTypes: [...new Set(annotations.map(a => a.type))]
-        }
-      };
-      
-      
-      const annotationFileName = `${imageName}_annotations_${timestamp}.json`;
-      const annotationBuffer = Buffer.from(JSON.stringify(annotationData, null, 2));
+      type Result = { id: string; name: string } | undefined;
+      let annotationResult: Result = undefined;
+      let imageResult: Result = undefined;
+      let fileResult: Result = undefined;
 
-      const annotationResult = await this.uploadFile(
-        annotationBuffer,
-        annotationFileName,
-        'application/json',
-        folderId,
-        {
-          app: 'picto360',
-          dataType: 'annotations',
-          relatedImageId: imageResult.id
-        }
-      );
+      switch(options.format){
+        //------------------- Raw Format (separated images)----------------------//  
+
+        case "raw":
+          imageFileName = `${fileName}_${timestamp}.jpg`;
+
+          if(!annotations) annotations = [];
+          
+          imageMetadata  = includeMetadata ? {
+            app: 'picto360',
+            annotationCount: annotations.length.toString(),
+            exportDate: timestamp,
+            imageType: '360degree'
+          } : { app: 'picto360' };
+
+          imageResult = await this.uploadFile(
+            fileBuffer,
+            imageFileName,
+            'image/jpeg',
+            folderId,
+            imageMetadata
+          );
+
+          // Upload annotations
+          const annotationData = {
+            version: '1.0',
+            imageFileId: imageResult.id,
+            exportDate: new Date().toISOString(),
+            annotations: annotations,
+            metadata: {
+              totalAnnotations: annotations?.length,
+              annotationTypes: [...new Set(annotations?.map(a => a.type))]
+            }
+          };
+          const annotationFileName = `${fileName}_annotations_${timestamp}.json`;
+          const annotationBuffer = Buffer.from(JSON.stringify(annotationData, null, 2));
+
+          annotationResult = await this.uploadFile(
+            annotationBuffer,
+            annotationFileName,
+            'application/json',
+            folderId,
+            {
+              app: 'picto360',
+              dataType: 'annotations',
+              relatedImageId: imageResult.id
+            }
+          );                    
+          break;
+        //------------------- Picto Format ----------------------//  
+        case "picto":
+        default:
+          imageFileName = `${fileName}_${timestamp}.picto`;
+          fileResult = await this.uploadFile(
+            fileBuffer,
+            imageFileName,
+            'application/picto',
+            folderId,
+          );
+      }
 
       return {
         success: true,
         folderId,
-        imageFile: imageResult,
+        imageFile: fileResult || imageResult,
         annotationFile: annotationResult,
         driveUrl: `https://drive.google.com/drive/folders/${folderId}`
       };

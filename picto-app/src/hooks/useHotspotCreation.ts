@@ -1,9 +1,6 @@
+import { HotspotEvent } from "@/utils/Types";
 import { useCallback, useEffect } from "react";
 
-export interface HotspotEvent {
-  type: string;
-  coords: [number, number];
-}
 
 export const useHotspotCreation = (
   viewerElement: HTMLDivElement | null,

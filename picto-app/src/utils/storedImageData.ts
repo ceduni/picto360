@@ -1,4 +1,4 @@
-import { HotspotData } from "@/components/HotspotManager";
+import { HotspotData } from "@/utils/Types";
 import imageCompression from "browser-image-compression";
 
 const DB = "viewer-db";

@@ -3,7 +3,7 @@ import ReactDOMServer from "react-dom/server";
 import { TiInfoLarge } from "react-icons/ti";
 import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineGif, MdOutlineVideoLibrary } from "react-icons/md";
-import { HotspotData, HotspotInstance } from "../components/HotspotManager";
+import { HotspotData, HotspotInstance } from "./Types";
 import { IoShapesOutline } from "react-icons/io5";
 import { BiSolidLabel } from "react-icons/bi";
 import ReactPlayer from "react-player";
@@ -134,7 +134,7 @@ export const renderTooltipContent = (
               alert("Erreur: lien URL YouTube invalide.");
               break;
             }
-                      
+
             const mountPoint = document.createElement("div");
 
             const root = createRoot(mountPoint);

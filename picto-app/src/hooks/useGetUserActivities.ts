@@ -2,34 +2,8 @@
 import { useEffect, useState } from "react";
 import { getIdToken } from "firebase/auth";
 import { useAuth } from "@/authContext/authContext";
+import { FetchedActivity } from "@/utils/Types";
 
-
-export interface FetchedActivity {
-  _id: string;
-  title: string;
-  description?: string;
-  createdBy: {
-    _id: string;
-    firebaseUid: string;
-    email: string;
-    displayName?: string;
-    photoUrl?: string;
-  };
-  teams: {
-    _id: string;
-    teamId: string;
-    teamName: string;
-    supervisorId: string;
-    participantsList: {
-      participantId: string;
-      name: string;
-      joinLink: string;
-    }[];
-  }[];
-  ownership: "creator" | "supervisor";
-  totalParticipants: number;
-  createdAt: string;
-}
 
 export function useFetchActivities() {
   const { currentUser } = useAuth();

@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useState, useRef, useMemo } from "react"
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
-import { HotspotData } from "./HotspotManager";
+import { HotspotData } from "../utils/Types";
 import "./css/PanoramaViewer.css";
 
 import EditionPannel from "./EditionPannel";

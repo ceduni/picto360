@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./css/EditionPannel.css"
-import { HotspotData } from "./HotspotManager"
-import TextEditor, { EditorRef } from "./editors/TextEditor";
+import { EditorRef, HotspotData } from "../utils/Types"
+import TextEditor from "./editors/TextEditor";
 import HyperlinkEditor from "./editors/HyperlinkEditor";
 import ImageEditor from "./editors/ImageEditor";
 import VideoEditor from "./editors/VideoEditor";
