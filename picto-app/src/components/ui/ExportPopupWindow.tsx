@@ -106,6 +106,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     };
 
     const exportToDisk = async(imageBlob:Blob,annotations?:HotspotData[],fileName?:string)=>{
+        console.log("Export format: ", exportFormat)
 
         try{
             await driveService.exportFileToDisk(imageBlob,  
@@ -186,32 +187,14 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         <CancelIcon sx={{ color: "#282828", "&:hover": { color: "red" } }} />
                     </IconButton>
                 </div>
-                {isAuthenticated ?
-                <div className="popup-export-main-content">
-                    { showWessage &&
+                {/* {isAuthenticated ? */}
+                {/* <div className="popup-export-main-content"> */}
+                    {/* { showWessage &&
                         <div className="popup-message">
                             <p className="popup-message-text">{exportStatus}</p>
                         </div>
                     }                    
-                    <div className="popup-field-container">
-                        <input type="text" 
-                                maxLength={20}
-                                value={titleState.projectTitle}
-                                onChange={(e)=>{titleState.setProjectTitle(e)}}
-                                placeholder="Titre du fichier" 
-                                className="popup-text-field"
-                                onBlur={titleState.saveProjectTitleToDB}
-                                onKeyDown={(event:React.KeyboardEvent<HTMLInputElement>)=>{
-                                    if(event.key==="Enter"){
-                                        event.preventDefault(); // avoid submitting forms
-                                        titleState.saveProjectTitleToDB()
-                                        event.currentTarget.blur();                                        
-                                    }
-                                    }
-                                }
-                                />
-                        <p>.picto</p>
-                    </div>
+
 
                     <div className="export_options">
                         <button type="button" 
@@ -234,17 +217,38 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         </div>
                     </div>
                 </div>                    
-                :
+                : */}
                 <div className="popup-export-content">
                     <div className="popup-select-export_format">
-
                         <p>Type d'export </p>
-                        <select title="export_format" name="formats" id="format-select" onSelect={(e)=>handleSelectFormat(e.currentTarget)}>
-                            <option selected value="picto">.picto</option>
+                        <select title="Exporter sous" value={exportFormat} onChange={(e)=>handleSelectFormat(e.currentTarget)}>
+                            <option value="picto">.picto</option>
                             <option value="raw">Fichiers séparés</option>
-                        </select>
-
+                        </select>   
                     </div>
+
+                    <div className="popup-field-container">
+
+                        <input type="text" 
+                                maxLength={20}
+                                value={titleState.projectTitle}
+                                onChange={(e)=>{titleState.setProjectTitle(e)}}
+                                placeholder="Titre du fichier" 
+                                className="popup-text-field"
+                                onBlur={titleState.saveProjectTitleToDB}
+                                onKeyDown={(event:React.KeyboardEvent<HTMLInputElement>)=>{
+                                    if(event.key==="Enter"){
+                                        event.preventDefault(); // avoid submitting forms
+                                        titleState.saveProjectTitleToDB()
+                                        event.currentTarget.blur();                                        
+                                    }
+                                    }
+                                }
+                                />
+                        <p>{exportFormat==="picto"?".picto":""}</p>
+                    </div>
+
+
                     { showWessage &&
                         <div className="popup-message">
                             <p className="popup-message-text">{exportStatus}</p>
@@ -253,7 +257,14 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                     <div className="export_options">
                         <button type="button" 
                                 className="export-single_options" 
-                                onClick={handleAuthenticate}
+                                onClick={async()=>
+                                    {
+
+                                        if(!isAuthenticated) await handleAuthenticate();
+                                        await handleExportTo("drive");
+                                        return;
+                                    }
+                                }
                                 disabled={isExporting}>
                             <FaGoogleDrive size={20}/>
                             <p>Google Drive</p>
@@ -276,7 +287,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         </button>
                     </div>
                 </div>
-                }
+                {/* } */}
             </div>
             </Fade>
         </Modal>
