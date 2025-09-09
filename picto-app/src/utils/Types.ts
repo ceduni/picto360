@@ -16,11 +16,13 @@ export interface HotspotInstance extends HotspotData {
   clickHandlerArgs?: HotspotData;
 }
 
-// -------------- Error banner -------------------
+// -------------- Message banner -------------------
 
-export type ErrorBannerRef = {
-  trigger: (message: string, duration?: number) => void;
+export type MessageBannerRef = {
+  trigger: (message: string,type:MessageBannerType, duration?: number) => void;
 };
+
+export type MessageBannerType = "success" | "warning" | "failure"
 
 
 //--------------- Activity types ----------------
@@ -116,6 +118,16 @@ export interface HotspotEvent {
   type: string;
   coords: [number, number];
 }
+
+
+//------------- GOOGLE Drive ----------------//
+export type DriveAuthStatus = {
+  isAuthenticated: boolean;
+  provider: 'google' | null;
+  scopes?: string[];
+  connectedAt?: string; // ISO
+  reason?: 'revoked' | 'expired' | 'manual_disconnect' | 'login' | 'refresh';
+};
   
 
 const TEXT_CHAR_LIMIT = 300;

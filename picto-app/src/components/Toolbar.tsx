@@ -23,18 +23,20 @@ import { useNavigate } from "react-router-dom";
 import ExportPopupWindow from "./ui/ExportPopupWindow";
 import SharePopupWindow from "./ui/SharePopupWindow";
 import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
+import { DriveAuthStatus, MessageBannerRef } from "@/utils/Types";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 
 interface ToolbarProps {
   isEditMode: boolean;
   toggleEditMode: () => void;
   viewerId?:string;
-  authStatus:string|null;
+  bannerRef: React.RefObject<MessageBannerRef | null>;
+  driveAuthStatus:DriveAuthStatus|null;
 }
 
 const CHARACTER_LIMIT = 20;
 
-const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,authStatus}) => {
+const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,bannerRef,driveAuthStatus}) => {
 
   const [projectTitle, setProjectTitle] = useState(""); //TODO: manage project uniqueness in DB
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
@@ -46,7 +48,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
   const spanRef = useRef<HTMLSpanElement>(null);
   const [titleWidth, setTitleWidth] = useState(1);
 
-  const {checkDriveAuth,logoutFromDrive} = useDriveAuth()
+  const {logoutFromDrive} = useDriveAuth()
 
   useEffect(() => {
     if (spanRef.current) {
@@ -317,7 +319,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
               </IconButton>
             </Tooltip>
             {
-              authStatus &&
+              driveAuthStatus?.isAuthenticated &&
             <Tooltip
               title="Déconnexion"
               slotProps={{
@@ -335,8 +337,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
             >
               <IconButton className="toolbar__icon-button" onClick={async()=>{
                   await logoutFromDrive();
-                  await checkDriveAuth();
-                  window.location.reload()
+                  // await checkDriveAuth();
+                  // window.location.reload()
                 }}>
                 <LogoutOutlined />
               </IconButton>
@@ -350,8 +352,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
         <ExportPopupWindow  isOpen={showExportOptions} 
                             setIsPopupOpen={setShowExportOptions} 
                             viewerId = {viewerId}
-                            authStatus = {authStatus}
-                            titleState = {{projectTitle,setProjectTitle: handleTitleChange,saveProjectTitleToDB}}/>
+                            titleState = {{projectTitle,setProjectTitle: handleTitleChange,saveProjectTitleToDB}}
+                            bannerRef={bannerRef}
+                            driveAuthStatus= {driveAuthStatus}/>
       </AppBar>
     </motion.div>
   );

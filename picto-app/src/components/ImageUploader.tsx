@@ -38,7 +38,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     console.log("File uploaded: ", file);
   };
 
-  const triggerFileInput = () => {
+  const triggerFileInput = (e:React.MouseEvent) => {
+    e.preventDefault()
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }

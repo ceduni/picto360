@@ -1,17 +1,20 @@
-  import React, { useState, useCallback, useEffect } from "react";
+  import React, { useState, useCallback, useEffect, useRef } from "react";
 import Toolbar from "@components/Toolbar";
 import PanoramaViewer from "@components/PanoramaViewer";
 import BottomNavBar from "@/components/BottomNavBar";
 import { motion, AnimatePresence } from "framer-motion";
 import "../App.css";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { auth } from "@/firebase/firebase";
-import { useDriveAuth } from "@/hooks/useDriveAuth";
+import { MessageBannerRef } from "@/utils/Types";
+import ErrorBanner from "@/components/FeedbackBanner";
+import { useServerSentAuth } from "@/hooks/useServerSentAuth";
 
 
 const VisualisationPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
+    const bannerRef = useRef<MessageBannerRef>(null); 
+    const {driveAuthStatus} = useServerSentAuth();
+    
     const { viewerId } = useParams<{ viewerId: string }>();
     const navigate =  useNavigate();
 
@@ -24,12 +27,7 @@ const VisualisationPage: React.FC = () => {
     }
 
     const query = useQuery();
-    const message = query.get("message");
-    const {checkDriveAuth,authStatus} =  useDriveAuth()
-    
-    useEffect(()=>{
-        checkDriveAuth()
-    },[authStatus])
+    // const message = query.get("message");
 
 
     const hasViewerId = Boolean(viewerId);
@@ -37,18 +35,23 @@ const VisualisationPage: React.FC = () => {
     return(
         
         <div>
-            <header className="app__header" onClick={checkDriveAuth}>
+            <header className="app__header">
                 <Toolbar isEditMode={isEditMode} 
                         toggleEditMode={toggleEditMode} 
                         viewerId = {viewerId}
-                        authStatus = {authStatus}/>
+                        bannerRef = {bannerRef}
+                        driveAuthStatus = {driveAuthStatus}
+                        />
             </header>
+            <ErrorBanner ref={bannerRef}/>
+
             {/* ⬇️ Don't mount until ready */}
             {hasViewerId ? (
                 <PanoramaViewer
                 key={viewerId!}       // force remount when url changes (if your viewer needs it)
                 viewerId={viewerId!}
                 isEditMode={isEditMode}
+                bannerRef = {bannerRef}
                 width="100vw"
                 height="100vh"
                 />

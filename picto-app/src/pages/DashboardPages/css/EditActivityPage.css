@@ -58,5 +58,12 @@
 }
 
 .edit-activity-main-content{
+    font-family: 'Inter' sans-serif;
+}
+
+.edit-activity-input_field{
+    all: unset;
+    background-color: rgba(217, 217, 217, 0.15);
+    padding: 1vh;
 
 }

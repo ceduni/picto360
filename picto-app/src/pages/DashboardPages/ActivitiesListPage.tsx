@@ -56,7 +56,7 @@ const ActivitiesListPage :React.FC<ActivitiesListProps> = ()=>{
                                             totalParticipants:activity.totalParticipants,
                                             ownership:activity.ownership
                                         }
-                                        return <ActivityCard activityData={activityToDisplay} handleGotoActivity = {goToActivity}/>
+                                        return <ActivityCard key={activity._id} activityData={activityToDisplay} handleGotoActivity = {goToActivity}/>
                                     })
                                 :
                                 <p>Aucune acitivités trouvées</p>

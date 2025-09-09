@@ -28,7 +28,9 @@ export default async function exportRoutes(app: FastifyInstance) {
         }
         
         // Get form fields
+        console.log("START File to buffer", Date.now());
         const fileBuffer = await data.toBuffer();
+        console.log("END File to buffer", Date.now());
         // typed view of fields: key -> MultipartValue[] (or undefined)
         const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
 
@@ -59,8 +61,8 @@ export default async function exportRoutes(app: FastifyInstance) {
             console.error("❌ Failed to parse annotations:", formFields.annotations, err);
           }
 
-          if(annotations && annotations.length<=0){
-            return reply.code(400).send(`Error: The annotations array is empty : ${JSON.stringify(annotations)}`)
+          if(!annotations){
+            return reply.code(400).send(`Error: The annotations array does not exist : ${JSON.stringify(annotations)}`)
           }   
         }            
 

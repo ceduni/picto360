@@ -28,25 +28,25 @@ import {
     arrayMove,
     verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ActivityIstance, 
+import {  
     addNewParticipants, 
     handleAddTag, 
     handleAddTeamsToActivity, 
     handleChange, 
     handleDeleteTeamFromActivity, 
     handleTeamNameChange, 
-    TeamInstance, 
-    TaskData,
+
     handleParticipantNameChange,
     handleDeleteParticipant,
     handleRemoveTag,
     handleRemoveTask,
     handleAddTask,
     validateActivityValues,} from "@/utils/ActivityCreactionUtils";
-import ErrorBanner, {  ErrorBannerRef } from "./ErrorBanner";
+import ErrorBanner from "../components/FeedbackBanner";
+
+import  {  MessageBannerRef,ActivityIstance,TeamInstance,TaskData } from "../utils/Types";
 import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
 import { useCreateActivity } from "@/hooks/useActivityCreation";
-import { LuInfo } from "react-icons/lu";
 import { TiInfoLarge } from "react-icons/ti";
 
 
@@ -92,7 +92,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     },[formValues.teamsList])
 
 
-    const bannerRef = useRef<ErrorBannerRef>(null);
+    const bannerRef = useRef<MessageBannerRef>(null);
 
     // for error checking
     const validateForm = async function() {
@@ -105,7 +105,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
             setConfirmationMessage({title:"Félicitations !!!",details:"Votre activité a été créée avec succès"});
 
         }else{
-            bannerRef.current?.trigger(check.message);
+            bannerRef.current?.trigger(check.message,"failure");
         }
     }
 

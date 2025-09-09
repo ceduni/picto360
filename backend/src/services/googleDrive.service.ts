@@ -7,9 +7,6 @@ import { google, drive_v3 } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 import { FastifyRequest } from "fastify";
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
-
 export interface HotspotData {
   id: string;
   pitch: number;
@@ -22,11 +19,20 @@ export interface HotspotData {
   meta?: Record<string, any>; // optional metadata for custom cases
 }
 
+type AuthStatus = {
+  isAuthenticated: boolean;
+  provider: 'google' | null;
+  scopes?: string[];
+  connectedAt?: string; // ISO
+  reason?: 'revoked' | 'expired' | 'manual_disconnect' | 'login' | 'refresh';
+};
+
 interface GoogleDriveConfig {
   clientId: string ;
   clientSecret: string;
   redirectUri:string;
 }
+
 
 class GoogleDriveBackendService {
   private config: GoogleDriveConfig;
@@ -168,7 +174,27 @@ class GoogleDriveBackendService {
       expiry: credentials.expiry_date!,
     };
     await req.session.save?.();
+    this.broadcast('auth-status', { connected: true, expiresAt: req.session.google.expiry });
     return req.session.google.access_token!;
+  }
+
+  async getAuthStatus (req:FastifyRequest){
+    try{
+      await this.ensureAccessToken(req);
+      return {
+          isAuthenticated: true,
+          provider: 'google',
+          scopes: ['https://www.googleapis.com/auth/drive.file'],
+      }
+    }catch(error){
+      this.broadcast('auth-status', { connected: false, reason: 'revoked' });
+      return {
+          isAuthenticated: false,
+          provider: 'google',
+          scopes: ['https://www.googleapis.com/auth/drive.file'],
+      }
+    }
+
   }
 
   // Main export function
@@ -193,7 +219,6 @@ class GoogleDriveBackendService {
       // Create export folder
       const folderId = await this.createFolder(folderName);
 
-      // Upload first file (image or picto accordingly)
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
       let imageFileName = "Untitled";
@@ -257,12 +282,16 @@ class GoogleDriveBackendService {
         case "picto":
         default:
           imageFileName = `${fileName}_${timestamp}.picto`;
+          console.log("START File upload", Date.now());
+
           fileResult = await this.uploadFile(
             fileBuffer,
             imageFileName,
             'application/picto',
             folderId,
           );
+          console.log("END File upload", Date.now());
+
       }
 
       return {
@@ -281,6 +310,13 @@ class GoogleDriveBackendService {
       };
     }
   }
+
+  // Simple in-memory SSE client registry
+  public clients = new Set<{ id: string; write: (data: string) => void }>();
+  broadcast = (event: string, data: unknown) => {
+    const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    this.clients.forEach(c => c.write(payload));
+  };    
 }
 
 let driveService : GoogleDriveBackendService|null = null;
@@ -292,5 +328,3 @@ export const getGoogleDriveService = () =>{
   return driveService;
 }
 
-
-export {  };

@@ -31,7 +31,12 @@ const setupServer = async () => {
     await fastify.register(fastifyCors, {
       origin: (origin, cb) => {
         const allowed = ["http://localhost:3000"];
-        if (!origin || allowed.includes(origin)) cb(null, true);
+        if (!origin) {
+          // Allow requests without an Origin header (e.g., same-site or redirect flows)
+          cb(null, true);
+          return;
+        }        
+        if (allowed.includes(origin)) cb(null, true);
         else cb(new Error("Not allowed by CORS"), false);
       },
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

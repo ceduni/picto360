@@ -77,19 +77,18 @@ class ExportService {
 
         const annotationsJSON = JSON.stringify(annotations,null,2);
         const jsonBlob = new Blob([annotationsJSON], { type: "application/json" });
-        let exportCompleted = false;
 
         let files : {name:string,blob:Blob}[]  = [
                                                     {name:fileName,blob},
                                                     {name:fileName+"_annotations",blob:jsonBlob}
-                                                ]    
-      
+                                                ];    
         if (canUseFileSystemAPI) {
             try {
             // Modern way: always open Save As dialog
 
             // Ask the user to select a folder
-            const dirHandle = await (window as any).showDirectoryPicker();
+            const options = {mode:"readwrite"}
+            const dirHandle = await (window as any).showDirectoryPicker(options);
 
             // change files to export according to the format choosed                                                      
             if(files && format==="picto"){
@@ -139,9 +138,10 @@ class ExportService {
 
     private async exportToDiskWithSave (dirHandle:any,file:Blob,fileName:string){
         try {
+            console.log("File type:", file.type)
             // Modern way: always open Save As dialog
             const newName = fileName.includes(".") ? fileName
-            : fileName + "." + (file.type.split("/")[1] || "bin");
+            : fileName + "." + (file.type.split("/").pop() || "bin");
             // Create (or overwrite) each file in the folder
             const fileHandle = await dirHandle.getFileHandle(newName, { create: true });
             const writable = await fileHandle.createWritable();

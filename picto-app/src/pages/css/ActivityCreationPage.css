@@ -1014,30 +1014,3 @@ input[type="number"]::-webkit-outer-spin-button {
     justify-content: center;
     gap:0.2vw;
 }
-
-.error_banner{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed;
-    top:6vh;
-    z-index: 50;
-    width: 40vw;
-    padding: 1vh;
-    padding-left: 1vw;
-    padding-right: 1vw;
-    color: black;
-    font-weight: 600;
-    background-color: #E9FF25;
-
-    transform: translateY(-100%);
-    opacity: 0;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-
-}
-
-.error_banner.visible {
-  transform: translateY(0);
-  opacity: 1;
-}

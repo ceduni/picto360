@@ -36,7 +36,9 @@ interface HomeProps{
                     console.log("Error on picto file",error)
                 }
                 break
-            case "jpg":
+            case "jpg" :
+            case "JPG" :
+            case "jpeg" :
             case "png":
                 await putViewerItem(viewerId,undefined,newImageSrc,undefined);
                 break;

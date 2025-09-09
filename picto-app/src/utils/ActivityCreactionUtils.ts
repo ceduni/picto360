@@ -283,3 +283,4 @@ export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
         
         return newTeam;
     }
+

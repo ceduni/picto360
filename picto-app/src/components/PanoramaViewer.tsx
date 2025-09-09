@@ -2,13 +2,14 @@ import React, { useEffect, useCallback, useState, useRef, useMemo } from "react"
 import { useHotspotCreation } from "../hooks/useHotspotCreation";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
-import { HotspotData } from "../utils/Types";
+import { HotspotData, MessageBannerRef } from "../utils/Types";
 import "./css/PanoramaViewer.css";
 
 import EditionPannel from "./EditionPannel";
 import { createHotspotInstance, deleteHotspotInstance } from "@/utils/HotspotUtils";
 import { useNavigate } from "react-router-dom";
 import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
+import ErrorBanner from "./FeedbackBanner";
 
 declare global {
   interface Window {
@@ -23,6 +24,8 @@ interface PanoramaViewerProps {
   height: string;
   viewerId: string;
   isEditMode: boolean;
+  bannerRef: React.RefObject<MessageBannerRef | null>
+  
 }
 
 interface PannellumViewer {
@@ -34,7 +37,7 @@ interface PannellumViewer {
   onLoad:()=>void;
 }
 
-const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode }) => {
+const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode ,bannerRef}) => {
   const viewerRef = useRef<HTMLDivElement>(null);
   const hotspotCounter = useRef(0);
   const [imageSource,setImageSource] = useState<string|null>(null);

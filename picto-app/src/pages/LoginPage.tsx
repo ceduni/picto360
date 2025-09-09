@@ -5,7 +5,8 @@ import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmail
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
-import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
+import ErrorBanner from "../components/FeedbackBanner";
+import { MessageBannerRef } from "@/utils/Types";
 
  const LoginPage = () => {
 
@@ -18,7 +19,7 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
     const [errorMessage,setErrormessage] = useState('');
     const [loginWithEmailBoxes,setLoginInputBoxes] = useState(false);
     const [isSubscribing,setIsSubscribing] = useState(false);
-    const bannerRef = useRef<ErrorBannerRef>(null);
+    const bannerRef = useRef<MessageBannerRef>(null);
 
 
     const onSubmitGoogle = async (e: { preventDefault: () => void }) =>{
@@ -81,13 +82,13 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
         if (!isValidEmail(email) || email=='') {
             setErrormessage("Format de l'adresse email invalide");
             console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage);
+            bannerRef.current?.trigger(errorMessage,"warning");
             return;
         }
         if(password===""){
             setErrormessage("Veuillez rentrer un mot de passe");
             console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage);
+            bannerRef.current?.trigger(errorMessage,"warning");
             return;            
         }        
 
@@ -98,7 +99,7 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
             doCreateUserWithEmailAndPassword(email,password).catch((err) => {
                 setIsSigninIn(false);
                 setErrormessage(err);
-                bannerRef.current?.trigger(errorMessage);
+                bannerRef.current?.trigger(errorMessage,"failure");
             });
         }
     };
@@ -110,13 +111,13 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
         if (!isValidEmail(email) || email=='') {
             setErrormessage("Format de l'adresse email invalide.");
             console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage);
+            bannerRef.current?.trigger(errorMessage,"warning");
             return;
         }
         if(password===""){
             setErrormessage("Veuillez rentrer un mot de passe");
             console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage);
+            bannerRef.current?.trigger(errorMessage,"warning");
             return;            
         }
         
@@ -128,7 +129,7 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
             }catch(err:any){
                 setIsSigninIn(false);
                 setErrormessage(err.message);
-                bannerRef.current?.trigger(errorMessage);
+                bannerRef.current?.trigger(errorMessage,"failure");
                 setIsSigninIn(false);
                 console.log(err);
             };
@@ -153,7 +154,7 @@ import ErrorBanner, { ErrorBannerRef } from "./ErrorBanner";
 
     useEffect(()=>{
         if(errorMessage!=""){
-            bannerRef.current?.trigger(errorMessage);
+            bannerRef.current?.trigger(errorMessage,"warning");
         }
     },[errorMessage])
 

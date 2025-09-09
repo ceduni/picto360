@@ -1,12 +1,11 @@
 // hooks/useDriveAuth.ts
 import { useLocation } from "react-router-dom";
-import { getExportService } from "@/utils/ExportFileUtils";
-import { useState } from "react";
+// import { getExportService } from "@/utils/ExportFileUtils";
+// import { useEffect, useState } from "react";
 
 export function useDriveAuth() {
-  const driveService = getExportService();
+  // const driveService = getExportService();
   const location = useLocation();
-  const [authStatus,setAuthStatus] = useState<string|null> (null);
 
   const baseUrl =  'http://localhost:5000'; 
   
@@ -18,7 +17,6 @@ export function useDriveAuth() {
     sessionStorage.setItem("oauth:viewerId", viewerId);
     sessionStorage.setItem("oauth:returnTo", returnTo);
     
-    console.log("Return to :" , returnTo)
     const authUrl = await getAuthUrl(viewerId, returnTo);
     window.location.href = authUrl; // go to Google
   }
@@ -46,46 +44,13 @@ export function useDriveAuth() {
   }  
 
 
-  async function getDriveAuthStatus () {
-    try{
-      const result = await fetch(`http://localhost:5000/api/auth-status`,{
-          method:"GET",
-          credentials:"include",
-      });
-
-      if(!result.ok){
-          return null;
-      }
-      const data = await result.json();
-
-      return data.authStatus;
-    }catch(err){
-      return null;
-    }
-  }
-
-    
-  const checkDriveAuth = async()=>{
-          const authStatu = await getDriveAuthStatus()
-          const url = new URL(window.location.href);
-
-          if(!authStatu) {
-              url.searchParams.delete("auth");
-          }else{
-              url.searchParams.set("auth",authStatu);
-          }
-          window.history.replaceState({}, "", url.toString());
-          setAuthStatus(authStatu)
-  }
-
   async function logoutFromDrive() {
     const res = await fetch("http://localhost:5000/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
     if (!res.ok) throw new Error("Logout failed");
-    setAuthStatus(null);
   }
 
-  return { startDriveAuth,authStatus, checkDriveAuth,logoutFromDrive };
+  return { startDriveAuth,logoutFromDrive };
 }

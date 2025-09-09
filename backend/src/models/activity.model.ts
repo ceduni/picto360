@@ -3,8 +3,6 @@ import { ITeam } from "./team.model";
 import { UserDocument } from "./user.model";
 
 
-
-
 export interface ActivityDocument extends Document {
   id:string,
   title: string,

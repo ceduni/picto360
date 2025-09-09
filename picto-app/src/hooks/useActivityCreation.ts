@@ -1,5 +1,5 @@
 import { useAuth } from "@/authContext/authContext";
-import { ActivityIstance } from "@/utils/ActivityCreactionUtils";
+import { ActivityIstance } from "@/utils/Types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
