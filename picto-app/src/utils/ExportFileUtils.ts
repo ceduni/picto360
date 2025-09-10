@@ -1,5 +1,6 @@
 import { ExportFormat, HotspotData } from "@/utils/Types";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
  
 class ExportService {
     private baseUrl: string;
@@ -105,6 +106,7 @@ class ExportService {
                 await this.exportToDiskWithSave(dirHandle,file.blob,file.name);
             }
             console.log(`✅ Export completed `);
+            // setBannerMessage({message:"Exporté avec succes vers le disk",type:"success"})            
 
             return;
             } catch (err:any) {

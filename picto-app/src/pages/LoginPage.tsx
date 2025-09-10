@@ -2,24 +2,23 @@ import { useAuth } from "@/authContext/authContext";
 import "./css/LoginPage.css"
 
 import { doSignInWithEmailAndPassword ,doSighInWithGoogle, doCreateUserWithEmailAndPassword, doSignInWithFacebook } from "@/firebase/authentification"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
 import ErrorBanner from "../components/FeedbackBanner";
-import { MessageBannerRef } from "@/utils/Types";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
  const LoginPage = () => {
 
     const { currentUser,userLoggedIn } = useAuth();
+    const { setBannerMessage,bannerRef } = useFeedbackBanner();
     const navigate = useNavigate();
 
     const [email,setEmail]= useState('');
     const [password,setPassword] = useState<string>('');
     const [isSigningIn,setIsSigninIn] = useState(false);
-    const [errorMessage,setErrormessage] = useState('');
     const [loginWithEmailBoxes,setLoginInputBoxes] = useState(false);
     const [isSubscribing,setIsSubscribing] = useState(false);
-    const bannerRef = useRef<MessageBannerRef>(null);
 
 
     const onSubmitGoogle = async (e: { preventDefault: () => void }) =>{
@@ -31,7 +30,7 @@ import { MessageBannerRef } from "@/utils/Types";
             }catch (err: any) {
 
                 if (err.code !== 'auth/popup-closed-by-user') {
-                    setErrormessage('Google Sign-In Error:'+ err.message);
+                     setBannerMessage({message:'Google Sign-In Error:'+ err.message,type:"warning"});
                 }
             }finally{
                 setIsSigninIn(false);
@@ -47,7 +46,7 @@ import { MessageBannerRef } from "@/utils/Types";
                 await doSignInWithFacebook();
             }catch (err: any) {
                 if (err.code != 'auth/popup-closed-by-user') {
-                    setErrormessage('Facebook Sign-In Error:'+ err.message);
+                     setBannerMessage({message:'Facebook Sign-In Error:'+ err.message,type:"warning"});
                 }
             }finally{
                 setIsSigninIn(false);
@@ -80,15 +79,12 @@ import { MessageBannerRef } from "@/utils/Types";
         e.preventDefault();
 
         if (!isValidEmail(email) || email=='') {
-            setErrormessage("Format de l'adresse email invalide");
-            console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage,"warning");
+             setBannerMessage({ message:"Format de l'adresse email invalide",type:"warning"});
             return;
         }
         if(password===""){
-            setErrormessage("Veuillez rentrer un mot de passe");
-            console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage,"warning");
+             setBannerMessage({ message:"Veuillez rentrer un mot de passe",type:"warning"});
+            // bannerRef.current?.trigger(errorMessage,"warning");
             return;            
         }        
 
@@ -98,8 +94,8 @@ import { MessageBannerRef } from "@/utils/Types";
 
             doCreateUserWithEmailAndPassword(email,password).catch((err) => {
                 setIsSigninIn(false);
-                setErrormessage(err);
-                bannerRef.current?.trigger(errorMessage,"failure");
+                 setBannerMessage({ message:err,type:"failure"});
+                // bannerRef.current?.trigger(errorMessage,"failure");
             });
         }
     };
@@ -109,15 +105,15 @@ import { MessageBannerRef } from "@/utils/Types";
         e.preventDefault();
 
         if (!isValidEmail(email) || email=='') {
-            setErrormessage("Format de l'adresse email invalide.");
-            console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage,"warning");
+             setBannerMessage({ message:"Format de l'adresse email invalide.",type:"warning"});
+            // console.log(errorMessage);
+            // bannerRef.current?.trigger(errorMessage,"warning");
             return;
         }
         if(password===""){
-            setErrormessage("Veuillez rentrer un mot de passe");
-            console.log(errorMessage);
-            bannerRef.current?.trigger(errorMessage,"warning");
+             setBannerMessage({ message:"Veuillez rentrer un mot de passe",type:"warning"});
+            // console.log(errorMessage);
+            // bannerRef.current?.trigger(errorMessage,"warning");
             return;            
         }
         
@@ -128,8 +124,8 @@ import { MessageBannerRef } from "@/utils/Types";
                 doSignInWithEmailAndPassword(email,password);
             }catch(err:any){
                 setIsSigninIn(false);
-                setErrormessage(err.message);
-                bannerRef.current?.trigger(errorMessage,"failure");
+                 setBannerMessage({ message:err.message,type:"failure"});
+                // bannerRef.current?.trigger(errorMessage?.message,"failure");
                 setIsSigninIn(false);
                 console.log(err);
             };
@@ -144,19 +140,14 @@ import { MessageBannerRef } from "@/utils/Types";
 
     const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value); // 🔁 Store input value in state
+         setBannerMessage({ message:'Email changed succesfuly',type:"success"});
     };
 
     const handleChangePassword = (pass: React.ChangeEvent<HTMLInputElement>) => {
-        setErrormessage('');
         // console.log("Password typed:", pass.target.value);
         setPassword(pass.target.value);
+         setBannerMessage({ message:'password changed succesfuly',type:"success"});
     };
-
-    useEffect(()=>{
-        if(errorMessage!=""){
-            bannerRef.current?.trigger(errorMessage,"warning");
-        }
-    },[errorMessage])
 
     return(
         <div className="login_background">

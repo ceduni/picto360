@@ -5,8 +5,9 @@
     align-items: center;
     justify-content: space-between;
     position: fixed;
-    top:6vh;
-    z-index: 50;
+    top:5vh;
+    left: 30%;
+    z-index: 2000;
     width: 40vw;
     padding: 1vh;
     padding-left: 1vw;
@@ -30,7 +31,6 @@
     color: white;
 }
 
-.feedback_banner
 .visible {
   transform: translateY(0);
   opacity: 1;

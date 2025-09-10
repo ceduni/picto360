@@ -1,7 +1,7 @@
 import { MessageBannerRef, MessageBannerType } from "@/utils/Types";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuX } from "react-icons/lu";
-import "./css/FeedbackBanner.css"
+import "./css/FeedbackBanner.css";
 
 
 const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
@@ -11,15 +11,15 @@ const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
 
 
   useImperativeHandle(ref, () => ({
-    trigger: (msg: string, type: MessageBannerType  , duration = 5000) => {
+    trigger: (msg: string, type?: MessageBannerType  , duration = 5000) => {
       if(msg==="") return;
-
-      setMessageType(type);
+      setMessageType(type||"warning");
       setMessage(msg);
       setVisible(true);
 
+
       setTimeout(() => {
-        setVisible(false);
+        setVisible(false);     
       }, duration);
 
     },
@@ -37,7 +37,6 @@ const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
               :
               <LuTriangleAlert size={22}/>
         }
-ç
         <p>{message}</p>
         <LuX size={22} onClick={()=>setVisible(false)} style={{cursor:"pointer"}}/>
     </div>

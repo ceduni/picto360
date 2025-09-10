@@ -19,7 +19,7 @@ export interface HotspotInstance extends HotspotData {
 // -------------- Message banner -------------------
 
 export type MessageBannerRef = {
-  trigger: (message: string,type:MessageBannerType, duration?: number) => void;
+  trigger: (message: string,type?:MessageBannerType, duration?: number,id?:number) => void;
 };
 
 export type MessageBannerType = "success" | "warning" | "failure"

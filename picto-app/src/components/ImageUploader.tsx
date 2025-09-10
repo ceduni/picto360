@@ -34,8 +34,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
 
   const processFile = (file: File) => {
     // const url = URL.createObjectURL(file);
-    onImageUpload(file);
-    console.log("File uploaded: ", file);
+    try{
+      onImageUpload(file);
+      console.log("File uploaded: ", file);
+    }catch(error){
+      console.log(error);
+      return;
+    }
   };
 
   const triggerFileInput = (e:React.MouseEvent) => {

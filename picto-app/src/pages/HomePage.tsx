@@ -3,10 +3,11 @@ import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/HomePage.css";  
 import { useAuth } from "@/authContext/authContext";
-import { doSignOut } from "@/firebase/authentification";
 import GotoProfile from "@/components/GotoProfile";
 import { putViewerItem,compressBeforeUpload } from "@/utils/storedImageData";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
+import ErrorBanner from "@/components/FeedbackBanner";
 
 
 interface HomeProps{
@@ -15,12 +16,13 @@ interface HomeProps{
 
   const HomePage: React.FC<HomeProps> = () => {
    
-    const {userLoggedIn,currentUser} = useAuth();
+    const {userLoggedIn} = useAuth();
+    const { setBannerMessage,bannerRef } = useFeedbackBanner();
 
     const navigate = useNavigate();
 
-    const handleImageUpload = useCallback(async (newImageSrc: File) => {
-        if(!ImageUploader) return;
+    const handleImageUpload = useCallback(async (newImageSrc: File) : Promise<boolean> => {
+        if(!ImageUploader) return false;
 
         const viewerId = crypto.randomUUID();
         const filetype = newImageSrc.name.split(".").pop();
@@ -32,8 +34,10 @@ interface HomeProps{
                 try{
                     const extractedFile = await CustomFileExporter.extractCustomFile(newImageSrc);
                     await putViewerItem(viewerId,fileName,extractedFile.imageBlob,extractedFile.annotations);
+                    setBannerMessage({message:"Fichier chargé avec succès",type:"success"})
                 }catch(error){
-                    console.log("Error on picto file",error)
+                    setBannerMessage({message:"Error on picto file",type:"failure"})
+                    // console.log("Error on picto file",error)
                 }
                 break
             case "jpg" :
@@ -41,34 +45,22 @@ interface HomeProps{
             case "jpeg" :
             case "png":
                 await putViewerItem(viewerId,undefined,newImageSrc,undefined);
+                setBannerMessage({message:"Image chargé avec succès",type:"success"})
                 break;
             default:
-                console.log("Invalid file Format")
-                return
+                setBannerMessage({message:"Format de fichier Invalide",type:"failure"})
+                // console.log("Invalid file Format")
+                return false
         }
         
         await navigate(`/view/${viewerId}`);
-
-        // await fetch("http://localhost:3000",{
-            
-        // })
-        
-        // const compressedImage = await compressBeforeUpload(newImageSrc);
-        // await putViewerItem(viewerId,undefined,undefined,undefined,compressedImage);
+        return true
 
     }, []);
 
     const handleLogClick = useCallback(() => {
         navigate('/login');
     }, []);
-
-
-    const onLoggOut = async (e: { preventDefault: () => void })=> {
-            e.preventDefault();
-            if(userLoggedIn){
-                await doSignOut()
-            }
-        }
 
     const onCreateActivityClick = () => {
         if(userLoggedIn){
@@ -86,7 +78,7 @@ interface HomeProps{
         <div className="home_background">
 
             <div className="home-page__content">
-
+                <ErrorBanner ref={bannerRef}/>
                 <div className="top-content">
                     <img className="image-uploader__logo" 
                         src="/images/logo_picto360.png" alt="Logo-picto360" />

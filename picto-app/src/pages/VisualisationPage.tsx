@@ -1,34 +1,27 @@
-  import React, { useState, useCallback, useEffect, useRef } from "react";
+  import React, { useState, useCallback } from "react";
 import Toolbar from "@components/Toolbar";
 import PanoramaViewer from "@components/PanoramaViewer";
 import BottomNavBar from "@/components/BottomNavBar";
 import { motion, AnimatePresence } from "framer-motion";
 import "../App.css";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { MessageBannerRef } from "@/utils/Types";
+import { useParams } from "react-router-dom";
+
 import ErrorBanner from "@/components/FeedbackBanner";
 import { useServerSentAuth } from "@/hooks/useServerSentAuth";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 
 const VisualisationPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
-    const bannerRef = useRef<MessageBannerRef>(null); 
+    const { bannerRef } = useFeedbackBanner();
+
     const {driveAuthStatus} = useServerSentAuth();
     
     const { viewerId } = useParams<{ viewerId: string }>();
-    const navigate =  useNavigate();
 
     const toggleEditMode = useCallback(() => {
         setIsEditMode((prevMode) => !prevMode);
     }, []);
-
-    function useQuery() {
-        return new URLSearchParams(useLocation().search);
-    }
-
-    const query = useQuery();
-    // const message = query.get("message");
-
 
     const hasViewerId = Boolean(viewerId);
 
@@ -37,10 +30,9 @@ const VisualisationPage: React.FC = () => {
         <div>
             <header className="app__header">
                 <Toolbar isEditMode={isEditMode} 
-                        toggleEditMode={toggleEditMode} 
-                        viewerId = {viewerId}
-                        bannerRef = {bannerRef}
-                        driveAuthStatus = {driveAuthStatus}
+                            toggleEditMode={toggleEditMode} 
+                            viewerId = {viewerId}
+                            driveAuthStatus = {driveAuthStatus}
                         />
             </header>
             <ErrorBanner ref={bannerRef}/>

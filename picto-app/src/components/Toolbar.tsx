@@ -30,13 +30,12 @@ interface ToolbarProps {
   isEditMode: boolean;
   toggleEditMode: () => void;
   viewerId?:string;
-  bannerRef: React.RefObject<MessageBannerRef | null>;
   driveAuthStatus:DriveAuthStatus|null;
 }
 
 const CHARACTER_LIMIT = 20;
 
-const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,bannerRef,driveAuthStatus}) => {
+const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,driveAuthStatus}) => {
 
   const [projectTitle, setProjectTitle] = useState(""); //TODO: manage project uniqueness in DB
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
@@ -353,7 +352,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                             setIsPopupOpen={setShowExportOptions} 
                             viewerId = {viewerId}
                             titleState = {{projectTitle,setProjectTitle: handleTitleChange,saveProjectTitleToDB}}
-                            bannerRef={bannerRef}
                             driveAuthStatus= {driveAuthStatus}/>
       </AppBar>
     </motion.div>

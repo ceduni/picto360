@@ -9,7 +9,13 @@ import { IoFileTrayFull } from "react-icons/io5";
 import { getExportService } from "@/utils/ExportFileUtils";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { getViewerItem } from "@/utils/storedImageData";
-import { DriveAuthStatus, ExportDestination, ExportFormat, HotspotData, MessageBannerRef } from "../../utils/Types";
+import { DriveAuthStatus, 
+        ExportDestination, 
+        ExportFormat, 
+        HotspotData, 
+        MessageBannerRef 
+} from "../../utils/Types";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "../FeedbackBanner";
 
 
@@ -23,14 +29,14 @@ interface ExportPopupProps {
         setProjectTitle: (e:React.ChangeEvent<HTMLInputElement>)=>void,
         saveProjectTitleToDB:()=>void
     }
-    bannerRef: React.RefObject<MessageBannerRef | null>;
     driveAuthStatus:DriveAuthStatus|null;
 
 }
 
-const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, titleState,bannerRef,driveAuthStatus}) => {
+const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, titleState,driveAuthStatus}) => {
     const { startDriveAuth,logoutFromDrive } = useDriveAuth();
     const driveService = getExportService(); // for file export
+    const { setBannerMessage,bannerRef } = useFeedbackBanner();
 
     const [exportFormat,setExportFormat] = useState<ExportFormat>("picto")
     const [isExporting, setIsExporting] = useState(false);
@@ -55,6 +61,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     const handleSelectFormat = (select : HTMLSelectElement)=>{
         if(!select.value) return;
         setExportFormat(select.value as "picto"|"raw");
+        setBannerMessage({message:"Format sélectionné",type:"success"})
     }
 
     const handleAuthenticate = async () => {
@@ -62,7 +69,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             await startDriveAuth(viewerId);
         } catch (error) {
             setExportStatus(`Authentication failed: ${error}`);
-            bannerRef.current?.trigger("Authentication failed, try again","failure")
+            setBannerMessage({message:"Authentication failed, try again",type:"failure"})
         }
     };
 
@@ -81,9 +88,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
             if (result.success) {
                 setExportStatus("Export successful! \n"  +`View files: ${result.driveUrl}`);
-            } else {
-                bannerRef.current?.trigger("Export failed, try again","failure")
+                setBannerMessage({message:"Exporté avec succes vers le drive",type:"success"})            
 
+            } else {
+                setBannerMessage({message:"Export failed, try again",type:"failure"})
                 logoutFromDrive();
                 console.log(result.error);
                 throw new Error(result.error);
@@ -98,20 +106,21 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     const exportToDisk = async(imageBlob:Blob,annotations?:HotspotData[],fileName?:string)=>{
         console.log("Export format: ", exportFormat)
 
-        try{
+        try{            
             await driveService.exportFileToDisk(imageBlob,  
                                                 fileName || "Untitled",  
                                                 exportFormat,
                                                 annotations && annotations?.length>0 ? annotations: undefined,                                                
                                     );
-            setTimeout(()=>{},1000)
-
+            setBannerMessage({message:"Exporté avec succes vers le disk",type:"success"})            
         } catch (error) {
-            bannerRef.current?.trigger("Export failed, try again","failure")
+            setBannerMessage({message:"Export failed, try again",type:"failure"})            
+            // bannerRef.current?.trigger(,"failure")
 
             setExportStatus(`Export failed: ${error}`);
         } finally {
             setIsExporting(false);
+
         }        
     }
 
@@ -125,7 +134,9 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         const fileName = viewerItem?.name || "Untitled";
                         
         if (!imageBlob || imageBlob === undefined) {
-            bannerRef.current?.trigger("No image found, upload an image","warning")
+            setBannerMessage({message:"No image found, upload an image",type:"warning"})            
+
+            // bannerRef.current?.trigger("No image found, upload an image","warning")
 
             setExportStatus('Please select an image');
             return null;
@@ -136,25 +147,27 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         switch(destination){
             case "drive":
                 setExportStatus('Exporting to Google Drive...');
-                exportToDrive(imageBlob,annotations,fileName);
+                await exportToDrive(imageBlob,annotations,fileName);
                 break
             case "disk":
             default:
                 setExportStatus('Exporting to Disk...');
-                exportToDisk(imageBlob,annotations,fileName)
-                
+                await exportToDisk(imageBlob,annotations,fileName);                
         }
     }
 
     useEffect(()=>{
         setIsPopupOpen(isExporting);
+        
     },[isExporting])
 
     
     return (
+        <div>
+            <ErrorBanner ref={bannerRef} />
         <Modal open={isOpen} onClose={handlePopupClose} closeAfterTransition >
+            
             <Fade in={isOpen}>
-                
             <div className="popup-export-content"
                 style={{
                 position: "absolute",
@@ -168,6 +181,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 alignContent:"center",
                 width:400,
             }}>
+
                 <div className="popup_window-header">
                     <p className="popup_window-title">
                         Exporter vers
@@ -256,6 +270,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             </div>
             </Fade>
         </Modal>
+        </div>
     )
 }    
 
