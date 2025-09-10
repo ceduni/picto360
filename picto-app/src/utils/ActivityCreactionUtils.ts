@@ -3,8 +3,7 @@ import { useAuth } from "@/authContext/authContext";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ActivityIstance, ParticipantData, TaskData, TeamInstance } from "./Types";
-
-
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 //Activity details change 
 export const handleChange = (formValues:ActivityIstance,e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -223,6 +222,7 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
 
 const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
     e.preventDefault();
+    const {setBannerMessage} = useFeedbackBanner();
 
     try {
       const response = await fetch("http://localhost:5000/activities", {
@@ -235,15 +235,14 @@ const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log("✅ Activity created:", data);
-        alert("Activity created successfully!");
+        // console.log("✅ Activity created:", data);
+        setBannerMessage({message:"Activité créée avec succès",type:"success"});
       } else {
-        console.error("❌ Failed to create activity:", data);
-        alert("Something went wrong.");
+        setBannerMessage({message:"Erreure de création d'activité",type:"failure"});
+        // console.error("❌ Failed to create activity:", data);
       }
     } catch (err) {
-      console.error("🚨 Error sending request:", err);
-      alert("Network error.");
+        setBannerMessage({message:"Erreure de création d'activité, Réessayez",type:"failure"});
     }
 };
 
@@ -267,15 +266,19 @@ const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
     }
 
 export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
+    const {setBannerMessage} = useFeedbackBanner();
 
         if (!team ) {
-            console.log("Erreur de création 2"); 
+            setBannerMessage({message:"Erreure d'ajout des participants, Réessayez",type:"failure"});
+
+            // console.log("Erreur de création 2"); 
             return 
         };
         const newTeam = team;
 
         if (team.participantsNames.length <= 0 && toAdd <= 0) {
-            console.log("Erreur de création 3"); 
+            setBannerMessage({message:"Erreure d'ajout des participants, Réessayez",type:"failure"});
+            // console.log("Erreur de création 3"); 
             return 
         };
 

@@ -2,6 +2,7 @@ import { useAuth } from "@/authContext/authContext";
 import { ActivityIstance } from "@/utils/Types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useFeedbackBanner } from "./useFeedbackbanner";
 
 export function useCreateActivity () {
 
@@ -9,6 +10,7 @@ export function useCreateActivity () {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activityId,setActivityId] = useState("");
+    const {setBannerMessage} = useFeedbackBanner()
 
     const createActivity = async (formValues:ActivityIstance) => {
         if (!currentUser || ! userLoggedIn) {
@@ -80,11 +82,14 @@ export function useCreateActivity () {
             } else {
                 const created = await response.json();
                 setActivityId(created._id);
-                console.log("Activity created successfully:", created);
+                setBannerMessage({message:"Activité créée avec succès",type:"success"})
+                // console.log("Activity created successfully:", created);
             }
         } catch (err:any) {
-                setError(err);
-                console.error("Something went wrong", err);
+                setBannerMessage({message:"Erreur lors de la créaction d'activité",type:"failure"})
+
+                // setError(err);
+                // console.error("Something went wrong", err);
         } finally {
                 setLoading (false);
         }

@@ -9,15 +9,10 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 import { LuArrowLeft, LuCheck, LuCross, LuGitFork, LuImageDown, LuPenLine, LuX } from "react-icons/lu";
 import { updateProfile } from "firebase/auth";
 import { updateUserName } from "@/firebase/userProfileUpdates";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
+import ErrorBanner from "@/components/FeedbackBanner";
 
-
-interface ProfileProps {
-    
-}
-
-
-
-  const ProfilePage: React.FC<ProfileProps> = () => {
+  const ProfilePage: React.FC = () => {
 
     const navigate = useNavigate();
 
@@ -25,6 +20,7 @@ interface ProfileProps {
 
     const [uname,setUname] = useState<string|null|undefined>(currentUser?.displayName);
     const [isTyping, setIsTyping] = useState(false);
+    const  {setBannerMessage,bannerRef} = useFeedbackBanner();
 
     const onLoggOut = async (e: { preventDefault: () => void })=> {
             e.preventDefault();
@@ -46,13 +42,16 @@ interface ProfileProps {
     const handleUpdateUserName = async (newName : string) =>{
         try{
             if (currentUser) {
-                await updateUserName(newName)
-                console.log("Name updated succesfuly")
+                await updateUserName(newName);
+                setBannerMessage({ message:"Nom actualisé avec succès",type:"success"});
+                
             }else{
-                console.log("User not logged in")
+                setBannerMessage({ message:"Utilisateur pas connecté",type:"failure"});
+                // console.log("User not logged in")
             }
         }catch(error:any){
-            console.log("Error on Update name: ", error)
+            setBannerMessage({ message:"Erreur lors de la mise à jour du nom, Réessayer",type:"failure"});
+            // console.log("Error on Update name: ", error)
         }
     }
 
@@ -76,7 +75,7 @@ interface ProfileProps {
     return(
         <div className="profile_page-background">
             <div className="profile_page-content">
-
+                <ErrorBanner ref={bannerRef}/>
                 <div className="profile_top">
 
                     <div onClick={handleGoBack} className="back_button">

@@ -46,11 +46,9 @@ export default async function oauthRoutes(app: FastifyInstance) {
       const {  state, code, error } = request.query as { state?: string; code?: string; error?: string };
       if (error) return reply.code(400).send({ error });
       if (!code) return reply.code(400).send({ error: "missing_code" });   
-      console.log("Query valid");
 
       let payload: { n:string; r: string; v?: string };
       payload = JSON.parse(Buffer.from(String(state), "base64url").toString("utf8")); // validate state
-      console.log("Payload passed");
 
       const sess = request.session.oauth;
       if (!sess?.nonce || payload.n !== sess.nonce) {
@@ -63,10 +61,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
       // one-time use
       delete request.session.oauth;
 
-      console.log("Drive service:", driveService)
-
       const tokens = await driveService.getTokensFromCode(code);
-      console.log("Token got");
       
       const returnTo = isSafeReturnTo(payload.r) ? payload.r : "/";
 

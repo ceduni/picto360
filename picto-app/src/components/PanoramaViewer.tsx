@@ -9,7 +9,7 @@ import EditionPannel from "./EditionPannel";
 import { createHotspotInstance, deleteHotspotInstance } from "@/utils/HotspotUtils";
 import { useNavigate } from "react-router-dom";
 import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
-import ErrorBanner from "./FeedbackBanner";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 declare global {
   interface Window {
@@ -37,7 +37,7 @@ interface PannellumViewer {
   onLoad:()=>void;
 }
 
-const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode ,bannerRef}) => {
+const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId, isEditMode }) => {
   const viewerRef = useRef<HTMLDivElement>(null);
   const hotspotCounter = useRef(0);
   const [imageSource,setImageSource] = useState<string|null>(null);
@@ -49,6 +49,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   });
   const [targetIconPosition, setTargetIconPosition] = useState<{ x: number; y: number } | null>(null);
   const contextMenuCoordsRef = useRef<{ pitch: number; yaw: number }>({ pitch: 0, yaw: 0 });
+  const {setBannerMessage} = useFeedbackBanner() 
 
   const [editingPannelState,setEditingPannelState] = useState<{ isOpen: boolean ; state: string} | null>(null);
   
@@ -79,17 +80,19 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   const initializeViewer = useCallback( () => {
 
     if (!viewerRef.current || !imageSource) {
-      console.error("PanellumViewer - Viewer ref or image source is missing.:", imageSource);
+      setBannerMessage({message:"PanellumViewer - Viewer ref or image source is missing.",type:"failure"})
+      // console.error("PanellumViewer - Viewer ref or image source is missing.:", imageSource);
       return;
     }
 
     if(!window.pannellum){
-      console.error("PanellumViewer - window.pannellum is not available. Check script loading.");
+      setBannerMessage({message:"PanellumViewer - window.pannellum is not available. Check script loading.",type:"failure"})
+      // console.error("PanellumViewer - window.pannellum is not available. Check script loading.");
       return;
     }
     
     if(!viewerInstanceRef.current){
-      console.log("PanellumViewer - Initializing Pannellum viewer...:", viewerConfig.panorama);
+      // console.log("PanellumViewer - Initializing Pannellum viewer...:", viewerConfig.panorama);      
       viewerInstanceRef.current = window.pannellum.viewer(viewerRef.current, viewerConfig) as PannellumViewer;    
     }
 
@@ -122,7 +125,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     
     return () => {
       if (viewerInstanceRef.current) {
-        console.log("PanellumViewer - Destroying Pannellum viewer...");
+        // console.log("PanellumViewer - Destroying Pannellum viewer...");
         viewerInstanceRef.current.destroy();
         viewerInstanceRef.current = null;
       }
@@ -142,7 +145,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   useEffect(() => {
     if (viewerInstanceRef.current && hotspots.length > 0) {
       const handler = () => {
-        console.log("hotspots: ", hotspots)
 
         hotspots.forEach(hs => {
           if (hs) addHotspotToViewer(hs);
@@ -169,7 +171,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
         event.preventDefault();
         event.stopPropagation();
         // change the error message to the banner
-        console.log("Context menu disabled on hotspots");
+        setBannerMessage({message:"Impossible de supperposer des annotations",type:"warning"})
         return;
       }
 
@@ -178,7 +180,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
       setTargetIconPosition(position);
 
       const coords = viewerInstanceRef.current.mouseEventToCoords(event.nativeEvent);
-      console.log("PanellumViewer - Mouse coords to pitch/yaw:", coords);
+      // console.log("PanellumViewer - Mouse coords to pitch/yaw:", coords);
       contextMenuCoordsRef.current = { pitch: coords[0], yaw: coords[1] };
     },
     [isEditMode]
@@ -191,7 +193,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
   
 
   const handleHotspotCreation = useCallback((type: string, coords: [number, number]) => {
-    console.log(`PanellumViewer - Performing action of type ${type} at pitch = ${coords[0]}, yaw = ${coords[1]}...`);
+    // console.log(`PanellumViewer - Performing action of type ${type} at pitch = ${coords[0]}, yaw = ${coords[1]}...`);
     
       const hotspotId = `hotspot-${Date.now()}-${hotspotCounter.current++}`;
 
@@ -292,8 +294,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
 
     hotspotCounter.current++;
 
-    console.log("put hotspot in viewer")
-
   }
 
   const handleHotspotSave = async (updatedHotspot: HotspotData) => {
@@ -331,8 +331,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
 
   const handleHotspotClick = (hotspot: HotspotData) => {
     openEditor("editing",hotspot);
-
-    console.log("Selected for editing:", hotspot);
   };
 
 

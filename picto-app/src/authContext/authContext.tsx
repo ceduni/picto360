@@ -1,7 +1,8 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { auth } from "@/firebase/firebase";
-import { getRedirectResult, onAuthStateChanged, User } from "firebase/auth";
+import {  onAuthStateChanged, User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 interface AuthContextType {
   currentUser: User | null;
@@ -23,7 +24,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     const [currentUser,setCurrentUser] = useState<User | null>(null);
     const [userLoggedIn,setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
-
+    const  {setBannerMessage} = useFeedbackBanner()
     const navigate = useNavigate();
 
     // Memoize the initializeUser function to prevent unnecessary re-renders
@@ -32,11 +33,10 @@ export function AuthProvider ({ children }: { children: ReactNode }){
             setCurrentUser(user);
             setUserLoggedIn(true);
             await createUserInDatabase(user);
-            console.log("onAuthStateChanged: User is logged in:", user.uid);
+            setBannerMessage({message:"Connecté avec succès",type:"success"});
         } else {
             setCurrentUser(null);
             setUserLoggedIn(false);
-            console.log("onAuthStateChanged: User is logged out.");
         }
         // Set loading to false once the initial authentication state is determined
         setLoading(false);
@@ -45,10 +45,10 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     const createUserInDatabase = async (user:User|null) =>{
         try{
             if(!user) {
-                console.log("User not found")
+                setBannerMessage({message:"Le compte utilisateur n'a pas été trouvé.",type:"failure"});
                 return;
             };
-            console.log("Phase 1 db")
+
             const token = await user.getIdToken();
             
             const response = await fetch("http://localhost:5000/users", {
@@ -58,10 +58,9 @@ export function AuthProvider ({ children }: { children: ReactNode }){
                     Authorization: `Bearer ${token}`,
                 }
             });
-            console.log("User logged in database", response)
             // return response;
         }catch(error:any){
-            console.log(error);
+            setBannerMessage({message:"Erreure de connexion.",type:"failure"});
         }
     } 
 

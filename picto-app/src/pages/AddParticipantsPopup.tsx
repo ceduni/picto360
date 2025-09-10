@@ -3,9 +3,11 @@ import { IoIosClose } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 
 import "./css/AddParticipantsPopup.css"
-import { TeamInstance,ActivityIstance, handleParticipantNameChange, handleDeleteParticipant, ParticipantData, handleAddParticipToTeam } from "@/utils/ActivityCreactionUtils";
+import { handleParticipantNameChange, handleDeleteParticipant, handleAddParticipToTeam } from "@/utils/ActivityCreactionUtils";
+import { TeamInstance,ActivityIstance,ParticipantData} from "@/utils/Types";
 import ParticipantCard from "./PagesUiComponents/ParticipantCard";
 import { FaPlus } from "react-icons/fa";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 
 interface AddParticipantsPopupProps{
@@ -27,6 +29,7 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
         supervisor_id:""
     })
     const [errorMessagePopup,setErrorMessagePopup] = useState<{err:string,isDisplayed:boolean}>({err:"",isDisplayed:false});
+    const {setBannerMessage} = useFeedbackBanner()
 
     // if skip participants add process is allowed , un-comment all the parts with addLater
     // const [addLater,setAddLater] = useState(true);
@@ -40,14 +43,17 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
     const onAddParticipToTeam = (toAdd:number) => {
 
         if(toAdd<=0) {
-            setErrorMessagePopup({err:"Nombre de participants invalide, doit être >= 0 ",isDisplayed:true})
+            setBannerMessage({message:"Nombre de participants invalide, doit être >= 0",type:"warning"});
+
+            setErrorMessagePopup({err:"Nombre de participants invalide, doit être >= 0 ",isDisplayed:true});
             return
         };
 
         // const newTeams = [...updatedTeams];
 
         if (!updatedTeams[teamIdx] ) {
-            console.log("Erreur de création 2"); 
+            setBannerMessage({message:"Erreur lors de l'ajout des participants",type:"failure"})
+            // console.log("Erreur de création 2"); 
             return 
         };
 
@@ -79,8 +85,6 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
     //     }
     // },[addLater,numberParticipants])
 
-
-
     // props handlers for paricipant card 
     const changeParticipantName = (idx:string,toAdd:string) =>{
         const newParticipantsList = handleParticipantNameChange(teamToEdit.participantsNames,idx,toAdd);
@@ -88,7 +92,7 @@ const AddParticipantsPopup : React.FC<AddParticipantsPopupProps> = ({onClose,tea
         const updatedTeams = [...teamList];
         updatedTeams[teamIdx].participantsNames = newParticipantsList
 
-        setFormValues((prev)=>({...prev,teamsList:updatedTeams}))
+        setFormValues((prev)=>({...prev,teamsList:updatedTeams}));
     }
 
     const deleteParticipantFromActivity = (toDelete:string) =>{

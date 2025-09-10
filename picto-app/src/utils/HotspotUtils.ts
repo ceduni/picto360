@@ -153,13 +153,6 @@ export const renderTooltipContent = (
       };
     };
 
-    
-    export const hotspotClickHandler = (event: any, args: HotspotData) =>{
-        // onHotspotClick(args);
-        console.log("Hotspot clicked:", args);
-    }
-
-
     export const createHotspotInstance = (
         hotspot: HotspotData,
         clickHandler: (event: MouseEvent, args: HotspotData) => void

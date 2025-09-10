@@ -27,7 +27,7 @@ interface HomeProps{
         const viewerId = crypto.randomUUID();
         const filetype = newImageSrc.name.split(".").pop();
         const fileName = newImageSrc.name.split(".")[0];
-        console.log("Filetype:",filetype);
+        // console.log("Filetype:",filetype);
 
         switch(filetype){
             case "picto":

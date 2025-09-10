@@ -124,10 +124,9 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
                 doSignInWithEmailAndPassword(email,password);
             }catch(err:any){
                 setIsSigninIn(false);
-                 setBannerMessage({ message:err.message,type:"failure"});
+                setBannerMessage({ message:err.message,type:"failure"});
                 // bannerRef.current?.trigger(errorMessage?.message,"failure");
                 setIsSigninIn(false);
-                console.log(err);
             };
         }
 

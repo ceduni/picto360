@@ -2,7 +2,7 @@ import {CircularProgress, Fade, IconButton, Modal } from "@mui/material"
 import {
   Cancel as CancelIcon,
 } from "@mui/icons-material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "@components/css/ExportPopupWindow.css"
 import { FaGoogleDrive } from "react-icons/fa";
 import { IoFileTrayFull } from "react-icons/io5";
@@ -12,8 +12,7 @@ import { getViewerItem } from "@/utils/storedImageData";
 import { DriveAuthStatus, 
         ExportDestination, 
         ExportFormat, 
-        HotspotData, 
-        MessageBannerRef 
+        HotspotData,
 } from "../../utils/Types";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "../FeedbackBanner";
@@ -91,10 +90,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                 setBannerMessage({message:"Exporté avec succes vers le drive",type:"success"})            
 
             } else {
-                setBannerMessage({message:"Export failed, try again",type:"failure"})
+                setBannerMessage({message:"Export échoué, essayez à nouveau",type:"failure"})
                 logoutFromDrive();
-                console.log(result.error);
-                throw new Error(result.error);
+                // console.log(result.error);
+                // throw new Error(result.error);
             }
         } catch (error) {
             setExportStatus(`Export failed: ${error}`);
@@ -104,8 +103,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
     };
 
     const exportToDisk = async(imageBlob:Blob,annotations?:HotspotData[],fileName?:string)=>{
-        console.log("Export format: ", exportFormat)
-
         try{            
             await driveService.exportFileToDisk(imageBlob,  
                                                 fileName || "Untitled",  

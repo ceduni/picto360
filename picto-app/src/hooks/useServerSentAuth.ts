@@ -46,7 +46,7 @@ export function useServerSentAuth(){
     es.addEventListener("auth-status", (evt) => {
         if (!canceled) {
         const next = JSON.parse((evt as MessageEvent).data) as DriveAuthStatus;
-        console.log("Auth status event:", next);
+        // console.log("Auth status event:", next);
         setAuthStatus(next);
         }
     });

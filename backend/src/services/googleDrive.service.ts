@@ -282,7 +282,6 @@ class GoogleDriveBackendService {
         case "picto":
         default:
           imageFileName = `${fileName}_${timestamp}.picto`;
-          console.log("START File upload", Date.now());
 
           fileResult = await this.uploadFile(
             fileBuffer,
@@ -290,7 +289,6 @@ class GoogleDriveBackendService {
             'application/picto',
             folderId,
           );
-          console.log("END File upload", Date.now());
 
       }
 

@@ -1,6 +1,5 @@
 import { ExportFormat, HotspotData } from "@/utils/Types";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
-import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
  
 class ExportService {
     private baseUrl: string;
@@ -21,9 +20,6 @@ class ExportService {
         } = {},
     ): Promise<any> {
         try {
-
-        console.log("Blob:" , imageBlob)
-
         const formData = new FormData();
         formData.append("format", format );
 
@@ -47,8 +43,6 @@ class ExportService {
         if (options.folderName) {
             formData.append('folderName', options.folderName);
         }
-
-        console.log("Request Body: ", JSON.stringify(formData.get("file")));
 
         const response = await fetch(`${this.baseUrl}/api/drive/export`, {
             method: 'POST',
@@ -111,7 +105,6 @@ class ExportService {
             return;
             } catch (err:any) {
                 if (err.name === "AbortError") {
-                    console.log("User cancelled the directory picker.");
                     return;
                 }
                 console.warn("Falling back... :", err);
@@ -140,7 +133,6 @@ class ExportService {
 
     private async exportToDiskWithSave (dirHandle:any,file:Blob,fileName:string){
         try {
-            console.log("File type:", file.type)
             // Modern way: always open Save As dialog
             const newName = fileName.includes(".") ? fileName
             : fileName + "." + (file.type.split("/").pop() || "bin");

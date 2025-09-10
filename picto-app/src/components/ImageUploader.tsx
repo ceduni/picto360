@@ -4,6 +4,7 @@ import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa
 import { GrOnedrive } from "react-icons/gr";
 //import WelcomeMessage from "./ui/WelcomeMessage";
 import "./css/ImageUploader.css";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 interface ImageUploaderProps {
   onImageUpload: (imageSrc: File) => void;
@@ -13,6 +14,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   //TODO: manage errors + add red color to the drop zone
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {setBannerMessage}= useFeedbackBanner()
 
   const handleDragEvents = (event: React.DragEvent, isDragging: boolean) => {
     event.preventDefault();
@@ -36,9 +38,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     // const url = URL.createObjectURL(file);
     try{
       onImageUpload(file);
-      console.log("File uploaded: ", file);
+      setBannerMessage({message:"Fichier chargé avec succès",type:"success"})
     }catch(error){
-      console.log(error);
+      setBannerMessage({message:"Erreure de chargement de fichier",type:"failure"})
       return;
     }
   };
