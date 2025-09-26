@@ -109,6 +109,7 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
             return <TextEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
         case "hyperlink":
             return <HyperlinkEditor  ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
+        case "gif":
         case "image":
             return <ImageEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
         case "video":

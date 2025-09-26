@@ -14,6 +14,8 @@ interface EditorProps {
 const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref) => {
   const [url_text, setURL] = useState(hotspot.url_text || "");
   const [content, setContent] = useState(hotspot.content || "");
+  const [image_url, setImageUrl] = useState("");
+
 
     const handleSubmit = (e?:React.FormEvent) => {
         e?.preventDefault();
@@ -50,18 +52,36 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
         className="annotation_edition_pannel" >
         
         <label className="edition_pannel_field">
-            <p className="edition_pannel_field_title">
+            {/* <p className="edition_pannel_field_title">
                 Titre ou description de l'image:
             </p>
             <input
                 type="text"
                 value={url_text}
                 onChange={(e) =>
-                    setURL(e.target.value)
+                    setImageUrl(e.target.value)
                 }
                 className="dialog_field"
                 placeholder="Entrez le titre ici ..."
+            /> */}
+
+            <p className="edition_pannel_field_title">
+                Image par lien:
+            </p>            
+            <input
+                type="text"
+                value={image_url}
+                onChange={(e) =>
+                    setImageUrl(e.target.value)
+                }
+                onKeyDown={(e)=>e.key==="Enter" && (
+                                                    e.preventDefault(),
+                                                    setContent(image_url)
+                                                )}
+                className="dialog_field"
+                placeholder="Entrez le lien de l'image ici ..."
             />
+
 
             <p className="edition_pannel_field_title">
                 Image:

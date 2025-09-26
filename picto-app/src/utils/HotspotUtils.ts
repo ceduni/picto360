@@ -182,7 +182,7 @@ export const renderTooltipContent = (
       try {
           const match = url.match(/media\/([a-zA-Z0-9]+)\/giphy\.gif/);
           const giphyId = match ? match[1] : url.split("-").pop();
-          return giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
+          return !giphyId ? `https://i.giphy.com/media/${giphyId}/giphy.gif` : url;
       } catch (error) {
           console.error("HotspotManager - Failed to parse Giphy URL:", error);
           return null;
