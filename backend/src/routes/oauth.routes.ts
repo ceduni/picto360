@@ -109,13 +109,13 @@ export default async function oauthRoutes(app: FastifyInstance) {
     reply.raw.setHeader('Cache-Control','no-cache');
     reply.raw.setHeader('Connection','keep-alive');
 
-    reply.raw.write(`event: auth-status\ndata: {"isAuthenticated":false}\n\n`);
+    // reply.raw.write(`event: auth-status\ndata: {"isAuthenticated":false}\n\n`);
 
     const id = Date.now().toString();
     const client = {id,write: (chunk:string) => reply.raw.write(chunk)};
     driveService.clients.add(client);
 
-    const status = driveService.getAuthStatus(request);
+    const status = await driveService.getAuthStatus(request);
     status && client.write(`event: auth-status\ndata: ${JSON.stringify(status)}\n\n`);
 
     // 👇 keep-alive pings

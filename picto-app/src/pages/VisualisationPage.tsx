@@ -12,7 +12,7 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 
 const VisualisationPage: React.FC = () => {
-    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [isEditMode, setIsEditMode] = useState<boolean>(true);
     const { bannerRef } = useFeedbackBanner();
 
     const {driveAuthStatus} = useServerSentAuth();
@@ -53,7 +53,7 @@ const VisualisationPage: React.FC = () => {
                 </div>
             )}
             
-            <AnimatePresence>
+            {/* <AnimatePresence>
             {viewerId && isEditMode && (
                 <motion.div
                 initial={{ y: 100, opacity: 0 }}
@@ -64,7 +64,7 @@ const VisualisationPage: React.FC = () => {
                 <BottomNavBar />
                 </motion.div>
             )}
-            </AnimatePresence>
+            </AnimatePresence> */}
         </div>
     )
 

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { google, drive_v3 } from "googleapis";
+import fs from "fs"
 
 import { OAuth2Client } from "google-auth-library";
 import { FastifyRequest } from "fastify";
@@ -129,27 +130,55 @@ class GoogleDriveBackendService {
     metadata?: Record<string, string>
   ): Promise<{ id: string; name: string }> {
     const drive = google.drive({ version: 'v3', auth: this.oauth2Client });
-
+    
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
       properties: metadata
     };
 
-    try {
-      const response = await drive.files.create({
-        requestBody: fileMetadata,
-        media: {
-          mimeType: mimeType,
-          body: require('stream').Readable.from(fileBuffer)
-        },
-        fields: 'id,name'
-      });
+    const fileSize = fileBuffer.length;
 
+    try {
+      const response = await drive.files.create(
+        {
+          requestBody: fileMetadata,
+          media: {
+            mimeType: mimeType,
+            body: require('stream').Readable.from(fileBuffer)
+          },
+          fields: 'id,name',
+        },
+        {
+          // ⚡ Use resumable upload
+          params:{uploadType: "resumable"},
+
+          // ⚡ Track upload progress
+          onUploadProgress: (evt) => {
+            // const progress = (evt.bytesRead / fileSize) * 100;
+            const percent = ((evt.bytesRead / fileSize) * 100).toFixed(2);
+
+            // 🔥 Broadcast to all SSE clients
+            this.broadcast("upload-progress", {
+              file: fileMetadata.name,
+              uploaded: evt.bytesRead,
+              total: fileSize,
+              percent,
+            });
+            
+            // process.stdout.write(
+            //   `\rUploaded ${evt.bytesRead} of ${fileSize} bytes (${progress.toFixed(2)}%)`
+            // );
+          },
+        }        
+      );
+      
+      this.broadcast("upload-complete", { fileId: response.data.id });
       return {
         id: response.data.id!,
         name: response.data.name!
       };
+      
     } catch (error) {
       throw new Error(`Failed to upload file: ${error}`);
     }
