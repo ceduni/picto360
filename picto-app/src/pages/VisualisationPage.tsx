@@ -12,7 +12,7 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 
 const VisualisationPage: React.FC = () => {
-    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [isEditMode, setIsEditMode] = useState<boolean>(true);
     const { bannerRef } = useFeedbackBanner();
 
     const {driveAuthStatus} = useServerSentAuth();

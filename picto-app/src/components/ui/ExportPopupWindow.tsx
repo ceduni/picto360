@@ -91,7 +91,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
             } else {
                 setBannerMessage({message:"Export échoué, essayez à nouveau",type:"failure"})
-                logoutFromDrive();
+                // logoutFromDrive();
                 // console.log(result.error);
                 // throw new Error(result.error);
             }

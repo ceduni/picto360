@@ -18,18 +18,6 @@ export function useServerSentAuth(){
       return null;
     }
   }
-  
-  // async function checkDriveAuth (){
-  //         const authStatus = await getDriveAuthStatus()
-  //         const url = new URL(window.location.href);
-          
-  //         url.searchParams.delete("auth");
-
-  //         if(authStatus) {
-  //             url.searchParams.set("auth",authStatus);
-  //         }
-  //         window.history.replaceState({}, "", url.toString());
-  // }
 
   useEffect(()=>{
     let es: EventSource | null = null;
@@ -51,9 +39,21 @@ export function useServerSentAuth(){
         }
     });
 
-    es.addEventListener("ping", (evt) => {
-        console.debug("Ping", JSON.parse((evt as MessageEvent).data));
+    // progress
+    es.addEventListener("upload-progress", (e) => {
+      const data = JSON.parse(e.data);
+      console.log(`Progress for ${data.id}: ${data.percent}%`);
     });
+
+    // export done
+    es.addEventListener("export-complete", (e) => {
+      const data = JSON.parse(e.data);
+      console.log(`✅ Export finished for ${data.id}`);
+    });    
+
+    // es.addEventListener("ping", (evt) => {
+    //     console.debug("Ping", JSON.parse((evt as MessageEvent).data));
+    // });
 
     es.onerror = () => {
         console.warn("SSE connection lost. The browser will retry automatically.");

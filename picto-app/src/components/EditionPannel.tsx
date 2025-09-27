@@ -79,6 +79,7 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
     const handleSave = (updatedFields: Partial<HotspotData>) => {
         if(pannelState==="editing"){
             onSave({ ...hotspot, ...updatedFields });
+            onClose();
             return;
         }
 
@@ -108,6 +109,7 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
             return <TextEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
         case "hyperlink":
             return <HyperlinkEditor  ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
+        case "gif":
         case "image":
             return <ImageEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
         case "video":
@@ -148,11 +150,11 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
                         <button type="button" className="cancel_button" onClick={onClose}>Cancel</button>
                         {
                             pannelState=="editing" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>Save</button>                      
+                            <button type="button" className="save_button" onClick={handleClickSave}>Sauvegarder</button>                      
                         }
                         {
                             pannelState=="creating" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>Create</button>                      
+                            <button type="button" className="save_button" onClick={handleClickSave}>Créer</button>                      
                         }
                     </div>
                 </div>
