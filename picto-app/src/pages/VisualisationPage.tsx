@@ -53,7 +53,7 @@ const VisualisationPage: React.FC = () => {
                 </div>
             )}
             
-            <AnimatePresence>
+            {/* <AnimatePresence>
             {viewerId && isEditMode && (
                 <motion.div
                 initial={{ y: 100, opacity: 0 }}
@@ -64,7 +64,7 @@ const VisualisationPage: React.FC = () => {
                 <BottomNavBar />
                 </motion.div>
             )}
-            </AnimatePresence>
+            </AnimatePresence> */}
         </div>
     )
 

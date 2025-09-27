@@ -221,6 +221,26 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                 )}
               </AnimatePresence>
             </Box>
+
+                 <Tooltip
+              title="Exporter"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -7.5],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+            <IconButton onClick={()=>{setShowExportOptions(true)}} className="toolbar__icon-button">
+              <ExportIcon />
+            </IconButton>
+            </Tooltip>
           </Box>
 
           <Box className="toolbar__right">
@@ -228,7 +248,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
               <ToggleSwitch checked={isEditMode} onChange={handleToggleEditMode} className="toolbar__toggle-switch" />
             </Tooltip>
 
-            <Tooltip
+            {/* <Tooltip
               title={isEditMode && !isSaved ? "Sauvegarder" : ""}
               slotProps={{
                 popper: {
@@ -256,27 +276,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
                   )}
                 </IconButton>
               </span>
-            </Tooltip>
+            </Tooltip> */}
             
-            <Tooltip
-              title="Exporter"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-            <IconButton onClick={()=>{setShowExportOptions(true)}} className="toolbar__icon-button">
-              <ExportIcon />
-            </IconButton>
-            </Tooltip>
+       
 
             {/* <Tooltip
               title="Partager"
@@ -298,7 +300,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
               </IconButton>
             </Tooltip> */}
 
-            <Tooltip
+            {/* <Tooltip
               title="Paramètres"
               slotProps={{
                 popper: {
@@ -316,7 +318,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,
               <IconButton className="toolbar__icon-button">
                 <SettingsIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             {
               driveAuthStatus?.isAuthenticated &&
             <Tooltip

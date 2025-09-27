@@ -65,7 +65,7 @@ const VideoEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
         onSubmit={handleSubmit} 
         className="annotation_edition_pannel" >
         
-        <label className="edition_pannel_field">
+        {/* <label className="edition_pannel_field">
             <p className="edition_pannel_field_title">
                 Texte à afficher:
             </p>
@@ -78,7 +78,7 @@ const VideoEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
                 className="dialog_field"
                 placeholder="Tapez le nouvel texte ici ..."
             />
-        </label>
+        </label> */}
         
             <div>
                 {content != ""? 

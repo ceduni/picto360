@@ -62,7 +62,7 @@ const menuSections: MenuSection[] = [
   {
     title: "Annotations",
     items: [
-      { type: "Forme", icon: IoShapesOutline, label: "Forme" },
+      // { type: "Forme", icon: IoShapesOutline, label: "Forme" },
       { type: "divider" },
       { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
       { type: "Image", icon: AiOutlinePicture, label: "Image" },
@@ -73,10 +73,10 @@ const menuSections: MenuSection[] = [
       { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
     ],
   },
-  {
-    title: "Actions",
-    items: [],
-  },
+  // {
+  //   title: "Actions",
+  //   items: [],
+  // },
 ];
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
