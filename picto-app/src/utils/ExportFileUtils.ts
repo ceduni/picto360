@@ -58,7 +58,7 @@ class ExportService {
         return result;
 
         } catch (error) {
-        throw new Error(`Export failed: ${error}`);
+            throw new Error(`Export failed: ${error}`);
         }
     }  
 

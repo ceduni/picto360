@@ -74,6 +74,10 @@ const ImageEditor = forwardRef<EditorRef,EditorProps> (({ hotspot, onSave },ref)
                 onChange={(e) =>
                     setImageUrl(e.target.value)
                 }
+                // onPaste={(e)=> (
+                //     e.preventDefault(),
+                //     setContent(image_url)
+                // )}
                 onKeyDown={(e)=>e.key==="Enter" && (
                                                     e.preventDefault(),
                                                     setContent(image_url)

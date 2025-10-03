@@ -110,8 +110,9 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({ width, height, viewerId
     ( async () => {
         if (!viewerId) return;
         const viewerItem = await getViewerItem(viewerId);
-        const compressedImage = viewerItem?.blob;
+        const compressedImage = viewerItem?.compressedBlob || viewerItem?.blob;
         const annotations = viewerItem?.annotations;
+
         if (!compressedImage) {
             navigate("/");
             return;

@@ -49,11 +49,15 @@ interface HomeProps{
                 break;
             default:
                 setBannerMessage({message:"Format de fichier Invalide",type:"failure"})
-                // console.log("Invalid file Format")
                 return false
         }
         
         await navigate(`/view/${viewerId}`);
+        if(filetype != "picto" && newImageSrc.size >= 10000000) {
+            const compressed_image = await compressBeforeUpload(newImageSrc);
+            if (compressed_image?.type.includes("image")) 
+                await putViewerItem(viewerId,undefined,undefined,undefined,compressed_image);
+        }
         return true
 
     }, []);
