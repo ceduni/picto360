@@ -46,13 +46,13 @@
 .toolbar__left {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .toolbar__logo {
     cursor: pointer;
     width: 40px;
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 .toolbar__title-container {
@@ -136,3 +136,8 @@
     background-color: var(--color-black);
 }
  
+@media (max-width: 600px)  {
+    .toolbar__mode-switcher__label {
+        display: none;
+    }
+}
