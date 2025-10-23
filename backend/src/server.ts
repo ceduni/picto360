@@ -4,6 +4,7 @@ import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
 import formContentRoutes from "./routes/content/formContent.routes";
 import linkContentRoutes from "./routes/content/linkContent.routes";
+import imageCompressionRoutes from "./routes/imageCompression.routes";
 import mediaContentRoutes from "./routes/content/mediaContent.routes";
 import textContentRoutes from "./routes/content/textContent.routes";
 import dimensionRoutes from "./routes/dimension.routes";
@@ -69,6 +70,7 @@ const setupServer = async () => {
     fastify.register(oauthRoutes);
     fastify.register(exportRoutes);
 
+    fastify.register(imageCompressionRoutes);
     fastify.register(contentRoutes);
     fastify.register(formContentRoutes);
     fastify.register(linkContentRoutes);
@@ -88,16 +90,16 @@ const setupServer = async () => {
       reply.send({ message: "Welcome to Picto360 API" });
     });
 
-    fastify.get("/teams", async (request, reply) => {
-    try{
-        const teams = await Team.find();
-        reply.send(teams);
-    }catch (err) {
-        console.error("❌ GET /activities error:", err);
-        reply.status(500).send({ error: 'Failed to fetch teams', 
-                                message: err instanceof Error ? err.message:JSON.stringify(err) });
-    }
-    });
+    // fastify.get("/teams", async (request, reply) => {
+    // try{
+    //     const teams = await Team.find();
+    //     reply.send(teams);
+    // }catch (err) {
+    //     console.error("❌ GET /activities error:", err);
+    //     reply.status(500).send({ error: 'Failed to fetch teams', 
+    //                             message: err instanceof Error ? err.message:JSON.stringify(err) });
+    // }
+    // });
 
     await fastify.listen({port:5000});
     fastify.log.info(`Server is running on port http://localhost:5000`);

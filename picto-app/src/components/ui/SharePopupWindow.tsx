@@ -1,7 +1,5 @@
 import { Box, Fade, IconButton, InputBase, Modal, Typography } from "@mui/material"
-import {
-  Cancel as CancelIcon,
-} from "@mui/icons-material";
+import { Cancel as CancelIcon, } from "@mui/icons-material";
 import React from "react";
 
 interface SharePopupProps {

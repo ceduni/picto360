@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-
 import { getGoogleDriveService, HotspotData } from "@/services/googleDrive.service";
 import { MultipartValue } from "@fastify/multipart";
 
@@ -29,6 +28,7 @@ export default async function exportRoutes(app: FastifyInstance) {
         
         // Get form fields
         const fileBuffer = await data.toBuffer();
+        
         // typed view of fields: key -> MultipartValue[] (or undefined)
         const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
 

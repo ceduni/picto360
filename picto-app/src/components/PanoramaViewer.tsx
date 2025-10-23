@@ -1,3 +1,4 @@
+import "./css/PanoramaViewer.css";
 import React, { useRef, useCallback, useEffect } from "react";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
@@ -10,7 +11,6 @@ import { useViewerData } from "@/hooks/useViewerData";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useHotspotManager } from "@/hooks/useHotspotManager";
 import { useEditionPanel } from "@/hooks/useEditionPanel";
-import "./css/PanoramaViewer.css";
 
 interface PanoramaViewerProps {
     width: string;

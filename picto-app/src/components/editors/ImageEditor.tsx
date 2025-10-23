@@ -5,7 +5,6 @@ import SegmentedControl, { SegmentOption } from "@ui/SegmentedControl";
 import { MdAdd, MdLaptopChromebook, MdLink, } from "react-icons/md";
 
 
-
 interface EditorProps {
     hotspot: HotspotData;
     onSave: (changes: Partial<HotspotData>) => void;

@@ -108,7 +108,25 @@ export type ExportDestination = "drive" |"disk";
 
 export type ExportFormat = "picto" | "raw";
 
-//---------------- Hotsports -------------------------
+export interface ExportOptions {
+    fileName?: string;
+    folderName?: string;
+    includeMetadata?: boolean;
+}
+
+export interface ExportResult {
+    success: boolean;
+    fileId?: string;
+    fileName?: string;
+    error?: string;
+}
+
+export interface FileToExport {
+    name: string;
+    blob: Blob;
+}
+
+//---------------- Hotspots -------------------------
 
 export interface EditorRef {
   submit: () => void;

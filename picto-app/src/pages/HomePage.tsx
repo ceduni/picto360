@@ -1,13 +1,14 @@
+import "./css/HomePage.css";
 import ImageUploader from "@/components/ImageUploader";
 import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import "./css/HomePage.css";
 import { useAuth } from "@/authContext/authContext";
 import GotoProfile from "@/components/GotoProfile";
-import { putViewerItem } from "@/utils/storedImageData";
+import { putViewerItem, compressBeforeUpload } from "@/utils/storedImageData";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "@/components/FeedbackBanner";
+
 
 const HomePage = () => {
     const { userLoggedIn } = useAuth();
@@ -40,11 +41,18 @@ const HomePage = () => {
                 setBannerMessage({ message: "Image chargé avec succès", type: "success" });
                 break;
             default:
-                setBannerMessage({ message: "Format de fichier Invalide", type: "failure" });
-                return false;
+                setBannerMessage({ message: "Format de fichier Invalide", type: "failure" })
+                return false
         }
 
         await navigate(`/view/${viewerId}`);
+
+        if (filetype != "picto" && newImageSrc.size >= 10000000) {
+            const compressed_image = await compressBeforeUpload(newImageSrc);
+            if (compressed_image?.type.includes("image"))
+                await putViewerItem(viewerId, undefined, undefined, undefined, compressed_image);
+        }
+
         return true;
     }, [navigate, setBannerMessage]);
 

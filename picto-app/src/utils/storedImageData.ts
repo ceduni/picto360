@@ -1,5 +1,4 @@
 import { HotspotData } from "@/utils/Types";
-import imageCompression from "browser-image-compression";
 
 const DB = "viewer-db";
 const VIEWER_STORE = "viewerItems";
@@ -112,18 +111,21 @@ export async function getAnnotations(id: string): Promise<HotspotData[] | undefi
 //---------------IMAGE COMPRESSION--------------------//
 
 export async function compressBeforeUpload(file: File) {
-  const options = {
-    maxSizeMB: 5,           // target size in MB
-    maxWidthOrHeight: 8000, // keep panoramas large enough
-    useWebWorker: true,
-    initialQuality: 0.8     // 80% quality
-  };
 
   try {
-    const compressedFile = await imageCompression(file, options);
-    console.log("Original size:", file.size / 1024 / 1024, "MB");
-    console.log("Compressed size:", compressedFile.size / 1024 / 1024, "MB");
-    return compressedFile;
+    const formData = new FormData();
+    formData.append("file", new File([file], file.name || "Untitled", 
+                                { type: file.type || "image/jpeg" }));
+
+    const compressedFile = await fetch("http://localhost:5000/api/compress-image",{
+      method:"POST",
+      body:formData,
+    });
+
+    const result = await compressedFile.blob()
+    console.log("Image compressed :", result);
+    
+    return result;
   } catch (error) {
     console.error("Compression failed:", error);
   }

@@ -124,7 +124,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         if (!viewerId) return null;
         const viewerItem = await getViewerItem(viewerId);
 
-        const imageBlob = viewerItem?.blob;
+        const imageBlob = viewerItem?.compressedBlob; 
         const annotations = viewerItem?.annotations;
         const fileName = viewerItem?.name || "Untitled";
 

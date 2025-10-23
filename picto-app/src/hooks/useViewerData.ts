@@ -36,23 +36,25 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
                 setError(null);
 
                 const viewerItem = await getViewerItem(viewerId);
-                
+                const compressedImage = viewerItem?.compressedBlob || viewerItem?.blob;
+                const annotations = viewerItem?.annotations;
+
                 if (!isMounted) return;
 
-                if (!viewerItem?.blob) {
+                if (!compressedImage) {
                     navigate("/");
                     return;
                 }
 
-                objectUrl = URL.createObjectURL(viewerItem.blob);
+                objectUrl = URL.createObjectURL(compressedImage);
                 setImageSource(objectUrl);
 
-                if (viewerItem.annotations && Array.isArray(viewerItem.annotations)) {
-                    setHotspots(viewerItem.annotations);
+                if (annotations && Array.isArray(annotations)) {
+                    setHotspots(annotations);
                 }
             } catch (err) {
                 if (!isMounted) return;
-                
+
                 const error = err instanceof Error ? err : new Error("Failed to load viewer data");
                 setError(error);
                 console.error("Error loading viewer data:", error);
