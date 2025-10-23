@@ -1,12 +1,11 @@
-import { ActivityIstance, ParticipantData, TaskData, TeamInstance } from "@/utils/Types";
+import { ActivityIstance } from "@/utils/Types";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import NavigationBar from "./NavigationBar";
 import "./css/EditActivityPage.css"
 import { LuPencilLine } from "react-icons/lu";
 import { useGetActivityById } from "@/hooks/useGetUserActivities";
-import ParticipantCard from "../PagesUiComponents/ParticipantCard";
-import { v4 as uuid4 } from "uuid";
+// import { v4 as uuid4 } from "uuid";
 
 
 interface EditActivityPageProps {
@@ -41,13 +40,13 @@ const EditActivityPage :React.FC<EditActivityPageProps> = ()=>{
     const { activity,activityLoading, activityError } = useGetActivityById(id);
 
     useEffect(()=>{
-        const activityTasks :TaskData[] = activity.tasks.map((task:string)=>{
-            const id = uuid4()
-            return {
-                id,
-                name:task,
-            }
-        });
+        // const activityTasks :TaskData[] = activity.tasks.map((task:string)=>{
+        //     const id = uuid4()
+        //     return {
+        //         id,
+        //         name:task,
+        //     }
+        // });
         // const activityTeams :TeamInstance[] = activity.teams.map((team:any)=>{
         //     return {
         //         id:team._id,

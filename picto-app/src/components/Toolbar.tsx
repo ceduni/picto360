@@ -11,7 +11,6 @@ import SettingsPopupWindow from "./ui/SettingsPopupWindow";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { DriveAuthStatus } from "@/utils/Types";
 import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
-import { IoMdTrash } from "react-icons/io";
 
 interface ToolbarProps {
     isEditMode: boolean;
@@ -88,7 +87,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode, viewerId,
     const redirectHomePage = useCallback(() => navigate('/'), [])
 
     return (
-        <div className={`toolbar-container toolbar-container--${isEditMode ? "edit-mode" : "preview-mode"}`} onLoad={getViewerFromDB}>
+        <div className={
+            `toolbar-container 
+            toolbar-container--${isEditMode ? "edit-mode" : "preview-mode"}
+            toolbar-container--${!isSaved ? "has-changes" : ""}
+            `} onLoad={getViewerFromDB}>
             <div className="toolbar">
                 <div className="toolbar__left">
                     <img src={logo} alt="Picto 360 logo" className="toolbar__logo" onClick={redirectHomePage} />

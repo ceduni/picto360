@@ -33,7 +33,6 @@ const VisualisationPage: React.FC = () => {
                     key={viewerId!}       // force remount when url changes (if your viewer needs it)
                     viewerId={viewerId!}
                     isEditMode={isEditMode}
-                    bannerRef={bannerRef}
                     width="100vw"
                     height="100vh"
                 />

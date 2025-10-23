@@ -6,7 +6,7 @@ import HyperlinkEditor from "./editors/HyperlinkEditor";
 import ImageEditor from "./editors/ImageEditor";
 import VideoEditor from "./editors/VideoEditor";
 import { BsTrash3Fill } from "react-icons/bs";
-import { MdAdd, MdClose, MdImage, MdLink, MdOndemandVideo, MdSave, MdTextSnippet } from "react-icons/md";
+import {  MdClose, MdImage, MdLink, MdOndemandVideo,  MdTextSnippet } from "react-icons/md";
 
 
 interface EditionPannelProps {
@@ -27,7 +27,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
     const boxRef = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    let handle = document.getElementById("handle");
+    const handle = document.getElementById("handle");
 
 
     const handleMouseDown = (e: React.MouseEvent) => {

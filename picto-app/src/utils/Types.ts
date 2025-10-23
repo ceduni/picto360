@@ -19,7 +19,7 @@ export interface HotspotInstance extends HotspotData {
 // -------------- Message banner -------------------
 
 export type MessageBannerRef = {
-  trigger: (message: string,type?:MessageBannerType, duration?: number,id?:number) => void;
+  trigger: (message: string, type?: MessageBannerType, duration?: number, id?: number) => void;
 };
 
 export type MessageBannerType = "success" | "warning" | "failure"
@@ -28,26 +28,26 @@ export type MessageBannerType = "success" | "warning" | "failure"
 //--------------- Activity types ----------------
 
 type ActivityData = {
-    id:string,
-    title:string,
-    tags:string[],
-    description:string,
-    tasks:TaskData[],
-    type:string,
-    authoriseEdit:boolean;
-    participantsList:ParticipantData[],
-    teamsList:TeamInstance[]
+  id: string,
+  title: string,
+  tags: string[],
+  description: string,
+  tasks: TaskData[],
+  type: string,
+  authoriseEdit: boolean;
+  participantsList: ParticipantData[],
+  teamsList: TeamInstance[]
 }
 
-export interface ActivityIstance extends ActivityData{
-    tagInput:string,
-    taskInput:string,
-    supervised_teams:boolean,
-    chrono:{isEnabled:boolean,minutes:number,seconds:number}
+export interface ActivityIstance extends ActivityData {
+  tagInput: string,
+  taskInput: string,
+  supervised_teams: boolean,
+  chrono: { isEnabled: boolean, minutes: number, seconds: number }
 }
 
-export type ActivityStatus ={
-    status : "created" | "open" | "closed";
+export type ActivityStatus = {
+  status: "created" | "open" | "closed";
 }
 
 export interface FetchedActivity {
@@ -79,51 +79,51 @@ export interface FetchedActivity {
 
 
 export type TeamsData = {
-    id:string;
-    name:string;
-    participantsNumber:number;
-    supervised:boolean;
-    participantsNames:ParticipantData[];
-    supervisor_id? : string;
+  id: string;
+  name: string;
+  participantsNumber: number;
+  supervised: boolean;
+  participantsNames: ParticipantData[];
+  supervisor_id?: string;
 }
 
-export interface TeamInstance extends TeamsData{
-    setTeamName? : (id:number,input:string) => void
-    addParticipants? : (id:number,numberToAdd:number) => void
+export interface TeamInstance extends TeamsData {
+  setTeamName?: (id: number, input: string) => void
+  addParticipants?: (id: number, numberToAdd: number) => void
 }
 
 export type TaskData = {
-    id:string,
-    title:string,
+  id: string,
+  title: string,
 }
 
-export type ParticipantData ={
-    id:string;
-    name:string;
+export type ParticipantData = {
+  id: string;
+  name: string;
 }
 
 
 // File exportation
-export type ExportDestination = "drive" |"disk";
+export type ExportDestination = "drive" | "disk";
 
 export type ExportFormat = "picto" | "raw";
 
 export interface ExportOptions {
-    fileName?: string;
-    folderName?: string;
-    includeMetadata?: boolean;
+  fileName?: string;
+  folderName?: string;
+  includeMetadata?: boolean;
 }
 
 export interface ExportResult {
-    success: boolean;
-    fileId?: string;
-    fileName?: string;
-    error?: string;
+  success: boolean;
+  fileId?: string;
+  fileName?: string;
+  error?: string;
 }
 
 export interface FileToExport {
-    name: string;
-    blob: Blob;
+  name: string;
+  blob: Blob;
 }
 
 //---------------- Hotspots -------------------------
@@ -146,23 +146,23 @@ export type DriveAuthStatus = {
   connectedAt?: string; // ISO
   reason?: 'revoked' | 'expired' | 'manual_disconnect' | 'login' | 'refresh';
 };
-  
+
 export interface PannellumViewer {
-    mouseEventToCoords: (event: MouseEvent) => [number, number];
-    destroy: () => void;
-    getYaw: () => number;
-    getPitch: () => number;
-    getHfov: () => number;
-    on: (event: string, handler: () => void) => void;
-    removeHotSpot: (id: string) => void;
-    addHotSpot: (config: unknown) => void;
+  mouseEventToCoords: (event: MouseEvent) => [number, number];
+  destroy: () => void;
+  getYaw: () => number;
+  getPitch: () => number;
+  getHfov: () => number;
+  on: (event: string, handler: () => void) => void;
+  removeHotSpot: (id: string) => void;
+  addHotSpot: (config: unknown) => void;
 }
 
 export interface ViewerConfig {
-    type: string;
-    panorama: string | null;
-    autoLoad: boolean;
-    autoRotate: number;
-    showControls: boolean;
-    // ... etc
+  type: string;
+  panorama: string | null;
+  autoLoad: boolean;
+  autoRotate: number;
+  showControls: boolean;
+  // ... etc
 }

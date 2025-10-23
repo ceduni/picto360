@@ -56,7 +56,7 @@ export const useHotspotManager = ({
 
             try {
                 viewerInstance.removeHotSpot(hotspotData.id);
-                const hotspotInstance = createHotspotInstance(hotspotData, onClickHandler);
+                const hotspotInstance = createHotspotInstance(hotspotData, onClickHandler!);
                 viewerInstance.addHotSpot(hotspotInstance);
                 hotspotCounter.current++;
             } catch (error) {
@@ -127,7 +127,7 @@ export const useHotspotManager = ({
 
                 if (viewerInstance) {
                     viewerInstance.removeHotSpot(updatedHotspot.id);
-                    const hotspotInstance = createHotspotInstance(updatedHotspot, onClickHandler);
+                    const hotspotInstance = createHotspotInstance(updatedHotspot, onClickHandler!);
                     viewerInstance.addHotSpot(hotspotInstance);
                 }
             } catch (error) {

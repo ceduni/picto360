@@ -1,4 +1,4 @@
-import { TeamInstance } from "@/utils/ActivityCreactionUtils";
+import { TeamInstance } from "@/utils/Types";
 import React from "react";
 import { HiTrash } from "react-icons/hi2";
 

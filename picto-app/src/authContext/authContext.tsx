@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { auth } from "@/firebase/firebase";
 import {  onAuthStateChanged, User } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 interface AuthContextType {
@@ -25,7 +24,6 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     const [userLoggedIn,setUserLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const  {setBannerMessage} = useFeedbackBanner()
-    const navigate = useNavigate();
 
     // Memoize the initializeUser function to prevent unnecessary re-renders
     const initializeUser = useCallback(async (user: User | null) => {
@@ -51,7 +49,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
 
             const token = await user.getIdToken();
             
-            const response = await fetch("http://localhost:5000/users", {
+            await fetch("http://localhost:5000/users", {
                 method: "POST",
                 headers: {
                     // "Content-Type": "application/json",
@@ -59,7 +57,8 @@ export function AuthProvider ({ children }: { children: ReactNode }){
                 }
             });
             // return response;
-        }catch(error:any){
+        }catch(error){
+                console.error("Failed to update hotspot:", error);
             setBannerMessage({message:"Erreur de connexion.",type:"failure"});
         }
     } 

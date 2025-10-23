@@ -10,7 +10,7 @@ declare global {
 }
 
 interface UsePannellumViewerProps {
-    viewerRef: React.RefObject<HTMLDivElement>;
+    viewerRef: React.RefObject<HTMLDivElement | null>;
     imageSource: string | null;
     config?: Partial<Omit<ViewerConfig, 'panorama'>>;
 }

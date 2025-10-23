@@ -1,6 +1,6 @@
 import { updateProfile } from "firebase/auth"
 import { auth } from "./firebase"
-import { useAuth } from "@/authContext/authContext"
+// import { useAuth } from "@/authContext/authContext"
 
 
 export const updateUserName = async (newName : string) => {

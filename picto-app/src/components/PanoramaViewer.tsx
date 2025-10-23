@@ -32,7 +32,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId });
 
     // Initialize Pannellum
-    const { viewerInstance, isReady } = usePannellumViewer({ viewerRef, imageSource, });
+    const { viewerInstance } = usePannellumViewer({ viewerRef, imageSource, });
 
     // Context menu
     const {
@@ -117,6 +117,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 addHotspotToViewer(hotspotData, handleHotspotClick);
                 clearTargetIcon();
             } catch (error) {
+                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la sauvegarde", type: "failure" });
             }
         },
@@ -128,6 +129,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             try {
                 await updateHotspot(updatedHotspot, handleHotspotClick);
             } catch (error) {
+                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la mise à jour", type: "failure" });
             }
         },
@@ -139,6 +141,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             try {
                 await deleteHotspot(toDeleteHotspot);
             } catch (error) {
+                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la suppression", type: "failure" });
             }
         },

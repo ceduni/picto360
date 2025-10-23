@@ -1,6 +1,4 @@
 //TODO: Move the activity global logic here
-import { useAuth } from "@/authContext/authContext";
-import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ActivityIstance, ParticipantData, TaskData, TeamInstance } from "./Types";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
@@ -154,7 +152,7 @@ export const handleRemoveTask = (formValues:ActivityIstance,taskToRemove: string
 
 // error handlind to display to user
 export const validateActivityValues = (formValues:ActivityIstance) =>{
-        const idValue = formValues.id;
+        // const idValue = formValues.id;
         const titleVallue = formValues.title;
         const tags = formValues.tags;
         const description = formValues.description;
@@ -220,31 +218,31 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
         return {state:true,message:""}
 }
 
-const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
-    e.preventDefault();
-    const {setBannerMessage} = useFeedbackBanner();
+// const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
+//     e.preventDefault();
+//     const {setBannerMessage} = useFeedbackBanner();
 
-    try {
-      const response = await fetch("http://localhost:5000/activities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formValues),
-      });
+//     try {
+//       const response = await fetch("http://localhost:5000/activities", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(formValues),
+//       });
 
-      const data = await response.json();
-      if (response.ok) {
-        // console.log("✅ Activity created:", data);
-        setBannerMessage({message:"Activité créée avec succès",type:"success"});
-      } else {
-        setBannerMessage({message:"Erreur de création d'activité",type:"failure"});
-        // console.error("❌ Failed to create activity:", data);
-      }
-    } catch (err) {
-        setBannerMessage({message:"Erreur de création d'activité, Réessayez",type:"failure"});
-    }
-};
+//       const data = await response.json();
+//       if (response.ok) {
+//         // console.log("✅ Activity created:", data);
+//         setBannerMessage({message:"Activité créée avec succès",type:"success"});
+//       } else {
+//         setBannerMessage({message:"Erreur de création d'activité",type:"failure"});
+//         // console.error("❌ Failed to create activity:", data);
+//       }
+//     } catch (err) {
+//         setBannerMessage({message:"Erreur de création d'activité, Réessayez",type:"failure"});
+//     }
+// };
 
 
     const createNewTeamParticipants = (toCreate:number,team:TeamInstance) =>{

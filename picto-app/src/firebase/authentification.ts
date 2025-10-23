@@ -17,8 +17,8 @@ export const doSighInWithGoogle = async () => {
       prompt:'select_account'
   })
 
-      // Create a promise for a custom timeout
-  const timeoutPromise = new Promise((resolve, reject) => {
+  // Create a promise for a custom timeout
+  const timeoutPromise = new Promise((_, reject) => {
     setTimeout(() => {
       reject(new Error("auth/popup-timeout"));
     }, 2000); // We will timeout after 3 seconds
@@ -38,7 +38,7 @@ export const doSignInWithFacebook = async () => {
     prompt:'select_account'
   })
 
-  const timeoutPromise = new Promise((resolve, reject) => {
+  const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error("auth/popup-timeout"));
       }, 2000); // We will timeout after 3 seconds

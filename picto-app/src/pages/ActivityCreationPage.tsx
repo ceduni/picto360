@@ -50,12 +50,9 @@ import { useCreateActivity } from "@/hooks/useActivityCreation";
 import { TiInfoLarge } from "react-icons/ti";
 
 
-interface ActivityCreationPageProps  {
-
-}
 
 
-const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
+const ActivityCreationPage : React.FC = () => {
     const [isPopupOpen,setIsPopupOpen] = useState(false);
     // const [chronoState,setChronoState] = useState({isEnabled:false,minutes:0,seconds:0})
     const [enteredValue,setEnteredValue] = useState(0);
@@ -63,7 +60,7 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
     const [selectedTeam,setSelectedTeam] = useState<{indx:number,teamData:TeamInstance}>();
     const [confirmationMessage,setConfirmationMessage] = useState<{title:string,details?:string}|null>(null);
 
-    const { createActivity, loading, error ,activityId} = useCreateActivity();
+    const { createActivity, activityId} = useCreateActivity();
 
     const [formValues,setFormValues] = useState<ActivityIstance>({
         id:'',
@@ -226,10 +223,10 @@ const ActivityCreationPage : React.FC<ActivityCreationPageProps> = () => {
         setSelectedTeam(undefined);
     }
 
-    const onCloseConfirmationPopup = ()=>{
-        setIsPopupOpen(false);
-        setConfirmationMessage(null);
-    }
+    // const onCloseConfirmationPopup = ()=>{
+    //     setIsPopupOpen(false);
+    //     setConfirmationMessage(null);
+    // }
 
 
     // Activity type("individuelle" || "equipe")

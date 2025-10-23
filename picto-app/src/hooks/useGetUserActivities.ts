@@ -1,6 +1,6 @@
 // hooks/useFetchActivities.ts
 import { useEffect, useState } from "react";
-import { getIdToken } from "firebase/auth";
+// import { getIdToken } from "firebase/auth";
 import { useAuth } from "@/authContext/authContext";
 import { FetchedActivity } from "@/utils/Types";
 
@@ -28,6 +28,7 @@ export function useFetchActivities() {
         setActivities(data);
         setGetActivitiesError(null);
       } catch (error:any) {
+        console.error(error);
         setActivities(null);
         setGetActivitiesError(error);
         console.error("Failed to fetch activities:", error);

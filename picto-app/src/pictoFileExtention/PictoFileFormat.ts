@@ -47,7 +47,7 @@ export class CustomFileExporter {
     } = {}
   ): Promise<Blob> {
     const {
-      filename = 'annotated_picto_file',
+      // filename = 'annotated_picto_file',
       imageFormat = 'jpg',
       compression = 6,
       creator = 'MyPictoApp',
@@ -129,7 +129,7 @@ export class CustomFileExporter {
     imageBlob: Blob;
     annotations: HotspotData[];
     metadata: MergedFileMetadata;
-    manifest: any;
+    manifest: unknown;
   }> {
     const zip = await JSZip.loadAsync(customBlob);
 

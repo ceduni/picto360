@@ -1,17 +1,14 @@
-import React, { useCallback } from "react"
+import React from "react"
 import NavigationBar from "./NavigationBar"
 import UseAnimations from "react-useanimations";
 import loading2 from 'react-useanimations/lib/loading2';
 import ActivityCard from "./ActivityCard"
-import { useFetchActivities, useGetActivityById } from "@/hooks/useGetUserActivities";
+import { useFetchActivities } from "@/hooks/useGetUserActivities";
 import { useNavigate } from "react-router-dom";
 
 
-interface ActivitiesListProps {
 
-}
-
-const ActivitiesListPage :React.FC<ActivitiesListProps> = ()=>{
+const ActivitiesListPage :React.FC = ()=>{
     const { userActivities, loading , getActivitiesError} =  useFetchActivities();
 
     const navigate = useNavigate();

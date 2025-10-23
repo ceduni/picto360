@@ -9,7 +9,7 @@ import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { getViewerItem } from "@/utils/storedImageData";
 import { DriveAuthStatus, ExportDestination, ExportFormat, HotspotData, } from "../../utils/Types";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import { MdClose, MdAdd } from "react-icons/md";
+import { MdClose } from "react-icons/md";
 import DropSelector, { SelectorOption } from "./DropSelector";
 import ErrorBanner from "../FeedbackBanner";
 
@@ -84,12 +84,12 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             );
 
             if (result.success) {
-                setExportStatus("Export successful! \n" + `View files: ${result.driveUrl}`);
+                setExportStatus("Export successful! \n" + `View files: ${result}`);
                 setBannerMessage({ message: "Exporté avec succes vers le drive", type: "success" })
 
             } else {
                 setBannerMessage({ message: "Export échoué, essayez à nouveau", type: "failure" })
-                // logoutFromDrive();
+                logoutFromDrive();
                 // console.log(result.error);
                 // throw new Error(result.error);
             }
