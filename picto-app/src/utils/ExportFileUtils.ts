@@ -12,13 +12,13 @@ class ExportService {
     async exportToGoogleDrive(
         imageBlob: Blob,
         annotations: HotspotData[],
-        format:ExportFormat,
+        format:ExportFormat|string,
         options: {
             fileName?: string;
             folderName?: string;
             includeMetadata?: boolean;
         } = {},
-    ): Promise<any> {
+    ): Promise<unknown> {
         try {
         const formData = new FormData();
         formData.append("format", format );

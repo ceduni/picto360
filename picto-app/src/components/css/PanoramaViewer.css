@@ -1,193 +1,222 @@
 /* Reset styles */
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /* Hide Pannellum's default about message */
 .pnlm-about-msg {
-  display: none !important;
+    display: none !important;
 }
 
 .pnlm-load-box {
-  position: absolute !important;
-  top: 50% !important;
+    position: absolute !important;
+    top: 50% !important;
 }
 
 /* Panorama Viewer */
 .panorama-viewer {
-  background-color: black;
-  flex-grow: 1;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
+    background-color: black;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.panorama-viewer__loading,
+.panorama-viewer__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    color: #666;
+}
+
+.panorama-viewer__error {
+    color: #f44336;
+    flex-direction: column;
+    gap: 16px;
 }
 
 /* Target Icon */
 .panorama-viewer__target-icon {
-  position: absolute;
-  font-size: 24px;
-  color: red;
-  z-index: 90;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32.5px;
-  height: 32.5px;
+    position: absolute;
+    font-size: 24px;
+    color: red;
+    z-index: 90;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32.5px;
+    height: 32.5px;
 }
 
 .panorama-viewer__target-icon svg {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 /* Ripple Animation */
 .panorama-viewer__target-icon:before,
 .panorama-viewer__target-icon:after {
-  position: absolute;
-  content: "";
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border: solid 2px red;
-  border-radius: 50%;
+    position: absolute;
+    content: "";
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: solid 2px red;
+    border-radius: 50%;
 }
 
 .panorama-viewer__target-icon:before {
-  animation: ripple 2s linear infinite;
+    animation: ripple 2s linear infinite;
 }
 
 .panorama-viewer__target-icon:after {
-  animation: ripple 2s 1s linear infinite;
+    animation: ripple 2s 1s linear infinite;
 }
 
 @keyframes ripple {
-  to {
-    transform: scale(2);
-    opacity: 0;
-  }
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
 }
 
 .pnlm-compass {
-  display: none !important;
+    display: none !important;
 }
 
 
 
 /* Hotspots */
 .hotspot-manager__custom_hotspot {
-  height: 17.5px;
-  width: 17.5px;
-  background: #000;
-  border-radius: 50%;
-  border: 4px solid #F0F0F0;
-  position: relative;
-  transition: border-color 0.1s ease;
+    height: 17.5px;
+    width: 17.5px;
+    background: #000;
+    border-radius: 50%;
+    border: 4px solid #F0F0F0;
+    position: relative;
+    transition: border-color 0.1s ease;
 }
 
 .hotspot-manager__custom_hotspot svg {
-  height: 90%;
-  width: 90%;
-  color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    height: 90%;
+    width: 90%;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .hotspot-manager__custom_hotspot:hover {
-  box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
+    box-shadow: 0 0 5px 1px rgba(240, 240, 240, 0.7);
 }
 
 /* Tooltip and content styling */
 .hotspot-manager__custom-tooltip .hotspot-manager__content,
 .hotspot-manager__label {
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #FFF;
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  border-radius: 5px;
-  white-space: normal;
-  word-wrap: break-word;
-  /*TODO: Handle all screen sizes */
-  max-width: 500px;
-  width: max-content;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 15px;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #FFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    border-radius: 5px;
+    white-space: normal;
+    word-wrap: break-word;
+    /*TODO: Handle all screen sizes */
+    max-width: 500px;
+    width: max-content;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
 }
 
 .hotspot-manager__custom-tooltip .hotspot-manager__content {
-  display: none;
-  /* visibility: hidden; */
-  left: 50%;
-  transform: translateX(-50%) translateY(-100%);
+    display: none;
+    /* visibility: hidden; */
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
 }
 
 .hotspot-manager__label {
-  font-weight: bold;
-  display: flow-root;
+    font-weight: bold;
+    display: flow-root;
 }
 
 .hotspot-manager__custom-tooltip .hotspot-manager__content--text {
-  text-align: left;
+    text-align: left;
 }
 
 .hotspot-manager__custom-tooltip .hotspot-manager__content--text,
 .hotspot-manager__label span {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .hotspot-manager__custom-tooltip:hover .hotspot-manager__content {
-  display: inline;
-  /* visibility: visible; */
+    display: inline;
+    /* visibility: visible; */
 }
 
 /* Tooltip's tip */
 .hotspot-manager__custom-tooltip span:after {
-  content: '';
-  position: absolute;
-  border-width: 10px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+    content: '';
+    position: absolute;
+    border-width: 10px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .hotspot-manager__custom-tooltip a {
-  color: white;
-  text-decoration: underline;
+    color: white;
+    text-decoration: underline;
 }
 
 .hotspot-manager__custom-tooltip a:hover {
-  color: #94d255;
+    color: #94d255;
 }
 
 /* Media content styling */
 .hotspot-manager__graphics,
 .hotspot-manager__video {
-  object-fit: contain;
+    object-fit: contain;
 }
 
 .hotspot-manager__graphics {
-  width: auto;
-  height: auto;
-  max-width: 100px;
-  max-height: 100px;
+    width: auto;
+    height: auto;
+    max-width: 100px;
+    max-height: 100px;
 }
 
 /* 16:9 ratio */
 .hotspot-manager__video {
-  width: 640px;
-  height: 360px;
-  max-width: 500px;
-  /* 16:9 aspect ratio for 500px width */
-  max-height: 281px;
+    width: 640px;
+    height: 360px;
+    max-width: 500px;
+    /* 16:9 aspect ratio for 500px width */
+    max-height: 281px;
 }
+
+.MuiList-root > span {
+    font-size: 1.3em;
+}
+
+.MuiList-root li {
+    font-size: 2.4em;
+}
+
+    .MuiList-root li span {
+        font-size: 1.3rem;
+    }

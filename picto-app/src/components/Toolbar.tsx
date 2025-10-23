@@ -1,363 +1,161 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import {
-  AppBar,
-  Toolbar as MUIToolbar,
-  Typography,
-  IconButton,
-  Box,
-  Tooltip,
-} from "@mui/material";
-import {
-  SaveOutlined as SaveIcon,
-  Share as ShareIcon,
-  Settings as SettingsIcon,
-  FileUpload as ExportIcon,
-  Done as CheckIcon,
-  LogoutOutlined,
-} from "@mui/icons-material";
-import { motion, AnimatePresence } from "framer-motion";
-import logo from "/images/logo_picto360.png";
-import ToggleSwitch from "./ui/ToggleSwitch";
 import "./css/Toolbar.css";
+import logo from "/images/logo_picto360.png";
+
+import React, { useState, useEffect, useCallback } from "react";
+import { MdSettings, MdOutlineFileDownload, MdLogout, MdEdit, MdRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import ToggleSwitch from "./ui/ToggleSwitch";
 import ExportPopupWindow from "./ui/ExportPopupWindow";
 import SharePopupWindow from "./ui/SharePopupWindow";
-import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
-import { DriveAuthStatus, MessageBannerRef } from "@/utils/Types";
+import SettingsPopupWindow from "./ui/SettingsPopupWindow";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
+import { DriveAuthStatus } from "@/utils/Types";
+import { getViewerItem, putViewerItem } from "@/utils/storedImageData";
+import { IoMdTrash } from "react-icons/io";
 
 interface ToolbarProps {
-  isEditMode: boolean;
-  toggleEditMode: () => void;
-  viewerId?:string;
-  driveAuthStatus:DriveAuthStatus|null;
+    isEditMode: boolean;
+    toggleEditMode: () => void;
+    viewerId?: string;
+    driveAuthStatus: DriveAuthStatus | null;
 }
 
-const CHARACTER_LIMIT = 20;
+const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode, viewerId, driveAuthStatus }) => {
 
-const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode ,viewerId,driveAuthStatus}) => {
+    const [projectTitle, setProjectTitle] = useState("Untitled");
+    const [isSaved, setIsSaved] = useState(false);
+    const [showShareOptions, setShowShareOptions] = useState(false);
+    const [showExportOptions, setShowExportOptions] = useState(false);
+    const [showSettingsOptions, setShowSettingsOptions] = useState(false);
 
-  const [projectTitle, setProjectTitle] = useState(""); //TODO: manage project uniqueness in DB
-  const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
-  const [showShareOptions, setShowShareOptions] = useState(false);
-  const [showExportOptions, setShowExportOptions] = useState(false);
-  const projectTitleRef = useRef<HTMLDivElement>(null);
+    const { logoutFromDrive } = useDriveAuth()
 
-  const spanRef = useRef<HTMLSpanElement>(null);
-  const [titleWidth, setTitleWidth] = useState(1);
+    // Change the project title
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newTitle = e.target.value;
 
-  const {logoutFromDrive} = useDriveAuth()
-
-  useEffect(() => {
-    if (spanRef.current) {
-        setTitleWidth(spanRef.current.offsetWidth + 8)
-    }
-  }, [projectTitle]);
-
-  // Change the project title
-  const handleTitleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = e.target.value;
-
-      setProjectTitle(newTitle);
-      setWarningMessage(
-        newTitle.length === CHARACTER_LIMIT
-          ? `ATTENTION: Le titre ne doit pas dépasser ${CHARACTER_LIMIT} caractères.`
-          : null
-      );
-
-  };
-
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (
-      projectTitleRef.current &&
-      projectTitleRef.current.innerText.trim().length >= CHARACTER_LIMIT &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !["Backspace", "Delete", "ArrowLeft", "ArrowRight" ].includes(event.key)
-    ) {
-      event.preventDefault();
-    }
-
-    if(event.key==="Enter"){
-      event.preventDefault();
-      saveProjectTitleToDB();
-      event.currentTarget.blur()
-    }
-  }, []);
-
-  const handleSave = useCallback(() => {
-    if (isEditMode) {
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 1500);
-    }
-  }, [isEditMode]);
-
-
-  const handleToggleEditMode = useCallback(() => {
-    toggleEditMode();
-  }, [toggleEditMode]);
-
-  
-  const getViewerFromDB = async()=> {
-    if(viewerId === "null" || !viewerId ){
-        navigate("/", {replace : true});
-        return;
-    }
-    const viewerItem = await getViewerItem(viewerId);
-
-    const name = viewerItem?.name;
-    if(name) {
-      setProjectTitle(name)
+        setProjectTitle(newTitle);
     };
-  }
 
-  const saveProjectTitleToDB = async () =>{
-    if(viewerId === "null" || !viewerId ){
-        return;
-    }
-      await putViewerItem(viewerId,projectTitle);
-  }
-
-
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-        event.preventDefault();
+    const handleSave = useCallback(() => {
         if (isEditMode) {
-          handleSave();
+            setIsSaved(true);
+            setTimeout(() => setIsSaved(false), 1500);
         }
-      }
-    };
+    }, [isEditMode]);
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleSave, isEditMode]);
+    const handleToggleEditMode = useCallback(() => {
+        toggleEditMode();
+    }, [toggleEditMode]);
 
-  const navigate = useNavigate();
-  const redirectHomePage = useCallback(() =>
-    navigate('/')
-  ,[])
- 
+    const getViewerFromDB = async () => {
+        if (viewerId === "null" || !viewerId) {
+            navigate("/", { replace: true });
+            return;
+        }
 
-  return (
-    <motion.div
-      className={`toolbar-container toolbar--${isEditMode ? "edit-mode" : "preview-mode"}`}
-      animate={{
-        backgroundColor: isEditMode ? "#282828" : "#ffffff",
-      }}
-      transition={{
-        type: "tween",
-        ease: "easeInOut",
-        duration: 0.5,
-      }}
-      onLoad={getViewerFromDB}
-    >
-      <AppBar position="static" className="toolbar" 
-              style={{ backgroundColor: "transparent" }}
-              >
-        <MUIToolbar disableGutters className="toolbar__content" >
-          <Box className="toolbar__left">
-            
-            <img src={logo} alt="Picto360 Logo" className="toolbar__logo" onClick={redirectHomePage} />
+        const viewerItem = await getViewerItem(viewerId);
 
-            <Box className="toolbar__title-container" style={{ minHeight: warningMessage ? "65px" : "55px" }}>
-              <Box className="toolbar__title-input-wrapper">
-                  {/* Invisible span to measure text */}
-                <span
-                  ref={spanRef}
-                  style={{
-                    position: "absolute",
-                    visibility: "hidden",
-                    whiteSpace: "pre", // preserve spaces
-                    fontSize: "16px",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {projectTitle.length>"Untitled".length ? 
-                  projectTitle || " "
-                  :
-                  "Untitled"} {/* add placeholder space for empty input */}
-                </span>
-                <input type="text" 
-                        maxLength={CHARACTER_LIMIT}
-                        value={projectTitle}
-                        onChange={(e)=>{
-                          handleTitleChange(e)
-                        }}
-                        onBlur={()=>{
-                            saveProjectTitleToDB()
-                          }
-                        }
-                        onKeyDown={handleKeyDown}
-                        disabled={!isEditMode}
-                        className={`toolbar__title-input ${isEditMode ? "toolbar__title-input_editable" : ""}`}
-                        placeholder="Untitled"
-                        style={{
-                          width:`${titleWidth}px`,
-                          cursor: isEditMode ? "text" : "default",
-                        }}
-                        />
-                <Typography variant="body2" className="toolbar__title-extension">
-                  .picto
-                </Typography>
-              </Box>
-              <AnimatePresence>
-                {warningMessage && (
-                  <motion.div
-                    initial={{ y: -5, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -5, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    style={{ overflow: "hidden" }}
-                  >
-                    <Box className="toolbar__warning-message">
-                      <Typography variant="caption" className="toolbar__warning-text">
-                        {warningMessage}
-                      </Typography>
-                    </Box>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </Box>
+        const name = viewerItem?.name;
+        if (name) {
+            setProjectTitle(name)
+        };
+    }
 
-                 <Tooltip
-              title="Exporter"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-            <IconButton onClick={()=>{setShowExportOptions(true)}} className="toolbar__icon-button">
-              <ExportIcon />
-            </IconButton>
-            </Tooltip>
-          </Box>
+    const saveProjectTitleToDB = async () => {
+        if (viewerId === "null" || !viewerId) {
+            return;
+        }
 
-          <Box className="toolbar__right">
-            <Tooltip title={null}>
-              <ToggleSwitch checked={isEditMode} onChange={handleToggleEditMode} className="toolbar__toggle-switch" />
-            </Tooltip>
+        await putViewerItem(viewerId, projectTitle);
+    }
 
-            {/* <Tooltip
-              title={isEditMode && !isSaved ? "Sauvegarder" : ""}
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <span>
-                <IconButton
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+                event.preventDefault();
+                if (isEditMode) {
+                    handleSave();
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [handleSave, isEditMode]);
+
+    const navigate = useNavigate();
+    const redirectHomePage = useCallback(() => navigate('/'), [])
+
+    return (
+        <div className={`toolbar-container toolbar-container--${isEditMode ? "edit-mode" : "preview-mode"}`} onLoad={getViewerFromDB}>
+            <div className="toolbar">
+                <div className="toolbar__left">
+                    <img src={logo} alt="Picto 360 logo" className="toolbar__logo" onClick={redirectHomePage} />
+
+                    <div className="toolbar__title-container">
+                        <span className="toolbar__title-value">{projectTitle}</span>
+                        <span className="toolbar__title-extension">.picto</span>
+                    </div>
+
+                    <button className="toolbar__icon-button has-helper" title="Paramètres du projet" onClick={() => { setShowSettingsOptions(true) }}>
+                        <MdSettings className="toolbar__settings-icon" />
+                        <span className="helper">Paramètres du projet</span>
+                    </button>
+
+                    <button className="toolbar__icon-button has-helper" onClick={() => { setShowExportOptions(true) }} title="Exporter">
+                        <MdOutlineFileDownload className="toolbar__export-icon" />
+                        <span className="helper">Exporter le projet</span>
+                    </button>
+                </div>
+
+                <div className="toolbar__right">
+                    {/* <button className="toolbar__icon-button has-helper" onClick={() => { setShowExportOptions(true) }} title="Exporter">
+                        <IoMdTrash className="toolbar__export-icon" />
+                        <span className="helper">Supprimer toutes les annotations</span>
+                    </button> */}
+
+                    <div className="toolbar__mode-switcher">
+                        <ToggleSwitch id="edit-mode" checked={isEditMode} onChange={handleToggleEditMode} variant="icon" checkedIcon={<MdEdit />} uncheckedIcon={<MdRemoveRedEye />} />
+                        <span onClick={toggleEditMode} className="toolbar__mode-switcher__label">{(isEditMode ? "Mode annotation" : "Mode visualisation")}</span>
+                    </div>
+
+                    {/* <button
                   onClick={!isSaved ? handleSave : undefined}
                   className="toolbar__icon-button"
                   disabled={!isEditMode}
+                  title={isEditMode && !isSaved ? "Sauvegarder" : ""}
                 >
                   {isSaved ? (
-                    <CheckIcon className="toolbar__check-icon" />
+                    <MdCheck className="toolbar__check-icon" />
                   ) : (
-                    <SaveIcon className="toolbar__save-icon" />
+                    <MdSaveAlt className="toolbar__save-icon" />
                   )}
-                </IconButton>
-              </span>
-            </Tooltip> */}
-            
-       
+                </button> */}
 
-            {/* <Tooltip
-              title="Partager"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <IconButton onClick={()=>{ setShowShareOptions(true)}} className="toolbar__icon-button">
-                <ShareIcon />
-              </IconButton>
-            </Tooltip> */}
 
-            {/* <Tooltip
-              title="Paramètres"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <IconButton className="toolbar__icon-button">
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip> */}
-            {
-              driveAuthStatus?.isAuthenticated &&
-            <Tooltip
-              title="Déconnexion"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -7.5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <IconButton className="toolbar__icon-button" onClick={async()=>{
-                  await logoutFromDrive();
-                  // await checkDriveAuth();
-                  // window.location.reload()
-                }}>
-                <LogoutOutlined />
-              </IconButton>
-            </Tooltip>
-            }
-          </Box>
-        </MUIToolbar>
+                    {/* <button onClick={()=>{ setShowShareOptions(true)}} className="toolbar__icon-button" title="Partager">
+                <MdShare />
+              </button> */}
 
-        {/* Share Options Modal */}
-        <SharePopupWindow isOpen={showShareOptions} setIsPopupOpen={setShowShareOptions}/>
-        <ExportPopupWindow  isOpen={showExportOptions} 
-                            setIsPopupOpen={setShowExportOptions} 
-                            viewerId = {viewerId}
-                            titleState = {{projectTitle,setProjectTitle: handleTitleChange,saveProjectTitleToDB}}
-                            driveAuthStatus= {driveAuthStatus}/>
-      </AppBar>
-    </motion.div>
-  );
+                    {
+                        driveAuthStatus?.isAuthenticated &&
+                        <button className="toolbar__icon-button" onClick={async () => { await logoutFromDrive(); }} title="Déconnexion">
+                            <MdLogout />
+                        </button>
+                    }
+                </div>
+            </div>
+
+            {/* Share Options Modal */}
+            <SharePopupWindow isOpen={showShareOptions} setIsPopupOpen={setShowShareOptions} />
+            <ExportPopupWindow isOpen={showExportOptions} setIsPopupOpen={setShowExportOptions}
+                viewerId={viewerId} driveAuthStatus={driveAuthStatus}
+                titleState={{ projectTitle, setProjectTitle: handleTitleChange, saveProjectTitleToDB }} />
+            <SettingsPopupWindow isOpen={showSettingsOptions} setIsPopupOpen={setShowSettingsOptions}
+                state={{ fileName: projectTitle, setFileName: (e) => { setProjectTitle(e.target.value) } }} />
+        </div>
+    );
 };
 
 export default React.memo(Toolbar);

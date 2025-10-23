@@ -1,227 +1,267 @@
-.draggable_line{
-    width: 7vw;
-    height: 0.4vw;
-    background-color: #a7a7a7;
-    border-radius: 5vw;
+.draggable_line {
     position: absolute;
     top: 1.5vh;
-    cursor:grab;
+    align-self: center;
+    width: 7vw;
+    height: 6px;
+    background-color: #a7a7a7;
+    border-radius: 5vw;
+    cursor: grab;
     user-select: none;
 }
 
-
-
-.edition_pannel{
-    min-height: 50vh;
-    min-width: 23vw;
-    max-height: 80vh;
-    max-width: 50vw;
-
-    top:20vh;
-    left:70vw;
-    border-radius : 2vw;
-    border: 3px solid white;
-    font-family: "Inter",sans-serif;
+.edition_pannel {
     position: absolute;
+    top: 20vh;
+    left: 70vw;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    
+    min-height: 480px;
+    max-height: 600px;
+    min-width: 360px;
+    border: 2px solid white;
+    border-radius: 2vw;
     overflow: hidden;
 
     /*the alpha value controls the transparency*/
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(245, 245, 245, 0.9);
 
     /* This controls the blurring effect*/
-    -webkit-backdrop-filter: blur( 7.5px );
-    backdrop-filter: blur( 7.5px );
+    backdrop-filter: blur(6px);
 
     /*Adding the shadow*/
     box-shadow: 0 8px 32px 0 rgba(255, 254, 254, 0.38);
 }
 
-.edition_pannel_content{
-    min-height: 40vh;
-    min-width: 20vw;
-    max-height: 70vh;
-
+.edition_pannel_content {
+    flex-grow: 2;
     display: flex;
     flex-direction: column;
-    padding: 2vw;
-    gap: 3vh;
-    align-items: center;
+    height: 100%;
+    min-width: 20vw;
+    padding: 30px 18px 12px;
+    gap: 15px;
     overflow: auto;
 }
 
-.edition_pannel_content::-webkit-scrollbar{
+.edition_pannel_content::-webkit-scrollbar {
     width: 6px;
-    height:5px ;
+    height: 5px;
 }
 
 .edition_pannel_content::-webkit-scrollbar-thumb {
-  background: #303030;
-  border-radius: 5px;
+    background: #303030;
+    border-radius: 5px;
 }
-.edition_pannel_content::-webkit-scrollbar-thumb:hover{
+
+.edition_pannel_content::-webkit-scrollbar-thumb:hover {
     cursor: pointer;
 }
 
-.edition_pannel_top_text{
-    font-weight: 800;
-    font-size: 1.5vw;
-}
-
-.edition_pannel_top{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5vw;
-}
-
-.pannel_main_content{
-    display: flex;
-    flex-direction: column;
-    gap: 1vw;
-    padding-bottom: 5vw;
-}
-
-.annotation_edition_pannel{
-    display: flex;
-    flex-direction: column;
-    gap: 2vw;   
-}
-
-.edition_pannel_logic{
+.edition_pannel_top {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5vw;   
+    margin-bottom: 12px;
 }
 
-.dialog_field{
-    background-color: aliceblue;
-    width: 20vw;
-    height: 7vh;
-    padding: 0.8vw;
-    max-width: 20vw;
-    max-height: 15vh;
-    resize: none ; /* Prevent user from manually resizing (optional)*/
-    overflow-y: auto ; /* Scroll when content overflows vertically */
-    overflow-x: hidden; /* Hide horizontal scroll */
-    white-space: pre-wrap; /* Keep whitespace and wrap long lines */
-    word-wrap: break-word ; /* Break long words onto next line */
+    .edition_pannel_icon {
+        /* position: absolute; */
+        /* left: 12px; */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: var(--color-white);
+        background: #232425;
+    }
+
+    .edition_pannel_top_text {
+        font-weight: 300;
+        font-size: 2.4rem;
+        margin-bottom: 6px;
+    }
+
+    
+.close-button {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    background-color: #d5d5d5;
+    color: #282828;
+}
+
+    .close-button svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .close-button:hover {
+        background-color: #fee;
+        color: #f44336;
+    }
+
+.pannel_main_content {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.annotation_edition_pannel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edition_pannel_logic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+.dialog_field {
+    background-color: #f5f5f5;
+    width: 100%;
+    min-height: 120px;
+    padding: 6px 2%;
+    max-height: 240px;
+    resize: none;
     font-size: 16px;
-    font-weight: 700;
-    border: 2px solid #ccc;
-    border-radius: 8px
+    font-weight: 500;
+    border: 2px solid #c0c0c0;
+    border-radius: 6px;
+    /* Prevent user from manually resizing (optional)*/
+    overflow-y: auto;
+    /* Scroll when content overflows vertically */
+    overflow-x: hidden;
+    /* Hide horizontal scroll */
+    white-space: pre-wrap;
+    /* Keep whitespace and wrap long lines */
+    word-wrap: break-word;
+    /* Break long words onto next line */
+  
 }
 
-.edition_pannel_field{
+.edition_pannel_field {
     display: flex;
     flex-direction: column;
     gap: 0.1vw;
     /* color : #364A9D ; */
 }
 
-.edition_pannel_field_title{
-    font-size: 1.05vw;
-    padding-left: 1vw;
+.edition_pannel_field_title {
+    display: flex; flex-direction: column;
+    margin-bottom: 12px;
 }
 
+.edition_pannel_field_title .label {
+    font-size: 1.1vw;
+    font-weight: 600;
+}
 
-.annotation_type_container{
+.annotation_type_container {
     display: flex;
     flex-direction: row;
     align-items: center;
-    align-self : flex-start;
-    gap:1vw;
+    align-self: flex-start;
+    gap: 1vw;
     padding-left: 1vw;
     font-weight: 700;
 }
 
-.annotation_type_title{
+.annotation_type_title {
     font-size: 1.05vw;
     font-weight: 500;
 }
 
-.save_button{
-    width: 9vw;
+.save_button {
+    flex: 1 1;
     height: 3vw;
     color: white;
-    font-size: 1vw;
+    font-size: 1.5em;
     font-weight: 700;
     background-color: black;
+    background-color: var(--color-primary);
     border: 0;
     border-radius: 3vw;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out
 }
+    .save_button:hover {
+        background-color: #1761CF;
+    }
 
-.save_button:hover{
-    background-color: rgb(39, 39, 39);
-}
-
-.cancel_button{
-    width: 9vw;
+.cancel_button {
+    flex: 1 1;
     height: 3vw;
     color: black;
-    font-size: 1vw;
-    font-weight: 700;
+    font-size: 1.5em;
+    font-weight: 600;
     background-color: none;
     border: 0;
     border-radius: 3vw;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out
 }
-.cancel_button:hover{
-    background-color: white;
-}
+    .cancel_button:hover {
+        background-color: #e5e4e2;
+    }
 
-.edition_panel_buttons{
-    max-height: 4vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center; 
-    justify-content: center;
-    gap:0.5vw;  
-    position:absolute;
-    bottom: 5%;
-}
-
-.bottom_pannel{
+.edition_panel_buttons {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap:1vw;
-    padding-top: 1vw;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10vw;
-    padding: 0.5vw;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.close_icon{
+.bottom_pannel {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 180px;
+    padding: 6px;
+}
+
+.close_icon {
     position: fixed;
     right: 2vw;
 }
 
-.delete_button{
+.delete_button {
     width: 3vw;
     height: 3vw;
+    margin-right: 12px;
     color: white;
-    font-size: 1vw;
+    font-size: 1.5em;
     font-weight: 700;
-    background-color: rgba(255, 0, 0,01);
+    background-color: rgba(255, 0, 0, 01);
     border: 0;
     border-radius: 4vw;
     cursor: pointer;
     transition: background-color 0.01s ease-in-out;
 }
+    .delete_button:hover {
+        background-color: rgb(223, 0, 0);
+    }
 
-.delete_button:hover{
-    background-color: rgb(223, 0, 0);
-}
-
-.image_preview{
+.image_preview {
     width: 10vw;
     height: 10vw;
     object-fit: cover;
@@ -229,7 +269,7 @@
     border: 0.3vw solid white
 }
 
-.add_image_button{
+.add_image_button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,26 +280,25 @@
     transition: background-color 0.1s ease-in-out;
     cursor: pointer;
 }
+    .add_image_button:hover {
+        background-color: rgba(0, 0, 0, 0.6)
+    }
 
-.add_image_button:hover{
-    background-color: rgba(0, 0, 0, 0.6)
-}
-
-.add_image_icon{
+.add_image_icon {
     color: white;
     width: 2vw;
     height: 2vw;
 }
 
-.image_preview_container{
+.image_preview_container {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap:1vw
+    gap: 1vw
 }
 
-.big_toggle_switch{
+.big_toggle_switch {
     display: flex;
     flex-direction: row;
     background-color: white;
@@ -271,7 +310,7 @@
     font-weight: 700;
 }
 
-.toggle_button{
+.toggle_button {
     color: rgba(0, 0, 0, 0.3);
     background-color: rgba(0, 0, 0, 0.1);
     height: 1.5vw;
@@ -284,12 +323,12 @@
     cursor: pointer;
 }
 
-.toggle_button:hover{
+.toggle_button:hover {
     background-color: rgba(0, 0, 0, 0.2);
 
 }
 
-.toggle_button_selected{
+.toggle_button_selected {
     color: rgb(255, 255, 255);
     background-color: rgba(0, 0, 0, 1);
     height: 1.5vw;
@@ -303,19 +342,17 @@
 
 }
 
-.video_upload_container{
+.video_upload_container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap:2vw;
 }
 
-.video_player{
+.video_player {
     border: 5px solid white;
     border-radius: 5px;
 }
 
-.error_message{
+.error_message {
     justify-self: center;
     align-self: center;
     font-weight: 100;
@@ -323,6 +360,131 @@
     color: red;
 }
 
+.annotation_edition_pannel--video .panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+    width: 100%;
+}
+
+.panel-section-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.panel-section-group__label {
+    font-weight: 600;
+    font-size: 1.6em;
+    margin-right: 6px;
+}
+
+.video-type-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.video-type-switcher__label {
+    font-size: 1.5em;
+    font-weight: 500;
+    color: var(--color-primary);
+}
 
 
+.video-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    height: 200px;
+    text-align: center;
+    color: #70757a;
+    border: 2px dashed #c8ccd4;
+    border-radius: 8px;
+    background-color: #f6f7f9;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
 
+.video-placeholder:hover {
+    background-color: #f0f1f3;
+    border-color: #aab0b8;
+}
+
+.placeholder_message {
+    font-size: 1.5em;
+    font-weight: 500;
+}
+
+.video_player {
+    width: 320px;
+    height: auto;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.text-field {
+    width: 100%;
+    padding: 10px 2%;
+    font-size: 1.6em;
+    font-weight: 500;
+    border: 1.5px solid #c0c0c0;
+    border-radius: 4px
+}
+
+.add_video_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.add_video_button:hover {
+    background-color: #005fcc;
+}
+
+.add_video_icon {
+    font-size: 1.2rem;
+}
+
+.file_upload_label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 1.6rem; font-weight: 500;
+    cursor: pointer;
+    background-color: #007bff;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.file_upload_label:hover {
+    background-color: #005fcc;
+}
+
+.file_upload_input {
+    display: none;
+    /* hides native file input */
+}
+
+.file_upload_icon {
+    font-size: 1.5em;
+}
+
+.title {
+    font-size: 1.8em;
+    font-weight: 600;
+    margin-bottom: 6px;
+}

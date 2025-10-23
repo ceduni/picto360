@@ -1,88 +1,88 @@
 import React, { useState, useRef } from "react";
-import { MdOutlineFileDownload } from "react-icons/md";
-import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
-import { GrOnedrive } from "react-icons/gr";
+import { MdInfo, MdFileUpload } from "react-icons/md";
+// import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
+// import { GrOnedrive } from "react-icons/gr";
 //import WelcomeMessage from "./ui/WelcomeMessage";
 import "./css/ImageUploader.css";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 interface ImageUploaderProps {
-  onImageUpload: (imageSrc: File) => void;
+    onImageUpload: (imageSrc: File) => void;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
-  //TODO: manage errors + add red color to the drop zone
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const {setBannerMessage}= useFeedbackBanner()
+    //TODO: manage errors + add red color to the drop zone
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { setBannerMessage } = useFeedbackBanner()
 
-  const handleDragEvents = (event: React.DragEvent, isDragging: boolean) => {
-    event.preventDefault();
-    setIsDragging(isDragging);
-  };
+    const handleDragEvents = (event: React.DragEvent, isDragging: boolean) => {
+        event.preventDefault();
+        setIsDragging(isDragging);
+    };
 
-  const handleDrop = (event: React.DragEvent) => {
-    handleDragEvents(event, false);
-    if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-      processFile(event.dataTransfer.files[0]);
-    }
-  };
+    const handleDrop = (event: React.DragEvent) => {
+        handleDragEvents(event, false);
+        if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+            processFile(event.dataTransfer.files[0]);
+        }
+    };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      processFile(event.target.files[0]);
-    }
-  };
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            processFile(event.target.files[0]);
+        }
+    };
 
-  const processFile = (file: File) => {
-    // const url = URL.createObjectURL(file);
-    try{
-      onImageUpload(file);
-      setBannerMessage({message:"Fichier chargé avec succès",type:"success"})
-    }catch(error){
-      setBannerMessage({message:"Erreure de chargement de fichier",type:"failure"})
-      return;
-    }
-  };
+    const processFile = (file: File) => {
+        // const url = URL.createObjectURL(file);
+        try {
+            onImageUpload(file);
+            setBannerMessage({ message: "Fichier chargé avec succès", type: "success" })
+        } catch (error) {
+            setBannerMessage({ message: "Erreur de chargement de fichier", type: "failure" })
+            return;
+        }
+    };
 
-  const triggerFileInput = (e:React.MouseEvent) => {
-    e.preventDefault()
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
+    const triggerFileInput = (e: React.MouseEvent) => {
+        e.preventDefault()
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
 
-  return (
-      <div className="image-uploader__content">
-        {/*<WelcomeMessage
-          text="Votre vision, enrichie en 360°."
-          color="#ffffff"
-          fontSize="4rem"
-          fontFamily="'Courier New', sans-serif"
-          fontWeight="bold"
-          textShadow="2px 2px 4px rgba(0,0,0,0.1)"
-        />*/}
-        <div
-          className={`image-uploader__drop-zone ${isDragging ? "image-uploader__drop-zone--dragging" : ""}`}
-          onDragOver={(event) => handleDragEvents(event, true)}
-          onDragLeave={(event) => handleDragEvents(event, false)}
-          onDrop={handleDrop}
-          onClick={triggerFileInput}
-        >
-          {" "}
-          {/*TODO: add clicking action*/}
-          <div className="image-uploader__download-icon">
-            <MdOutlineFileDownload />
-          </div>
-          <div className="image-uploader__drop-text">Déposez une image ou un projet</div>
-          {/*TODO: mention the supported files format + file size limit*/}
-        </div>
+    return (
+        <div className="image-uploader__content">
+            <div
+                className={`image-uploader__drop-zone ${isDragging ? "image-uploader__drop-zone--dragging" : ""}`}
+                onDragOver={(event) => handleDragEvents(event, true)}
+                onDragLeave={(event) => handleDragEvents(event, false)}
+                onDrop={handleDrop}
+                onClick={triggerFileInput}
+            >
+                {" "}
+                {/*TODO: add clicking action*/}
+                <div className="image-uploader__download-icon">
+                    <MdFileUpload className="image-uploader__download-icon-ico" />
+                </div>
+                <p className="image-uploader__drop-text">
+                    <b>Selectionnez une image ou un projet Picto
+                        <span className="has-helper">
+                            <MdInfo />
+                            <span className="helper mid">Fichier <code><b>.picto</b></code></span>
+                        </span>
+                    </b> 
+                    <br /> ou glissez là simplement ici
+                </p>
+                {/*TODO: mention the supported files format + file size limit*/}
+            </div>
 
-        <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
+            <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
 
-        
-        {/* 
-        Othe ways to import images or picto files
+
+            {/* 
+        Other ways to import images or picto files
 
         <div className="image-uploader__icon-container">
           <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
@@ -101,8 +101,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
             <GrOnedrive />
           </div>
         </div> */}
-      </div>
-  );
+        </div>
+    );
 };
 
 export default React.memo(ImageUploader);

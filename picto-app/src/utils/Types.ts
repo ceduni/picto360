@@ -7,7 +7,7 @@ export interface HotspotData {
   url_text?: string;
   sceneId?: string;
   cssClass?: string;
-  meta?: Record<string, any>; // optional metadata for custom cases
+  meta?: Record<string, unknown>; // optional metadata for custom cases
 }
 
 export interface HotspotInstance extends HotspotData {
@@ -129,7 +129,22 @@ export type DriveAuthStatus = {
   reason?: 'revoked' | 'expired' | 'manual_disconnect' | 'login' | 'refresh';
 };
   
+export interface PannellumViewer {
+    mouseEventToCoords: (event: MouseEvent) => [number, number];
+    destroy: () => void;
+    getYaw: () => number;
+    getPitch: () => number;
+    getHfov: () => number;
+    on: (event: string, handler: () => void) => void;
+    removeHotSpot: (id: string) => void;
+    addHotSpot: (config: unknown) => void;
+}
 
-const TEXT_CHAR_LIMIT = 300;
-const LABEL_HYPERLINK_CHAR_LIMIT = 30;
-
+export interface ViewerConfig {
+    type: string;
+    panorama: string | null;
+    autoLoad: boolean;
+    autoRotate: number;
+    showControls: boolean;
+    // ... etc
+}

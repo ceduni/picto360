@@ -83,7 +83,7 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
             return;
         }
         if(password===""){
-             setBannerMessage({ message:"Veuillez rentrer un mot de passe",type:"warning"});
+             setBannerMessage({ message:"Veuillez entrer un mot de passe",type:"warning"});
             // bannerRef.current?.trigger(errorMessage,"warning");
             return;            
         }        
@@ -111,7 +111,7 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
             return;
         }
         if(password===""){
-             setBannerMessage({ message:"Veuillez rentrer un mot de passe",type:"warning"});
+             setBannerMessage({ message:"Veuillez entrer un mot de passe",type:"warning"});
             // console.log(errorMessage);
             // bannerRef.current?.trigger(errorMessage,"warning");
             return;            

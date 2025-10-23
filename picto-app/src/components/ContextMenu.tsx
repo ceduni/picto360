@@ -2,9 +2,8 @@ import React, { useEffect, useCallback, useMemo } from "react";
 import { Menu, MenuItem, Divider, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import { IconType } from "react-icons";
-import { AiOutlineUnorderedList, AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
+import { AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
 import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
-import { IoShapesOutline } from "react-icons/io5";
 
 
 
@@ -52,10 +51,10 @@ type MenuSection = {
 
 type MenuItemType =
   | {
-      type: string;
-      icon: IconType;
-      label: string;
-    }
+    type: string;
+    icon: IconType;
+    label: string;
+  }
   | { type: "divider" };
 
 const menuSections: MenuSection[] = [
@@ -64,12 +63,13 @@ const menuSections: MenuSection[] = [
     items: [
       // { type: "Forme", icon: IoShapesOutline, label: "Forme" },
       { type: "divider" },
-      { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
-      { type: "Image", icon: AiOutlinePicture, label: "Image" },
-      { type: "Gif", icon: MdOutlineGif, label: "GIF" },
-      { type: "divider" },
       { type: "Text", icon: AiOutlineFileText, label: "Texte" },
       { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
+      { type: "divider" },
+      { type: "Image", icon: AiOutlinePicture, label: "Image" },
+      { type: "Gif", icon: MdOutlineGif, label: "GIF" },
+      { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
+      { type: "divider" },
       { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
     ],
   },
@@ -92,7 +92,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   useEffect(() => {
     if (!isEditMode) handleClose();
   }, [isEditMode, handleClose]);
-  
+
   // Relocate the context menu when right-clicking elsewhere while it's open
   useEffect(() => {
     const handleRelocate = (e: MouseEvent) => {

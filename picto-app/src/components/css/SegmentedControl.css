@@ -1,0 +1,135 @@
+/* Segmented Control Container */
+.segmented-control {
+    position: relative;
+    display: inline-flex;
+    background-color: #f0f0f0;
+    border-radius: 180px;
+    padding: 4px;
+    gap: 4px;
+    isolation: isolate;
+}
+
+.segmented-control--full-width {
+    display: flex;
+    width: 100%;
+}
+
+.segmented-control--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Sliding Background Indicator */
+.segmented-control__slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 180px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+/* Segment Buttons */
+.segmented-control__segment {
+    position: relative;
+    flex: 1;
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-radius: 180px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 80px;
+}
+
+.segmented-control__segment:hover:not(:disabled) {
+    color: #1c73fa;
+}
+
+.segmented-control__segment--active {
+    color: #1c73fa;
+    font-weight: 600;
+}
+
+.segmented-control__segment:disabled {
+    cursor: not-allowed;
+}
+
+.segmented-control__segment:focus-visible {
+    outline: 2px solid #1c73fa;
+    outline-offset: 2px;
+}
+
+/* Label and Icon */
+.segmented-control__label {
+    display: inline-block;
+}
+
+.segmented-control__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.segmented-control__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Compact Variant */
+.segmented-control--compact .segmented-control__segment {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-width: 60px;
+}
+
+.segmented-control--compact .segmented-control__icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Icon Only Variant */
+.segmented-control--icon .segmented-control__segment {
+    padding: 10px 16px;
+}
+
+.segmented-control--icon .segmented-control__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .segmented-control__segment {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-width: 60px;
+    }
+
+    .segmented-control--icon .segmented-control__segment {
+        padding: 8px 10px;
+    }
+}
+
+/* Accessibility - High Contrast Mode */
+@media (prefers-contrast: high) {
+    .segmented-control {
+        border: 2px solid currentColor;
+    }
+
+    .segmented-control__slider {
+        border: 2px solid #1c73fa;
+    }
+}

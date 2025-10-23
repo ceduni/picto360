@@ -238,11 +238,11 @@ const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
         // console.log("✅ Activity created:", data);
         setBannerMessage({message:"Activité créée avec succès",type:"success"});
       } else {
-        setBannerMessage({message:"Erreure de création d'activité",type:"failure"});
+        setBannerMessage({message:"Erreur de création d'activité",type:"failure"});
         // console.error("❌ Failed to create activity:", data);
       }
     } catch (err) {
-        setBannerMessage({message:"Erreure de création d'activité, Réessayez",type:"failure"});
+        setBannerMessage({message:"Erreur de création d'activité, Réessayez",type:"failure"});
     }
 };
 
@@ -269,7 +269,7 @@ export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
     const {setBannerMessage} = useFeedbackBanner();
 
         if (!team ) {
-            setBannerMessage({message:"Erreure d'ajout des participants, Réessayez",type:"failure"});
+            setBannerMessage({message:"Erreur d'ajout des participants, Réessayez",type:"failure"});
 
             // console.log("Erreur de création 2"); 
             return 
@@ -277,7 +277,7 @@ export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
         const newTeam = team;
 
         if (team.participantsNames.length <= 0 && toAdd <= 0) {
-            setBannerMessage({message:"Erreure d'ajout des participants, Réessayez",type:"failure"});
+            setBannerMessage({message:"Erreur d'ajout des participants, Réessayez",type:"failure"});
             // console.log("Erreur de création 3"); 
             return 
         };

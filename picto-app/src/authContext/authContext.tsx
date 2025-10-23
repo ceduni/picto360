@@ -60,7 +60,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
             });
             // return response;
         }catch(error:any){
-            setBannerMessage({message:"Erreure de connexion.",type:"failure"});
+            setBannerMessage({message:"Erreur de connexion.",type:"failure"});
         }
     } 
 

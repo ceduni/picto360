@@ -1,61 +1,46 @@
-import React, { useState, useCallback } from "react";
-// import Toolbar from "@components/Toolbar";
-// import PanoramaViewer from "@components/PanoramaViewer";
-// import ImageUploader from "@components/ImageUploader";
-// import BottomNavBar from "@/components/BottomNavBar";
-// import { motion, AnimatePresence } from "framer-motion";
+import React, { lazy, Suspense } from "react";
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
-import LoginPage from "./pages/LoginPage";
 import { AuthProvider } from "./authContext/authContext";
-import ProfilePage from "./pages/ProfilePage";
-import ActivityCreationPage from "./pages/ActivityCreationPage";
-import EditActivityPage from "./pages/DashboardPages/EditActivityPage";
-import ActivitiesListPage from "./pages/DashboardPages/ActivitiesListPage";
 
-const App: React.FC = () => {
 
-  return (
-    <div className="app">
-      <AuthProvider >
-        <Routes>
-          <Route  path= "/" element= {<HomePage />} />
-          <Route  path= "/view/:viewerId" element= {<VisualisationPage />} />
-          <Route  path= "/login" element= {<LoginPage />} />
-          <Route  path= "/profile" element= {<ProfilePage />} />
-          <Route  path="/activity_creation" element = {<ActivityCreationPage/>} />
-          <Route path="/dashboard/activity-editor/:id" element = {<EditActivityPage />}/>
-          <Route path="/dashboard/your-activities" element = {<ActivitiesListPage />}/> 
-        </Routes>
-      </AuthProvider>
+const App = () => {
+    // Build routes in a block that only exists when admin is enabled.
+    // When __ENABLE_ADMIN__ is false, the whole block is compiled out.
+    let adminRoutes: React.ReactElement[] = [];
 
-{/* 
-      <header className="app__header">
-        {imageSrc && <Toolbar imageSrc={imageSrc} isEditMode={isEditMode} toggleEditMode={toggleEditMode} />}
-      </header>
-      <div className="app__body">
-        {imageSrc ? (
-          <PanoramaViewer width="100%" height="100%" imageSrc={imageSrc} isEditMode={isEditMode} />
-        ) : (
-          <ImageUploader onImageUpload={handleImageUpload} />
-        )}
-      </div>
-      <AnimatePresence>
-        {imageSrc && isEditMode && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <BottomNavBar />
-          </motion.div>
-        )}
-      </AnimatePresence> */}
-    </div>
-  );
+    if (__ENABLE_ADMIN__) {
+        const LoginPage = lazy(() => import('./pages/LoginPage'));
+        const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+        const ActivityCreationPage = lazy(() => import('./pages/ActivityCreationPage'));
+        const EditActivityPage = lazy(() => import('./pages/DashboardPages/EditActivityPage'));
+        const ActivitiesListPage = lazy(() => import('./pages/DashboardPages/ActivitiesListPage'));
+
+        adminRoutes = [
+            <Route key="login" path="/login" element={<LoginPage />} />,
+            <Route key="profile" path="/profile" element={<ProfilePage />} />,
+            <Route key="create" path="/activity_creation" element={<ActivityCreationPage />} />,
+            <Route key="editor" path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />,
+            <Route key="list" path="/dashboard/your-activities" element={<ActivitiesListPage />} />,
+        ];
+    }
+
+    return (
+        <div className="app">
+            <AuthProvider >
+                {/* Suspense for the lazy-loaded elements (admin specific pages) */}
+                <Suspense fallback={null}>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/view/:viewerId" element={<VisualisationPage />} />
+                        {adminRoutes}
+                    </Routes>
+                </Suspense>
+            </AuthProvider>
+        </div>
+    );
 };
 
 export default React.memo(App);

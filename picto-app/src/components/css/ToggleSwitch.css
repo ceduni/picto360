@@ -1,0 +1,186 @@
+/* Base Toggle Container */
+.toggle {
+    display: inline-block;
+    position: relative;
+}
+
+.toggle__checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle__label {
+    display: block;
+    position: relative;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Track (Background) */
+.toggle__track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 28px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle__checkbox:checked + .toggle__label .toggle__track {
+    background-color: #1c73fa;
+}
+
+.toggle__checkbox:disabled + .toggle__label .toggle__track {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+}
+
+/* Thumb (Circle) */
+.toggle__thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle__checkbox:checked + .toggle__label .toggle__thumb {
+    transform: translateX(24px);
+}
+
+.toggle__checkbox:disabled + .toggle__label .toggle__thumb {
+    background-color: #f5f5f5;
+}
+
+/* Focus State */
+.toggle__checkbox:focus + .toggle__label .toggle__track {
+    box-shadow: 0 0 0 3px rgba(54, 74, 157, 0.2);
+}
+
+/* Icon Variant */
+.toggle--icon .toggle__label {
+    width: 60px;
+    height: 32px;
+}
+
+.toggle--icon .toggle__thumb {
+    width: 24px;
+    height: 24px;
+    top: 4px;
+}
+
+.toggle--icon .toggle__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #1c73fa;
+    transition: color 0.3s ease;
+}
+
+.toggle--icon .toggle__checkbox:checked + .toggle__label .toggle__thumb {
+    transform: translateX(28px);
+}
+
+.toggle--icon .toggle__icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Text Variant */
+.toggle--text .toggle__label {
+    width: 60px;
+    height: 32px;
+}
+
+.toggle--text .toggle__thumb {
+    width: 28px;
+    height: 24px;
+    top: 4px;
+}
+
+.toggle--text .toggle__text {
+    font-size: 10px;
+    font-weight: 700;
+    color: #1c73fa;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.toggle--text .toggle__checkbox:checked + .toggle__label .toggle__thumb {
+    transform: translateX(28px);
+}
+
+/* Label Variant (Text on Track) */
+.toggle--label .toggle__label {
+    width: 80px;
+    height: 32px;
+}
+
+.toggle--label .toggle__thumb {
+    width: 28px;
+    height: 24px;
+    top: 4px;
+    z-index: 2;
+}
+
+.toggle--label .toggle__track-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.toggle--label .toggle__track-label--left {
+    left: 8px;
+    opacity: 1;
+}
+
+.toggle--label .toggle__track-label--right {
+    right: 8px;
+    opacity: 0;
+}
+
+.toggle--label .toggle__checkbox:checked + .toggle__label .toggle__track-label--left {
+    opacity: 0;
+}
+
+.toggle--label .toggle__checkbox:checked + .toggle__label .toggle__track-label--right {
+    opacity: 1;
+}
+
+.toggle--label .toggle__checkbox:checked + .toggle__label .toggle__thumb {
+    transform: translateX(48px);
+}
+
+/* Hover Effects */
+.toggle__label:hover .toggle__thumb {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toggle__checkbox:disabled + .toggle__label {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.toggle__checkbox:disabled + .toggle__label:hover .toggle__thumb {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

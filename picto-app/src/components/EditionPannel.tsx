@@ -6,21 +6,22 @@ import HyperlinkEditor from "./editors/HyperlinkEditor";
 import ImageEditor from "./editors/ImageEditor";
 import VideoEditor from "./editors/VideoEditor";
 import { BsTrash3Fill } from "react-icons/bs";
+import { MdAdd, MdClose, MdImage, MdLink, MdOndemandVideo, MdSave, MdTextSnippet } from "react-icons/md";
 
 
 interface EditionPannelProps {
-    hotspot:HotspotData |  null;
-    onSave: (hotspot:HotspotData) => void;
-    onClose : () => void;
-    onDelete : (hotspot:HotspotData) => void;
-    onCreate : (hotspot:HotspotData) => void;
-    pannelState : string
+    hotspot: HotspotData | null;
+    onSave: (hotspot: HotspotData) => void;
+    onClose: () => void;
+    onDelete: (hotspot: HotspotData) => void;
+    onCreate: (hotspot: HotspotData) => void;
+    pannelState: string
 }
 
-const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,onDelete,onCreate,pannelState}) => {
+const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose, onDelete, onCreate, pannelState }) => {
     if (!hotspot) return null;
 
-    const [formState, setFormState] = useState<HotspotData | null>(null);    
+    const [formState, setFormState] = useState<HotspotData | null>(null);
     const editorRef = useRef<EditorRef>(null);
 
     const boxRef = useRef<HTMLDivElement>(null);
@@ -47,7 +48,7 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-        if (!dragging || !boxRef.current) return;
+            if (!dragging || !boxRef.current) return;
             boxRef.current.style.left = `${e.clientX - offset.x}px`;
             boxRef.current.style.top = `${e.clientY - offset.y}px`;
         };
@@ -62,29 +63,29 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
         document.addEventListener("mouseup", handleMouseUp);
 
         return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
         };
     }, [dragging, offset]);
 
 
     useEffect(() => {
         setFormState(hotspot);
-    }, [hotspot]);   
+    }, [hotspot]);
 
-    if (!formState && pannelState=="editing"){
+    if (!formState && pannelState == "editing") {
         return <p>No hotspot selected</p>;
-    } 
+    }
 
     const handleSave = (updatedFields: Partial<HotspotData>) => {
-        if(pannelState==="editing"){
+        if (pannelState === "editing") {
             onSave({ ...hotspot, ...updatedFields });
             onClose();
             return;
         }
 
-        if(pannelState==="creating"){
-            onCreate({... hotspot, ...updatedFields});
+        if (pannelState === "creating") {
+            onCreate({ ...hotspot, ...updatedFields });
             onClose();
             return;
         }
@@ -94,7 +95,7 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
         editorRef.current?.submit();
     };
 
-    const handleDelete = () =>{
+    const handleDelete = () => {
         onDelete(hotspot);
         onClose()
     }
@@ -102,64 +103,106 @@ const EditionPannel : React.FC <EditionPannelProps> = ({hotspot,onSave,onClose,o
 
     const type = hotspot.type;
 
+    const typeLabel = (() => {
+        switch (type) {
+            case "text":
+                return "Texte";
+            case "label":
+                return "Étiquette";
+            case "hyperlink":
+                return "Hyperlien";
+            case "gif":
+                return "GIF";
+            case "image":
+                return "Image";
+            case "video":
+                return "Vidéo";
+            default:
+                return "Inconnu";
+        }
+    })();
+
     const editor = (() => {
         switch (type) {
-        case "text":
-        case "label":
-            return <TextEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
-        case "hyperlink":
-            return <HyperlinkEditor  ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
-        case "gif":
-        case "image":
-            return <ImageEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
-        case "video":
-            return <VideoEditor ref={editorRef} hotspot={hotspot} onSave={handleSave}/>
+            case "text":
+            case "label":
+                return <TextEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
+            case "hyperlink":
+                return <HyperlinkEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
+            case "gif":
+            case "image":
+                return <ImageEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />;
+            case "video":
+                return <VideoEditor ref={editorRef} hotspot={hotspot} onSave={handleSave} />
 
-        // add more cases as needed
-        default:
-            return <p>Unsupported hotspot type: {type}</p>;
+            // add more cases as needed
+            default:
+                return <p>Unsupported hotspot type: {type}</p>;
+        }
+    })();
+
+    const panelIcon = (() => {
+        switch (type) {
+            case "text":
+            case "label":
+                return <MdTextSnippet size={20} className="edition_pannel_top_icon" />;
+            case "hyperlink":
+                return <MdLink size={20} className="edition_pannel_top_icon" />;
+            case "gif":
+            case "image":
+                return <MdImage size={20} className="edition_pannel_top_icon" />;
+            case "video":
+                return <MdOndemandVideo size={20} className="edition_pannel_top_icon" />;
+
+            // add more cases as needed
+            default:
+                return <p>Unsupported hotspot type: {type}</p>;
         }
     })();
 
     return (
         <div id="movable" className="edition_pannel" ref={boxRef}>
-                <div id = "handle" className="draggable_line" onMouseDown={handleMouseDown}/>
+            <div id="handle" className="draggable_line" onMouseDown={handleMouseDown}></div>
             <div className="edition_pannel_content">
                 <div className="edition_pannel_top">
-                    <p className="edition_pannel_top_text">
-                        Panneau d'édition
-                    </p>
+                    <div className="edition_pannel_top_text">
+                        <div className="edition_pannel_icon">{panelIcon}</div> {typeLabel}
+                    </div>
+                   
+                    <button className="close-button" onClick={onClose} aria-label="Fermer le pannel d'édition sans sauvegarder">
+                        <MdClose />
+                    </button>
+                    
                     {/* <IoCloseCircleOutline size={40} className="close_icon"/> */}
                 </div>
                 <div className="pannel_main_content">
-                    <div className="annotation_type_container">
-                        <p className="annotation_type_title">Type d'annotation:</p>
-                        <p>{hotspot.type}</p>
-                    </div>
-
-                    {editor}                
+                    {editor}
                 </div>
                 <div className="edition_panel_buttons">
                     {
-                        pannelState=="editing" &&
+                        pannelState == "editing" &&
                         <button type="button" title="delete" className="delete_button" onClick={handleDelete}>
                             <BsTrash3Fill />
-                        </button>                        
+                        </button>
                     }
                     <div className="bottom_pannel">
-                        <button type="button" className="cancel_button" onClick={onClose}>Cancel</button>
+                        <button type="button" className="cancel_button" onClick={onClose}>Annuler</button>
                         {
-                            pannelState=="editing" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>Sauvegarder</button>                      
+                            pannelState == "editing" &&
+                            <button type="button" className="save_button" onClick={handleClickSave}>
+                                Sauvegarder
+                            </button>
                         }
                         {
-                            pannelState=="creating" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>Créer</button>                      
+                            pannelState == "creating" &&
+                            <button type="button" className="save_button" onClick={handleClickSave}>
+                                Créer
+                            </button>
                         }
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     );

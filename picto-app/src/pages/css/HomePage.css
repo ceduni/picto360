@@ -1,129 +1,258 @@
-.home_background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #f8f9ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* behind everything else */
-  z-index: 1000;
+.home-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9ff;
+    min-height: 100%;
 }
+
+.panorama-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+    /* Animated 360° background using CSS */
+    .panorama-background:before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        /* Make it wider than viewport for seamless loop */
+        width: 300%;
+        height: 100%;
+        background-image: url('./../../../samples/Sommets_St-Sauveur_Avila_1-min.JPG');
+        background-size: 33.333% 100%;
+        background-repeat: repeat-x;
+        background-position: center;
+        transform: translate(-50%, -50%);
+        animation: panorama-scroll 120s linear infinite;
+        will-change: transform;
+    }
+
+    @keyframes panorama-scroll {
+        from {
+            transform: translate(-50%, -50%) translateX(0);
+        }
+        to {
+            transform: translate(-50%, -50%) translateX(-33.333%);
+        }
+    }
+
+    /* Overlay to soften the panorama and improve content readability */
+    .panorama-background:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+.home-page__header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    padding: 48px 24px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(245, 245, 245, 0.8) 100%);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+    .image-uploader__logo {
+        position: relative;
+        display: block;
+        width: 180px; min-width: 180px;
+        height: 180px; min-height: 180px;
+        margin-bottom: 24px;
+        filter: drop-shadow(0 4px 12px rgba(54, 74, 157, 0.15));
+        transition: transform 0.3s ease;
+        z-index: 10;
+    }
+
+        .image-uploader__logo:hover {
+            transform: scale(1.05);
+        }
+
+    .home-page__intro-text {
+        max-width: 800px;
+        font-weight: 500; font-size: 2em;
+        text-align: center;
+        line-height: 1.65;
+    }
 
 .home-page__content {
-  position: relative;
-  background-color: #f8f9ff;
-  width: 100%;
-  height: 100%;
-  padding: 1vw;
-  padding-bottom: 1vw;
-  border-radius: 20px;
-  /* box-shadow: 0 16px 24px rgba(0, 0, 0, 0.1); */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  /* above the particles */
-  z-index: 1100;
+    flex-grow: 2;
+    position: relative;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 48px 0;
+    z-index: 100;
 }
 
-.home-page__center {
-    width: 55vw;
-  height: 75vh;
-    display: flex;
-  flex-direction: column;  
-  justify-content: center;
-  align-items: center;
-
-}
-
-/* .home-page__content>div:first-child {
-  position: absolute;
-  top: 1vw;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-} */
-
-
-.home-page__login_container{
-  width: 44vw;
-  padding: 1.5vw;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-.home-page__login_button{
-  width: 20vw;
-  height: 4vw;
-  color: #364A9D;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-  font-size: 1.2vw;
-  background-color: white;
-  border-width: 0;
-  border-radius :74px; 
-}
-
-.home-page__create_group_button{
-  width: 20vw;
-  height: 4vw;
-  color: #364A9D;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-  font-size: 1.2vw;
-  background-color: #D8E0FF;
-  border-width: 0;
-  border-radius :74px; 
-}
-
-.home-page__login_button:hover{
-  background-color: #fbfcff;
-  border-color: #a4b6fc;
-  border-width: 0.2vh;
-}
-
-.home-page_create_activity{
-  width: 20vw;
-  height: 4vw;
-  color: white;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-  font-size: 1.2vw;
-  background-color: #364A9D;
-  border-width: 0;
-  border-radius :74px; 
-}
-
-
-.image-uploader__logo {
-  position: absolute;
-  left: 46.5%;
-  align-self: center;  
-  justify-content: center;
-  width: 4vw;
-  height: 4vw;
-}
-
-.material-icons{
-    color: #364A9D;
-    padding-right: 0.5vw;
-}
-
-
-.top-content{
-    width:85vw;
+.home-page__login_container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 700px;
+    padding: 24px;
     display: flex;
     flex-direction: row;
-    justify-content: right;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.home-page__btn-login,
+.home-page__btn-create-group,
+.home-page__btn-create-activity {
+    position: relative;
+    z-index: 10;
+    min-width: 200px;
+    height: 56px;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+    border-width: 0;
+    border-radius: 28px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+}
+
+.home-page__btn-login {
+    color: #364A9D;
+    background-color: white;
+    border: 2px solid transparent;
+}
+
+    .home-page__btn-login:hover {
+        background-color: #fbfcff;
+        border-color: #364A9D;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.2);
+    }
+
+    .home-page__btn-login:active {
+        transform: translateY(0);
+    }
+
+.home-page__btn-create-group {
+    color: #364A9D;
+    background-color: #D8E0FF;
+}
+
+    .home-page__btn-create-group:hover {
+        background-color: #c5d1ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.25);
+    }
+
+    .home-page__btn-create-group:active {
+        transform: translateY(0);
+    }
+
+.home-page__btn-create-activity {
+    color: white;
+    background-color: #364A9D;
+}
+
+    .home-page__btn-create-activity:hover {
+        background-color: #2a3a7d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(54, 74, 157, 0.35);
+    }
+
+    .home-page__btn-create-activity:active {
+        transform: translateY(0);
+    }
+
+.material-icons {
+    color: #364A9D;
+    padding-right: 8px;
+    vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .home-page__login_container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .home-page__btn-login,
+    .home-page__btn-create-group,
+    .home-page__btn-create-activity {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .image-uploader__logo {
+        width: 140px;
+        height: 140px;
+    }
+
+    .top-content {
+        padding: 32px 16px;
+    }
+
+    .home-page__center {
+        padding: 32px 16px;
+    }
+    
+    /* Slower animation on mobile for better performance */
+    .panorama-background::before {
+        animation-duration: 90s;
+    }
+}
+
+/* Accessibility improvements */
+.home-page__btn-login:focus,
+.home-page__btn-create-group:focus,
+.home-page__btn-create-activity:focus {
+    outline: 3px solid #364A9D;
+    outline-offset: 2px;
+}
+
+/* Optional: Add a subtle vignette effect over the panorama */
+.home-page:after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.15) 100%);
+    z-index: 1;
+}
+
+/* Pause animation on reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .panorama-background:before {
+        animation: none;
+    }
 }

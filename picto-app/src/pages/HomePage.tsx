@@ -1,124 +1,114 @@
-  import ImageUploader from "@/components/ImageUploader";
+import ImageUploader from "@/components/ImageUploader";
 import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import "./css/HomePage.css";  
+import "./css/HomePage.css";
 import { useAuth } from "@/authContext/authContext";
 import GotoProfile from "@/components/GotoProfile";
-import { putViewerItem,compressBeforeUpload } from "@/utils/storedImageData";
+import { putViewerItem } from "@/utils/storedImageData";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "@/components/FeedbackBanner";
 
-
-interface HomeProps{
-
-}
-
-  const HomePage: React.FC<HomeProps> = () => {
-   
-    const {userLoggedIn} = useAuth();
-    const { setBannerMessage,bannerRef } = useFeedbackBanner();
-
+const HomePage = () => {
+    const { userLoggedIn } = useAuth();
+    const { setBannerMessage, bannerRef } = useFeedbackBanner();
     const navigate = useNavigate();
 
-    const handleImageUpload = useCallback(async (newImageSrc: File) : Promise<boolean> => {
-        if(!ImageUploader) return false;
+    const handleImageUpload = useCallback(async (newImageSrc: File): Promise<boolean> => {
+        if (!ImageUploader) return false;
 
         const viewerId = crypto.randomUUID();
         const filetype = newImageSrc.name.split(".").pop();
         const fileName = newImageSrc.name.split(".")[0];
-        // console.log("Filetype:",filetype);
 
-        switch(filetype){
+        switch (filetype) {
             case "picto":
-                try{
+                try {
                     const extractedFile = await CustomFileExporter.extractCustomFile(newImageSrc);
-                    await putViewerItem(viewerId,fileName,extractedFile.imageBlob,extractedFile.annotations);
-                    setBannerMessage({message:"Fichier chargé avec succès",type:"success"})
-                }catch(error){
-                    setBannerMessage({message:"Error on picto file",type:"failure"})
-                    // console.log("Error on picto file",error)
+                    await putViewerItem(viewerId, fileName, extractedFile.imageBlob, extractedFile.annotations);
+                    setBannerMessage({ message: "Fichier chargé avec succès", type: "success" });
+                } catch (error) {
+                    setBannerMessage({ message: "Error on picto file", type: "failure" });
+                    console.error("Error on picto file", error);
                 }
-                break
-            case "jpg" :
-            case "JPG" :
-            case "jpeg" :
+                break;
+            case "jpg":
+            case "JPG":
+            case "jpeg":
             case "png":
-                await putViewerItem(viewerId,undefined,newImageSrc,undefined);
-                setBannerMessage({message:"Image chargé avec succès",type:"success"})
+                await putViewerItem(viewerId, undefined, newImageSrc, undefined);
+                setBannerMessage({ message: "Image chargé avec succès", type: "success" });
                 break;
             default:
-                setBannerMessage({message:"Format de fichier Invalide",type:"failure"})
-                // console.log("Invalid file Format")
-                return false
+                setBannerMessage({ message: "Format de fichier Invalide", type: "failure" });
+                return false;
         }
-        
-        await navigate(`/view/${viewerId}`);
-        return true
 
-    }, []);
+        await navigate(`/view/${viewerId}`);
+        return true;
+    }, [navigate, setBannerMessage]);
 
     const handleLogClick = useCallback(() => {
         navigate('/login');
-    }, []);
+    }, [navigate]);
 
     const onCreateActivityClick = () => {
-        if(userLoggedIn){
+        if (userLoggedIn) {
             handleCreateActivity();
-        }else{
+        } else {
             handleLogClick();
         }
-    }
+    };
 
-    const handleCreateActivity = useCallback (() => {
+    const handleCreateActivity = useCallback(() => {
         navigate('/activity_creation');
-    },[])
+    }, [navigate]);
 
-    return(
-        <div className="home_background">
+    return (
+        <div className="home-page">
+            {/* Animated 360° Panorama Background */}
+            <div className="panorama-background"></div>
 
-            <div className="home-page__content">
-                <ErrorBanner ref={bannerRef}/>
-                <div className="top-content">
-                    <img className="image-uploader__logo" 
-                        src="/images/logo_picto360.png" alt="Logo-picto360" />
-                    <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
-                </div>
+            <ErrorBanner ref={bannerRef} />
 
-                <div className="home-page__center">
-                    <div className="home-page__login_container">
-                        {userLoggedIn ?
-                        <button type="button" className="home-page__create_group_button">
-                            {/* Créer un groupe    */}
-                            Créer un groupe
-                        </button>
-                        : 
-                        <button type="button" className="home-page__login_button"
-                            onClick={handleLogClick}>
-                            Se connecter
-                        </button>
-                        }
+            <header className="home-page__header">
+                <img className="image-uploader__logo" src="/images/logo_picto360.png" alt="Logo de Picto 360" />
+                <p className="home-page__intro-text">
+                    Annotez librement vos images 360 avec <br />
+                    du texte, des liens, des images et des vidéos.
+                </p>
+                {__ENABLE_ADMIN__ && (
+                    <div>
+                        <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
+                        <div className="home-page__login_container">
+                            {userLoggedIn ? (
+                                <button type="button" className="home-page__btn-create-group">
+                                    Créer un groupe
+                                </button>
+                            ) : (
+                                <button type="button" className="home-page__btn-login" onClick={handleLogClick}>
+                                    Se connecter
+                                </button>
+                            )}
 
-                        <button type ="button" className="home-page_create_activity" onClick={onCreateActivityClick}>
-                            Créer une activité
-                        </button>
+                            <button type="button" className="home-page__btn-create-activity" onClick={onCreateActivityClick}>
+                                Créer une activité
+                            </button>
+                        </div>
                     </div>
+                )}
+            </header>
 
-                    <ImageUploader onImageUpload={handleImageUpload} />
+            <section className="home-page__content">
+                <ImageUploader onImageUpload={handleImageUpload} />
+            </section>
 
-                </div>
-
-
-            </div>
-            {/* TODO : Do the css */}
-
+            <footer className="app-footer">
+                <p>Projet mené en collaboration avec <strong>École en réseau</strong>.</p>
+                <p>&copy; 2025 Picto 360. Tous droits réservés.</p>
+            </footer>
         </div>
-    )
-
-}
+    );
+};
 
 export default React.memo(HomePage);
-
-function setIsSigninIn(arg0: boolean) {
-    throw new Error("Function not implemented.");
-}
