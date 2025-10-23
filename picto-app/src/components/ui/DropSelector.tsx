@@ -11,7 +11,7 @@ export interface SelectorOption {
 interface DropSelectorProps {
     id: string;
     value: string;
-    onChange: (value: string) => void;
+    onChange: (value: any) => void;
     options: SelectorOption[];
     placeholder?: string;
     disabled?: boolean;

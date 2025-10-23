@@ -7,7 +7,7 @@ import { IoFileTrayFull } from "react-icons/io5";
 import { getExportService } from "@/utils/ExportFileUtils";
 import { useDriveAuth } from "@/hooks/useDriveAuth";
 import { getViewerItem } from "@/utils/storedImageData";
-import { DriveAuthStatus, ExportDestination, HotspotData, } from "../../utils/Types";
+import { DriveAuthStatus, ExportDestination, ExportFormat, HotspotData, } from "../../utils/Types";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { MdClose, MdAdd } from "react-icons/md";
 import DropSelector, { SelectorOption } from "./DropSelector";
@@ -39,7 +39,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         { value: "raw", label: "Fichiers séparés" },
     ];
 
-    const [exportFormat, setExportFormat] = useState("picto")
+    const [exportFormat, setExportFormat] = useState<ExportFormat>("picto")
     const [isExporting, setIsExporting] = useState(false);
     const [exportStatus, setExportStatus] = useState<string>('');
     const [showWessage, setShowMessage] = useState(false);
@@ -102,7 +102,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
     const exportToDisk = async (imageBlob: Blob, annotations?: HotspotData[], fileName?: string) => {
         try {
-            await driveService.exportFileToDisk(imageBlob,
+            await driveService.exportToDisk(imageBlob,
                 fileName || "Untitled",
                 exportFormat,
                 annotations && annotations?.length > 0 ? annotations : undefined,
