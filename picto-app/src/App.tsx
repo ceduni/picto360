@@ -29,23 +29,6 @@ const App = () => {
 
     return (
         <div className="app">
-            <>
-                <title>Picto 360 - Annoter et organiser des images 360</title>
-                <meta name="description" content="Picto 360 est un outil pédagogique pour organiser des activités autour d'images 360. Annoter vos images avec texte, liens, images et vidéos." />
-                <meta property="og:title" content="Picto 360 - Outil d'annotation pour images 360" />
-                <meta property="og:description" content="Organisez des activités pédagogiques autour d'images 360 avec Picto 360." />
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://picto360.netlify.app/" />
-                <meta property="og:image" content="https://picto360.netlify.app/images/logo_picto360.png" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Picto 360 - Outil d'annotation pour images 360" />
-                <meta
-                    name="twitter:description"
-                    content="Organisez des activités pédagogiques autour d'images 360 avec Picto 360."
-                />
-                <meta name="twitter:image" content="https://picto360.netlify.app/images/logo_picto360.png" />
-            </>
-
             <AuthProvider >
                 {/* Suspense for the lazy-loaded elements (admin specific pages) */}
                 <Suspense fallback={null}>
