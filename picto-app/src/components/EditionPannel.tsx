@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react"
 import "./css/EditionPannel.css"
+
+import React, { useEffect, useRef, useState } from "react"
 import { EditorRef, HotspotData } from "../utils/Types"
 import TextEditor from "./editors/TextEditor";
 import HyperlinkEditor from "./editors/HyperlinkEditor";

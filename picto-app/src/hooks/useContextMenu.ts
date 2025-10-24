@@ -11,7 +11,7 @@ interface UseContextMenuReturn {
     visible: boolean;
     position: ContextMenuPosition;
     targetIconPosition: ContextMenuPosition | null;
-    coords: ContextMenuCoords;
+    getCoords: () => ContextMenuCoords;  // Changed to function
     showContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void;
     hideContextMenu: () => void;
     relocateContextMenu: (newPosition: ContextMenuPosition) => void;
@@ -45,17 +45,18 @@ export const useContextMenu = ({
                 return;
             }
 
-            const pos: ContextMenuPosition = { 
-                x: event.clientX, 
-                y: event.clientY 
+            const pos: ContextMenuPosition = {
+                x: event.clientX,
+                y: event.clientY
             };
-            
+
             setVisible(true);
             setPosition(pos);
             setTargetIconPosition(pos);
 
             try {
                 const coords = viewerInstance.mouseEventToCoords(event.nativeEvent);
+
                 coordsRef.current = { pitch: coords[0], yaw: coords[1] };
             } catch (error) {
                 console.error("Failed to get coordinates:", error);
@@ -98,6 +99,10 @@ export const useContextMenu = ({
         setTargetIconPosition(null);
     }, []);
 
+    const getCoords = useCallback((): ContextMenuCoords => {
+        return coordsRef.current;
+    }, []);
+
     useEffect(() => {
         if (!isEditMode) {
             hideContextMenu();
@@ -108,7 +113,7 @@ export const useContextMenu = ({
         visible,
         position,
         targetIconPosition,
-        coords: coordsRef.current,
+        getCoords,  // Return function instead of ref value
         showContextMenu,
         hideContextMenu,
         relocateContextMenu,

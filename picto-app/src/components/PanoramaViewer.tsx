@@ -1,4 +1,5 @@
 import "./css/PanoramaViewer.css";
+
 import React, { useRef, useCallback, useEffect } from "react";
 import { PiTargetBold } from "react-icons/pi";
 import ContextMenu from "./ContextMenu";
@@ -11,6 +12,7 @@ import { useViewerData } from "@/hooks/useViewerData";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useHotspotManager } from "@/hooks/useHotspotManager";
 import { useEditionPanel } from "@/hooks/useEditionPanel";
+
 
 interface PanoramaViewerProps {
     width: string;
@@ -32,14 +34,17 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId });
 
     // Initialize Pannellum
-    const { viewerInstance } = usePannellumViewer({ viewerRef, imageSource, });
+    const { viewerInstance } = usePannellumViewer({
+        viewerRef,
+        imageSource,
+    });
 
-    // Context menu
+
     const {
         visible: contextMenuVisible,
         position: contextMenuPosition,
         targetIconPosition,
-        coords: contextMenuCoords,
+        getCoords,
         showContextMenu,
         hideContextMenu,
         relocateContextMenu,
@@ -50,11 +55,20 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         onShowWarning: (message) => setBannerMessage({ message, type: "warning" }),
     });
 
+    // Hotspot click handler
+    const handleHotspotClick = useCallback(
+        (event: MouseEvent, hotspot: HotspotData): void => {
+            event.preventDefault();
+            setSelectedHotspot(hotspot);
+            openPanel("editing");
+        },
+        []
+    );
+
     // Hotspot management
     const {
         selectedHotspot,
         setSelectedHotspot,
-        addHotspotToViewer,
         createHotspot,
         updateHotspot,
         deleteHotspot,
@@ -64,6 +78,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         viewerId,
         viewerInstance,
         initialHotspots,
+        onHotspotClick: handleHotspotClick,
     });
 
     // Edition panel
@@ -72,8 +87,16 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     // Hotspot creation
     const handleHotspotCreation = useCallback(
         (type: string, coords: [number, number]): void => {
+            console.log('🎯 handleHotspotCreation called with:', {
+                type,
+                coords,
+                pitch: coords[0],
+                yaw: coords[1]
+            });
+            
             try {
                 const newHotspot = createNewHotspotData(type, coords);
+                console.log('🎯 New hotspot data created:', newHotspot);
                 setSelectedHotspot(newHotspot);
                 openPanel("creating");
             } catch (error) {
@@ -89,51 +112,43 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         handleHotspotCreation
     );
 
-    // Handlers
+    // Handlers - NOW USING getCoords()
     const handleContextMenuClick = useCallback(
         (menuItemType: string): void => {
             if (!viewerInstance) return;
 
+            const contextMenuCoords = getCoords();
+            console.log('🎯 Context menu clicked, coords:', contextMenuCoords);
             const coords: [number, number] = [contextMenuCoords.pitch, contextMenuCoords.yaw];
+            console.log('🎯 Dispatching event with coords:', coords);
+            
             dispatchHotspotEvent(menuItemType, coords);
             hideContextMenu();
         },
-        [viewerInstance, contextMenuCoords, dispatchHotspotEvent, hideContextMenu]
-    );
-
-    const handleHotspotClick = useCallback(
-        (event: MouseEvent, hotspot: HotspotData): void => {
-            event.preventDefault();
-            setSelectedHotspot(hotspot);
-            openPanel("editing");
-        },
-        [setSelectedHotspot, openPanel]
+        [viewerInstance, getCoords, dispatchHotspotEvent, hideContextMenu]
     );
 
     const handleHotspotCreate = useCallback(
         async (hotspotData: HotspotData): Promise<void> => {
             try {
                 await createHotspot(hotspotData);
-                addHotspotToViewer(hotspotData, handleHotspotClick);
                 clearTargetIcon();
             } catch (error) {
-                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la sauvegarde", type: "failure" });
             }
         },
-        [createHotspot, addHotspotToViewer, handleHotspotClick, clearTargetIcon, setBannerMessage]
+        [createHotspot, clearTargetIcon, setBannerMessage]
     );
 
     const handleHotspotSave = useCallback(
         async (updatedHotspot: HotspotData): Promise<void> => {
             try {
-                await updateHotspot(updatedHotspot, handleHotspotClick);
+                await updateHotspot(updatedHotspot);
             } catch (error) {
-                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la mise à jour", type: "failure" });
             }
         },
-        [updateHotspot, handleHotspotClick, setBannerMessage]
+        [updateHotspot, setBannerMessage]
     );
 
     const handleHotspotDelete = useCallback(
@@ -141,7 +156,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             try {
                 await deleteHotspot(toDeleteHotspot);
             } catch (error) {
-                console.error("Failed to update hotspot:", error);
                 setBannerMessage({ message: "Erreur lors de la suppression", type: "failure" });
             }
         },
