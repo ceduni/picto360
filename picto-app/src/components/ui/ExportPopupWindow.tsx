@@ -124,7 +124,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         if (!viewerId) return null;
         const viewerItem = await getViewerItem(viewerId);
 
-        const imageBlob = viewerItem?.compressedBlob; 
+        const imageBlob = viewerItem?.compressedBlob;
         const annotations = viewerItem?.annotations;
         const fileName = viewerItem?.name || "Untitled";
 
@@ -221,10 +221,22 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                                 return;
                             }
                             }
-                            disabled>
+                            disabled={false}
+                            >
                             <FaGoogleDrive size={20} />
                             Google Drive
                         </button>
+                        {/* <div
+                            className="settings-modal__button settings-modal__button--primary"
+                        >
+                            <script src="https://apis.google.com/js/platform.js" async defer></script>
+                            <div className="g-savetodrive"
+                                data-src="//example.com/path/to/myfile.pdf"
+                                data-filename="My Statement.pdf"
+                                data-sitename="Picto 360">
+                            </div>
+                        </div> */}
+
                         <button type="button" className="settings-modal__button settings-modal__button--primary" disabled={isExporting}
                             onClick={async () => {
                                 await handleExportTo("disk");

@@ -93,7 +93,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 pitch: coords[0],
                 yaw: coords[1]
             });
-            
+
             try {
                 const newHotspot = createNewHotspotData(type, coords);
                 console.log('🎯 New hotspot data created:', newHotspot);
@@ -121,7 +121,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             console.log('🎯 Context menu clicked, coords:', contextMenuCoords);
             const coords: [number, number] = [contextMenuCoords.pitch, contextMenuCoords.yaw];
             console.log('🎯 Dispatching event with coords:', coords);
-            
+
             dispatchHotspotEvent(menuItemType, coords);
             hideContextMenu();
         },
@@ -234,7 +234,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                         left: targetIconPosition.x,
                     }}
                     className="panorama-viewer__target-icon"
-                    aria-hidden="true"
                 >
                     <PiTargetBold />
                 </div>

@@ -12,12 +12,12 @@
 
 .edition_pannel {
     position: absolute;
-    top: 20vh;
+    top: 15vh;
     left: 70vw;
     display: flex;
     flex-direction: column;
-    min-height: 480px;
-    max-height: 600px;
+    min-height: 50vh;
+    max-height: 80vh;
     min-width: 360px;
     border: 2px solid white;
     border-radius: 2vw;
@@ -84,7 +84,7 @@
         margin-bottom: 6px;
     }
 
-    
+
 .close-button {
     position: absolute;
     top: 12px; right: 12px;
@@ -152,7 +152,7 @@
     /* Keep whitespace and wrap long lines */
     word-wrap: break-word;
     /* Break long words onto next line */
-  
+
 }
 
 .edition_pannel_field {
