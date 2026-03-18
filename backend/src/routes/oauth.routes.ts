@@ -45,7 +45,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
 
       const {  state, code, error } = request.query as { state?: string; code?: string; error?: string };
       if (error) return reply.code(400).send({ error });
-      if (!code) return reply.code(400).send({ error: "missing_code" });   
+      if (!code) return reply.code(400).send({ error: "missing_code" });
 
       let payload: { n:string; r: string; v?: string };
       payload = JSON.parse(Buffer.from(String(state), "base64url").toString("utf8")); // validate state
@@ -62,7 +62,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
       delete request.session.oauth;
 
       const tokens = await driveService.getTokensFromCode(code);
-      
+
       const returnTo = isSafeReturnTo(payload.r) ? payload.r : "/";
 
       // save tokens in session
@@ -92,7 +92,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
       reply.code(500).send(`Error on auth status load ${error}`)
     }
   });
-  
+
 
   app.get("/api/auth/stream",async(request:FastifyRequest,reply:FastifyReply)=>{
 
@@ -119,13 +119,13 @@ export default async function oauthRoutes(app: FastifyInstance) {
     status && client.write(`event: auth-status\ndata: ${JSON.stringify(status)}\n\n`);
 
     // 👇 keep-alive pings
-    const interval = setInterval(() => {
-      reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`);
-    }, 25000);
+    // const interval = setInterval(() => {
+    //   reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`);
+    // }, 25000);
 
     request.raw.on('close',()=>{
       driveService.clients.delete(client);
-      clearInterval(interval);
+      // clearInterval(interval);
     });
   });
 
@@ -136,8 +136,8 @@ export default async function oauthRoutes(app: FastifyInstance) {
       driveService.broadcast('auth-status',{connected: false, reason:'manual-logout'})
       return reply.code(401).send("Not authenticated with Google");
     }
-    
-    try{    
+
+    try{
       // To revoke Google's token first
       const g = req.session.google;
 

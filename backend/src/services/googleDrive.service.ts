@@ -4,6 +4,7 @@ dotenv.config();
 
 import { google, drive_v3 } from "googleapis";
 import fs from "fs"
+import { PassThrough } from "stream";
 
 import { OAuth2Client } from "google-auth-library";
 import { FastifyRequest } from "fastify";
@@ -130,7 +131,7 @@ class GoogleDriveBackendService {
     metadata?: Record<string, string>
   ): Promise<{ id: string; name: string }> {
     const drive = google.drive({ version: 'v3', auth: this.oauth2Client });
-    
+
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
@@ -138,47 +139,60 @@ class GoogleDriveBackendService {
     };
 
     const fileSize = fileBuffer.length;
+    let uploadedBytes = 0;
+
+    // Define chunk size (64KB for better progress granularity)
+    const CHUNK_SIZE = 64 * 1024; // 64KB chunks
+
+    // Create a passthrough stream with smaller highWaterMark to force chunking
+    const progressStream = new PassThrough({ highWaterMark: CHUNK_SIZE });
+
+    progressStream.on('data', (chunk: Buffer) => {
+      uploadedBytes += chunk.length;
+      const percent = ((uploadedBytes / fileSize) * 100).toFixed(2);
+
+      console.log(`Chunk size: ${chunk.length} bytes, file size: ${fileSize} bytes`);
+      // 🔥 Broadcast to all SSE clients
+      this.broadcast("upload-progress", {
+        file: fileName,
+        uploaded: uploadedBytes,
+        total: fileSize,
+        percent,
+      });
+      console.log(`Upload progress for ${fileName}: ${percent}%`);
+    });
 
     try {
+      // Manually write the buffer in chunks to ensure progress events fire
+      let offset = 0;
+      while (offset < fileBuffer.length) {
+        const chunk = fileBuffer.slice(offset, offset + CHUNK_SIZE);
+        progressStream.write(chunk);
+        offset += CHUNK_SIZE;
+      }
+      progressStream.end();
+
       const response = await drive.files.create(
         {
           requestBody: fileMetadata,
           media: {
             mimeType: mimeType,
-            body: require('stream').Readable.from(fileBuffer)
+            body: progressStream
           },
           fields: 'id,name',
         },
         {
-          // ⚡ Use resumable upload
-          params:{uploadType: "resumable"},
-
-          // ⚡ Track upload progress
-          onUploadProgress: (evt) => {
-            // const progress = (evt.bytesRead / fileSize) * 100;
-            const percent = ((evt.bytesRead / fileSize) * 100).toFixed(2);
-
-            // 🔥 Broadcast to all SSE clients
-            this.broadcast("upload-progress", {
-              file: fileMetadata.name,
-              uploaded: evt.bytesRead,
-              total: fileSize,
-              percent,
-            });
-            
-            // process.stdout.write(
-            //   `\rUploaded ${evt.bytesRead} of ${fileSize} bytes (${progress.toFixed(2)}%)`
-            // );
-          },
-        }        
+          // ⚡ Use resumable upload with 256KB chunks (Google Drive default)
+          params:{uploadType: "resumable", chunksize: 256 * 1024},
+        }
       );
-      
+
       this.broadcast("upload-complete", { fileId: response.data.id });
       return {
         id: response.data.id!,
         name: response.data.name!
       };
-      
+
     } catch (error) {
       throw new Error(`Failed to upload file: ${error}`);
     }
@@ -244,7 +258,7 @@ class GoogleDriveBackendService {
     } = options;
 
     try {
-      
+
       // Create export folder
       const folderId = await this.createFolder(folderName);
 
@@ -259,13 +273,13 @@ class GoogleDriveBackendService {
       let fileResult: Result = undefined;
 
       switch(options.format){
-        //------------------- Raw Format (separated images)----------------------//  
+        //------------------- Raw Format (separated images)----------------------//
 
         case "raw":
           imageFileName = `${fileName}_${timestamp}.jpg`;
 
           if(!annotations) annotations = [];
-          
+
           imageMetadata  = includeMetadata ? {
             app: 'picto360',
             annotationCount: annotations.length.toString(),
@@ -305,9 +319,9 @@ class GoogleDriveBackendService {
               dataType: 'annotations',
               relatedImageId: imageResult.id
             }
-          );                    
+          );
           break;
-        //------------------- Picto Format ----------------------//  
+        //------------------- Picto Format ----------------------//
         case "picto":
         default:
           imageFileName = `${fileName}_${timestamp}.picto`;
@@ -343,7 +357,7 @@ class GoogleDriveBackendService {
   broadcast = (event: string, data: unknown) => {
     const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
     this.clients.forEach(c => c.write(payload));
-  };    
+  };
 }
 
 let driveService : GoogleDriveBackendService|null = null;

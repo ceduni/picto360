@@ -1,8 +1,16 @@
 import { DriveAuthStatus } from "@/utils/Types";
 import { useEffect, useState } from "react";
 
+export interface UploadProgress {
+  file: string;
+  uploaded: number;
+  total: number;
+  percent: string;
+}
+
 export function useServerSentAuth(){
-  const [driveAuthStatus, setAuthStatus] = useState<DriveAuthStatus | null>(null);  
+  const [driveAuthStatus, setAuthStatus] = useState<DriveAuthStatus | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
 
   async function getDriveAuthStatus () {
     try{
@@ -41,19 +49,16 @@ export function useServerSentAuth(){
 
     // progress
     es.addEventListener("upload-progress", (e) => {
-      const data = JSON.parse(e.data);
-      console.log(`Progress for ${data.id}: ${data.percent}%`);
+      const data = JSON.parse(e.data) as UploadProgress;
+      setUploadProgress(data);
+      console.log(`Progress for ${data.file}: ${data.percent}%`);
     });
 
     // export done
-    es.addEventListener("export-complete", (e) => {
-      const data = JSON.parse(e.data);
-      console.log(`✅ Export finished for ${data.id}`);
-    });    
-
-    // es.addEventListener("ping", (evt) => {
-    //     console.debug("Ping", JSON.parse((evt as MessageEvent).data));
-    // });
+    es.addEventListener("export-complete", () => {
+      console.log(`✅ Export finished`);
+      setUploadProgress(null); // Clear progress when done
+    });
 
     es.onerror = () => {
         console.warn("SSE connection lost. The browser will retry automatically.");
@@ -62,9 +67,9 @@ export function useServerSentAuth(){
     return () => {
         canceled = true;
         if (es) es.close();
-    };     
+    };
 
-  },[]);  
+  },[]);
 
-  return {driveAuthStatus};
+  return {driveAuthStatus, uploadProgress};
 }
