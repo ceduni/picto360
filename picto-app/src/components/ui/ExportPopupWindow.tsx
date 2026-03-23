@@ -1,6 +1,5 @@
 import "@css/SettingsPopupWindow.css";
 
-import { CircularProgress, } from "@mui/material"
 import React, { useEffect, useState } from "react";
 import { FaGoogleDrive } from "react-icons/fa";
 import { IoFileTrayFull } from "react-icons/io5";
@@ -27,6 +26,8 @@ interface ExportPopupProps {
     driveAuthStatus: DriveAuthStatus | null;
 }
 
+type ExportStatus = "idle" | "exporting" | "success" | "failure";
+
 const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, titleState, driveAuthStatus, fileNameMaxLength = 50 }) => {
     const { projectTitle, setProjectTitle } = titleState;
     const { startDriveAuth, logoutFromDrive } = useDriveAuth();
@@ -41,7 +42,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
     const [exportFormat, setExportFormat] = useState<ExportFormat>("picto")
     const [isExporting, setIsExporting] = useState(false);
-    const [exportStatus, setExportStatus] = useState<string>('');
+    const [exportStatus, setExportStatus] = useState<ExportStatus>('idle');
     const [showWessage, setShowMessage] = useState(false);
 
     useEffect(() => {
@@ -65,7 +66,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
         try {
             await startDriveAuth(viewerId);
         } catch (error) {
-            setExportStatus(`Authentication failed: ${error}`);
+            setExportStatus("failure");
             setBannerMessage({ message: "Authentication failed, try again", type: "failure" })
         }
     };
@@ -84,17 +85,15 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             );
 
             if (result.success) {
-                setExportStatus("Export successful! \n" + `View files: ${result}`);
+                setExportStatus("success");
                 setBannerMessage({ message: "Exporté avec succes vers le drive", type: "success" })
 
             } else {
+                setExportStatus("failure");
                 setBannerMessage({ message: "Export échoué, essayez à nouveau", type: "failure" })
-                logoutFromDrive();
-                // console.log(result.error);
-                // throw new Error(result.error);
             }
         } catch (error) {
-            setExportStatus(`Export failed: ${error}`);
+            setExportStatus("failure");
         } finally {
             setIsExporting(false);
         }
@@ -112,7 +111,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
             setBannerMessage({ message: "Export n'a pas réussi, essaie à nouveau", type: "failure" })
             // bannerRef.current?.trigger(,"failure")
 
-            setExportStatus(`Export failed: ${error}`);
+            setExportStatus("failure");
         } finally {
             setIsExporting(false);
 
@@ -133,7 +132,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
             // bannerRef.current?.trigger("No image found, upload an image","warning")
 
-            setExportStatus('Please select an image');
+            setExportStatus("failure");
             return null;
         }
 
@@ -141,19 +140,18 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
 
         switch (destination) {
             case "drive":
-                setExportStatus('Exporting to Google Drive...');
+                setExportStatus("exporting");
                 await exportToDrive(imageBlob, annotations, fileName);
                 break
             case "disk":
             default:
-                setExportStatus('Exporting to Disk...');
+                setExportStatus("exporting");
                 await exportToDisk(imageBlob, annotations, fileName);
         }
     }
 
     useEffect(() => {
         setIsPopupOpen(isExporting);
-
     }, [isExporting])
 
     if (!isOpen) return null;
@@ -202,11 +200,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                         </div>
                     </div>
                 </div>
-                {showWessage &&
-                    <div className="popup-message">
-                        <p className="popup-message-text">{exportStatus}</p>
-                    </div>
-                }
+
                 <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>
                     <p style={{width: "100%"}} className="export-instruction">Choisissez une destination d'exportation :</p>
                     <button className="settings-modal__button settings-modal__button--secondary" onClick={handlePopupClose}>
@@ -215,27 +209,20 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                     <div style={{flexGrow: 2, display: "flex", justifyContent: "flex-end", gap: "6px"}}>
                         <button type="button"
                             className="settings-modal__button settings-modal__button--primary"
-                            onClick={async () => {
-                                if (!driveAuthStatus?.isAuthenticated) await handleAuthenticate();
-                                await handleExportTo("drive");
-                                return;
+                            onClick={
+                                async () => {
+                                    if (!driveAuthStatus?.isAuthenticated) await handleAuthenticate();
+                                    if(driveAuthStatus?.isAuthenticated){
+                                        await handleExportTo("drive");
+                                    }
+                                    return;
+                                }
                             }
-                            }
-                            disabled={false}
+                            disabled={isExporting}
                             >
                             <FaGoogleDrive size={20} />
                             Google Drive
                         </button>
-                        {/* <div
-                            className="settings-modal__button settings-modal__button--primary"
-                        >
-                            <script src="https://apis.google.com/js/platform.js" async defer></script>
-                            <div className="g-savetodrive"
-                                data-src="//example.com/path/to/myfile.pdf"
-                                data-filename="My Statement.pdf"
-                                data-sitename="Picto 360">
-                            </div>
-                        </div> */}
 
                         <button type="button" className="settings-modal__button settings-modal__button--primary" disabled={isExporting}
                             onClick={async () => {
@@ -244,9 +231,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen,
                             }}
                         >
                             <IoFileTrayFull size={20} />
-                            {
-                                isExporting ? <CircularProgress /> : "Ordinateur"
-                            }
+                            Ordinateur
                         </button>
                     </div>
                 </div>

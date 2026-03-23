@@ -4,6 +4,8 @@ import { EditorRef, HotspotData } from "../../utils/Types";
 import ReactPlayer from "react-player";
 import SegmentedControl, { SegmentOption } from "@ui/SegmentedControl";
 import { MdAdd, MdLaptopChromebook, MdLink, } from "react-icons/md";
+import { isValidVideoUrl, isValidYouTubeUrl } from "@/utils/FormInputvalidators";
+import { useBanner } from "@/hooks/useBanner";
 
 
 interface EditorProps {
@@ -16,6 +18,8 @@ const VideoEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
     const [url_text, setURL] = useState(hotspot.url_text || "");
     const [content, setContent] = useState(hotspot.content || "");
     const [videoType, setVideoType] = useState("url");
+
+    const { setBannerMessage } = useBanner();
 
     // Annotation type options with icons
     const annotationOptions: SegmentOption[] = [
@@ -31,6 +35,14 @@ const VideoEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
 
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
+
+        if(videoType === "url" &&
+            ((!isValidVideoUrl(content) && !isValidYouTubeUrl(content)) ||
+            content === "")
+        ) {
+            setBannerMessage("L'URL saisie n'est pas valide ou ne mène pas vers une vidéo.", "failure");
+            return;
+        }
         onSave({ url_text, content });
     };
 

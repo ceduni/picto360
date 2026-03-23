@@ -1,4 +1,5 @@
 import "./css/PanoramaViewer.css";
+import ".css/HotspotManager.css";
 
 import React, { useRef, useCallback, useEffect } from "react";
 import { PiTargetBold } from "react-icons/pi";
@@ -38,7 +39,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         viewerRef,
         imageSource,
     });
-
 
     const {
         visible: contextMenuVisible,
@@ -83,6 +83,9 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
     // Edition panel
     const { panelState, openPanel, closePanel } = useEditionPanel();
+
+    const isTargetIconVisible = isEditMode && targetIconPosition && (contextMenuVisible || panelState?.isOpen);
+
 
     // Hotspot creation
     const handleHotspotCreation = useCallback(
@@ -171,6 +174,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         setSelectedHotspot(null);
     }, [panelState, decrementCounter, clearTargetIcon, closePanel, setSelectedHotspot]);
 
+
     // Close panel on outside click
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent): void => {
@@ -183,7 +187,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             ) {
                 return;
             }
-
+            closePanel();
             setSelectedHotspot(null);
         };
 
@@ -227,7 +231,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 />
             )}
 
-            {isEditMode && targetIconPosition && (
+            {isTargetIconVisible && (
                 <div
                     style={{
                         top: targetIconPosition.y,

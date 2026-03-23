@@ -25,7 +25,7 @@ const VisualisationPage: React.FC = () => {
     return (
         <div >
             <Toolbar isEditMode={isEditMode} toggleEditMode={toggleEditMode} viewerId={viewerId} driveAuthStatus={driveAuthStatus} />
-            <ErrorBanner ref={bannerRef} />
+            {/* <ErrorBanner ref={bannerRef} /> */}
 
             {/* Don't mount until ready */}
             {hasViewerId ? (

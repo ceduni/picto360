@@ -60,9 +60,9 @@ export function useServerSentAuth(){
       setUploadProgress(null); // Clear progress when done
     });
 
-    es.onerror = () => {
-        console.warn("SSE connection lost. The browser will retry automatically.");
-    };
+    // es.onerror = () => {
+    //     console.warn("SSE connection lost. The browser will retry automatically.");
+    // };
 
     return () => {
         canceled = true;
