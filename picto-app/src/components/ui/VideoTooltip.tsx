@@ -1,5 +1,4 @@
 import React from "react";
-import "./css/HotspotManager.css";
 
 interface VideoTooltipProps {
   src: string;

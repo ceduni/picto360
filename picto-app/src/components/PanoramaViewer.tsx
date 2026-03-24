@@ -1,5 +1,4 @@
 import "./css/PanoramaViewer.css";
-import ".css/HotspotManager.css";
 
 import React, { useRef, useCallback, useEffect } from "react";
 import { PiTargetBold } from "react-icons/pi";
@@ -210,7 +209,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     }
 
     return (
-        <>
+        <div className="viewer_container">
             <div
                 ref={viewerRef}
                 className="panorama-viewer"
@@ -253,7 +252,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                     pannelState={panelState.state}
                 />
             )}
-        </>
+        </div>
     );
 };
 

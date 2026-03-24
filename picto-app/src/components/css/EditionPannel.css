@@ -13,12 +13,13 @@
 .edition_pannel {
     position: absolute;
     top: 15vh;
-    left: 70vw;
+    right: 10vw;
     display: flex;
     flex-direction: column;
     min-height: 50vh;
     max-height: 80vh;
     min-width: 360px;
+    max-width: 400px;
     border: 2px solid white;
     border-radius: 2vw;
     overflow: hidden;
@@ -39,6 +40,7 @@
     flex-direction: column;
     height: 100%;
     min-width: 20vw;
+    max-width: 400px;
     padding: 30px 18px 12px;
     gap: 15px;
     overflow: auto;

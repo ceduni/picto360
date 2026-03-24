@@ -68,6 +68,7 @@ export const useContextMenu = ({
 
     const hideContextMenu = useCallback((): void => {
         setVisible(false);
+        setTargetIconPosition(null);
         setPosition({ x: 0, y: 0 });
     }, []);
 

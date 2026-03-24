@@ -12,18 +12,20 @@ interface EditorProps {
 
 
 const HyperlinkEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref) => {
-    const [url_text, setURL] = useState(hotspot.url_text || "");
-    const [content, setContent] = useState(hotspot.content || "");
+    const [url, setURL] = useState(hotspot.url_text || ""); // link to open
+    const [content, setContent] = useState(hotspot.content || ""); // text to display (if empty, url will be displayed)
     const { setBannerMessage } = useBanner();
 
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
 
-        if (!isValidUrl(url_text)) {
+        if (!isValidUrl(url)) {
             setBannerMessage("L'URL saisie n'est pas valide.", "failure");
             return;
         }
-        onSave({ url_text, content });
+
+        const text_to_view = content.trim() ==="" ? url : content;
+        onSave({ url_text: url, content:text_to_view });
     };
 
     useEffect(() => {
@@ -44,7 +46,7 @@ const HyperlinkEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave },
         >
             <label className="edition_pannel_field_title">
                 <span className="label">URL</span>
-                <input className="text-field" type="url" value={url_text}
+                <input className="text-field" type="url" value={url}
                     onChange={(e) => setURL(e.target.value) }
                     placeholder="Lien URL..."
                 />
@@ -53,7 +55,7 @@ const HyperlinkEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave },
             <label className="edition_pannel_field_title">
                 <span className="label">Texte à afficher</span>
                 <input className="text-field" type="text" value={content}
-                    onChange={(e) => setContent(e.target.value) }
+                    onChange={(e) => setContent(e.target.value.trim()) }
                     placeholder="Texte à afficher..."
                 />
             </label>

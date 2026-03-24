@@ -26,6 +26,13 @@
     overflow: hidden;
 }
 
+.viewer_container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
 .panorama-viewer__loading,
 .panorama-viewer__error {
     display: flex;
