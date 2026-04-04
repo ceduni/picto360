@@ -36,7 +36,7 @@ export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityB
 
     const {uid} = userData;
 
-    let user = await User.findOne({firebaseUid:uid});
+    let user = await User.findOne({uid:uid});
     if(!user) {
         return reply.status(404).send({message:"User Acount not found"});
     }
@@ -51,7 +51,7 @@ export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityB
 
         const incomingTeams = teamsList;
         const teamIds :mongoose.Types.ObjectId[] = [];
-        
+
         for (const team of incomingTeams) {
             if (!team.id || typeof team.id !== "string") {
                 return reply.status(400).send({ message: "Each team must have a valid 'id' (string)." });
@@ -64,7 +64,7 @@ export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityB
             }
             if (typeof team.supervised !== "boolean") {
                 return reply.status(400).send({ message: "Each team must have a 'supervised' boolean field." });
-            }            
+            }
             const participantsList = team.participantsNames.map((particip, idx) => ({
                 participantId: particip.id,
                 name:particip.name,
@@ -81,7 +81,7 @@ export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityB
             const teamDoc : ITeam = await Team.create({
                 teamId: team.id,
                 teamName: team.name,
-                supervisorId: team.supervisor_id || user.firebaseUid,
+                supervisorId: team.supervisor_id || user.uid,
                 participantsList,
                 // objectsAndImage: {
                 //     objectstoFind,
@@ -92,14 +92,14 @@ export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityB
             teamIds.push(teamDoc._id as mongoose.Types.ObjectId);
         }
 
-        const activity = new Activity({ id, 
-                                        title, 
-                                        description, 
-                                        type, 
-                                        tasks, 
-                                        authoriseEdit, 
-                                        tags, 
-                                        teams:teamIds, 
+        const activity = new Activity({ id,
+                                        title,
+                                        description,
+                                        type,
+                                        tasks,
+                                        authoriseEdit,
+                                        tags,
+                                        teams:teamIds,
                                         createdBy:user._id});
         const saved = await activity.save();
 
@@ -120,7 +120,7 @@ export const getActivities = async ( request: FastifyRequest , reply:FastifyRepl
         const firebaseUser = (request as any).user;
         if (!firebaseUser) return reply.status(401).send({ message: "Unauthorized" });
 
-        const mongoUser = await User.findOne({ firebaseUid: firebaseUser.uid });
+        const mongoUser = await User.findOne({ uid: firebaseUser.uid });
         if (!mongoUser) return reply.status(404).send({ message: "User not found" });
 
         const userId = mongoUser._id;
@@ -155,7 +155,7 @@ export const getActivities = async ( request: FastifyRequest , reply:FastifyRepl
         reply.send(activitiesWithOwnership);
     }catch (err) {
         console.error("❌ GET /activities error:", err);
-        reply.status(500).send({ error: 'Failed to fetch activities', 
+        reply.status(500).send({ error: 'Failed to fetch activities',
                                 message: err instanceof Error ? err.message:JSON.stringify(err) });
     }
   }
@@ -168,7 +168,7 @@ export const getActivities = async ( request: FastifyRequest , reply:FastifyRepl
     const { id } = request.params as { id: string };
 
     try {
-        const mongoUser = await User.findOne({ firebaseUid: firebaseUser.uid });
+        const mongoUser = await User.findOne({ uid: firebaseUser.uid });
         if (!mongoUser) return reply.status(404).send({ message: "User not found" });
 
         const activity = await Activity.findById(id)
@@ -211,6 +211,6 @@ export const getActivities = async ( request: FastifyRequest , reply:FastifyRepl
         console.error("Error fetching activity:", err);
         return reply.status(500).send({ message: "Server error" });
     }
-    
+
   }
 

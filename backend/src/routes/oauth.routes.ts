@@ -1,166 +1,269 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import path from "path";
-import { getGoogleDriveService } from "@/services/googleDrive.service";
 import { randomUUID } from "crypto";
+import { getAuthService } from "@/services/auth.service";
+import { getExportService } from "@/services/export.service";
+import { getNotificationHubService } from "@/services/notificationHub.service";
 
-const TOKEN_PATH = path.join(__dirname, "../../tokens.json");
-
-interface AuthTokenRequest {
-  code: string;
+interface OAuthRedirectMetadata {
+  returnTo?: string;
+  viewerId?: string;
+  autoExport?: boolean;
 }
 
-// Helpers
-const b64u = (s: string) => Buffer.from(s, "utf8").toString("base64url");
-const isSafeReturnTo = (p: unknown): p is string => typeof p === "string" && p.startsWith("/");
+function getFrontendBaseUrl() {
+  return process.env.FRONTEND_SERVER || "http://localhost:3000";
+}
 
+function getFallbackFrontendPath(metadata?: OAuthRedirectMetadata, fallbackPath = "/") {
+  if (metadata?.viewerId) {
+    return `/view/${encodeURIComponent(metadata.viewerId)}`;
+  }
+
+  return fallbackPath;
+}
+
+function getSafeFrontendPath(metadata?: OAuthRedirectMetadata, fallbackPath = "/") {
+  const frontendUrl = new URL(getFrontendBaseUrl());
+  const safeFallbackPath = getFallbackFrontendPath(metadata, fallbackPath);
+
+  if (!metadata?.returnTo) {
+    return safeFallbackPath;
+  }
+
+  try {
+    const candidateUrl = new URL(metadata.returnTo, frontendUrl);
+
+    if (candidateUrl.origin !== frontendUrl.origin) {
+      return safeFallbackPath;
+    }
+
+    return `${candidateUrl.pathname}${candidateUrl.search}${candidateUrl.hash}`;
+  } catch (_error) {
+    return safeFallbackPath;
+  }
+}
+
+function buildFrontendRedirectUrl(
+  status: "success" | "error",
+  metadata?: OAuthRedirectMetadata,
+  fallbackPath = "/",
+  message?: string,
+) {
+  const redirectUrl = new URL(
+    getSafeFrontendPath(metadata, fallbackPath),
+    getFrontendBaseUrl(),
+  );
+
+  redirectUrl.searchParams.set("driveAuth", status);
+
+  if (metadata?.autoExport) {
+    redirectUrl.searchParams.set("autoExport", "drive");
+  }
+
+  return redirectUrl.toString();
+}
+
+/**
+ * Refactored OAuth routes using new auth.service
+ * Clean abstraction - works with any OAuth provider
+ */
 export default async function oauthRoutes(app: FastifyInstance) {
-  app.post('/api/drive/auth-url', async (request: FastifyRequest, reply: FastifyReply) => {
+  const authService = getAuthService("google"); // Can switch to "jwt" or "onedrive" later
+  const exportService = getExportService();
+  const notificationHub = getNotificationHubService();
+
+  /**
+   * Generate OAuth authorization URL
+   */
+  app.post("/api/drive/auth-url", async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const driveService = getGoogleDriveService();
+      const { returnTo, viewerId, autoExport } = request.body as {
+        returnTo?: string;
+        viewerId?: string;
+        autoExport?: boolean;
+      };
+      const state = randomUUID(); // State for CSRF protection
 
-      const { returnTo, viewerId } = request.body as { returnTo: string; viewerId?: string };
+      // Generate auth URL
+      const authUrl = authService.generateAuthUrl(state);
 
-      const nonce = randomUUID();
-      request.session.oauth = { nonce ,createdAt:Date.now() };
-      request.session.save();
+      // Store state in session for validation during callback
+      (request.session as any).oauth_state = state;
+      (request.session as any).oauth_metadata = {
+        returnTo,
+        viewerId,
+        autoExport: autoExport === true,
+      };
+      await request.session.save?.();
 
-      const safeReturnTo = isSafeReturnTo(returnTo) ? returnTo : "/";
-
-      const state = b64u(JSON.stringify({n:nonce, r: safeReturnTo, v: viewerId }));
-
-      const authUrl = driveService.generateAuthUrl(state);
       return reply.status(200).send({ authUrl });
     } catch (error) {
-      reply.status(500).send({ error: 'Failed to generate auth URL' });
+      return reply.status(500).send({ error: "Failed to generate auth URL" });
     }
   });
 
-  // Handle OAuth callback
-  app.get('/api/drive/auth/callback', async (
-    request: FastifyRequest<{ Body: AuthTokenRequest }>,
-    reply: FastifyReply
-  ) => {
+  /**
+   * Handle OAuth callback from provider
+   */
+  app.get(
+    "/api/drive/auth/callback",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { code, state, error } = request.query as {
+          code?: string;
+          state?: string;
+          error?: string;
+        };
+
+        const session = request.session as any;
+        const oauthMetadata = session.oauth_metadata as OAuthRedirectMetadata | undefined;
+        const clearOAuthState = async () => {
+          delete session.oauth_state;
+          delete session.oauth_metadata;
+          await session.save?.();
+        };
+
+        if (error) {
+          await clearOAuthState();
+          return reply.redirect(buildFrontendRedirectUrl("error", oauthMetadata, "/", error));
+        }
+
+        // Verify state matches
+        if (state !== session.oauth_state) {
+          await clearOAuthState();
+          return reply.redirect(
+            buildFrontendRedirectUrl("error", oauthMetadata, "/", "state_mismatch"),
+          );
+        }
+
+        console.log(`Code to token: ${code}`);
+        // Exchange code for tokens
+        const result = await authService.handleOAuthCallback(request, code!);
+
+        // Clear temporary state
+        await clearOAuthState();
+
+        return reply.redirect(
+          buildFrontendRedirectUrl("success", oauthMetadata, result.redirectTo),
+        );
+      } catch (error) {
+        console.error("OAuth callback error:", error);
+        const session = request.session as any;
+        const oauthMetadata = session.oauth_metadata as OAuthRedirectMetadata | undefined;
+
+        delete session.oauth_state;
+        delete session.oauth_metadata;
+        await session.save?.();
+
+        return reply.redirect(
+          buildFrontendRedirectUrl("error", oauthMetadata, "/", "oauth_failed"),
+        );
+      }
+    },
+  );
+
+  /**
+   * Get current authentication status
+   */
+  app.get("/api/auth/status", async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const driveService = getGoogleDriveService();
-
-      const {  state, code, error } = request.query as { state?: string; code?: string; error?: string };
-      if (error) return reply.code(400).send({ error });
-      if (!code) return reply.code(400).send({ error: "missing_code" });
-
-      let payload: { n:string; r: string; v?: string };
-      payload = JSON.parse(Buffer.from(String(state), "base64url").toString("utf8")); // validate state
-
-      const sess = request.session.oauth;
-      if (!sess?.nonce || payload.n !== sess.nonce) {
-        return reply.code(400).send({ error: "state_mismatch" });
-      }
-      if (Date.now() - (sess.createdAt ?? 0) > 5 * 60_000) {
-        return reply.code(400).send({ error: "state_expired" });
-      }
-
-      // one-time use
-      delete request.session.oauth;
-
-      const tokens = await driveService.getTokensFromCode(code);
-
-      const returnTo = isSafeReturnTo(payload.r) ? payload.r : "/";
-
-      // save tokens in session
-      request.session.google = {
-        access_token: tokens.access_token!,
-        refresh_token: tokens.refresh_token || undefined,
-        expiry: Date.now() + (tokens.expiry_date ?? 0) * 1000,
-      };
-      await request.session.save();
-
-      driveService.broadcast('auth-status',{connected: true, expiresAt: request.session.google.expiry});
-
-      return reply.redirect(`http://localhost:3000${returnTo}`).code(200);
-
+      const status = await authService.getAuthStatus(request);
+      return status.isAuthenticated ? reply.send({
+                                      email: status.user?.email,
+                                      displayName: status.user?.displayName,
+                                      authenticated: status.isAuthenticated,
+                                      provider: status.provider })
+              : reply.status(401).send({ authenticated: false });
     } catch (error) {
-      reply.status(400).send({ error: `Error during callback : ${error}` });
-      reply.redirect(`http://localhost:3000/?auth=error&message=oauth_failed`)
+      return reply.status(500).send({ error: "Failed to get auth status" });
     }
   });
 
-  app.get("/api/auth/status",async(request:FastifyRequest,reply:FastifyReply)=>{
-    try{
-      const driveService = getGoogleDriveService();
-      const authStatus = await driveService.getAuthStatus(request);
-      return  authStatus ;
-    }catch(error){
-      reply.code(500).send(`Error on auth status load ${error}`)
-    }
-  });
-
-
-  app.get("/api/auth/stream",async(request:FastifyRequest,reply:FastifyReply)=>{
-
-    const driveService = getGoogleDriveService();
-
+  /**
+   * Server-Sent Events stream for real-time notifications
+   * Broadcasts auth status, export progress, and other events
+   */
+  app.get("/api/auth/stream", async (request: FastifyRequest, reply: FastifyReply) => {
+    // CORS headers
     const origin = request.headers.origin;
-    const allowed = ["http://localhost:3000"];
+    const allowed = [process.env.FRONTEND_SERVER || "http://localhost:3000"];
 
     if (origin && allowed.includes(origin)) {
       reply.raw.setHeader("Access-Control-Allow-Origin", origin);
       reply.raw.setHeader("Access-Control-Allow-Credentials", "true");
     }
-    reply.raw.setHeader('Content-Type','text/event-stream');
-    reply.raw.setHeader('Cache-Control','no-cache');
-    reply.raw.setHeader('Connection','keep-alive');
 
-    // reply.raw.write(`event: auth-status\ndata: {"isAuthenticated":false}\n\n`);
+    // SSE headers
+    reply.raw.setHeader("Content-Type", "text/event-stream");
+    reply.raw.setHeader("Cache-Control", "no-cache");
+    reply.raw.setHeader("Connection", "keep-alive");
 
-    const id = Date.now().toString();
-    const client = {id,write: (chunk:string) => reply.raw.write(chunk)};
-    driveService.clients.add(client);
+    // Get scope for this session
+    const scope = authService.getSessionScope(request);
+    const clientId = randomUUID();
+    const client = {
+      id: clientId,
+      write: (chunk: string) => reply.raw.write(chunk),
+    };
 
-    const status = await driveService.getAuthStatus(request);
-    status && client.write(`event: auth-status\ndata: ${JSON.stringify(status)}\n\n`);
+    // Register client with notification hub
+    notificationHub.addClient(scope, client);
 
-    // 👇 keep-alive pings
-    // const interval = setInterval(() => {
-    //   reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`);
-    // }, 25000);
+    // Send initial auth status
+    const status = await authService.getAuthStatus(request);
+    client.write(`event: auth-status\ndata: ${JSON.stringify(status)}\n\n`);
 
-    request.raw.on('close',()=>{
-      driveService.clients.delete(client);
-      // clearInterval(interval);
+    // Cleanup on disconnect
+    request.raw.on("close", () => {
+      notificationHub.removeClient(scope, client);
     });
   });
 
-  app.post("/api/auth/logout", async (req, reply) => {
-      const driveService = getGoogleDriveService();
+  /**
+   * Logout and disconnect authentication
+   */
+  app.post("/api/auth/logout", async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const disconnected = await authService.disconnect(request);
 
-    if (!req.session.google?.access_token && !req.session.google?.refresh_token) {
-      driveService.broadcast('auth-status',{connected: false, reason:'manual-logout'})
-      return reply.code(401).send("Not authenticated with Google");
-    }
-
-    try{
-      // To revoke Google's token first
-      const g = req.session.google;
-
-      if (g?.refresh_token) {
-        await driveService.revokeGoogleToken(g.refresh_token);
-      } else if (g?.access_token) {
-        await driveService.revokeGoogleToken(g.access_token);
+      if (!disconnected) {
+        return reply.status(401).send({ error: "Not authenticated" });
       }
 
-      delete req.session.google;
-      delete req.session.oauth; // if you stored a nonce
-      await req.session.save?.();  // optional
-
-      // destroy the whole session (cookie invalidation)
-      req.session.destroy()
-
-      driveService.broadcast('auth-status',{connected: false, reason:'manual-logout'})
-
       return reply.send({ ok: true });
-    }catch(error){
-      return reply.code(500).send(`Error on Drive logout ${error}`);
+    } catch (error) {
+      console.error("Logout error:", error);
+      return reply.status(500).send({ error: "Failed to logout" });
     }
   });
 
-}
+  /**
+   * Export file to cloud storage (Google Drive or other)
+   */
+  app.post("/api/export", async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const { fileBuffer, annotations, options } = request.body as any;
 
+      if (!fileBuffer) {
+        return reply.status(400).send({ error: "Missing fileBuffer" });
+      }
+
+      // Convert base64 to Buffer if needed
+      const buffer = Buffer.from(fileBuffer, "base64");
+
+      // Execute export
+      const result = await exportService.exportToGoogleDrive(request, {
+        fileBuffer: buffer,
+        annotations,
+        options,
+      });
+
+      return reply.send(result);
+    } catch (error) {
+      console.error("Export error:", error);
+      return reply.status(500).send({
+        error: error instanceof Error ? error.message : "Export failed",
+      });
+    }
+  });
+}

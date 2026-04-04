@@ -1,34 +1,23 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import { getGoogleDriveService, HotspotData } from "@/services/googleDrive.service";
+import { getExportService } from "@/services/export.service";
 import { MultipartValue } from "@fastify/multipart";
-
-type ExportFormat  = "raw" | "picto";
-
-interface ExportRequest {
-  annotations: HotspotData[];
-  imageName?: string;
-  folderName?: string;
-  includeMetadata?: boolean;
-}
+import { ExportFormat, HotspotData } from "@/types/export.types";
 
 export default async function exportRoutes(app: FastifyInstance) {
   // Export to Google Drive
   app.post('/api/drive/export', async (request: FastifyRequest, reply: FastifyReply) => {
-    const driveService = getGoogleDriveService();
+    const exportService = getExportService();
     try {
-        const token = await driveService.ensureAccessToken(request);
-        driveService.setAccessToken(token);
-
         // Parse multipart form data
         const data = await request.file();
         if (!data) {
             return reply.status(400).send({ error: `Image file required: ${data}` });
         }
-        
+
         // Get form fields
         const fileBuffer = await data.toBuffer();
-        
+
         // typed view of fields: key -> MultipartValue[] (or undefined)
         const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
 
@@ -47,7 +36,8 @@ export default async function exportRoutes(app: FastifyInstance) {
 
         );
 
-        const format = formFields.format as ExportFormat|undefined;
+        const format = formFields.format as ExportFormat | undefined;
+
 
         let annotations: HotspotData[]|undefined = undefined;
 
@@ -61,8 +51,8 @@ export default async function exportRoutes(app: FastifyInstance) {
 
           if(!annotations){
             return reply.code(400).send(`Error: The annotations array does not exist : ${JSON.stringify(annotations)}`)
-          }   
-        }            
+          }
+        }
 
         const options = {
             format: format || "picto" ,
@@ -72,18 +62,18 @@ export default async function exportRoutes(app: FastifyInstance) {
         };
 
         // Export to Google Drive
-        const result = await driveService.exportToGoogleDrive(
+        const result = await exportService.exportToGoogleDrive(request, {
             fileBuffer,
             annotations,
-            options
-        );
+            options,
+        });
 
         return result;
 
     } catch (error) {
       console.error('Export error:', error);
-      reply.status(500).send({ 
-        error: error instanceof Error ? error.message : 'Export failed' 
+      reply.status(500).send({
+        error: error instanceof Error ? error.message : 'Export failed'
       });
     }
   });

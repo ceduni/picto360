@@ -17,11 +17,11 @@ const postUsers = async (request:FastifyRequest,reply:FastifyReply)=>{
 
     const {uid,email,name,picture} = userData;
 
-    let user = await User.findOne({firebaseUid:uid});
+    let user = await User.findOne({uid:uid});
     if(!user) {
         try{
             user = await User.create({
-                firebaseUid:uid,
+                uid:uid,
                 email,
                 displayName:name,
                 photoUrl:picture,
@@ -42,7 +42,7 @@ const putUserName = async (request:FastifyRequest,reply:FastifyReply)=>{
     const {uid,name,picture} = userData;
 
     try{
-        await User.updateOne({firebaseUid:uid},{displayName:name,photoUrl:picture})
+        await User.updateOne({uid:uid},{displayName:name,photoUrl:picture})
     }catch(error:any){
         reply.status(500).send("Error on user update")
     }

@@ -2,8 +2,7 @@ import process from "process";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { google, drive_v3 } from "googleapis";
-import fs from "fs"
+import { google } from "googleapis";
 import { PassThrough } from "stream";
 
 import { OAuth2Client } from "google-auth-library";
@@ -21,13 +20,6 @@ export interface HotspotData {
   meta?: Record<string, any>; // optional metadata for custom cases
 }
 
-type AuthStatus = {
-  isAuthenticated: boolean;
-  provider: 'google' | null;
-  scopes?: string[];
-  connectedAt?: string; // ISO
-  reason?: 'revoked' | 'expired' | 'manual_disconnect' | 'login' | 'refresh';
-};
 
 interface GoogleDriveConfig {
   clientId: string ;
@@ -199,7 +191,8 @@ class GoogleDriveBackendService {
   }
 
   async ensureAccessToken(req: FastifyRequest) {
-    const g = req.session.google;
+    const sessionGoogle = (req.session as { google?: { access_token: string; refresh_token?: string; expiry: number } }).google;
+    const g = sessionGoogle;
     if (!g) throw new Error("Not authenticated with Google");
 
     // still valid?
@@ -211,14 +204,15 @@ class GoogleDriveBackendService {
     oauth.setCredentials({ refresh_token: g.refresh_token });
 
     const { credentials } = await oauth.refreshAccessToken();
-    req.session.google = {
+    (req.session as { google?: { access_token: string; refresh_token?: string; expiry: number } }).google = {
       ...g,
       access_token: credentials.access_token!,
       expiry: credentials.expiry_date!,
     };
     await req.session.save?.();
-    this.broadcast('auth-status', { connected: true, expiresAt: req.session.google.expiry });
-    return req.session.google.access_token!;
+    const refreshedGoogle = (req.session as { google?: { access_token: string; refresh_token?: string; expiry: number } }).google;
+    this.broadcast('auth-status', { connected: true, expiresAt: refreshedGoogle?.expiry });
+    return refreshedGoogle!.access_token;
   }
 
   async getAuthStatus (req:FastifyRequest){
