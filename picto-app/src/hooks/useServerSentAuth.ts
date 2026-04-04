@@ -1,75 +1,86 @@
-import { DriveAuthStatus } from "@/utils/Types";
+import {
+  DriveAuthStatus,
+  ExportErrorEvent,
+  ExportStatusEvent,
+  UploadCompleteEvent,
+  UploadProgress,
+} from "@/utils/Types";
 import { useEffect, useState } from "react";
 
-export interface UploadProgress {
-  file: string;
-  uploaded: number;
-  total: number;
-  percent: string;
-}
-
-export function useServerSentAuth(){
+export function useServerSentAuth() {
   const [driveAuthStatus, setAuthStatus] = useState<DriveAuthStatus | null>(null);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [exportStatus, setExportStatus] = useState<ExportStatusEvent | null>(null);
+  const [exportError, setExportError] = useState<ExportErrorEvent | null>(null);
+  const [uploadComplete, setUploadComplete] = useState<UploadCompleteEvent | null>(null);
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-  async function getDriveAuthStatus () {
-    try{
-      const result = await fetch(`http://localhost:5000/api/auth/status`,{credentials:"include",});
+  async function getDriveAuthStatus() {
+    try {
+      const result = await fetch(`${baseUrl}/api/auth/status`, { credentials: "include" });
+      const data = await result.json() as DriveAuthStatus;
 
-      if(!result.ok){
-          return null;
+      if ((!result.ok || !data.isAuthenticated)) {
+        return null;
       }
-      const data = await result.json();
 
       return data;
-    }catch(err){
+    } catch (_err) {
       return null;
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     let es: EventSource | null = null;
     let canceled = false;
 
-    // 1) initial snapshot
     getDriveAuthStatus().then((status) => {
-        if (!canceled) setAuthStatus(status);
+      if (!canceled) {
+        setAuthStatus(status);
+      }
     });
 
-    // 2) open stream immediately
-    es = new EventSource("http://localhost:5000/api/auth/stream", { withCredentials: true });
+    es = new EventSource(`${baseUrl}/api/auth/stream`, { withCredentials: true });
 
     es.addEventListener("auth-status", (evt) => {
-        if (!canceled) {
+      if (!canceled) {
         const next = JSON.parse((evt as MessageEvent).data) as DriveAuthStatus;
-        // console.log("Auth status event:", next);
         setAuthStatus(next);
-        }
+      }
     });
 
-    // progress
-    es.addEventListener("upload-progress", (e) => {
-      const data = JSON.parse(e.data) as UploadProgress;
+    es.addEventListener("export-status", (evt) => {
+      const data = JSON.parse((evt as MessageEvent).data) as ExportStatusEvent;
+      setExportError(null);
+      setExportStatus(data);
+    });
+
+    es.addEventListener("upload-progress", (evt) => {
+      const data = JSON.parse((evt as MessageEvent).data) as UploadProgress;
+      setExportError(null);
+      setUploadComplete(null);
       setUploadProgress(data);
       console.log(`Progress for ${data.file}: ${data.percent}%`);
     });
 
-    // export done
-    es.addEventListener("export-complete", () => {
-      console.log(`✅ Export finished`);
-      setUploadProgress(null); // Clear progress when done
+    es.addEventListener("upload-complete", (evt) => {
+      const data = JSON.parse((evt as MessageEvent).data) as UploadCompleteEvent;
+      setUploadComplete(data);
     });
 
-    // es.onerror = () => {
-    //     console.warn("SSE connection lost. The browser will retry automatically.");
-    // };
+    es.addEventListener("export-error", (evt) => {
+      const data = JSON.parse((evt as MessageEvent).data) as ExportErrorEvent;
+      setExportError(data);
+      setUploadProgress(null);
+    });
 
     return () => {
-        canceled = true;
-        if (es) es.close();
+      canceled = true;
+      if (es) {
+        es.close();
+      }
     };
+  }, []);
 
-  },[]);
-
-  return {driveAuthStatus, uploadProgress};
+  return { driveAuthStatus, uploadProgress, exportStatus, exportError, uploadComplete };
 }

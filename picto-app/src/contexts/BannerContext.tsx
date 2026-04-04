@@ -1,8 +1,8 @@
 import { MessageBannerRef, MessageBannerType } from "@/utils/Types";
-import { createContext, useRef, ReactNode, useImperativeHandle, forwardRef } from "react";
+import { createContext, useRef, ReactNode } from "react";
 import ErrorBanner from "@/components/FeedbackBanner";
 
-interface BannerContextType {
+export interface BannerContextType {
   setBannerMessage: (message: string, type?: MessageBannerType, duration?: number) => void;
 }
 

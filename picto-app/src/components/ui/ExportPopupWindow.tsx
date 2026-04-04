@@ -1,243 +1,306 @@
 import "@css/SettingsPopupWindow.css";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaGoogleDrive } from "react-icons/fa";
 import { IoFileTrayFull } from "react-icons/io5";
-import { getExportService } from "@/utils/ExportFileUtils";
-import { useDriveAuth } from "@/hooks/useDriveAuth";
-import { getViewerItem } from "@/utils/storedImageData";
-import { DriveAuthStatus, ExportDestination, ExportFormat, HotspotData, } from "../../utils/Types";
-import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { MdClose } from "react-icons/md";
+import { getExportService } from "@/utils/ExportFileUtils";
+import { savePendingDriveExport, useDriveAuth } from "@/hooks/useDriveAuth";
+import { getViewerItem } from "@/utils/storedImageData";
+import {
+  DriveAuthStatus,
+  ExportDestination,
+  ExportFormat,
+  HotspotData,
+} from "../../utils/Types";
+import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import DropSelector, { SelectorOption } from "./DropSelector";
 import ErrorBanner from "../FeedbackBanner";
 
-
 interface ExportPopupProps {
-    isOpen: boolean;
-    fileNameMaxLength?: number;
-    setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    viewerId?: string;
-    titleState: {
-        projectTitle: string,
-        setProjectTitle: (e: React.ChangeEvent<HTMLInputElement>) => void,
-        saveProjectTitleToDB: () => void
-    }
-    driveAuthStatus: DriveAuthStatus | null;
+  isOpen: boolean;
+  fileNameMaxLength?: number;
+  setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  viewerId?: string;
+  driveExportInProgress: boolean;
+  onDriveExportStart: (fileName?: string) => void;
+  onDriveExportSuccess: () => void;
+  onDriveExportFailure: (message?: string) => void;
+  titleState: {
+    projectTitle: string;
+    setProjectTitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    saveProjectTitleToDB: () => void;
+  };
+  driveAuthStatus: DriveAuthStatus | null;
 }
 
 type ExportStatus = "idle" | "exporting" | "success" | "failure";
 
-const ExportPopupWindow: React.FC<ExportPopupProps> = ({ isOpen, setIsPopupOpen, viewerId, titleState, driveAuthStatus, fileNameMaxLength = 50 }) => {
-    const { projectTitle, setProjectTitle } = titleState;
-    const { startDriveAuth, logoutFromDrive } = useDriveAuth();
-    const driveService = getExportService(); // for file export
-    const { setBannerMessage, bannerRef } = useFeedbackBanner();
+const ExportPopupWindow: React.FC<ExportPopupProps> = ({
+  isOpen,
+  setIsPopupOpen,
+  viewerId,
+  driveExportInProgress,
+  onDriveExportStart,
+  onDriveExportSuccess,
+  onDriveExportFailure,
+  titleState,
+  driveAuthStatus,
+  fileNameMaxLength = 50,
+}) => {
+  const { projectTitle, setProjectTitle } = titleState;
+  const { startDriveAuth } = useDriveAuth();
+  const driveService = getExportService();
+  const { setBannerMessage, bannerRef } = useFeedbackBanner();
 
-    // Annotation type options with icons
-    const exportOptions: SelectorOption[] = [
-        { value: "picto", label: "Projet .picto" },
-        { value: "raw", label: "Fichiers séparés" },
-    ];
+  const exportOptions: SelectorOption[] = [
+    { value: "picto", label: "Projet .picto" },
+    { value: "raw", label: "Fichiers separes" },
+  ];
 
-    const [exportFormat, setExportFormat] = useState<ExportFormat>("picto")
-    const [isExporting, setIsExporting] = useState(false);
-    const [exportStatus, setExportStatus] = useState<ExportStatus>('idle');
-    const [showWessage, setShowMessage] = useState(false);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("picto");
+  const [isExporting, setIsExporting] = useState(false);
+  const [, setExportStatus] = useState<ExportStatus>("idle");
 
-    useEffect(() => {
-        if (exportStatus) {
-            setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 5000);
-        }
-    }, [exportStatus])
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+  };
 
-    const handlePopupClose = () => {
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      handlePopupClose();
+    }
+  };
+
+  const handleAuthenticate = async () => {
+    try {
+      if (!viewerId) {
+        throw new Error("viewerId missing in URL");
+      }
+
+      savePendingDriveExport({
+        viewerId,
+        format: exportFormat,
+        fileName: projectTitle || "Untitled",
+        folderName: `Picto360 deg ${projectTitle || "Untitled"} Annotations`,
+        includeMetadata: true,
+      });
+
+      await startDriveAuth(viewerId, { autoExport: true });
+    } catch (_error) {
+      setExportStatus("failure");
+      setBannerMessage({ message: "Authentication failed, try again", type: "failure" });
+    }
+  };
+
+  const exportToDrive = async (
+    imageBlob: Blob,
+    annotations?: HotspotData[],
+    fileName?: string,
+  ) => {
+    try {
+      const resolvedFileName = fileName || "Untitled";
+      const result = await driveService.exportToGoogleDrive(
+        imageBlob,
+        annotations || [],
+        exportFormat,
+        {
+          fileName: resolvedFileName,
+          folderName: `Picto360 deg ${resolvedFileName} Annotations`,
+          includeMetadata: true,
+        },
+      );
+
+      if (result.success) {
+        onDriveExportSuccess();
+        setExportStatus("success");
+        setBannerMessage({ message: "Exporte avec succes vers le drive", type: "success" });
+      } else {
+        const errorMessage = result.error || "Export failed";
+        onDriveExportFailure(errorMessage);
+        setExportStatus("failure");
+        setBannerMessage({ message: "Export echoue, essayez a nouveau", type: "failure" });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Export failed";
+      onDriveExportFailure(errorMessage);
+      setExportStatus("failure");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const exportToDisk = async (
+    imageBlob: Blob,
+    annotations?: HotspotData[],
+    fileName?: string,
+  ) => {
+    try {
+      await driveService.exportToDisk(
+        imageBlob,
+        fileName || "Untitled",
+        exportFormat,
+        annotations && annotations.length > 0 ? annotations : undefined,
+      );
+      setBannerMessage({ message: "Fichier exporte avec succes vers le disque", type: "success" });
+    } catch (_error) {
+      setBannerMessage({ message: "Export non reussi, essayez a nouveau", type: "failure" });
+      setExportStatus("failure");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportTo = async (destination: ExportDestination) => {
+    if (!viewerId) {
+      return null;
+    }
+
+    const viewerItem = await getViewerItem(viewerId);
+    const imageBlob = viewerItem?.compressedBlob;
+    const annotations = viewerItem?.annotations;
+    const fileName = viewerItem?.name || "Untitled";
+
+    if (!imageBlob) {
+      setBannerMessage({ message: "No image found, upload an image", type: "warning" });
+      setExportStatus("failure");
+      return null;
+    }
+
+    setIsExporting(true);
+
+    switch (destination) {
+      case "drive":
+        setExportStatus("exporting");
+        onDriveExportStart(fileName);
         setIsPopupOpen(false);
-    };
-
-    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            handlePopupClose();
-        }
-    };
-
-    const handleAuthenticate = async () => {
-        try {
-            await startDriveAuth(viewerId);
-        } catch (error) {
-            setExportStatus("failure");
-            setBannerMessage({ message: "Authentication failed, try again", type: "failure" })
-        }
-    };
-
-    const exportToDrive = async (imageBlob: Blob, annotations?: HotspotData[], fileName?: string) => {
-        try {
-            const result = await driveService.exportToGoogleDrive(
-                imageBlob,
-                annotations || [],
-                exportFormat,
-                {
-                    fileName: fileName || "Untitled",
-                    folderName: 'Picto360° ' + fileName + ' Annotations',
-                    includeMetadata: true,
-                },
-            );
-
-            if (result.success) {
-                setExportStatus("success");
-                setBannerMessage({ message: "Exporté avec succes vers le drive", type: "success" })
-
-            } else {
-                setExportStatus("failure");
-                setBannerMessage({ message: "Export échoué, essayez à nouveau", type: "failure" })
-            }
-        } catch (error) {
-            setExportStatus("failure");
-        } finally {
-            setIsExporting(false);
-        }
-    };
-
-    const exportToDisk = async (imageBlob: Blob, annotations?: HotspotData[], fileName?: string) => {
-        try {
-            await driveService.exportToDisk(imageBlob,
-                fileName || "Untitled",
-                exportFormat,
-                annotations && annotations?.length > 0 ? annotations : undefined,
-            );
-            setBannerMessage({ message: "Fichier exporté avec succès vers le disque", type: "success" })
-        } catch (error) {
-            setBannerMessage({ message: "Export n'a pas réussi, essaie à nouveau", type: "failure" })
-            // bannerRef.current?.trigger(,"failure")
-
-            setExportStatus("failure");
-        } finally {
-            setIsExporting(false);
-
-        }
+        await exportToDrive(imageBlob, annotations, fileName);
+        break;
+      case "disk":
+      default:
+        setExportStatus("exporting");
+        await exportToDisk(imageBlob, annotations, fileName);
     }
 
-    const handleExportTo = async (destination: ExportDestination) => {
-        // Get your app's current image and annotations
-        if (!viewerId) return null;
-        const viewerItem = await getViewerItem(viewerId);
+    return null;
+  };
 
-        const imageBlob = viewerItem?.compressedBlob;
-        const annotations = viewerItem?.annotations;
-        const fileName = viewerItem?.name || "Untitled";
+  if (!isOpen) {
+    return null;
+  }
 
-        if (!imageBlob || imageBlob === undefined) {
-            setBannerMessage({ message: "No image found, upload an image", type: "warning" })
-
-            // bannerRef.current?.trigger("No image found, upload an image","warning")
-
-            setExportStatus("failure");
-            return null;
-        }
-
-        setIsExporting(true);
-
-        switch (destination) {
-            case "drive":
-                setExportStatus("exporting");
-                await exportToDrive(imageBlob, annotations, fileName);
-                break
-            case "disk":
-            default:
-                setExportStatus("exporting");
-                await exportToDisk(imageBlob, annotations, fileName);
-        }
-    }
-
-    useEffect(() => {
-        setIsPopupOpen(isExporting);
-    }, [isExporting])
-
-    if (!isOpen) return null;
-
-    return (
-        <div className={`settings-modal-backdrop ${isOpen ? 'settings-modal-backdrop--open' : ''}`} onClick={handleBackdropClick}>
-             <ErrorBanner ref={bannerRef} />
-            <div className={`settings-modal ${isOpen ? 'settings-modal--open' : ''}`}>
-                <div className="settings-modal__header">
-                    <h2 className="settings-modal__title">Exporter vers</h2>
-                    <button className="settings-modal__close-button" onClick={handlePopupClose} aria-label="Fermer les paramètres">
-                        <MdClose />
-                    </button>
-                </div>
-
-                <div className="settings-modal__content">
-                    <div className="popup-select-export_format">
-                        <label className="settings-modal__label">
-                            Type d'export
-                        </label>
-                        <DropSelector id="export-type" value={exportFormat} options={exportOptions} variant="default" onChange={setExportFormat}></DropSelector>
-                    </div>
-
-                    {/* File Name */}
-                    <div className="settings-modal__section">
-                        <label htmlFor="file-name" className="settings-modal__label">
-                            Nom du fichier
-                        </label>
-                        <div className={`settings-modal__filename-wrapper ${exportFormat === "picto" ? "settings-modal__filename-wrapper--extension" : ""}`}>
-                            <input id="file-name" className="settings-modal__input settings-modal__input--filename"
-                                type="text"
-                                value={projectTitle}
-                                onChange={setProjectTitle}
-                                placeholder="Entrez le nom du fichier"
-                                maxLength={fileNameMaxLength}
-                                onBlur={titleState.saveProjectTitleToDB}
-                                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                                    if (event.key === "Enter") {
-                                        event.preventDefault(); // avoid submitting forms
-                                        titleState.saveProjectTitleToDB()
-                                        event.currentTarget.blur();
-                                    }
-                                }}
-                            />
-                            {exportFormat === "picto" && <code className="settings-modal__file-extension">.picto</code>}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>
-                    <p style={{width: "100%"}} className="export-instruction">Choisissez une destination d'exportation :</p>
-                    <button className="settings-modal__button settings-modal__button--secondary" onClick={handlePopupClose}>
-                        Annuler
-                    </button>
-                    <div style={{flexGrow: 2, display: "flex", justifyContent: "flex-end", gap: "6px"}}>
-                        <button type="button"
-                            className="settings-modal__button settings-modal__button--primary"
-                            onClick={
-                                async () => {
-                                    if (!driveAuthStatus?.isAuthenticated) await handleAuthenticate();
-                                    if(driveAuthStatus?.isAuthenticated){
-                                        await handleExportTo("drive");
-                                    }
-                                    return;
-                                }
-                            }
-                            disabled={isExporting}
-                            >
-                            <FaGoogleDrive size={20} />
-                            Google Drive
-                        </button>
-
-                        <button type="button" className="settings-modal__button settings-modal__button--primary" disabled={isExporting}
-                            onClick={async () => {
-                                await handleExportTo("disk");
-                                setIsPopupOpen(false);
-                            }}
-                        >
-                            <IoFileTrayFull size={20} />
-                            Ordinateur
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div
+      className={`settings-modal-backdrop ${isOpen ? "settings-modal-backdrop--open" : ""}`}
+      onClick={handleBackdropClick}
+    >
+      <ErrorBanner ref={bannerRef} />
+      <div className={`settings-modal ${isOpen ? "settings-modal--open" : ""}`}>
+        <div className="settings-modal__header">
+          <h2 className="settings-modal__title">Exporter vers</h2>
+          <button
+            className="settings-modal__close-button"
+            onClick={handlePopupClose}
+            aria-label="Fermer les parametres"
+          >
+            <MdClose />
+          </button>
         </div>
-    )
-}
+
+        <div className="settings-modal__content">
+          <div className="popup-select-export_format">
+            <label className="settings-modal__label">Type d'export</label>
+            <DropSelector
+              id="export-type"
+              value={exportFormat}
+              options={exportOptions}
+              variant="default"
+              onChange={setExportFormat}
+            />
+          </div>
+
+          <div className="settings-modal__section">
+            <label htmlFor="file-name" className="settings-modal__label">
+              Nom du fichier
+            </label>
+            <div
+              className={`settings-modal__filename-wrapper ${
+                exportFormat === "picto" ? "settings-modal__filename-wrapper--extension" : ""
+              }`}
+            >
+              <input
+                id="file-name"
+                className="settings-modal__input settings-modal__input--filename"
+                type="text"
+                value={projectTitle}
+                onChange={setProjectTitle}
+                placeholder="Entrez le nom du fichier"
+                maxLength={fileNameMaxLength}
+                onBlur={titleState.saveProjectTitleToDB}
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    titleState.saveProjectTitleToDB();
+                    event.currentTarget.blur();
+                  }
+                }}
+              />
+              {exportFormat === "picto" && (
+                <code className="settings-modal__file-extension">.picto</code>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>
+          <p style={{ width: "100%" }} className="export-instruction">
+            Choisissez une destination d'exportation :
+          </p>
+          <button
+            className="settings-modal__button settings-modal__button--secondary"
+            onClick={handlePopupClose}
+          >
+            Annuler
+          </button>
+          <div style={{ flexGrow: 2, display: "flex", justifyContent: "flex-end", gap: "6px" }}>
+            <button
+              type="button"
+              className="settings-modal__button settings-modal__button--primary"
+              onClick={async () => {
+                if (driveExportInProgress) {
+                  return;
+                }
+
+                if (!driveAuthStatus?.isAuthenticated) {
+                  await handleAuthenticate();
+                  return;
+                }
+
+                await handleExportTo("drive");
+              }}
+              disabled={isExporting || driveExportInProgress}
+            >
+              <FaGoogleDrive size={20} />
+              Google Drive
+            </button>
+
+            <button
+              type="button"
+              className="settings-modal__button settings-modal__button--primary"
+              disabled={isExporting}
+              onClick={async () => {
+                await handleExportTo("disk");
+                setIsPopupOpen(false);
+              }}
+            >
+              <IoFileTrayFull size={20} />
+              Ordinateur
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default React.memo(ExportPopupWindow);
