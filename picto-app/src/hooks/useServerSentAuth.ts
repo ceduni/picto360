@@ -39,7 +39,6 @@ export function useServerSentAuth() {
     es.addEventListener("auth-status", (evt) => {
       if (!canceled) {
         const next = JSON.parse((evt as MessageEvent).data) as DriveAuthStatus;
-        console.log("Received auth status update from stream: ", next);
         setAuthStatus(next);
       }
     });
@@ -55,7 +54,6 @@ export function useServerSentAuth() {
       setExportError(null);
       setUploadComplete(null);
       setUploadProgress(data);
-      console.log(`Progress for ${data.file}: ${data.percent}%`);
     });
 
     es.addEventListener("upload-complete", (evt) => {
