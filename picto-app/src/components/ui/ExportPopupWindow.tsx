@@ -22,10 +22,10 @@ interface ExportPopupProps {
   fileNameMaxLength?: number;
   setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
   viewerId?: string;
-  // driveExportInProgress: boolean;
-  // onDriveExportStart: (fileName?: string) => void;
-  // onDriveExportSuccess: () => void;
-  // onDriveExportFailure: (message?: string) => void;
+  driveExportInProgress: boolean;
+  onDriveExportStart: (fileName?: string) => void;
+  onDriveExportSuccess: () => void;
+  onDriveExportFailure: (message?: string) => void;
   titleState: {
     projectTitle: string;
     setProjectTitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -40,10 +40,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   isOpen,
   setIsPopupOpen,
   viewerId,
-  // driveExportInProgress,
-  // onDriveExportStart,
-  // onDriveExportSuccess,
-  // onDriveExportFailure,
+  driveExportInProgress,
+  onDriveExportStart,
+  onDriveExportSuccess,
+  onDriveExportFailure,
   titleState,
   driveAuthStatus,
   fileNameMaxLength = 50,
@@ -112,18 +112,18 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
       );
 
       if (result.success) {
-        // onDriveExportSuccess();
+        onDriveExportSuccess();
         setExportStatus("success");
         setBannerMessage({ message: "Exporte avec succes vers le drive", type: "success" });
       } else {
         const errorMessage = result.error || "Export failed";
-        // onDriveExportFailure(errorMessage);
+        onDriveExportFailure(errorMessage);
         setExportStatus("failure");
         setBannerMessage({ message: "Export echoue, essayez a nouveau", type: "failure" });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Export failed";
-      // onDriveExportFailure(errorMessage);
+      onDriveExportFailure(errorMessage);
       setExportStatus("failure");
     } finally {
       setIsExporting(false);
@@ -172,7 +172,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     switch (destination) {
       case "drive":
         setExportStatus("exporting");
-        // onDriveExportStart(fileName);
+        onDriveExportStart(fileName);
         setIsPopupOpen(false);
         await exportToDrive(imageBlob, annotations, fileName);
         break;
@@ -267,9 +267,9 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
               type="button"
               className="settings-modal__button settings-modal__button--primary"
               onClick={async () => {
-                // if (driveExportInProgress) {
-                //   return;
-                //  }
+                if (driveExportInProgress) {
+                  return;
+                 }
 
                 if (!driveAuthStatus?.isAuthenticated) {
                   await handleAuthenticate();
@@ -279,8 +279,8 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
                 await handleExportTo("drive");
               }}
               disabled={isExporting ||
-                // driveExportInProgress
-                false}
+                driveExportInProgress
+                }
             >
               <FaGoogleDrive size={20} />
               Google Drive

@@ -7,7 +7,7 @@ import ErrorBanner from "@/components/FeedbackBanner";
 import { useAutoDriveExport } from "@/hooks/useAutoDriveExport";
 import { useDriveExportProgress } from "@/hooks/useDriveExportProgress";
 import { useServerSentAuth } from "@/hooks/useServerSentAuth";
-// import ExportProgressPopupWindow from "@/components/ui/ExportProgressPopupWindow";
+import ExportProgressPopupWindow from "@/components/ui/ExportProgressPopupWindow";
 
 
 const VisualisationPage: React.FC = () => {
@@ -21,11 +21,11 @@ const VisualisationPage: React.FC = () => {
     } = useServerSentAuth();
     const { viewerId } = useParams<{ viewerId: string }>();
     const {
-        // progressState,
+        progressState,
         startDriveExport,
         markDriveExportSuccess,
         markDriveExportFailure,
-        // closeProgressPopup,
+        closeProgressPopup,
     } = useDriveExportProgress({
         uploadProgress,
         exportStatus,
@@ -55,13 +55,13 @@ const VisualisationPage: React.FC = () => {
                 toggleEditMode={toggleEditMode}
                 viewerId={viewerId}
                 driveAuthStatus={driveAuthStatus}
-                // driveExportInProgress={progressState.isActive}
-                // onDriveExportStart={startDriveExport}
-                // onDriveExportSuccess={markDriveExportSuccess}
-                // onDriveExportFailure={markDriveExportFailure}
+                driveExportInProgress={progressState.isActive}
+                onDriveExportStart={startDriveExport}
+                onDriveExportSuccess={markDriveExportSuccess}
+                onDriveExportFailure={markDriveExportFailure}
             />
             <ErrorBanner ref={bannerRef} />
-            {/* <ExportProgressPopupWindow progressState={progressState} onClose={closeProgressPopup} /> */}
+            <ExportProgressPopupWindow progressState={progressState} onClose={closeProgressPopup} />
 
             {/* Don't mount until ready */}
             {hasViewerId ? (
