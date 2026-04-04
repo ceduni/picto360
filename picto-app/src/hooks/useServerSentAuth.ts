@@ -15,20 +15,20 @@ export function useServerSentAuth() {
   const [uploadComplete, setUploadComplete] = useState<UploadCompleteEvent | null>(null);
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-  async function getDriveAuthStatus() {
-    try {
-      const result = await fetch(`${baseUrl}/api/auth/status`, { credentials: "include" });
-      const data = await result.json() as DriveAuthStatus;
+  // async function getDriveAuthStatus() {
+  //   try {
+  //     const result = await fetch(`${baseUrl}/api/auth/status`, { credentials: "include" });
+  //     const data = await result.json() as DriveAuthStatus;
 
-      if ((!result.ok || !data.isAuthenticated)) {
-        return null;
-      }
+  //     if ((!result.ok || !data.isAuthenticated)) {
+  //       return null;
+  //     }
 
-      return data;
-    } catch (_err) {
-      return null;
-    }
-  }
+  //     return data;
+  //   } catch (_err) {
+  //     return null;
+  //   }
+  // }
 
   useEffect(() => {
     let es: EventSource | null = null;
