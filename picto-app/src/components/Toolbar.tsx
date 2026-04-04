@@ -88,7 +88,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode, viewerId,
 
     return (
         <div className={
-            `toolbar-container 
+            `toolbar-container
             toolbar-container--${isEditMode ? "edit-mode" : "preview-mode"}
             toolbar-container--${!isSaved ? "has-changes" : ""}
             `} onLoad={getViewerFromDB}>
@@ -140,7 +140,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ isEditMode, toggleEditMode, viewerId,
                     {/* <button onClick={()=>{ setShowShareOptions(true)}} className="toolbar__icon-button" title="Partager">
                 <MdShare />
               </button> */}
-
                     {
                         driveAuthStatus?.isAuthenticated &&
                         <button className="toolbar__icon-button" onClick={async () => { await logoutFromDrive(); }} title="Déconnexion">

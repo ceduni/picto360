@@ -70,7 +70,7 @@ export class ExportService {
       });
 
       // Get formatter and export
-      const format = input.options.format || "picto";
+      const format = input.options.format;
       const formatter = ExportFormatterFactory.getFormatter(format);
       const exportResult = await formatter.export(
         input.fileBuffer,

@@ -34,17 +34,12 @@ export function useServerSentAuth() {
     let es: EventSource | null = null;
     let canceled = false;
 
-    getDriveAuthStatus().then((status) => {
-      if (!canceled) {
-        setAuthStatus(status);
-      }
-    });
-
     es = new EventSource(`${baseUrl}/api/auth/stream`, { withCredentials: true });
 
     es.addEventListener("auth-status", (evt) => {
       if (!canceled) {
         const next = JSON.parse((evt as MessageEvent).data) as DriveAuthStatus;
+        console.log("Received auth status update from stream: ", next);
         setAuthStatus(next);
       }
     });

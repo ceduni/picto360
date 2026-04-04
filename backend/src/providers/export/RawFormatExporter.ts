@@ -16,8 +16,7 @@ export class RawFormatExporter extends BaseExportFormatter {
     onProgress?: UploadProgressCallback,
   ): Promise<Partial<ExportResult>> {
     const { fileName = "annotated_360_image", includeMetadata = true } = options;
-    const timestamp = this.getTimestamp();
-    const imageFileName = `${fileName}_${timestamp}.jpg`;
+    const imageFileName = `${fileName}.jpg`;
 
     if (!annotations) {
       annotations = [];
@@ -31,7 +30,7 @@ export class RawFormatExporter extends BaseExportFormatter {
           metadata: {
             app: "picto360",
             annotationCount: annotations.length.toString(),
-            exportDate: timestamp,
+            exportDate: new Date().toISOString(),
             imageType: "360degree",
           },
         }
@@ -57,7 +56,7 @@ export class RawFormatExporter extends BaseExportFormatter {
       },
     };
 
-    const annotationFileName = `${fileName}_annotations_${timestamp}.json`;
+    const annotationFileName = `${fileName}_annotations.json`;
     const annotationBuffer = Buffer.from(JSON.stringify(annotationData, null, 2));
 
     const annotationMetadata : StorageFileMetadata = {

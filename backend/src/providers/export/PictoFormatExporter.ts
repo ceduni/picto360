@@ -17,44 +17,18 @@ export class PictoFormatExporter extends BaseExportFormatter {
     onProgress?: UploadProgressCallback,
   ): Promise<Partial<ExportResult>> {
     const { fileName = "annotated_360_image" } = options;
-    const timestamp = this.getTimestamp();
-    const pictoFileName = `${fileName}_${timestamp}.picto`;
+    const pictoFileName = `${fileName}.picto`;
 
-    // In a real implementation, you would:
-    // 1. Encode the image and annotations into a custom binary format
-    // 2. Potentially compress with gzip or brotli
-    // 3. Create a structured format with headers, checksums, etc.
-
-    // For now, we'll create a simple JSON-based container
-    const pictoData = {
-      version: "1.0",
-      format: "picto",
-      exportDate: new Date().toISOString(),
-      image: {
-        data: fileBuffer.toString("base64"),
-        mimeType: "image/jpeg",
-        size: fileBuffer.length,
-      },
-      annotations: annotations || [],
-      metadata: {
-        totalAnnotations: (annotations || []).length,
-        annotationTypes: [...new Set((annotations || []).map((a) => a.type))],
-      },
-    };
-
-    const pictoBuffer = Buffer.from(JSON.stringify(pictoData, null, 2));
+    // the compression service is in the front-end
+    type Result = { id: string; name: string } | undefined;
+    let annotationResult: Result = undefined;
 
     const fileMetadata = {
       name: pictoFileName,
       mimeType: "application/picto",
-      metadata: {
-        app: "picto360",
-        format: "picto",
-        annotationCount: (annotations || []).length.toString(),
-      },
     };
 
-    const fileResult = await storage.uploadFile(pictoBuffer, fileMetadata, folderId, onProgress);
+    const fileResult = await storage.uploadFile(fileBuffer, fileMetadata, folderId, onProgress);
 
     return {
       imageFile: fileResult,

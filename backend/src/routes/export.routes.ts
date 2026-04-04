@@ -9,63 +9,55 @@ export default async function exportRoutes(app: FastifyInstance) {
   app.post('/api/drive/export', async (request: FastifyRequest, reply: FastifyReply) => {
     const exportService = getExportService();
     try {
-        // Parse multipart form data
-        const data = await request.file();
-        if (!data) {
-            return reply.status(400).send({ error: `Image file required: ${data}` });
+        const formFields: Record<string, string> = {};
+        let fileBuffer: Buffer | null = null;
+        let filename = '';
+        let mimetype = '';
+
+        // ✅ Iterate through ALL multipart parts
+        const parts = request.parts();
+        for await (const part of parts) {
+          if (part.type === 'file') {
+            // Handle file part
+            fileBuffer = await part.toBuffer();
+            filename = part.filename;
+            mimetype = part.mimetype;
+            console.log("Received file:", { filename, mimetype, size: fileBuffer.length });
+          } else if (part.type === 'field') {
+            // Handle text field parts
+            formFields[part.fieldname] = part.value as string;
+          }
         }
 
-        // Get form fields
-        const fileBuffer = await data.toBuffer();
+        if (!fileBuffer || fileBuffer.length === 0) {
+          return reply.status(400).send({ error: 'Image file required' });
+        }
 
-        // typed view of fields: key -> MultipartValue[] (or undefined)
-        const fields = data.fields as Record<string, MultipartValue | MultipartValue[] | undefined>;
+        console.log("Received export request with fields:", formFields);
 
-        const formFields = Object.fromEntries(
-            Object.entries(fields).map(([key, field]) => {
-              if (!field) return [key, undefined];
+        const format = formFields.format as ExportFormat || 'picto';
+        let annotations: HotspotData[] | undefined = undefined;
 
-              // Case: single object
-              if (!Array.isArray(field)) {
-                return [key, field.value?.toString()];
-              }
-
-              // Case: array of values (multiple form entries with same name)
-              return [key, field[0]?.value?.toString()];
-            })
-
-        );
-
-        const format = formFields.format as ExportFormat | undefined;
-
-
-        let annotations: HotspotData[]|undefined = undefined;
-
-        if (format==="raw" && formFields.annotations) {
-
+        if (format === "raw" && formFields.annotations) {
           try {
             annotations = JSON.parse(formFields.annotations);
           } catch (err) {
             console.error("❌ Failed to parse annotations:", formFields.annotations, err);
-          }
-
-          if(!annotations){
-            return reply.code(400).send(`Error: The annotations array does not exist : ${JSON.stringify(annotations)}`)
+            return reply.status(400).send('Error: Invalid annotations JSON');
           }
         }
 
         const options = {
-            format: format || "picto" ,
-            fileName: formFields.fileName as string || undefined,
-            folderName: formFields.folderName as string || undefined,
-            includeMetadata: formFields.includeMetadata === 'true'
+          format,
+          fileName: formFields.fileName || undefined,
+          folderName: formFields.folderName || undefined,
+          includeMetadata: formFields.includeMetadata === 'true'
         };
 
-        // Export to Google Drive
         const result = await exportService.exportToGoogleDrive(request, {
-            fileBuffer,
-            annotations,
-            options,
+          fileBuffer,
+          annotations,
+          options,
         });
 
         return result;
