@@ -3,14 +3,14 @@ import "@css/ExportProgressPopupWindow.css";
 
 import React from "react";
 import { MdCheckCircle, MdClose, MdCloudUpload, MdErrorOutline, MdFolder } from "react-icons/md";
-import { DriveExportProgressState } from "@/utils/Types";
+import { ExportProgressState } from "@/utils/Types";
 
 interface ExportProgressPopupWindowProps {
-  progressState: DriveExportProgressState;
+  progressState: ExportProgressState;
   onClose: () => void;
 }
 
-function getPhaseIcon(phase: DriveExportProgressState["phase"]) {
+function getPhaseIcon(phase: ExportProgressState["phase"]) {
   switch (phase) {
     case "folder_created":
       return <MdFolder className="export-progress-modal__status-icon" />;

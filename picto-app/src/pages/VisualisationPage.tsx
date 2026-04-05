@@ -5,20 +5,28 @@ import { useParams } from "react-router-dom";
 
 import ErrorBanner from "@/components/FeedbackBanner";
 import { useAutoDriveExport } from "@/hooks/useAutoDriveExport";
-import { useDriveExportProgress } from "@/hooks/useDriveExportProgress";
+import { useExportProgress } from "@/hooks/useExportProgress";
 import { useServerSentAuth } from "@/hooks/useServerSentAuth";
 import ExportProgressPopupWindow from "@/components/ui/ExportProgressPopupWindow";
+import { useExportStatus } from "@/hooks/useExportStatus";
 
 
 const VisualisationPage: React.FC = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(true);
+
+    const {
+        uploadProgress, exportStatus, exportError, uploadComplete,
+        setExportStatus, setUploadProgress, setExportError, setUploadComplete
+    } = useExportStatus();
+
     const {
         driveAuthStatus,
-        uploadProgress,
-        exportStatus,
-        exportError,
-        uploadComplete,
-    } = useServerSentAuth();
+    } = useServerSentAuth({
+        setUploadProgress,
+        setExportStatus,
+        setExportError,
+        setUploadComplete,
+    });
     const { viewerId } = useParams<{ viewerId: string }>();
     const {
         progressState,
@@ -26,7 +34,7 @@ const VisualisationPage: React.FC = () => {
         markDriveExportSuccess,
         markDriveExportFailure,
         closeProgressPopup,
-    } = useDriveExportProgress({
+    } = useExportProgress({
         uploadProgress,
         exportStatus,
         exportError,
@@ -55,10 +63,10 @@ const VisualisationPage: React.FC = () => {
                 toggleEditMode={toggleEditMode}
                 viewerId={viewerId}
                 driveAuthStatus={driveAuthStatus}
-                driveExportInProgress={progressState.isActive}
-                onDriveExportStart={startDriveExport}
-                onDriveExportSuccess={markDriveExportSuccess}
-                onDriveExportFailure={markDriveExportFailure}
+                exportInProgress={progressState.isActive}
+                onExportStart={startDriveExport}
+                onExportSuccess={markDriveExportSuccess}
+                onExportFailure={markDriveExportFailure}
             />
             <ErrorBanner ref={bannerRef} />
             <ExportProgressPopupWindow progressState={progressState} onClose={closeProgressPopup} />

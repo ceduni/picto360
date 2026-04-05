@@ -17,10 +17,10 @@ interface ToolbarProps {
     toggleEditMode: () => void;
     viewerId?: string;
     driveAuthStatus: DriveAuthStatus | null;
-    driveExportInProgress: boolean;
-    onDriveExportStart: (fileName?: string) => void;
-    onDriveExportSuccess: () => void;
-    onDriveExportFailure: (message?: string) => void;
+    exportInProgress: boolean;
+    onExportStart: (fileName?: string) => void;
+    onExportSuccess: () => void;
+    onExportFailure: (message?: string) => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -28,10 +28,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
     toggleEditMode,
     viewerId,
     driveAuthStatus,
-    driveExportInProgress,
-    onDriveExportStart,
-    onDriveExportSuccess,
-    onDriveExportFailure,
+    exportInProgress,
+    onExportStart,
+    onExportSuccess,
+    onExportFailure,
 }) => {
 
     const [projectTitle, setProjectTitle] = useState("Untitled");
@@ -121,9 +121,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
                     <button
                         className="toolbar__icon-button has-helper"
-                        onClick={() => { if (!driveExportInProgress) { setShowExportOptions(true) } }}
+                        onClick={() => { if (!exportInProgress) { setShowExportOptions(true) } }}
                         title="Exporter"
-                        disabled={driveExportInProgress}
+                        disabled={exportInProgress}
                     >
                         <MdOutlineFileDownload className="toolbar__export-icon" />
                         <span className="helper">Exporter le projet</span>
@@ -172,10 +172,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
             <ExportPopupWindow isOpen={showExportOptions} setIsPopupOpen={setShowExportOptions}
                 viewerId={viewerId}
                 driveAuthStatus={driveAuthStatus}
-                driveExportInProgress={driveExportInProgress}
-                onDriveExportStart={onDriveExportStart}
-                onDriveExportSuccess={onDriveExportSuccess}
-                onDriveExportFailure={onDriveExportFailure}
+                exportInProgress={exportInProgress}
+                onExportStart={onExportStart}
+                onExportSuccess={onExportSuccess}
+                onExportFailure={onExportFailure}
                 titleState={{ projectTitle, setProjectTitle: handleTitleChange, saveProjectTitleToDB }} />
             <SettingsPopupWindow isOpen={showSettingsOptions} setIsPopupOpen={setShowSettingsOptions}
                 state={{ fileName: projectTitle, setFileName: (e) => { setProjectTitle(e.target.value) } }} />
