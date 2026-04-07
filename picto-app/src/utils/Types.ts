@@ -56,7 +56,7 @@ export interface FetchedActivity {
   description?: string;
   createdBy: {
     _id: string;
-    firebaseUid: string;
+    uid: string;
     email: string;
     displayName?: string;
     photoUrl?: string;
@@ -118,6 +118,48 @@ export interface ExportResult {
   success: boolean;
   fileId?: string;
   fileName?: string;
+  error?: string;
+}
+
+export interface UploadProgress {
+  file: string;
+  uploaded: number;
+  total: number;
+  percent: string;
+}
+
+export interface ExportStatusEvent {
+  status: string;
+  folderId?: string;
+  folderName?: string;
+}
+
+export interface ExportErrorEvent {
+  error: string;
+}
+
+export interface UploadCompleteEvent {
+  fileId?: string;
+}
+
+export type DriveExportPhase =
+  | "idle"
+  | "preparing"
+  | "folder_created"
+  | "uploading"
+  | "finalizing"
+  | "success"
+  | "failure";
+
+export interface DriveExportProgressState {
+  isOpen: boolean;
+  isActive: boolean;
+  phase: DriveExportPhase;
+  title: string;
+  detail: string;
+  progressPercent: number | null;
+  fileName?: string;
+  folderName?: string;
   error?: string;
 }
 

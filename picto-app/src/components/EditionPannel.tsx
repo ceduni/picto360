@@ -10,6 +10,7 @@ import { BsTrash3Fill } from "react-icons/bs";
 import {  MdClose, MdImage, MdLink, MdOndemandVideo,  MdTextSnippet } from "react-icons/md";
 
 
+
 interface EditionPannelProps {
     hotspot: HotspotData | null;
     onSave: (hotspot: HotspotData) => void;
@@ -79,6 +80,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
     }
 
     const handleSave = (updatedFields: Partial<HotspotData>) => {
+
         if (pannelState === "editing") {
             onSave({ ...hotspot, ...updatedFields });
             onClose();
@@ -146,14 +148,14 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
         switch (type) {
             case "text":
             case "label":
-                return <MdTextSnippet size={20} className="edition_pannel_top_icon" />;
+                return <MdTextSnippet size={20} />;
             case "hyperlink":
-                return <MdLink size={20} className="edition_pannel_top_icon" />;
+                return <MdLink size={20} />;
             case "gif":
             case "image":
-                return <MdImage size={20} className="edition_pannel_top_icon" />;
+                return <MdImage size={20} />;
             case "video":
-                return <MdOndemandVideo size={20} className="edition_pannel_top_icon" />;
+                return <MdOndemandVideo size={20} />;
 
             // add more cases as needed
             default:
@@ -169,11 +171,11 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                     <div className="edition_pannel_top_text">
                         <div className="edition_pannel_icon">{panelIcon}</div> {typeLabel}
                     </div>
-                   
+
                     <button className="close-button" onClick={onClose} aria-label="Fermer le pannel d'édition sans sauvegarder">
                         <MdClose />
                     </button>
-                    
+
                     {/* <IoCloseCircleOutline size={40} className="close_icon"/> */}
                 </div>
                 <div className="pannel_main_content">

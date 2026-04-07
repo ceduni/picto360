@@ -19,7 +19,7 @@ const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
 
 
       setTimeout(() => {
-        setVisible(false);     
+        setVisible(false);
       }, duration);
 
     },
@@ -27,12 +27,12 @@ const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
 
 
   return (
-    <div className={`feedback_banner ${visible ? "visible" : ""} feedback_banner_${messageType}`}>
+    <div hidden={!visible} className={`feedback_banner ${visible ? "visible" : ""} feedback_banner_${messageType}`}>
         {
-          messageType ==="success" ? 
+          messageType ==="success" ?
             <LuCircleCheck size={22} />
           :
-            messageType ==="failure" ? 
+            messageType ==="failure" ?
               <LuCircleX size={22} />
               :
               <LuTriangleAlert size={22}/>

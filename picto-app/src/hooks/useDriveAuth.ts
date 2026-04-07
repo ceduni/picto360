@@ -1,35 +1,73 @@
 // hooks/useDriveAuth.ts
+import { ExportFormat } from "@/utils/Types";
 import { useLocation } from "react-router-dom";
-// import { getExportService } from "@/utils/ExportFileUtils";
-// import { useEffect, useState } from "react";
+
+export interface PendingDriveExport {
+  viewerId: string;
+  format: ExportFormat;
+  fileName?: string;
+  folderName?: string;
+  includeMetadata?: boolean;
+}
+
+interface StartDriveAuthOptions {
+  autoExport?: boolean;
+  returnTo?: string;
+}
+
+const OAUTH_VIEWER_ID_KEY = "oauth:viewerId";
+const OAUTH_RETURN_TO_KEY = "oauth:returnTo";
+const PENDING_DRIVE_EXPORT_KEY = "oauth:pendingDriveExport";
+
+export function savePendingDriveExport(payload: PendingDriveExport) {
+  sessionStorage.setItem(PENDING_DRIVE_EXPORT_KEY, JSON.stringify(payload));
+}
+
+export function getPendingDriveExport(): PendingDriveExport | null {
+  const rawValue = sessionStorage.getItem(PENDING_DRIVE_EXPORT_KEY);
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawValue) as PendingDriveExport;
+  } catch (_error) {
+    sessionStorage.removeItem(PENDING_DRIVE_EXPORT_KEY);
+    return null;
+  }
+}
+
+export function clearPendingDriveExport() {
+  sessionStorage.removeItem(PENDING_DRIVE_EXPORT_KEY);
+}
 
 export function useDriveAuth() {
-  // const driveService = getExportService();
   const location = useLocation();
-
-  const baseUrl =  'http://localhost:5000'; 
   
-  async function startDriveAuth(viewerId?:string) {
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  
+  async function startDriveAuth(viewerId?: string, options: StartDriveAuthOptions = {}) {
     if (!viewerId || viewerId === undefined) throw new Error("viewerId missing in URL");
-    const returnTo = location.pathname + location.search;
+    const returnTo = options.returnTo || location.pathname + location.search;
 
     // Fallbacks in case 'state' gets lost
-    sessionStorage.setItem("oauth:viewerId", viewerId);
-    sessionStorage.setItem("oauth:returnTo", returnTo);
+    sessionStorage.setItem(OAUTH_VIEWER_ID_KEY, viewerId);
+    sessionStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
     
-    const authUrl = await getAuthUrl(viewerId, returnTo);
+    const authUrl = await getAuthUrl(viewerId, returnTo, options.autoExport === true);
     window.location.href = authUrl; // go to Google
   }
 
   // Get OAuth URL from backend
-  async function getAuthUrl(viewerId: string, returnTo: string): Promise<string> {
+  async function getAuthUrl(viewerId: string, returnTo: string, autoExport = false): Promise<string> {
+    const endpoint = autoExport ? "/api/drive/auth-and-export-url" : "/api/drive/auth-url";
 
     try {
-      const response = await fetch(`${baseUrl}/api/drive/auth-url`,{
+      const response = await fetch(`${baseUrl}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ returnTo,viewerId }),        
+        body: JSON.stringify({ returnTo, viewerId }),
       });
       const data = await response.json();
       
@@ -45,7 +83,7 @@ export function useDriveAuth() {
 
 
   async function logoutFromDrive() {
-    const res = await fetch("http://localhost:5000/api/auth/logout", {
+    const res = await fetch(`${baseUrl}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

@@ -79,41 +79,44 @@ const HomePage = () => {
 
             <ErrorBanner ref={bannerRef} />
 
-            <header className="home-page__header">
-                <img className="image-uploader__logo" src="/images/logo_picto360.png" alt="Logo de Picto 360" />
-                <p className="home-page__intro-text">
-                    Annotez librement vos images 360 avec <br />
-                    du texte, des liens, des images et des vidéos.
-                </p>
-                {__ENABLE_ADMIN__ && (
-                    <div>
-                        <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
-                        <div className="home-page__login_container">
-                            {userLoggedIn ? (
-                                <button type="button" className="home-page__btn-create-group">
-                                    Créer un groupe
-                                </button>
-                            ) : (
-                                <button type="button" className="home-page__btn-login" onClick={handleLogClick}>
-                                    Se connecter
-                                </button>
-                            )}
-
-                            <button type="button" className="home-page__btn-create-activity" onClick={onCreateActivityClick}>
-                                Créer une activité
-                            </button>
+            <div className="home-page__container">
+                <header className="home-page__header">
+                    <img className="image-uploader__logo" src="/images/logo_picto360.png" alt="Logo de Picto 360" />
+                    <p className="home-page__intro-text">
+                        Annotez librement vos images 360 avec <br />
+                        du texte, des liens, des images et des vidéos.
+                    </p>
+                    {__ENABLE_ADMIN__ && (
+                        <div>
+                            <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
                         </div>
-                    </div>
-                )}
-            </header>
+                    )}
+                </header>
 
-            <section className="home-page__content">
-                <ImageUploader onImageUpload={handleImageUpload} />
-            </section>
+                <section className="home-page__content">
+                    <ImageUploader onImageUpload={handleImageUpload} />
+                    <div className="home-page__login_container">
+                        {userLoggedIn ? (
+                            <button type="button" className="home-page__btn-create-group">
+                                Créer un groupe
+                            </button>
+                        ) : (
+                            <button type="button" className="home-page__btn-login" onClick={handleLogClick}>
+                                Se connecter
+                            </button>
+                        )}
+
+                        <button type="button" className="home-page__btn-create-activity" onClick={onCreateActivityClick}>
+                            Créer une activité
+                        </button>
+                    </div>
+                </section>
+            </div>
+
 
             <footer className="app-footer">
                 <p>Projet mené en collaboration avec <strong>École en réseau</strong>.</p>
-                <p>&copy; 2025 Picto 360. Tous droits réservés.</p>
+                <p>&copy; {new Date().getFullYear()} Picto 360. Tous droits réservés.</p>
             </footer>
         </div>
     );

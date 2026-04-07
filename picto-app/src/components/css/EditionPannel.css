@@ -12,13 +12,14 @@
 
 .edition_pannel {
     position: absolute;
-    top: 20vh;
-    left: 70vw;
+    top: 15vh;
+    right: 10vw;
     display: flex;
     flex-direction: column;
-    min-height: 480px;
-    max-height: 600px;
+    min-height: 50vh;
+    max-height: 80vh;
     min-width: 360px;
+    max-width: 400px;
     border: 2px solid white;
     border-radius: 2vw;
     overflow: hidden;
@@ -39,6 +40,7 @@
     flex-direction: column;
     height: 100%;
     min-width: 20vw;
+    max-width: 400px;
     padding: 30px 18px 12px;
     gap: 15px;
     overflow: auto;
@@ -65,18 +67,18 @@
     margin-bottom: 12px;
 }
 
-    .edition_pannel_icon {
-        /* position: absolute; */
-        /* left: 12px; */
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        color: var(--color-white);
-        background: #232425;
-    }
+.edition_pannel_icon {
+    /* position: absolute; */
+    /* left: 12px; */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--color-white);
+    background: #232425;
+}
 
     .edition_pannel_top_text {
         font-weight: 300;
@@ -84,7 +86,7 @@
         margin-bottom: 6px;
     }
 
-    
+
 .close-button {
     position: absolute;
     top: 12px; right: 12px;
@@ -152,7 +154,7 @@
     /* Keep whitespace and wrap long lines */
     word-wrap: break-word;
     /* Break long words onto next line */
-  
+
 }
 
 .edition_pannel_field {
@@ -348,6 +350,10 @@
 }
 
 .video_player {
+    width: 320px;
+    height: auto;
+    border-radius: 6px;
+    overflow: hidden;
     border: 5px solid white;
     border-radius: 5px;
 }
@@ -416,12 +422,6 @@
     font-weight: 500;
 }
 
-.video_player {
-    width: 320px;
-    height: auto;
-    border-radius: 6px;
-    overflow: hidden;
-}
 
 .text-field {
     width: 100%;

@@ -3,6 +3,8 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { EditorRef, HotspotData } from "../../utils/Types";
 import SegmentedControl, { SegmentOption } from "@ui/SegmentedControl";
 import { MdAdd, MdLaptopChromebook, MdLink, } from "react-icons/md";
+import { isValidImageUrl } from "@/utils/FormInputvalidators";
+import { useBanner } from "@/hooks/useBanner";
 
 
 interface EditorProps {
@@ -15,6 +17,7 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
     const [url_text, setURL] = useState(hotspot.url_text || "");
     const [content, setContent] = useState(hotspot.content || "");
     const [imageType, setImageType] = useState("url");
+    const { setBannerMessage } = useBanner();
 
     // Annotation type options with icons
     const annotationOptions: SegmentOption[] = [
@@ -25,6 +28,11 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
 
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
+
+        if(imageType === "url" && (!isValidImageUrl(content) || content === "")) {
+            setBannerMessage("L'URL saisie n'est pas valide ou ne mène pas vers une image.", "failure");
+            return;
+        }
         onSave({ url_text, content });
     };
 
@@ -45,7 +53,7 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
             <div className="video_preview_container">
                 {content != "" ?
                     <div>
-                        <img src={content} className="video_player" />
+                        <img title="image_placeholder" src={content} className="video_player" />
                     </div>
                     :
                     <div className="video-placeholder">

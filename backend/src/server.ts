@@ -18,10 +18,11 @@ import activityRoutes from "./routes/activity.routes";
 import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
 import exportRoutes from "./routes/export.routes";
+import authAndExportRoutes from "./routes/auth_and_export.routes";
 import fastifyCookie  from "@fastify/cookie";
 import fastifySession from "@fastify/session";
 
-import 'dotenv/config';
+import 'dotenv/config'; // Load environment variables from .env file
 
 const fastify = Fastify({ logger: true });
 
@@ -31,12 +32,12 @@ const setupServer = async () => {
 
     await fastify.register(fastifyCors, {
       origin: (origin, cb) => {
-        const allowed = ["http://localhost:3000"];
+        const allowed = [process.env.FRONTEND_SERVER || "http://localhost:3000"];
         if (!origin) {
           // Allow requests without an Origin header (e.g., same-site or redirect flows)
           cb(null, true);
           return;
-        }        
+        }
         if (allowed.includes(origin)) cb(null, true);
         else cb(new Error("Not allowed by CORS"), false);
       },
@@ -53,7 +54,7 @@ const setupServer = async () => {
 
     await fastify.register(fastifyCookie);
     await fastify.register(fastifySession,{
-      secret: SESSION_SECRET,               
+      secret: SESSION_SECRET,
       cookie: {
         path: "/",
         httpOnly: true,
@@ -68,6 +69,7 @@ const setupServer = async () => {
 
     // Register the OAuth + export routes
     fastify.register(oauthRoutes);
+    fastify.register(authAndExportRoutes);
     fastify.register(exportRoutes);
 
     fastify.register(imageCompressionRoutes);
@@ -79,7 +81,7 @@ const setupServer = async () => {
 
     fastify.register(activityRoutes);
     fastify.register(userRoutes);
-    
+
     fastify.register(annotationRoutes);
     fastify.register(dimensionRoutes);
     fastify.register(imageRoutes);
@@ -96,13 +98,13 @@ const setupServer = async () => {
     //     reply.send(teams);
     // }catch (err) {
     //     console.error("❌ GET /activities error:", err);
-    //     reply.status(500).send({ error: 'Failed to fetch teams', 
+    //     reply.status(500).send({ error: 'Failed to fetch teams',
     //                             message: err instanceof Error ? err.message:JSON.stringify(err) });
     // }
     // });
 
     await fastify.listen({port:5000});
-    fastify.log.info(`Server is running on port http://localhost:5000`);
+    fastify.log.info(`Server is running on port ${process.env.FRONTEND_SERVER}`);
   } catch (err) {
     fastify.log.error("❌ Server startup failed:", err);
     process.exit(1);

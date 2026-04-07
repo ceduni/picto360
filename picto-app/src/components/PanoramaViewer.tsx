@@ -39,7 +39,6 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         imageSource,
     });
 
-
     const {
         visible: contextMenuVisible,
         position: contextMenuPosition,
@@ -84,6 +83,9 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     // Edition panel
     const { panelState, openPanel, closePanel } = useEditionPanel();
 
+    const isTargetIconVisible = isEditMode && targetIconPosition && (contextMenuVisible || panelState?.isOpen);
+
+
     // Hotspot creation
     const handleHotspotCreation = useCallback(
         (type: string, coords: [number, number]): void => {
@@ -93,7 +95,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 pitch: coords[0],
                 yaw: coords[1]
             });
-            
+
             try {
                 const newHotspot = createNewHotspotData(type, coords);
                 console.log('🎯 New hotspot data created:', newHotspot);
@@ -121,7 +123,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             console.log('🎯 Context menu clicked, coords:', contextMenuCoords);
             const coords: [number, number] = [contextMenuCoords.pitch, contextMenuCoords.yaw];
             console.log('🎯 Dispatching event with coords:', coords);
-            
+
             dispatchHotspotEvent(menuItemType, coords);
             hideContextMenu();
         },
@@ -171,6 +173,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         setSelectedHotspot(null);
     }, [panelState, decrementCounter, clearTargetIcon, closePanel, setSelectedHotspot]);
 
+
     // Close panel on outside click
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent): void => {
@@ -183,7 +186,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             ) {
                 return;
             }
-
+            closePanel();
             setSelectedHotspot(null);
         };
 
@@ -206,7 +209,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     }
 
     return (
-        <>
+        <div className="viewer_container">
             <div
                 ref={viewerRef}
                 className="panorama-viewer"
@@ -227,14 +230,13 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 />
             )}
 
-            {isEditMode && targetIconPosition && (
+            {isTargetIconVisible && (
                 <div
                     style={{
                         top: targetIconPosition.y,
                         left: targetIconPosition.x,
                     }}
                     className="panorama-viewer__target-icon"
-                    aria-hidden="true"
                 >
                     <PiTargetBold />
                 </div>
@@ -250,7 +252,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                     pannelState={panelState.state}
                 />
             )}
-        </>
+        </div>
     );
 };
 
