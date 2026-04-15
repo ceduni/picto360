@@ -143,9 +143,9 @@ export class Store {
     }
 
     public setViewerInstance(viewerInstance: PannellumViewer | null): void {
-        this.setState({ 
-            viewerInstance, 
-            isViewerReady: viewerInstance !== null 
+        this.setState({
+            viewerInstance,
+            isViewerReady: viewerInstance !== null
         });
     }
 
