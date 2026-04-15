@@ -59,6 +59,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   ];
 
   const [exportFormat, setExportFormat] = useState<ExportFormat>("picto");
+  const [includeLocalFiles, setIncludeLocalFiles] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [, setExportStatus] = useState<ExportStatus>("idle");
 
@@ -84,6 +85,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         fileName: projectTitle || "Untitled",
         folderName: `Picto360 deg ${projectTitle || "Untitled"} Annotations`,
         includeMetadata: true,
+        includeLocalFiles,
       });
 
       await startDriveAuth(viewerId, { autoExport: true });
@@ -97,6 +99,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     imageBlob: Blob,
     annotations?: HotspotData[],
     fileName?: string,
+    assets?: NonNullable<Awaited<ReturnType<typeof getViewerItem>>>["assets"],
   ) => {
     try {
       const resolvedFileName = fileName || "Untitled";
@@ -108,7 +111,9 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
           fileName: resolvedFileName,
           folderName: `Picto360 deg ${resolvedFileName} Annotations`,
           includeMetadata: true,
+          includeLocalFiles,
         },
+        assets,
       );
 
       if (result.success) {
@@ -134,6 +139,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     imageBlob: Blob,
     annotations?: HotspotData[],
     fileName?: string,
+    assets?: NonNullable<Awaited<ReturnType<typeof getViewerItem>>>["assets"],
   ) => {
     try {
       await driveService.exportToDisk(
@@ -141,6 +147,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         fileName || "Untitled",
         exportFormat,
         annotations && annotations.length > 0 ? annotations : undefined,
+        {
+          includeLocalFiles,
+        },
+        assets,
       );
       setBannerMessage({ message: "Fichier exporte avec succes vers le disque", type: "success" });
     } catch (_error) {
@@ -160,6 +170,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     const imageBlob = viewerItem?.compressedBlob;
     const annotations = viewerItem?.annotations;
     const fileName = viewerItem?.name || "Untitled";
+    const assets = viewerItem?.assets;
 
     if (!imageBlob) {
       setBannerMessage({ message: "No image found, upload an image", type: "warning" });
@@ -174,12 +185,12 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         setExportStatus("exporting");
         // onDriveExportStart(fileName);
         setIsPopupOpen(false);
-        await exportToDrive(imageBlob, annotations, fileName);
+        await exportToDrive(imageBlob, annotations, fileName, assets);
         break;
       case "disk":
       default:
         setExportStatus("exporting");
-        await exportToDisk(imageBlob, annotations, fileName);
+        await exportToDisk(imageBlob, annotations, fileName, assets);
     }
 
     return null;
@@ -250,6 +261,16 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
               )}
             </div>
           </div>
+          {exportFormat === "picto" && (
+            <label className="settings-modal__section" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={includeLocalFiles}
+                onChange={(event) => setIncludeLocalFiles(event.target.checked)}
+              />
+              <span>Inclure les fichiers locaux integres</span>
+            </label>
+          )}
         </div>
 
         <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>

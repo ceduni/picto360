@@ -1,4 +1,4 @@
-import { HotspotData } from "@/utils/Types";
+import { HotspotData, ViewerItem, StoredViewerAsset } from "@/utils/Types";
 
 const DB = "viewer-db";
 const VIEWER_STORE = "viewerItems";
@@ -21,21 +21,14 @@ function open(): Promise<IDBDatabase> {
   });
 }
 
-interface ViewerItem {
-  id: string;
-  name?:string;
-  blob: Blob;
-  annotations?: HotspotData[];
-  compressedBlob?:Blob;
-}
-
 // ---------------- PUT ----------------
 export async function putViewerItem(
   id: string,
   name?:string,
   blob?: Blob,
-  annotations?: HotspotData[],
+  annotations?: ViewerItem["annotations"],
   compressedBlob?:Blob,
+  assets?: StoredViewerAsset[],
 ) {
   const db = await open();
   await new Promise<void>((res, rej) => {
@@ -59,6 +52,7 @@ export async function putViewerItem(
         blob: blob ?? existing!.blob,   // guaranteed safe if existing or blob provided
         compressedBlob: compressedBlob ?? existing?.compressedBlob ?? blob ?? existing!.blob ,
         annotations: annotations ?? existing?.annotations ?? [],
+        assets: assets ?? existing?.assets ?? [],
       };
 
       const putReq = store.put(updated);

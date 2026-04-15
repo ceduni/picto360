@@ -105,6 +105,7 @@ export function useAutoDriveExport({
         }
 
         const annotations = viewerItem?.annotations || [];
+        const assets = viewerItem?.assets;
         const resolvedFileName = pendingExport.fileName || viewerItem?.name || "Untitled";
 
         onDriveExportStart?.(resolvedFileName);
@@ -117,9 +118,11 @@ export function useAutoDriveExport({
             fileName: resolvedFileName,
             folderName:
               pendingExport.folderName ||
-              `Picto360° ${resolvedFileName} Annotations`,
+              `Picto360 ${resolvedFileName} Annotations`,
             includeMetadata: pendingExport.includeMetadata ?? true,
+            includeLocalFiles: pendingExport.includeLocalFiles ?? false,
           },
+          assets,
         );
 
         if (!isCancelled) {

@@ -1,4 +1,11 @@
-import { ExportFormat, HotspotData, ExportOptions, ExportResult, FileToExport } from "@/utils/Types";
+import {
+    ExportFormat,
+    HotspotData,
+    ExportOptions,
+    ExportResult,
+    FileToExport,
+    StoredViewerAsset,
+} from "@/utils/Types";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
 
 
@@ -8,6 +15,7 @@ class ExportService {
         fileName: "Untitled",
         folderName: "",
         includeMetadata: true,
+        includeLocalFiles: false,
     };
 
     constructor(baseUrl: string = import.meta.env.VITE_API_URL || 'http://localhost:5000') {
@@ -21,7 +29,8 @@ class ExportService {
         imageBlob: Blob,
         annotations: HotspotData[],
         format: ExportFormat,
-        options: ExportOptions = {}
+        options: ExportOptions = {},
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<ExportResult> {
         const mergedOptions = { ...this.defaultOptions, ...options };
 
@@ -30,7 +39,8 @@ class ExportService {
                 imageBlob,
                 annotations,
                 format,
-                mergedOptions
+                mergedOptions,
+                viewerAssets,
             );
 
             const response = await this.sendToDrive(formData);
@@ -104,14 +114,19 @@ class ExportService {
         imageBlob: Blob,
         fileName: string,
         format: ExportFormat,
-        annotations?: HotspotData[]
+        annotations?: HotspotData[],
+        options: ExportOptions = {},
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<void> {
         try {
+            const mergedOptions = { ...this.defaultOptions, ...options };
             const files = await this.prepareFilesForDiskExport(
                 imageBlob,
                 fileName,
                 format,
-                annotations
+                annotations,
+                mergedOptions,
+                viewerAssets,
             );
 
             if (this.isFileSystemAccessSupported()) {
@@ -238,7 +253,8 @@ class ExportService {
         imageBlob: Blob,
         annotations: HotspotData[],
         format: ExportFormat,
-        options: Required<ExportOptions>
+        options: Required<ExportOptions>,
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<FormData> {
         const formData = new FormData();
         formData.append("format", format);
@@ -246,7 +262,7 @@ class ExportService {
         if (format === "raw") {
             this.appendRawFileData(formData, imageBlob, annotations, options);
         } else {
-            await this.appendPictoFileData(formData, imageBlob, annotations, options);
+            await this.appendPictoFileData(formData, imageBlob, annotations, options, viewerAssets);
         }
 
         if (options.fileName) {
@@ -286,12 +302,17 @@ class ExportService {
         formData: FormData,
         imageBlob: Blob,
         annotations: HotspotData[],
-        options: Required<ExportOptions>
+        options: Required<ExportOptions>,
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<void> {
         const pictoFile = await CustomFileExporter.createPictoFile(
             imageBlob,
             annotations,
-            { filename: options.fileName }
+            {
+                filename: options.fileName,
+                includeLocalFiles: options.includeLocalFiles,
+                viewerAssets,
+            }
         );
 
         formData.append("file", pictoFile);
@@ -327,10 +348,12 @@ class ExportService {
         imageBlob: Blob,
         fileName: string,
         format: ExportFormat,
-        annotations?: HotspotData[]
+        annotations?: HotspotData[],
+        options?: Required<ExportOptions>,
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<FileToExport[]> {
         if (format === "picto") {
-            return await this.preparePictoFiles(imageBlob, fileName, annotations);
+            return await this.preparePictoFiles(imageBlob, fileName, annotations, options, viewerAssets);
         }
 
         return this.prepareRawFiles(imageBlob, fileName, annotations);
@@ -342,12 +365,18 @@ class ExportService {
     private async preparePictoFiles(
         imageBlob: Blob,
         fileName: string,
-        annotations?: HotspotData[]
+        annotations?: HotspotData[],
+        options?: Required<ExportOptions>,
+        viewerAssets?: StoredViewerAsset[],
     ): Promise<FileToExport[]> {
         const pictoFile = await CustomFileExporter.createPictoFile(
             imageBlob,
             annotations,
-            { filename: fileName }
+            {
+                filename: fileName,
+                includeLocalFiles: options?.includeLocalFiles,
+                viewerAssets,
+            }
         );
 
         return [

@@ -1,3 +1,22 @@
+export type HotspotAssetSource = "url" | "local";
+
+export type StoredViewerAssetKind = "image" | "video";
+
+export interface PendingHotspotAsset {
+  blob: Blob;
+  fileName: string;
+  mimeType: string;
+  kind: StoredViewerAssetKind;
+}
+
+export interface StoredViewerAsset {
+  id: string;
+  blob: Blob;
+  fileName: string;
+  mimeType: string;
+  kind: StoredViewerAssetKind;
+}
+
 export interface HotspotData {
   id: string;
   pitch: number;
@@ -7,6 +26,11 @@ export interface HotspotData {
   url_text?: string;
   sceneId?: string;
   cssClass?: string;
+  assetId?: string;
+  assetSource?: HotspotAssetSource;
+  mimeType?: string;
+  fileName?: string;
+  pendingAsset?: PendingHotspotAsset;
   meta?: Record<string, unknown>; // optional metadata for custom cases
 }
 
@@ -112,6 +136,7 @@ export interface ExportOptions {
   fileName?: string;
   folderName?: string;
   includeMetadata?: boolean;
+  includeLocalFiles?: boolean;
 }
 
 export interface ExportResult {
@@ -166,6 +191,15 @@ export interface DriveExportProgressState {
 export interface FileToExport {
   name: string;
   blob: Blob;
+}
+
+export interface ViewerItem {
+  id: string;
+  name?: string;
+  blob: Blob;
+  annotations?: HotspotData[];
+  compressedBlob?: Blob;
+  assets?: StoredViewerAsset[];
 }
 
 //---------------- Hotspots -------------------------
