@@ -262,14 +262,18 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
             </div>
           </div>
           {exportFormat === "picto" && (
-            <label className="settings-modal__section" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div className="settings-modal__section_horizontal">
               <input
+                id="include-local-files"
                 type="checkbox"
                 checked={includeLocalFiles}
                 onChange={(event) => setIncludeLocalFiles(event.target.checked)}
+                className="settings-modal__checkbox"
               />
-              <span>Inclure les fichiers locaux integres</span>
-            </label>
+              <label htmlFor="include-local-files" className="settings-modal__label">
+                Inclure les fichiers locaux intégrés
+              </label>
+            </div>
           )}
         </div>
 
