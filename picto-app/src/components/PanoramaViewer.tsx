@@ -57,6 +57,12 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     // Hotspot click handler
     const handleHotspotClick = useCallback(
         (event: MouseEvent, hotspot: HotspotData): void => {
+            const target = event.target as HTMLElement | null;
+
+            if (target?.closest("a")) {
+                return;
+            }
+
             event.preventDefault();
             setSelectedHotspot(hotspot);
             openPanel("editing");
