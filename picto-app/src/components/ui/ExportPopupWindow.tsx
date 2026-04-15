@@ -112,7 +112,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         onExportSuccess();
         setBannerMessage({ message: "Exporte avec succes vers le drive", type: "success" });
       } else {
-<<<<<<< feat/export-to-drive-progress-pannel
         const errorMessage = result.error || "Export failed";
         onExportFailure(errorMessage);
         setBannerMessage({ message: "Export echoue, essayez a nouveau", type: "failure" });
@@ -120,19 +119,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Export failed";
       onExportFailure(errorMessage);
-=======
-        // const errorMessage = result.error || "Export failed";
-        // onDriveExportFailure(errorMessage);
-        setExportStatus("failure");
-        setBannerMessage({ message: "Export echoue, essayez a nouveau", type: "failure" });
-      }
-    } catch (error) {
-      // const errorMessage = error instanceof Error ? error.message : "Export failed";
-      // onDriveExportFailure(errorMessage);
-      setExportStatus("failure");
-    } finally {
-      setIsExporting(false);
->>>>>>> main
     }
   };
 
