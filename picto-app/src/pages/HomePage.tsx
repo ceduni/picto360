@@ -42,6 +42,7 @@ const HomePage = () => {
                 break;
             case "jpg":
             case "JPG":
+            case "JPEG":
             case "jpeg":
             case "png":
                 await putViewerItem(viewerId, undefined, newImageSrc, undefined);

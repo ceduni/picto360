@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import {
@@ -35,6 +35,15 @@ export function useAutoDriveExport({
   const navigate = useNavigate();
   const driveService = useMemo(() => getExportService(), []);
   const { bannerRef, setBannerMessage } = useFeedbackBanner();
+
+  // ✅ Use refs to avoid stale closure issues
+  const callbacksRef = useRef({ onDriveExportStart, onDriveExportSuccess, onDriveExportFailure });
+  const cancelledRef = useRef(false);
+
+  // Update ref whenever callbacks change
+  useEffect(() => {
+    callbacksRef.current = { onDriveExportStart, onDriveExportSuccess, onDriveExportFailure };
+  }, [onDriveExportStart, onDriveExportSuccess, onDriveExportFailure]);
 
   const clearOAuthSearchParams = useCallback(() => {
     const params = new URLSearchParams(location.search);
@@ -85,7 +94,8 @@ export function useAutoDriveExport({
       return;
     }
 
-    let isCancelled = false;
+    // ✅ Reset cancel flag for this effect run
+    cancelledRef.current = false;
 
     const runAutoExport = async () => {
       setIsHandlingAutoExport(true);
@@ -108,7 +118,8 @@ export function useAutoDriveExport({
         const assets = viewerItem?.assets;
         const resolvedFileName = pendingExport.fileName || viewerItem?.name || "Untitled";
 
-        onDriveExportStart?.(resolvedFileName);
+        // ✅ Call current callback from ref (always latest version)
+        callbacksRef.current.onDriveExportStart?.(resolvedFileName);
 
         const result = await driveService.exportToGoogleDrive(
           imageBlob,
@@ -125,9 +136,15 @@ export function useAutoDriveExport({
           assets,
         );
 
-        if (!isCancelled) {
+        console.log("Automatic export result:", result);
+        console.log("Cancelled flag:", cancelledRef.current);
+
+        if (!cancelledRef.current) {
+          console.log("Automatic export not cancelled, ✅ processing result");
           if (result.success) {
-            onDriveExportSuccess?.();
+            // ✅ Call current callback from ref (always latest version)
+            console.log("Automatic export successful, calling success callback");
+            callbacksRef.current.onDriveExportSuccess?.();
             setBannerMessage({
               message: "Exported successfully to Google Drive",
               type: "success",
@@ -137,8 +154,9 @@ export function useAutoDriveExport({
           }
         }
       } catch (error) {
-        if (!isCancelled) {
-          onDriveExportFailure?.(
+        if (!cancelledRef.current) {
+          // ✅ Call current callback from ref (always latest version)
+          callbacksRef.current.onDriveExportFailure?.(
             error instanceof Error
               ? error.message
               : "Automatic export failed",
@@ -153,7 +171,7 @@ export function useAutoDriveExport({
         }
       } finally {
         clearPendingDriveExport();
-        if (!isCancelled) {
+        if (!cancelledRef.current) {
           clearOAuthSearchParams();
           setIsHandlingAutoExport(false);
         }
@@ -163,19 +181,17 @@ export function useAutoDriveExport({
     void runAutoExport();
 
     return () => {
-      isCancelled = true;
+      cancelledRef.current = true;
     };
   }, [
     clearOAuthSearchParams,
     driveAuthStatus?.isAuthenticated,
     driveService,
-    isHandlingAutoExport,
     location.search,
     setBannerMessage,
     viewerId,
-    onDriveExportFailure,
-    onDriveExportStart,
-    onDriveExportSuccess,
+    // ✅ Removed isHandlingAutoExport - it's set inside this effect, not a dependency
+    // ✅ Removed callbacks from dependency array - they're captured via ref now
   ]);
 
   return { bannerRef, isHandlingAutoExport };

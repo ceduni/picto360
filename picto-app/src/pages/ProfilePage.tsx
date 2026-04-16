@@ -79,10 +79,11 @@ const ProfilePage: React.FC = () => {
 
                     <div onClick={handleGoBack} className="back_button">
                         <LuArrowLeft size={24} strokeWidth={3} />
-                        <h2>Back</h2>
                     </div>
-                    <img className="login-page__logo"
-                        src="/images/logo_picto360.png" alt="Logo-picto360" />
+                    <h1 className="profile_title">Mon Profil</h1>
+                    {/* <img className="login-page__logo"
+                        src="/images/logo_picto360.png" alt="Logo-picto360"
+                        /> */}
                 </div>
 
                 <div className="profile_main_content">

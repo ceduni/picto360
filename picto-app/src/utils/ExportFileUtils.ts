@@ -52,61 +52,6 @@ class ExportService {
         }
     }
 
-    // Export to Google Drive via backend
-    async _exportToGoogleDrive(
-        imageBlob: Blob,
-        annotations: HotspotData[],
-        format: ExportFormat | string,
-        options: {
-            fileName?: string;
-            folderName?: string;
-            includeMetadata?: boolean;
-        } = {},
-    ): Promise<unknown> {
-        try {
-            const formData = new FormData();
-            formData.append("format", format);
-
-            switch (format) {
-                case "raw":
-                    formData.append("file", new File([imageBlob], options.fileName || "Untitled",
-                        { type: imageBlob.type || "image/jpeg" }));
-                    formData.append('annotations', JSON.stringify(annotations));
-                    formData.append('includeMetadata', String(options.includeMetadata ?? true));
-                    break;
-                case "picto":
-                default:
-                    const fileExporter = await CustomFileExporter.createPictoFile(imageBlob, annotations, { filename: options.fileName });
-                    formData.append("file", fileExporter);
-                    formData.append('includeMetadata', String(false));
-            }
-
-            if (options.fileName) {
-                formData.append('fileName', options.fileName);
-            }
-            if (options.folderName) {
-                formData.append('folderName', options.folderName);
-            }
-
-            const response = await fetch(`${this.baseUrl}/api/drive/export`, {
-                method: 'POST',
-                body: formData,
-                credentials: "include",
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Export failed');
-            }
-            return result;
-
-        } catch (error) {
-            throw new Error(`Export failed: ${error}`);
-        }
-    }
-
-
     /**
      * Export files to local disk
      */
@@ -168,7 +113,7 @@ class ExportService {
                 const options = { mode: "readwrite" }
                 const dirHandle = await (window as any).showDirectoryPicker(options);
 
-                // change files to export according to the format choosed                                                      
+                // change files to export according to the format choosed
                 if (files && format === "picto") {
                     const fileExporter = await CustomFileExporter.createPictoFile(blob, annotations, { filename: fileName });
                     files = [{ name: fileName + ".picto", blob: fileExporter }]
@@ -183,7 +128,7 @@ class ExportService {
                     await this.exportToDiskWithSave(dirHandle, file.blob, file.name);
                 }
                 console.log(`✅ Export completed `);
-                // setBannerMessage({message:"Exporté avec succes vers le disk",type:"success"})            
+                // setBannerMessage({message:"Exporté avec succes vers le disk",type:"success"})
 
                 return;
             } catch (err: any) {
@@ -195,7 +140,7 @@ class ExportService {
         }
 
 
-        // change files to export according to the format choosed                                                      
+        // change files to export according to the format choosed
         if (files && format === "picto") {
             const fileExporter = await CustomFileExporter.createPictoFile(blob, annotations, { filename: fileName });
             files = [{ name: fileName + ".picto", blob: fileExporter }]

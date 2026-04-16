@@ -7,12 +7,20 @@ import {
 } from "@/utils/Types";
 import { useEffect, useState } from "react";
 
-export function useServerSentAuth() {
+export function useServerSentAuth(
+  {
+  setUploadProgress,
+  setExportStatus,
+  setExportError,
+  setUploadComplete,
+}: {
+  setUploadProgress: React.Dispatch<React.SetStateAction<UploadProgress | null>>;
+  setExportStatus: React.Dispatch<React.SetStateAction<ExportStatusEvent | null>>;
+  setExportError: React.Dispatch<React.SetStateAction<ExportErrorEvent | null>>;
+  setUploadComplete: React.Dispatch<React.SetStateAction<UploadCompleteEvent | null>>;
+}
+) {
   const [driveAuthStatus, setAuthStatus] = useState<DriveAuthStatus | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
-  const [exportStatus, setExportStatus] = useState<ExportStatusEvent | null>(null);
-  const [exportError, setExportError] = useState<ExportErrorEvent | null>(null);
-  const [uploadComplete, setUploadComplete] = useState<UploadCompleteEvent | null>(null);
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   // async function getDriveAuthStatus() {
@@ -75,5 +83,5 @@ export function useServerSentAuth() {
     };
   }, []);
 
-  return { driveAuthStatus, uploadProgress, exportStatus, exportError, uploadComplete };
+  return { driveAuthStatus, /*uploadProgress, exportStatus, exportError, uploadComplete*/ };
 }

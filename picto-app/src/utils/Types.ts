@@ -167,7 +167,7 @@ export interface UploadCompleteEvent {
   fileId?: string;
 }
 
-export type DriveExportPhase =
+export type ExportPhase =
   | "idle"
   | "preparing"
   | "folder_created"
@@ -176,10 +176,10 @@ export type DriveExportPhase =
   | "success"
   | "failure";
 
-export interface DriveExportProgressState {
+export interface ExportProgressState {
   isOpen: boolean;
   isActive: boolean;
-  phase: DriveExportPhase;
+  phase: ExportPhase;
   title: string;
   detail: string;
   progressPercent: number | null;
