@@ -34,7 +34,7 @@ interface ExportPopupProps {
   driveAuthStatus: DriveAuthStatus | null;
 }
 
-// type ExportStatus = "idle" | "exporting" | "success" | "failure";
+type ExportStatus = "idle" | "exporting" | "success" | "failure";
 
 const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   isOpen,
@@ -60,7 +60,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
 
   const [exportFormat, setExportFormat] = useState<ExportFormat>("picto");
   const [includeLocalFiles, setIncludeLocalFiles] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
   const [, setExportStatus] = useState<ExportStatus>("idle");
 
   const handlePopupClose = () => {
