@@ -51,15 +51,15 @@ export const useHotspotManager = ({
             }
 
             try {
-                console.log(`📍 Adding hotspot ${hotspotData.id} to viewer:`);
-                console.log('   Input data:', {
-                    id: hotspotData.id,
-                    pitch: hotspotData.pitch,
-                    yaw: hotspotData.yaw,
-                    type: hotspotData.type,
-                    cssClass: hotspotData.cssClass,
-                    content: hotspotData.content
-                });
+                // console.log(`📍 Adding hotspot ${hotspotData.id} to viewer:`);
+                // console.log('   Input data:', {
+                //     id: hotspotData.id,
+                //     pitch: hotspotData.pitch,
+                //     yaw: hotspotData.yaw,
+                //     type: hotspotData.type,
+                //     cssClass: hotspotData.cssClass,
+                //     content: hotspotData.content
+                // });
 
                 viewerInstance.removeHotSpot(hotspotData.id);
                 const hotspotInstance = createHotspotInstance(hotspotData, onHotspotClick);

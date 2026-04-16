@@ -1,0 +1,110 @@
+.export-progress-modal-backdrop {
+    z-index: 1200;
+}
+
+.export-progress-modal {
+    max-width: 540px;
+}
+
+.export-progress-modal__content {
+    gap: 20px;
+}
+
+.export-progress-modal__title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.export-progress-modal__subtitle {
+    margin: 0;
+    color: #687387;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.export-progress-modal__status-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: linear-gradient(180deg, #f8fbff 0%, #f1f6ff 100%);
+    border: 1px solid #dbe8ff;
+    border-radius: 12px;
+}
+
+.export-progress-modal__status-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: #1c73fa;
+    margin-top: 2px;
+}
+
+.export-progress-modal__status-icon--success {
+    color: #1c9b5f;
+}
+
+.export-progress-modal__status-icon--failure {
+    color: #d63a3a;
+}
+
+.export-progress-modal__status-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.export-progress-modal__detail,
+.export-progress-modal__meta {
+    margin: 0;
+    color: #282828;
+}
+
+.export-progress-modal__detail {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.export-progress-modal__meta {
+    font-size: 13px;
+    color: #5b6576;
+}
+
+.export-progress-modal__progress-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.export-progress-modal__progress-bar {
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    background-color: #e5ecf7;
+    border-radius: 999px;
+}
+
+.export-progress-modal__progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1c73fa 0%, #39a7ff 100%);
+    transition: width 0.25s ease;
+}
+
+.export-progress-modal__progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #36528f;
+    align-self: flex-end;
+}
+
+.export-progress-modal__error {
+    padding: 12px 14px;
+    color: #8a1f1f;
+    background-color: #fff1f1;
+    border: 1px solid #f4b2b2;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}

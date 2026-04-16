@@ -21,10 +21,10 @@
     align-items: center;
     justify-content: center;
     margin: 2vh 0 3vh 0;
-    height: 35vh;
+    height: 45vh;
     width: 100%;
     border: 4px dashed transparent;
-    
+
     cursor: pointer;
     transition: .3s;
 }

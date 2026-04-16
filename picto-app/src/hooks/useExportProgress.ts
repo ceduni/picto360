@@ -1,5 +1,5 @@
 import {
-  DriveExportProgressState,
+  ExportProgressState,
   ExportErrorEvent,
   ExportStatusEvent,
   UploadCompleteEvent,
@@ -7,7 +7,7 @@ import {
 } from "@/utils/Types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-interface UseDriveExportProgressParams {
+interface UseExportProgressParams {
   uploadProgress: UploadProgress | null;
   exportStatus: ExportStatusEvent | null;
   exportError: ExportErrorEvent | null;
@@ -16,7 +16,7 @@ interface UseDriveExportProgressParams {
 
 const SUCCESS_CLOSE_DELAY_MS = 1600;
 
-const idleState: DriveExportProgressState = {
+const idleState: ExportProgressState = {
   isOpen: false,
   isActive: false,
   phase: "idle",
@@ -25,13 +25,13 @@ const idleState: DriveExportProgressState = {
   progressPercent: null,
 };
 
-export function useDriveExportProgress({
+export function useExportProgress({
   uploadProgress,
   exportStatus,
   exportError,
   uploadComplete,
-}: UseDriveExportProgressParams) {
-  const [progressState, setProgressState] = useState<DriveExportProgressState>(idleState);
+}: UseExportProgressParams) {
+  const [progressState, setProgressState] = useState<ExportProgressState>(idleState);
   const closeTimerRef = useRef<number | null>(null);
 
   const clearCloseTimer = useCallback(() => {
@@ -143,6 +143,8 @@ export function useDriveExportProgress({
       return;
     }
 
+    // ✅ Show finalizing state (SSE sent before HTTP response completes)
+    // Will transition to success when HTTP response returns
     setProgressState((current) => ({
       ...current,
       isOpen: true,

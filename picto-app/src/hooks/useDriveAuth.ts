@@ -43,9 +43,9 @@ export function clearPendingDriveExport() {
 
 export function useDriveAuth() {
   const location = useLocation();
-  
+
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  
+
   async function startDriveAuth(viewerId?: string, options: StartDriveAuthOptions = {}) {
     if (!viewerId || viewerId === undefined) throw new Error("viewerId missing in URL");
     const returnTo = options.returnTo || location.pathname + location.search;
@@ -53,7 +53,7 @@ export function useDriveAuth() {
     // Fallbacks in case 'state' gets lost
     sessionStorage.setItem(OAUTH_VIEWER_ID_KEY, viewerId);
     sessionStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
-    
+
     const authUrl = await getAuthUrl(viewerId, returnTo, options.autoExport === true);
     window.location.href = authUrl; // go to Google
   }
@@ -70,7 +70,7 @@ export function useDriveAuth() {
         body: JSON.stringify({ returnTo, viewerId }),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to get auth URL');
       }
@@ -79,7 +79,7 @@ export function useDriveAuth() {
     } catch (error) {
       throw new Error(`Failed to get auth URL: ${error}`);
     }
-  }  
+  }
 
 
   async function logoutFromDrive() {
@@ -90,5 +90,5 @@ export function useDriveAuth() {
     if (!res.ok) throw new Error("Logout failed");
   }
 
-  return { startDriveAuth,logoutFromDrive };
+  return { startDriveAuth, logoutFromDrive };
 }

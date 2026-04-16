@@ -53,10 +53,8 @@ export class ExportService {
       oauth2Client.setCredentials({ access_token: accessToken });
 
       // Create storage provider
-      if (!this.googleStorageProvider) {
-        this.googleStorageProvider = new GoogleDriveStorageProvider(oauth2Client);
-      }
-      const storage = this.googleStorageProvider;
+      const storage = new GoogleDriveStorageProvider(oauth2Client);
+      this.googleStorageProvider = storage; // Store for potential reuse
 
       // Create export folder
       const folderName = input.options.folderName || "360° Image Annotations";
