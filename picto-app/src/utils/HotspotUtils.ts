@@ -27,24 +27,18 @@ export const getIconForType = (type: string): JSX.Element => {
 
 
 const adjustTooltipPosition = (element: HTMLElement) => {
-    //   debugLog("HotspotManager - Adjusting element position", element);
     requestAnimationFrame(() => {
-        // Anchoring the tooltip to the tip at the bottom
-        const tooltipHeight = element.offsetHeight;
-        element.style.marginTop = `-${tooltipHeight + 15}px`;
-
-        // Horizontal positioning adjustment if element overflows the screen
+        // Tooltip vertical anchoring is handled in CSS.
+        // Runtime adjustment only clamps horizontal overflow.
         const elementRect = element.getBoundingClientRect();
         if (elementRect.right > window.innerWidth) {
             element.style.left = `${window.innerWidth - elementRect.width - 10}px`;
+            element.style.transform = "translateX(0)";
+        } else {
+            element.style.left = "50%";
+            element.style.transform = "translateX(-50%)";
         }
 
-        // debugLog("HotspotManager - Adjusted element position", {
-        //   width: element.style.width,
-        //   maxWidth: element.style.maxWidth,
-        //   marginTop: element.style.marginTop,
-        //   left: element.style.left,
-        // });
     });
 };
 
@@ -59,13 +53,14 @@ export const renderTooltipContent = (
     return (hotSpotDiv: HTMLElement) => {
         console.log("Generating tooltip content", { type, content, editable, charLimit });
 
-        // if (type !== "label") {
         hotSpotDiv.classList.add("hotspot-manager__custom-tooltip");
+        if (type === "label") {
+            hotSpotDiv.classList.add("hotspot-manager__custom-tooltip--persistent");
+        }
+
         const iconDiv = document.createElement("div");
         iconDiv.innerHTML = ReactDOMServer.renderToString(icon);
         hotSpotDiv.appendChild(iconDiv);
-
-        // }
 
         const span = document.createElement("span");
         span.className = "hotspot-manager__content";
@@ -77,6 +72,9 @@ export const renderTooltipContent = (
                     const textNode = document.createTextNode(content);
                     span.appendChild(textNode);
                     span.classList.add("hotspot-manager__content--text");
+                    if (type === "label") {
+                        span.classList.add("hotspot-manager__content--persistent");
+                    }
                 }
                 break;
             case "hyperlink":
@@ -138,7 +136,7 @@ export const createHotspotInstance = (
 ): HotspotInstance => {
     const icon = getIconForType(hotspot.type);
     const editable = hotspot.type === "text" || hotspot.type === "label";
-    const charLimit = hotspot.type === "text" ? 300 : 30;
+    const charLimit = hotspot.type === "text" ? 300 : 20;
 
     return {
         ...hotspot,

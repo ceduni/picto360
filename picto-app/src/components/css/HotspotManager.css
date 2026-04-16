@@ -52,8 +52,14 @@
 .hotspot-manager__custom-tooltip .hotspot-manager__content {
     display: none;
     /* visibility: hidden; */
+    bottom: calc(100% + 15px);
     left: 50%;
-    transform: translateX(-50%) translateY(-100%);
+    transform: translateX(-50%);
+}
+
+.hotspot-manager__custom-tooltip--persistent .hotspot-manager__content,
+.hotspot-manager__custom-tooltip .hotspot-manager__content--persistent {
+    display: flex;
 }
 
 .hotspot-manager__label {
@@ -73,6 +79,10 @@
 .hotspot-manager__custom-tooltip:hover .hotspot-manager__content {
     display: inline;
     /* visibility: visible; */
+}
+
+.hotspot-manager__custom-tooltip--persistent:hover .hotspot-manager__content {
+    display: flex;
 }
 
 /* Tooltip's tip */
