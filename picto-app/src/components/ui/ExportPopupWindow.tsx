@@ -59,12 +59,9 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   ];
 
   const [exportFormat, setExportFormat] = useState<ExportFormat>("picto");
-<<<<<<< feat/export-with-images
   const [includeLocalFiles, setIncludeLocalFiles] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [, setExportStatus] = useState<ExportStatus>("idle");
-=======
->>>>>>> main
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -179,7 +176,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
 
     switch (destination) {
       case "drive":
-<<<<<<< feat/export-with-images
         setExportStatus("exporting");
         // onDriveExportStart(fileName);
         setIsPopupOpen(false);
@@ -189,14 +185,6 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
       default:
         setExportStatus("exporting");
         await exportToDisk(imageBlob, annotations, fileName, assets);
-=======
-        await exportToDrive(imageBlob, annotations, fileName);
-        break;
-      case "disk":
-      default:
-        await exportToDisk(imageBlob, annotations, fileName);
-        break;
->>>>>>> main
     }
 
     return null;
