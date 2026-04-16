@@ -80,8 +80,21 @@ export const renderTooltipContent = (
                 }
                 break;
             case "hyperlink":
-                span.innerHTML = `<a href="${url}" target="_blank">${content}</a>`;
-                break
+                {
+                    const link = document.createElement("a");
+                    link.href = url ?? content;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                    link.textContent = content;
+
+                    // Keep the hotspot container click handler from swallowing link navigation.
+                    link.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                    });
+
+                    span.appendChild(link);
+                }
+                break;
             case "forme":
                 span.innerHTML = content;
                 break;
