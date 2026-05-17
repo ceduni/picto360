@@ -169,7 +169,10 @@ export class CustomFileExporter {
     if (!imageFile) {
       throw new Error("Invalid custom 360 file: missing image");
     }
-    const imageBlob = await imageFile.async("blob");
+    const imageBlob = new Blob(
+      [await imageFile.async("arraybuffer")],
+      { type: getImageMimeType(metadata.imageInfo.format) },
+    );
 
     const assets = await this.extractBundledAssets(zip, manifest?.embeddedAssets);
 
@@ -193,9 +196,14 @@ export class CustomFileExporter {
           throw new Error(`Invalid custom 360 file: missing asset ${entry.path}`);
         }
 
+        const assetBlob = new Blob(
+          [await assetFile.async("arraybuffer")],
+          { type: entry.mimeType || "application/octet-stream" },
+        );
+
         return {
           id: entry.id,
-          blob: await assetFile.async("blob"),
+          blob: assetBlob,
           fileName: entry.fileName,
           mimeType: entry.mimeType,
           kind: entry.kind,
@@ -222,4 +230,18 @@ export class CustomFileExporter {
 
 function sanitizeFilename(fileName: string): string {
   return fileName.replace(/[<>:"/\\|?*]+/g, "_");
+}
+
+function getImageMimeType(format?: string): string {
+  switch (format?.toLowerCase()) {
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "webp":
+      return "image/webp";
+    default:
+      return "application/octet-stream";
+  }
 }
