@@ -115,6 +115,7 @@ export function useAutoDriveExport({
         }
 
         const annotations = viewerItem?.annotations || [];
+        const assets = viewerItem?.assets;
         const resolvedFileName = pendingExport.fileName || viewerItem?.name || "Untitled";
 
         // ✅ Call current callback from ref (always latest version)
@@ -128,9 +129,11 @@ export function useAutoDriveExport({
             fileName: resolvedFileName,
             folderName:
               pendingExport.folderName ||
-              `Picto360° ${resolvedFileName} Annotations`,
+              `Picto360 ${resolvedFileName} Annotations`,
             includeMetadata: pendingExport.includeMetadata ?? true,
+            includeLocalFiles: pendingExport.includeLocalFiles ?? false,
           },
+          assets,
         );
 
         console.log("Automatic export result:", result);
