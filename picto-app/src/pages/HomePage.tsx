@@ -96,6 +96,7 @@ const HomePage = () => {
 
                 <section className="home-page__content">
                     <ImageUploader onImageUpload={handleImageUpload} />
+                    {__ENABLE_ADMIN__ && (
                     <div className="home-page__login_container">
                         {userLoggedIn ? (
                             <button type="button" className="home-page__btn-create-group">
@@ -111,6 +112,7 @@ const HomePage = () => {
                             Créer une activité
                         </button>
                     </div>
+                    )}
                 </section>
             </div>
 
