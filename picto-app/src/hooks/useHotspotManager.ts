@@ -1,7 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { HotspotData, PannellumViewer } from "@/utils/Types";
-import { putViewerItem } from "@/utils/storedImageData";
+import { putViewerItem, getViewerItem } from "@/utils/storedImageData";
 import { createHotspotInstance, deleteHotspotInstance } from "@/utils/HotspotUtils";
+import { resolveHotspotPersistence } from "@/utils/HotspotAssetUtils";
 
 interface UseHotspotManagerProps {
     viewerId: string;
@@ -108,17 +109,26 @@ export const useHotspotManager = ({
 
     const createHotspot = useCallback(
         async (hotspotData: HotspotData): Promise<void> => {
-            if (!hotspotData.content) {
+            if (!hotspotData.content && !hotspotData.pendingAsset) {
                 throw new Error("Hotspot must have content");
             }
 
-            addHotspotToViewer(hotspotData);
-
-            const newHotspotList = [...hotspots, hotspotData];
-
             try {
-                await putViewerItem(viewerId, undefined, undefined, newHotspotList);
-                setHotspots(newHotspotList);
+                const viewerItem = await getViewerItem(viewerId);
+                const newHotspotList = [...hotspots, hotspotData];
+                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
+                const runtimeHotspot = resolved.runtimeHotspots[resolved.runtimeHotspots.length - 1];
+
+                await putViewerItem(
+                    viewerId,
+                    undefined,
+                    undefined,
+                    resolved.storedHotspots,
+                    undefined,
+                    resolved.assets,
+                );
+                setHotspots(resolved.runtimeHotspots);
+                addHotspotToViewer(runtimeHotspot);
             } catch (error) {
                 console.error("Failed to create hotspot:", error);
                 throw error;
@@ -134,10 +144,23 @@ export const useHotspotManager = ({
             );
 
             try {
-                await putViewerItem(viewerId, undefined, undefined, newHotspotList);
-                setHotspots(newHotspotList);
+                const viewerItem = await getViewerItem(viewerId);
+                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
+                const runtimeHotspot = resolved.runtimeHotspots.find((hs) => hs.id === updatedHotspot.id);
 
-                addHotspotToViewer(updatedHotspot);
+                await putViewerItem(
+                    viewerId,
+                    undefined,
+                    undefined,
+                    resolved.storedHotspots,
+                    undefined,
+                    resolved.assets,
+                );
+                setHotspots(resolved.runtimeHotspots);
+
+                if (runtimeHotspot) {
+                    addHotspotToViewer(runtimeHotspot);
+                }
             } catch (error) {
                 console.error("Failed to update hotspot:", error);
                 throw error;
@@ -155,8 +178,18 @@ export const useHotspotManager = ({
             const newHotspotList = hotspots.filter((hs) => hs.id !== toDeleteHotspot.id);
 
             try {
-                await putViewerItem(viewerId, undefined, undefined, newHotspotList);
-                setHotspots(newHotspotList);
+                const viewerItem = await getViewerItem(viewerId);
+                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
+
+                await putViewerItem(
+                    viewerId,
+                    undefined,
+                    undefined,
+                    resolved.storedHotspots,
+                    undefined,
+                    resolved.assets,
+                );
+                setHotspots(resolved.runtimeHotspots);
 
                 viewerInstance.removeHotSpot(toDeleteHotspot.id);
                 deleteHotspotInstance(viewerInstance, toDeleteHotspot);

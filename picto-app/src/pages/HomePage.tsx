@@ -26,7 +26,14 @@ const HomePage = () => {
             case "picto":
                 try {
                     const extractedFile = await CustomFileExporter.extractCustomFile(newImageSrc);
-                    await putViewerItem(viewerId, fileName, extractedFile.imageBlob, extractedFile.annotations);
+                    await putViewerItem(
+                        viewerId,
+                        fileName,
+                        extractedFile.imageBlob,
+                        extractedFile.annotations,
+                        undefined,
+                        extractedFile.assets,
+                    );
                     setBannerMessage({ message: "Fichier chargé avec succès", type: "success" });
                 } catch (error) {
                     setBannerMessage({ message: "Error on picto file", type: "failure" });

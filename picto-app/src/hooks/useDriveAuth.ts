@@ -8,6 +8,7 @@ export interface PendingDriveExport {
   fileName?: string;
   folderName?: string;
   includeMetadata?: boolean;
+  includeLocalFiles?: boolean;
 }
 
 interface StartDriveAuthOptions {
