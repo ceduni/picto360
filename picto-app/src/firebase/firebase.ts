@@ -3,13 +3,14 @@ import { getAuth } from "firebase/auth";
 
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const firebaseConfig = {
-  apiKey: "AIzaSyAUs_lHJckdNmppQ8Fw1TBArk_m078xOxw",
-  authDomain: "picto-360.firebaseapp.com",
-  projectId: "picto-360",
-  storageBucket: "picto-360.firebasestorage.app",
-  messagingSenderId: "58871127131",
-  appId: "1:58871127131:web:83945e299abb9f1a23b37e",
-  measurementId: "G-BT3EZ0TEZV"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
