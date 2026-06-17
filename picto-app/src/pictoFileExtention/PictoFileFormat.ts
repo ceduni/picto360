@@ -1,11 +1,12 @@
-import { HotspotData } from "@/utils/Types";
-import JSZip from 'jszip';
+import { HotspotData, StoredViewerAsset } from "@/utils/Types";
+import { prepareHotspotsForPictoExport } from "@/utils/HotspotAssetUtils";
+import JSZip from "jszip";
 
-type imageFormat = "picto"  ; // add supported format here
+type imageFormat = "picto";
 
 interface MergedFileMetadata {
   version: string;
-  format: imageFormat ;     
+  format: imageFormat;
   created: string;
   imageInfo: {
     filename: string;
@@ -14,158 +15,233 @@ interface MergedFileMetadata {
     dimensions?: { width: number; height: number };
   };
   annotationCount: number;
+  bundledAssetCount: number;
   creator: string;
 }
 
-// ===========================
-// APPROACH : ZIP-BASED FORMAT (.picto)
-// Recommended for compatibility and flexibility
-// ===========================
+interface PictoAssetManifestEntry {
+  id: string;
+  path: string;
+  fileName: string;
+  mimeType: string;
+  kind: StoredViewerAsset["kind"];
+  size: number;
+}
 
 export class CustomFileExporter {
+  private static readonly EXTENSION = ".picto";
+  private static readonly MIME_TYPE = "application/picto";
 
-  private static readonly EXTENSION = '.picto'; // ← Change this to anything you want!
-  private static readonly MIME_TYPE = 'application/picto';
-
-  /**
-   * Create custom 360 file (ZIP containing image + JSON metadata)
-   * Structure:
-   * - image.jpg (the 360° image)
-   * - metadata.json (annotations + file info)
-   * - manifest.json (file structure info)
-   */
   static async createPictoFile(
     imageBlob: Blob,
     annotations?: HotspotData[],
     options: {
       filename?: string;
-      imageFormat?: 'jpg' | 'png';
-      compression?: number; // 0-9
+      imageFormat?: "jpg" | "png";
+      compression?: number;
       creator?: string;
-      customExtension?: string; // ← New option to override extension
-      customMimeType?: string;  // ← New option to override MIME type
-    } = {}
+      customExtension?: string;
+      customMimeType?: string;
+      includeLocalFiles?: boolean;
+      viewerAssets?: StoredViewerAsset[];
+    } = {},
   ): Promise<Blob> {
     const {
-      // filename = 'annotated_picto_file',
-      imageFormat = 'jpg',
+      imageFormat = "jpg",
       compression = 6,
-      creator = 'MyPictoApp',
+      creator = "MyPictoApp",
       customExtension = this.EXTENSION,
-      customMimeType = this.MIME_TYPE
+      customMimeType = this.MIME_TYPE,
+      includeLocalFiles = false,
+      viewerAssets = [],
     } = options;
 
     const zip = new JSZip();
-    
-    // Add the image file
     const imageFilename = `image.${imageFormat}`;
+    const bundledAssets = includeLocalFiles
+      ? this.getBundledAssets(annotations || [], viewerAssets)
+      : [];
+    const exportedAnnotations = prepareHotspotsForPictoExport(
+      annotations,
+      includeLocalFiles,
+    );
+
     zip.file(imageFilename, imageBlob);
 
-    // Create metadata
     const metadata: MergedFileMetadata = {
-      version: '1.0',
-      format: customExtension.replace('.','') as imageFormat, 
+      version: "1.0",
+      format: customExtension.replace(".", "") as imageFormat,
       created: new Date().toISOString(),
       imageInfo: {
         filename: imageFilename,
         format: imageFormat,
-        size: imageBlob.size
+        size: imageBlob.size,
       },
-      annotationCount: annotations?.length || 0,
-      creator
+      annotationCount: exportedAnnotations?.length || 0,
+      bundledAssetCount: bundledAssets.length,
+      creator,
     };
 
-    // Add metadata file
-    zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+    zip.file("metadata.json", JSON.stringify(metadata, null, 2));
 
-    // Add annotations file
     const annotationData = {
-      version: '1.0',
-      annotations: annotations,
+      version: "1.0",
+      annotations: exportedAnnotations,
       statistics: {
-        total: annotations?.length || 0,
-        types: [...new Set(annotations?.map(a => a.type))],
-        // createdRange: {
-        //   earliest: annotations.length > 0 ? annotations.reduce((min, a) => a.t < min ? a.timestamp : min, annotations[0].timestamp) : null,
-        //   latest: annotations.length > 0 ? annotations.reduce((max, a) => a.timestamp > max ? a.timestamp : max, annotations[0].timestamp) : null
-        // }
-      }
+        total: exportedAnnotations?.length || 0,
+        types: [...new Set(exportedAnnotations?.map((annotation) => annotation.type))],
+      },
     };
-    zip.file('annotations.json', JSON.stringify(annotationData, null, 2));
+    zip.file("annotations.json", JSON.stringify(annotationData, null, 2));
 
-    // Add manifest (describes file structure)
+    const assetEntries: PictoAssetManifestEntry[] = bundledAssets.map((asset) => {
+      const assetPath = `assets/${asset.id}-${sanitizeFilename(asset.fileName)}`;
+      zip.file(assetPath, asset.blob);
+
+      return {
+        id: asset.id,
+        path: assetPath,
+        fileName: asset.fileName,
+        mimeType: asset.mimeType,
+        kind: asset.kind,
+        size: asset.blob.size,
+      };
+    });
+
     const manifest = {
-      fileType: 'Annotated Picto 360 Image',
+      fileType: "Annotated Picto 360 Image",
       extension: customExtension,
-      version: '1.0',
-      creator: creator,
+      version: "1.1",
+      creator,
       files: [
-        { name: imageFilename, type: 'image', description: '360° panoramic image' },
-        { name: 'metadata.json', type: 'metadata', description: 'File metadata and information' },
-        { name: 'annotations.json', type: 'annotations', description: 'Annotation data' },
-        { name: 'manifest.json', type: 'manifest', description: 'File structure description' }
-      ]
+        { name: imageFilename, type: "image", description: "360 panoramic image" },
+        { name: "metadata.json", type: "metadata", description: "File metadata and information" },
+        { name: "annotations.json", type: "annotations", description: "Annotation data" },
+        { name: "manifest.json", type: "manifest", description: "File structure description" },
+        ...assetEntries.map((asset) => ({
+          name: asset.path,
+          type: asset.kind,
+          description: `${asset.kind} hotspot asset`,
+        })),
+      ],
+      embeddedAssets: assetEntries,
     };
-    zip.file('manifest.json', JSON.stringify(manifest, null, 2));
+    zip.file("manifest.json", JSON.stringify(manifest, null, 2));
 
-    // Generate the ZIP file with custom MIME type
     const zipBlob = await zip.generateAsync({
-      type: 'blob',
-      compression: 'DEFLATE',
+      type: "blob",
+      compression: "DEFLATE",
       compressionOptions: { level: compression },
-      mimeType: customMimeType
+      mimeType: customMimeType,
     });
 
     return zipBlob;
   }
 
-
-
-
-  /**
-   * Extract contents from custom 360 file
-   */
   static async extractCustomFile(customBlob: Blob): Promise<{
     imageBlob: Blob;
     annotations: HotspotData[];
+    assets: StoredViewerAsset[];
     metadata: MergedFileMetadata;
     manifest: unknown;
   }> {
     const zip = await JSZip.loadAsync(customBlob);
 
-    // Read manifest to understand file structure
-    const manifestFile = zip.file('manifest.json');
+    const manifestFile = zip.file("manifest.json");
     if (!manifestFile) {
-      throw new Error('Invalid custom 360 file: missing manifest');
+      throw new Error("Invalid custom 360 file: missing manifest");
     }
-    const manifest = JSON.parse(await manifestFile.async('string'));
+    const manifest = JSON.parse(await manifestFile.async("string"));
 
-    // Read metadata
-    const metadataFile = zip.file('metadata.json');
+    const metadataFile = zip.file("metadata.json");
     if (!metadataFile) {
-      throw new Error('Invalid custom 360 file: missing metadata');
+      throw new Error("Invalid custom 360 file: missing metadata");
     }
-    const metadata = JSON.parse(await metadataFile.async('string'));
+    const metadata = JSON.parse(await metadataFile.async("string"));
 
-    // Read annotations
-    const annotationsFile = zip.file('annotations.json');
+    const annotationsFile = zip.file("annotations.json");
     if (!annotationsFile) {
-      throw new Error('Invalid custom 360 file: missing annotations');
+      throw new Error("Invalid custom 360 file: missing annotations");
     }
-    const annotationData = JSON.parse(await annotationsFile.async('string'));
+    const annotationData = JSON.parse(await annotationsFile.async("string"));
 
-    // Read image
     const imageFile = zip.file(metadata.imageInfo.filename);
     if (!imageFile) {
-      throw new Error('Invalid custom 360 file: missing image');
+      throw new Error("Invalid custom 360 file: missing image");
     }
-    const imageBlob = await imageFile.async('blob');
+    const imageBlob = new Blob(
+      [await imageFile.async("arraybuffer")],
+      { type: getImageMimeType(metadata.imageInfo.format) },
+    );
+
+    const assets = await this.extractBundledAssets(zip, manifest?.embeddedAssets);
 
     return {
       imageBlob,
-      annotations: annotationData.annotations,
+      annotations: annotationData.annotations || [],
+      assets,
       metadata,
-      manifest
+      manifest,
     };
+  }
+
+  private static async extractBundledAssets(
+    zip: JSZip,
+    assetEntries: PictoAssetManifestEntry[] = [],
+  ): Promise<StoredViewerAsset[]> {
+    const assets = await Promise.all(
+      assetEntries.map(async (entry) => {
+        const assetFile = zip.file(entry.path);
+        if (!assetFile) {
+          throw new Error(`Invalid custom 360 file: missing asset ${entry.path}`);
+        }
+
+        const assetBlob = new Blob(
+          [await assetFile.async("arraybuffer")],
+          { type: entry.mimeType || "application/octet-stream" },
+        );
+
+        return {
+          id: entry.id,
+          blob: assetBlob,
+          fileName: entry.fileName,
+          mimeType: entry.mimeType,
+          kind: entry.kind,
+        } satisfies StoredViewerAsset;
+      }),
+    );
+
+    return assets;
+  }
+
+  private static getBundledAssets(
+    annotations: HotspotData[],
+    viewerAssets: StoredViewerAsset[],
+  ): StoredViewerAsset[] {
+    const referencedIds = new Set(
+      annotations
+        .filter((annotation) => annotation.assetSource === "local" && annotation.assetId)
+        .map((annotation) => annotation.assetId as string),
+    );
+
+    return viewerAssets.filter((asset) => referencedIds.has(asset.id));
+  }
+}
+
+function sanitizeFilename(fileName: string): string {
+  return fileName.replace(/[<>:"/\\|?*]+/g, "_");
+}
+
+function getImageMimeType(format?: string): string {
+  switch (format?.toLowerCase()) {
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "webp":
+      return "image/webp";
+    default:
+      return "application/octet-stream";
   }
 }

@@ -93,6 +93,13 @@
     gap: 8px;
 }
 
+.settings-modal__section_horizontal{
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+}
+
 .settings-modal__label {
     display: block;
     font-size: 14px;
@@ -285,10 +292,10 @@
 }
 
 .settings-modal__checkbox {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
+    opacity: 100;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
 }
 
 .settings-modal__toggle-slider {

@@ -34,7 +34,7 @@ interface ExportPopupProps {
   driveAuthStatus: DriveAuthStatus | null;
 }
 
-// type ExportStatus = "idle" | "exporting" | "success" | "failure";
+type ExportStatus = "idle" | "exporting" | "success" | "failure";
 
 const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   isOpen,
@@ -59,6 +59,8 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
   ];
 
   const [exportFormat, setExportFormat] = useState<ExportFormat>("picto");
+  const [includeLocalFiles, setIncludeLocalFiles] = useState(true);
+  const [, setExportStatus] = useState<ExportStatus>("idle");
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -82,6 +84,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         fileName: projectTitle || "Untitled",
         folderName: `${projectTitle || "Untitled"} Annotations`,
         includeMetadata: true,
+        includeLocalFiles,
       });
 
       await startDriveAuth(viewerId, { autoExport: true });
@@ -94,6 +97,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     imageBlob: Blob,
     annotations?: HotspotData[],
     fileName?: string,
+    assets?: NonNullable<Awaited<ReturnType<typeof getViewerItem>>>["assets"],
   ) => {
     try {
       const resolvedFileName = fileName || "Untitled";
@@ -105,7 +109,9 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
           fileName: resolvedFileName,
           folderName: `Picto360 deg ${resolvedFileName} Annotations`,
           includeMetadata: true,
+          includeLocalFiles,
         },
+        assets,
       );
 
       if (result.success) {
@@ -126,6 +132,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     imageBlob: Blob,
     annotations?: HotspotData[],
     fileName?: string,
+    assets?: NonNullable<Awaited<ReturnType<typeof getViewerItem>>>["assets"],
   ) => {
     try {
       await exportService.exportToDisk(
@@ -133,6 +140,10 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
         fileName || "Untitled",
         exportFormat,
         annotations && annotations.length > 0 ? annotations : undefined,
+        {
+          includeLocalFiles,
+        },
+        assets,
       );
       onExportSuccess();
       setBannerMessage({ message: "Fichier exporte avec succes vers le disque", type: "success" });
@@ -152,6 +163,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
     const imageBlob = viewerItem?.compressedBlob;
     const annotations = viewerItem?.annotations;
     const fileName = viewerItem?.name || "Untitled";
+    const assets = viewerItem?.assets;
 
     if (!imageBlob) {
       setBannerMessage({ message: "No image found, upload an image", type: "warning" });
@@ -163,12 +175,15 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
 
     switch (destination) {
       case "drive":
-        await exportToDrive(imageBlob, annotations, fileName);
+        setExportStatus("exporting");
+        // onDriveExportStart(fileName);
+        setIsPopupOpen(false);
+        await exportToDrive(imageBlob, annotations, fileName, assets);
         break;
       case "disk":
       default:
-        await exportToDisk(imageBlob, annotations, fileName);
-        break;
+        setExportStatus("exporting");
+        await exportToDisk(imageBlob, annotations, fileName, assets);
     }
 
     return null;
@@ -239,6 +254,20 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
               )}
             </div>
           </div>
+          {exportFormat === "picto" && (
+            <div className="settings-modal__section_horizontal">
+              <input
+                id="include-local-files"
+                type="checkbox"
+                checked={includeLocalFiles}
+                onChange={(event) => setIncludeLocalFiles(event.target.checked)}
+                className="settings-modal__checkbox"
+              />
+              <label htmlFor="include-local-files" className="settings-modal__label">
+                Inclure les fichiers locaux intégrés
+              </label>
+            </div>
+          )}
         </div>
 
         <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>

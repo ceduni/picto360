@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getViewerItem } from "@/utils/storedImageData";
+import { hydrateStoredHotspots } from "@/utils/HotspotAssetUtils";
 import type { HotspotData } from "@/utils/Types";
 
 interface UseViewerDataProps {
@@ -28,6 +29,7 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
         }
 
         let objectUrl: string | undefined;
+        let hotspotObjectUrls: string[] = [];
         let isMounted = true;
 
         const loadViewerData = async (): Promise<void> => {
@@ -38,6 +40,7 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
                 const viewerItem = await getViewerItem(viewerId);
                 const compressedImage = viewerItem?.compressedBlob || viewerItem?.blob;
                 const annotations = viewerItem?.annotations;
+                const assets = viewerItem?.assets || [];
 
                 if (!isMounted) return;
 
@@ -50,7 +53,9 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
                 setImageSource(objectUrl);
 
                 if (annotations && Array.isArray(annotations)) {
-                    setHotspots(annotations);
+                    const hydratedHotspots = hydrateStoredHotspots(annotations, assets);
+                    hotspotObjectUrls = hydratedHotspots.objectUrls;
+                    setHotspots(hydratedHotspots.hotspots);
                 }
             } catch (err) {
                 if (!isMounted) return;
@@ -73,6 +78,7 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
             if (objectUrl) {
                 URL.revokeObjectURL(objectUrl);
             }
+            hotspotObjectUrls.forEach((url) => URL.revokeObjectURL(url));
         };
     }, [viewerId, navigate]);
 
