@@ -1,19 +1,13 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { baseContentFields, ContentDocument } from "./content.model";
 
-export interface LinkContentDocument extends Document {
-  id: string;
-  creationDate: Date;
-  lastModificationDate: Date;
-  title: string;
+export interface LinkContentDocument extends ContentDocument {
   url: string;
   description?: string;
 }
 
 const linkContentSchema = new Schema<LinkContentDocument>({
-  id: { type: String, required: true },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
-  title: { type: String, required: true },
+  ...baseContentFields,
   url: { type: String, required: true },
   description: { type: String }, // Optional field
 });

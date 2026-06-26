@@ -1,62 +1,43 @@
-import mongoose, { Document, Schema, model } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
+import { constraintSchema, IConstraint } from './activity.model';
 
-interface IParticipant {
-    participantId: string;
-    name: string;
-    joinLink: string;
+
+export interface TeamParticipant{
+  praticipantName:string,
+  joinLink:string,
 }
 
-interface IIndice {
-    indiceTitle: string;
-    indiceValue: any; 
-}
-
-interface IObjectToFind {
-    objectName: string;
-    indices: IIndice[];
-}
-
-const indiceSchema = new Schema<IIndice>({
-  indiceTitle: { type: String, required: true },
-  indiceValue: { type: String, required: true },
-});
-
-const objectSchema = new Schema<IObjectToFind>({
-  objectName: { type: String, required: true },
-  indices: { type: [indiceSchema], required: true },
-});
-
-export interface ObjectsAndImageDocument extends Document {
-  objectstoFind: IObjectToFind[];
-  imageWithObjects: mongoose.Types.ObjectId;
-}
-
-const objectsAndImageSchema = new Schema<ObjectsAndImageDocument>({
-  objectstoFind: { type: [objectSchema], required: true },
-  imageWithObjects: { type: Schema.Types.ObjectId, required: true },
-});
+const teamParticipantSchema = new Schema<TeamParticipant>(
+    {
+        praticipantName: { type: String, required: true, trim: true },
+        joinLink: {type:String,required:true},
+    },
+    { 
+      _id: true,
+      timestamps:true,
+    }
+);
 
 export interface ITeam extends Document {
-    teamId: string;
     teamName: string;
+    description:string;
     supervisorId: string;
-    participantsList: IParticipant[];
-    objectsAndImage?: ObjectsAndImageDocument;
+    participantsList: TeamParticipant[];
+    constraints:IConstraint[]
 }
 
 const teamSchema = new Schema<ITeam>({
-    teamId: { type: String, required: true, unique: true },
     teamName: { type: String, required: true },
+    description:{type:String},
     supervisorId: { type: String, default: "" },
-    participantsList: [
-        {
-            participantId: { type: String, required: true },
-            name: { type: String, required: true },
-            joinLink: { type: String, default: "" },
-        },
-    ],
-    objectsAndImage: { type: objectsAndImageSchema, required: false },
-});
+    participantsList: {type:[teamParticipantSchema], required:true},
+    constraints:{type:[constraintSchema]}
+    // workspace: { type: ActivityWorkspace, required: false },
+},
+{
+    _id:true,
+}
+);
 
 const Team = model<ITeam>('Team', teamSchema);
 

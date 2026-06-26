@@ -1,6 +1,6 @@
 import FormContent, {
   FormContentDocument,
-} from "@/models/content/formContent.model";
+} from "@/models/content/shapeContent.model";
 
 class FormContentService {
   async createFormContent(formContent: FormContentDocument) {

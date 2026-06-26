@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import FormContentService from "@/services/content/formContent.service";
-import { FormContentDocument } from "@/models/content/formContent.model";
+import { FormContentDocument } from "@/models/content/shapeContent.model";
 
 async function createFormContent(
   request: FastifyRequest<{ Body: FormContentDocument }>,

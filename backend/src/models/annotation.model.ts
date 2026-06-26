@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { ContentDocument } from "./content/content.model";
 
 export interface PositionDocument extends Document {
   x: number;
@@ -13,7 +14,7 @@ export interface AnnotationDocument extends Document {
   creationDate: Date;
   lastModificationDate: Date;
   position: PositionDocument;
-  content: unknown;
+  content: ContentDocument;
 }
 
 const positionSchema = new Schema({
