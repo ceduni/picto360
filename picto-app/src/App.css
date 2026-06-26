@@ -1,3 +1,21 @@
+:root {
+  --yellow-green: #92D050ff;
+  --gunmetal: #404040ff;
+  --azure-blue: #3682FCff;
+  --blue-slate: #4E5A6Dff;
+  --dust-grey: #D8D8D8ff;
+
+  --gradient-top: linear-gradient(0deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-right: linear-gradient(90deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-bottom: linear-gradient(180deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-left: linear-gradient(270deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-top-right: linear-gradient(45deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-bottom-right: linear-gradient(135deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-top-left: linear-gradient(225deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-bottom-left: linear-gradient(315deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+  --gradient-radial: radial-gradient(#92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
+}
+
 html,
 body,
 #root {
