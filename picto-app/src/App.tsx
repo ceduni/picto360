@@ -20,7 +20,6 @@ const App = () => {
 
     if (__ENABLE_ADMIN__) {
         const LoginPage = lazy(() => import('./pages/LoginPage'));
-        const ProfilePage = lazy(() => import('./pages/ProfilePage'));
         const ActivityCreationPage = lazy(() => import('./pages/ActivityCreationPage'));
         const EditActivityPage = lazy(() => import('./pages/DashboardPages/EditActivityPage'));
         const ActivitiesListPage = lazy(() => import('./pages/DashboardPages/ActivitiesListPage'));
@@ -31,7 +30,6 @@ const App = () => {
             <Route key="protected" element={<RequireAuth />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/dashboard/studio" element={<StudioPage />} />
-                <Route path="/dashboard/profile" element={<ProfilePage />} />
                 <Route path="/dashboard/your-activities" element={<ActivitiesListPage />} />
                 <Route path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />
                 <Route path="/dashboard/activity-creation" element={<ActivityCreationPage />} />

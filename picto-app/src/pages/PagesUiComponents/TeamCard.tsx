@@ -21,29 +21,23 @@ const TeamCard : React.FC<TeamCardProps> = ({index,teamData,supervised,setSelect
                                                 setSelectedTeam({indx:index,teamData});
                                                 setIsPaticipantsPopupOpen(true)}
                                                 }>
-            <p className="team_card_name" >
-                            {teamData.name}
-            </p>
+            <button className="team-card__delete" onClick={(e)=>{e.stopPropagation(); handleDeleteTeam(index)}}>
+                <TrashIcon width={14} height={14} />
+            </button>
 
-            <div className="team_participants-number-field">
-                <h2>{teamData.participantsNames.length}</h2>
-                <p className="team_participants">Participants</p>
+            <div className="team-card__count">
+                <span className="team-card__count-number">{teamData.participantsNames.length}</span>
+                <span className="team-card__count-label">participants</span>
             </div>
-            <div className="team-card_bottom">
-                <div className="team_add-supervisor">
-                    {
-                        supervised && 
-                        <div className="add-participants_to_group-button">
-                            <UserPlusIcon width={18} height={18} />
-                        </div>
-                    }
+
+            <p className="team_card_name">{teamData.name}</p>
+
+            {supervised && (
+                <div className="add-participants_to_group-button">
+                    <UserPlusIcon width={14} height={14} />
                 </div>
-                <span className="delete_team" onClick={(e)=>{e.stopPropagation(); handleDeleteTeam(index)}}>
-                    <TrashIcon width={18} height={18} />
-                </span>
-            </div>
-
-        </div>        
+            )}
+        </div>
     )
 
 } 

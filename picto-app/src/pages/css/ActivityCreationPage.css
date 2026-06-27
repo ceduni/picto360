@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-.activity-page-header{
+.activity-page-header {
   display: flex;
   flex-direction: row;
   gap: var(--space-3);
@@ -23,12 +23,105 @@
   width: 100%;
 }
 
+
+/* ═══════════════════════════════════════════════
+   SHARED CARD STYLES
+   ═══════════════════════════════════════════════ */
+
+/* Card heading — used across all three columns */
+.main-left_title,
+.list_title {
+  font-size: var(--type-card-heading-size);
+  line-height: var(--type-card-heading-line);
+  font-weight: var(--type-card-heading-weight);
+  color: #222;
+  margin: 0;
+}
+
+.card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.card-subtitle {
+  font-size: var(--type-subtitle-size);
+  line-height: var(--type-subtitle-line);
+  font-weight: var(--type-subtitle-weight);
+  color: var(--blue-slate);
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* Field grouping */
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section-header-title {
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  font-weight: var(--type-label-weight);
+  color: var(--accent-dark);
+  opacity: 0.5;
+}
+
+/* Empty / error state */
+.error_board {
+  font-size: var(--type-subtitle-size);
+  line-height: var(--type-subtitle-line);
+  font-weight: var(--type-subtitle-weight);
+  color: var(--blue-slate);
+  opacity: 0.5;
+}
+
+/* ── Ghost danger icon button (delete, used in participant / task / team cards) ── */
+.delete_participant,
+.delete_task {
+  all: unset;
+}
+
+.delete_participant,
+.delete_task,
+.team-card__delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--blue-slate);
+  opacity: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.delete_participant,
+.delete_task {
+  width: 28px;
+  height: 28px;
+}
+
+.delete_participant:hover,
+.delete_task:hover,
+.team-card__delete:hover {
+  background: rgba(211, 47, 47, 0.08);
+  color: #c62828;
+}
+
+/* Reveal on parent hover */
+.participant_card:hover .delete_participant,
+.task-chip:hover .delete_task,
+.team_card:hover .team-card__delete {
+  opacity: 1;
+}
+
+
 /* ═══════════════════════════════════════════════
    LEFT COLUMN — Détails de l'activité
-   ═══════════════════════════════════════════════
-*/
+   ═══════════════════════════════════════════════ */
 
-/* wrapper that stacks the two left cards */
 .main-left-col {
   flex: 0 0 33%;
   display: flex;
@@ -46,7 +139,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Options card — same card style as main-left, grows to fill remaining left-col height */
+/* Options card — grows to fill remaining left-col height */
 .options-card {
   display: flex;
   flex-direction: column;
@@ -58,55 +151,10 @@
   padding: var(--space-5);
 }
 
-.card-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.main-left_title {
-  font-size: var(--type-card-heading-size);
-  line-height: var(--type-card-heading-line);
-  font-weight: var(--type-card-heading-weight);
-  color: #222;
-  margin: 0;
-}
-
-.card-subtitle {
-  font-size: var(--type-subtitle-size);
-  line-height: var(--type-subtitle-line);
-  font-weight: var(--type-subtitle-weight);
-  color: var(--blue-slate);
-  opacity: 0.65;
-  margin: 0;
-}
-
 .main-left-fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-/* ── Field section card ── */
-.section-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.section-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-left: 1%;
-}
-
-.section-header-title{
-  font-size: var(--type-label-size);
-  line-height: var(--type-label-line);
-  font-weight: var(--type-label-weight);
-  color: var(--accent-dark);
-  opacity: 0.5;
 }
 
 /* ── Text inputs ── */
@@ -144,8 +192,9 @@
   background: white;
 }
 
-.text_field-title { height: 40px; }
-.text_field-tag   { height: 40px; }
+.text_field-title,
+.text_field-tag { height: 40px; }
+
 .text_field-descript {
   height: 96px;
   resize: none;
@@ -186,6 +235,7 @@
   border-left: 1px solid rgba(214, 217, 255, 0.5);
   transition: background-color 0.1s ease, color 0.1s ease;
 }
+
 .tag-chip_delete:hover {
   background: #d6d9ff;
   color: var(--accent);
@@ -204,9 +254,7 @@
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-1);
-  transition: background-color 0.1s ease;
 }
-
 
 .option-row__label {
   display: flex;
@@ -239,21 +287,7 @@
   opacity: 0.65;
 }
 
-.main-left_section-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.toggle_authorise {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--fs-200);
-  font-weight: var(--fw-semibold);
-}
-
+/* ── Chrono field ── */
 .chrono-toggle_and_field {
   display: flex;
   flex-direction: row;
@@ -272,10 +306,7 @@
   margin-top: var(--space-1);
 }
 
-.chrono-icon {
-  color: var(--accent);
-  flex-shrink: 0;
-}
+.chrono-icon { color: var(--accent); flex-shrink: 0; }
 
 .chrono-inputs {
   display: flex;
@@ -320,13 +351,10 @@
   font-family: var(--font-family-base);
   transition: color 0.15s ease;
 }
+
 .chrono_field:focus {
   outline: none;
   color: var(--accent);
-}
-.chrono_field:focus {
-  border-color: var(--accent);
-  outline: none;
 }
 
 /* Hide number spinners */
@@ -348,7 +376,7 @@ input[type="number"]::-webkit-outer-spin-button {
   background: white;
   box-shadow: var(--shadow-sm);
   border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);    
+  padding: var(--space-3) var(--space-4);
 }
 
 /* ── Activity mode segmented control ── */
@@ -376,7 +404,7 @@ input[type="number"]::-webkit-outer-spin-button {
   font-weight: var(--fw-medium);
   color: var(--blue-slate);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, font-weight 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   user-select: none;
   white-space: nowrap;
 }
@@ -403,7 +431,7 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
-  padding-right: var(--space-8) ;
+  padding-right: var(--space-8);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-centered-sm);
 }
@@ -454,7 +482,7 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #444;
 }
 
-/* ── List container (white card) ── */
+/* ── List container ── */
 .list_container {
   border: 1px solid var(--dust-grey);
   border-radius: var(--radius-lg);
@@ -485,7 +513,7 @@ input[type="number"]::-webkit-outer-spin-button {
   height: 100%;
 }
 
-/* ── Stepper (− / count / +) pinned to bottom of list card ── */
+/* ── Stepper (− / count / +) pinned to bottom ── */
 .stepper-row {
   display: flex;
   align-items: center;
@@ -515,12 +543,17 @@ input[type="number"]::-webkit-outer-spin-button {
   color: var(--blue-slate);
   border: 1px solid var(--dust-grey);
 }
-.stepper-btn--minus:hover { background: var(--accent-light); color: var(--accent); }
+
+.stepper-btn--minus:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
 
 .stepper-btn--plus {
   background: var(--accent);
   color: white;
 }
+
 .stepper-btn--plus:hover { background: var(--accent-hover); }
 
 .stepper-count {
@@ -532,29 +565,7 @@ input[type="number"]::-webkit-outer-spin-button {
   text-align: center;
 }
 
-.list_title {
-  font-size: var(--type-card-heading-size);
-  line-height: var(--type-card-heading-line);
-  font-weight: var(--type-card-heading-weight);
-  color: #333;
-}
-
-.enter_number_field {
-  width: 48px;
-  padding: var(--space-1) var(--space-2);
-  background: #f0f3ff;
-  border: 1.5px solid #e8ebf7;
-  border-radius: var(--radius-sm);
-  text-align: center;
-  font-size: var(--fs-200);
-  font-weight: var(--fw-bold);
-  transition: border-color 0.15s ease;
-}
-.enter_number_field:focus {
-  border-color: #c3cfff;
-  outline: none;
-}
-
+/* ── Add participant button (used in AddParticipantsPopup) ── */
 .add_one {
   cursor: pointer;
   display: flex;
@@ -568,14 +579,8 @@ input[type="number"]::-webkit-outer-spin-button {
   transition: background-color 0.15s ease;
   flex-shrink: 0;
 }
-.add_one:hover {
-  background: #1e2b5f;
-}
 
-.add_one-text{
-  font-size: var(--fs-200);
-  font-weight: var(--fw-semibold);
-}
+.add_one:hover { background: #1e2b5f; }
 
 /* ── Scrollable list ── */
 .list_group {
@@ -590,51 +595,41 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .list_group::-webkit-scrollbar { width: 6px; }
-.list_group::-webkit-scrollbar-thumb {
-  background: #e8ebf7;
-  border-radius: 3px;
-}
+.list_group::-webkit-scrollbar-thumb { background: #e8ebf7; border-radius: 3px; }
 .list_group::-webkit-scrollbar-button { display: none; }
-
-/* ── Empty state ── */
-.error_board {
-  font-size: var(--type-subtitle-size);
-  line-height: var(--type-subtitle-line);
-  font-weight: var(--type-subtitle-weight);
-  color: var(--blue-slate);
-  opacity: 0.5;
-}
 
 /* ── Participant card ── */
 .participant_card {
-  background: rgba(241, 242, 255, 0.6);
-  height: 44px;
   width: 100%;
-  font-weight: var(--fw-semibold);
-  border-radius: var(--radius-md);
-  padding-left: var(--space-3);
+  height: 40px;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  font-size: var(--fs-200);
+  gap: var(--space-2);
+  padding: 0 var(--space-2) 0 var(--space-3);
+  background: white;
+  border: 1px solid var(--dust-grey);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.delete_participant {
-  cursor: pointer;
-  background: #f0f3ff;
-  height: 44px;
-  width: 40px;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease, color 0.15s ease;
-  flex-shrink: 0;
+.participant_card:hover {
+  border-color: rgba(28, 115, 250, 0.35);
+  box-shadow: var(--shadow-sm);
 }
-.delete_participant:hover {
-  background: var(--accent);
-  color: white;
+
+.participant_card input {
+  all: unset;
+  flex: 1;
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
+  color: var(--accent-dark);
+  font-family: var(--font-family-base);
+}
+
+.participant_card input::placeholder {
+  color: #aaa;
+  font-weight: var(--fw-regular);
 }
 
 /* ── Teams grid ── */
@@ -659,129 +654,90 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .teams_list::-webkit-scrollbar { width: 6px; }
-.teams_list::-webkit-scrollbar-thumb {
-  background: #e8ebf7;
-  border-radius: 3px;
-}
+.teams_list::-webkit-scrollbar-thumb { background: #e8ebf7; border-radius: 3px; }
 .teams_list::-webkit-scrollbar-button { display: none; }
 
+/* ── Team card ── */
 .team_card {
-  width: 120px;
-  min-height: 120px;
+  position: relative;
+  width: 140px;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid var(--accent-light);
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-3) var(--space-3);
+  background: white;
+  border: 1px solid var(--dust-grey);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.team_card:hover{
-  border: 1px solid var(--accent);
   cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
-.team_participants-number-field {
+.team_card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.team-card__delete {
+  all: unset;
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 26px;
+  height: 26px;
+}
+
+.team-card__count {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: var(--space-3) 0;
 }
 
-.team_participants {
-  font-size: var(--type-pill-size);
-  line-height: var(--type-pill-line);
-  font-weight: var(--type-pill-weight);
+.team-card__count-number {
+  font-size: var(--type-stat-number-size);
+  line-height: var(--type-stat-number-line);
+  font-weight: var(--type-stat-number-weight);
+  color: var(--accent);
+}
+
+.team-card__count-label {
+  font-size: var(--fs-100);
+  font-weight: var(--fw-regular);
   color: var(--blue-slate);
+  opacity: 0.6;
 }
 
 .team_card_name {
-  margin-top: var(--space-3);
-  font-weight: var(--fw-semibold);
   font-size: var(--fs-200);
-  max-width: 100px;
+  font-weight: var(--fw-semibold);
+  color: var(--accent-dark);
+  max-width: 120px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: var(--accent);
-  cursor: pointer;
-  padding: 0 var(--space-2);
   text-align: center;
-}
-.team_card_name:hover {
-  font-weight: var(--fw-bold);
-  text-decoration: underline;
-}
-
-.team-card_bottom {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.delete_team {
-  cursor: pointer;
-  background: var(--accent);
-  color: white;
-  width: 36px;
-  height: 32px;
-  border-radius:var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-.delete_team:hover {
-  background: var(--accent-hover);
+  margin: 0;
 }
 
 .add-participants_to_group-button {
   cursor: pointer;
-  background: #f0f3ff;
-  width: 36px;
-  height: 32px;
-  border-radius: 0 0 var(--radius-md) 0;
+  color: var(--blue-slate);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
+
 .add-participants_to_group-button:hover {
-  background: var(--accent);
-  color: white;
-}
-
-.remove_particip {
-  cursor: pointer;
+  background: var(--accent-light);
   color: var(--accent);
-  background: #f0f3ff;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-}
-
-.participants_bottom_buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  width: 100%;
-}
-
-.group_top {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  font-size: var(--fs-100);
 }
 
 
@@ -798,7 +754,7 @@ input[type="number"]::-webkit-outer-spin-button {
   background: white;
   box-shadow: var(--shadow-sm);
   border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);  
+  padding: var(--space-3) var(--space-4);
 }
 
 /* ── Add task row ── */
@@ -825,35 +781,27 @@ input[type="number"]::-webkit-outer-spin-button {
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
 }
+
 .add_button:hover {
   background: var(--accent);
   color: white;
 }
 
-/* ── Task list container ── */
-.task-chips_group {
-  background: white;
-  border: 1px solid var(--dust-grey);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-height: 200px;
-}
-
-.task-chip-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
 /* ── Tooltip ripple ── */
+.list_title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .tool-tip-tasks {
   cursor: pointer;
   position: relative;
   width: 20px;
   height: 20px;
+  font-size: var(--type-helper-size);
+
 }
 
 .tool-tip_content {
@@ -882,6 +830,7 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 0;
   animation: ripple 2s infinite;
 }
+
 .tool-tip-tasks::after { animation-delay: 1s; }
 
 @keyframes ripple {
@@ -897,10 +846,9 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: var(--space-2);
   width: 100%;
 }
-.task_card:hover .drag-handle { opacity: 1; }
+
 
 .drag-handle {
-  opacity: 0;
   cursor: grab;
   user-select: none;
   color: var(--blue-slate);
@@ -910,20 +858,24 @@ input[type="number"]::-webkit-outer-spin-button {
 .task-chip {
   flex: 1;
   min-width: 0;
-  height: 44px;
-  padding-left: var(--space-3);
+  height: 40px;
+  padding: 0 var(--space-2) 0 var(--space-3);
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-2);
   border-radius: var(--radius-md);
   font-size: var(--fs-200);
-  font-weight: var(--fw-semibold);
-  background: rgba(241, 242, 255, 0.5);
-  transition: background-color 0.1s ease;
-  overflow: hidden;
+  font-weight: var(--fw-medium);
+  background: var(--accent-light-bg);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.task-chip:hover { background: rgba(241, 242, 255, 0.9); }
+
+.task-chip:hover {
+  background: white;
+  border-color: var(--dust-grey);
+}
 
 .task-chip span {
   flex: 1;
@@ -932,29 +884,11 @@ input[type="number"]::-webkit-outer-spin-button {
   text-overflow: ellipsis;
 }
 
-.delete_task {
-  cursor: pointer;
-  background: #f0f3ff;
-  width: 44px;
-  height: 44px;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease, color 0.15s ease;
-  flex-shrink: 0;
-}
-.delete_task:hover {
-  background: var(--accent);
-  color: white;
-}
-
 
 /* ═══════════════════════════════════════════════
    ACTION BUTTONS
    ═══════════════════════════════════════════════ */
 
-/* shared base for all header action buttons */
 .cancel-creation_button,
 .draft-creation_button,
 .create-activity-button {
@@ -993,11 +927,9 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.5;
   transition: background-color 0.15s ease, opacity 0.15s ease;
 }
-.create-activity-button:hover {
-  background: var(--accent-hover);
-}
 
-/* ── view-all link ── */
+.create-activity-button:hover { background: var(--accent-hover); }
+
 .view_all-button {
   font-size: var(--fs-200);
   font-weight: var(--fw-semibold);
