@@ -36,6 +36,7 @@ const teamSchema = new Schema<ITeam>({
 },
 {
     _id:true,
+    timestamps:true,
 }
 );
 

@@ -111,11 +111,13 @@ export interface ActivityDocument extends Document {
   title: string,
   description: string,
   mode: "SOLO" | "COLLABORATIVE" | "COMPETITIVE",
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED",
   constraints:IConstraint[],
   tags: string[],
   tasks:ActivityTask[],
   authoriseEdit:boolean,
   teams: [ITeam],
+  deadline: Date,
   createdBy: mongoose.Types.ObjectId | UserDocument;
 };
 
@@ -123,19 +125,27 @@ const activitySchema = new Schema<ActivityDocument> (
   {
     title: {type: String , required:true},
     description: {type:String},
-    mode:{type: String ,enum: ["SOLO", "COLLABORATIVE", "COMPETITIVE"], required:true, default:"SOLO"},
+    mode:{type: String ,enum: ["SOLO", "COLLABORATIVE", "COMPETITIVE"], default:"SOLO"},
+    status: { type: String, enum: ["DRAFT", "PUBLISHED", "ARCHIVED"], default: "DRAFT" },    
     constraints:{type:[constraintSchema]},
-    tags: {type:[String],required:false},
+    tags: {type:[String]},
     tasks:{type: [activityTaskSchema], default: []},
-    authoriseEdit:{type: Boolean , required:true},
-    teams: {type:[Schema.Types.ObjectId],ref:"Team",required:true},
+    authoriseEdit:{type: Boolean, default:false},
+    teams: {type:[Schema.Types.ObjectId],ref:"Team"},
+    deadline:{type:Date},
     createdBy:{ type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {
-    timestamps:true,  // Mongo manages createdAt and updatedAt automaticcaly
     _id:true,
+    timestamps:true,  // Mongo manages createdAt and updatedAt automaticcaly
   }
 );
+
+// TTL: auto-delete DRAFT records not touched in 7 days
+activitySchema.index(
+  { updatedAt: 1 },
+  { expireAfterSeconds: 604800, partialFilterExpression: { status: "DRAFT" } }
+)
 
 const Activity = mongoose.model("Activity", activitySchema);
 export default {Activity,ActivityParticipantProgressModel};

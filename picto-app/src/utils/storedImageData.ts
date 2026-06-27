@@ -111,7 +111,7 @@ export async function compressBeforeUpload(file: File) {
     formData.append("file", new File([file], file.name || "Untitled", 
                                 { type: file.type || "image/jpeg" }));
 
-    const compressedFile = await fetch("http://localhost:5000/api/compress-image",{
+    const compressedFile = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/compress-image`,{
       method:"POST",
       body:formData,
     });

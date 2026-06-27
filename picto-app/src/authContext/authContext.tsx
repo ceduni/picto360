@@ -49,7 +49,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
 
             const token = await user.getIdToken();
             
-            await fetch("http://localhost:5000/users", {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/users`, {
                 method: "POST",
                 headers: {
                     // "Content-Type": "application/json",

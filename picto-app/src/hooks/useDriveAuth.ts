@@ -45,7 +45,7 @@ export function clearPendingDriveExport() {
 export function useDriveAuth() {
   const location = useLocation();
 
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
 
   async function startDriveAuth(viewerId?: string, options: StartDriveAuthOptions = {}) {
     if (!viewerId || viewerId === undefined) throw new Error("viewerId missing in URL");

@@ -1,5 +1,8 @@
 :root {
-  --yellow-green: #92D050ff;
+  --accent:#1c73fa;
+  --accent-dark:#001833;
+  --accent-light:#EBF4FF;
+  --accent-secondary: #92D050ff;
   --gunmetal: #404040ff;
   --azure-blue: #3682FCff;
   --blue-slate: #4E5A6Dff;

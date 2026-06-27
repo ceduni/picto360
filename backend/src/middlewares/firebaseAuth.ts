@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import admin from "firebase-admin";
-import serviceAccount from "../../picto-360-firebase-adminsdk-fbsvc-542411c36b.json"; // must be in your .gitignore
+import serviceAccount from "../../picto-360-firebase-adminsdk-fbsvc-76d12c9ce7.json"; // must be in .gitignore
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),

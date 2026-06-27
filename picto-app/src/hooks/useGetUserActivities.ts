@@ -19,7 +19,7 @@ export function useFetchActivities() {
 
       try {
         const token = await currentUser.getIdToken();
-        const response = await fetch("http://localhost:5000/activities", {
+        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/activities", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -57,7 +57,7 @@ export function useGetActivityById(activityId: string) {
     const fetchActivity = async () =>{ 
         try {
             const token = await currentUser.getIdToken();
-            const res = await fetch(`http://localhost:5000/activities/${activityId}`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/activities/${activityId}`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,

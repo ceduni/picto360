@@ -21,7 +21,7 @@ export function useServerSentAuth(
 }
 ) {
   const [driveAuthStatus, setAuthStatus] = useState<DriveAuthStatus | null>(null);
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   // async function getDriveAuthStatus() {
   //   try {
