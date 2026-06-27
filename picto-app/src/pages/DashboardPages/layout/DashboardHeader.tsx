@@ -6,9 +6,11 @@ import "./DashboardHeader.css";
 
 interface DashboardHeaderProps {
   title: string;
+  actions?: React.ReactNode;
+  onOpenProfile?: () => void;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title }) => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title, actions, onOpenProfile }) => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -22,6 +24,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title }) => {
   return (
     <header className="dash-header">
       <h1 className="dash-header-title">{title}</h1>
+
+      {actions && <div className="dash-header-page-actions">{actions}</div>}
 
       <div className="dash-header-actions">
         <button className="dash-header-icon-btn" aria-label="Notifications">
@@ -37,7 +41,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title }) => {
 
         <div
           className="dash-header-avatar"
-          onClick={() => navigate("/dashboard/profile")}
+          onClick={() => onOpenProfile ? onOpenProfile() : navigate("/dashboard/profile")}
           title={currentUser?.displayName ?? "Profil"}
         >
           {currentUser?.photoURL ? (

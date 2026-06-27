@@ -17,10 +17,11 @@ interface TeamCardProps {
 
 const TeamCard : React.FC<TeamCardProps> = ({index,teamData,supervised,setSelectedTeam,setIsPaticipantsPopupOpen,handleDeleteTeam}) =>{
     return (
-        <div className="team_card" >
-            <p className="team_card_name" onClick={()=>{
+        <div className="team_card" onClick={()=>{
                                                 setSelectedTeam({indx:index,teamData});
-                                                setIsPaticipantsPopupOpen(true)}}>
+                                                setIsPaticipantsPopupOpen(true)}
+                                                }>
+            <p className="team_card_name" >
                             {teamData.name}
             </p>
 
@@ -37,7 +38,7 @@ const TeamCard : React.FC<TeamCardProps> = ({index,teamData,supervised,setSelect
                         </div>
                     }
                 </div>
-                <span className="delete_team" onClick={()=>handleDeleteTeam(index)}>
+                <span className="delete_team" onClick={(e)=>{e.stopPropagation(); handleDeleteTeam(index)}}>
                     <TrashIcon width={18} height={18} />
                 </span>
             </div>

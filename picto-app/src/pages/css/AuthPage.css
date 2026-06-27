@@ -37,8 +37,8 @@
 }
 
 .auth-logo span {
-  font-size: var(--text-md);
-  font-weight: var(--font-bold);
+  font-size: var(--fs-300);
+  font-weight: var(--fw-bold);
   color: var(--accent);
   letter-spacing: -0.3px;
 }
@@ -56,8 +56,8 @@
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
   color: var(--blue-slate);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -67,7 +67,7 @@
 .auth-tab--active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  font-weight: var(--font-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .auth-tab:hover:not(.auth-tab--active) {
@@ -81,14 +81,14 @@
 }
 
 .auth-heading__title {
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
+  font-size: var(--fs-600);
+  font-weight: var(--fw-bold);
   margin: 0 0 var(--space-1);
   line-height: 1.2;
 }
 
 .auth-heading__sub {
-  font-size: var(--text-sm);
+  font-size: var(--fs-200);
   color: var(--blue-slate);
   margin: 0;
   opacity: 0.8;
@@ -105,8 +105,8 @@
   background: white;
   border: 1px solid var(--dust-grey);
   border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
   cursor: pointer;
   color: inherit;
   transition: background-color 0.15s, border-color 0.15s;
@@ -138,7 +138,7 @@
 }
 
 .auth-divider p {
-  font-size: var(--text-xs);
+  font-size: var(--fs-100);
   color: var(--blue-slate);
   margin: 0;
   white-space: nowrap;
@@ -159,15 +159,15 @@
 }
 
 .auth-field__label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
 }
 
 .auth-field__input {
   padding: var(--space-3);
   border: 1px solid var(--dust-grey);
   border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
+  font-size: var(--fs-200);
   font-family: inherit;
   outline: none;
   width: 100%;
@@ -190,8 +190,8 @@
   color: white;
   border: none;
   border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
@@ -210,7 +210,7 @@
 /* ── Toggle link ── */
 .auth-toggle {
   text-align: center;
-  font-size: var(--text-sm);
+  font-size: var(--fs-200);
   color: var(--blue-slate);
   margin: 0;
 }
@@ -219,8 +219,8 @@
   background: none;
   border: none;
   color: var(--accent);
-  font-weight: var(--font-semibold);
-  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-200);
   font-family: inherit;
   cursor: pointer;
   text-decoration: underline;
@@ -230,7 +230,7 @@
 /* ── Footer ── */
 .auth-footer {
   text-align: center;
-  font-size: var(--text-xs);
+  font-size: var(--fs-100);
   color: var(--blue-slate);
   opacity: 0.65;
   margin: 0;

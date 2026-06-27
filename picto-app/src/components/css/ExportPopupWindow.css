@@ -1,5 +1,5 @@
 .popup-export-content{
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-family-base), sans-serif;
     border-radius: 2vh;
     display: flex;
     flex-direction: column;

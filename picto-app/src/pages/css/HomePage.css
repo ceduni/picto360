@@ -140,7 +140,7 @@
     min-width: 200px;
     height: 56px;
     cursor: pointer;
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-family-base), sans-serif;
     font-weight: 700;
     font-style: normal;
     font-size: clamp(1.5rem, 1.2vw, 1.1rem);
@@ -277,8 +277,8 @@
     background: transparent;
     border: none;
     border-radius: var(--radius-full);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
+    font-size: var(--fs-200);
+    font-weight: var(--fw-medium);
     color: var(--blue-slate);
     cursor: pointer;
     transition: background-color 0.15s, color 0.15s;
@@ -289,7 +289,7 @@
 .editor-view-tab--active {
     background: white;
     color: var(--accent);
-    font-weight: var(--font-semibold);
+    font-weight: var(--fw-semibold);
     box-shadow: var(--shadow-sm);
 }
 

@@ -34,7 +34,7 @@ const App = () => {
                 <Route path="/dashboard/profile" element={<ProfilePage />} />
                 <Route path="/dashboard/your-activities" element={<ActivitiesListPage />} />
                 <Route path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />
-                <Route path="/activity_creation" element={<ActivityCreationPage />} />
+                <Route path="/dashboard/activity-creation" element={<ActivityCreationPage />} />
             </Route>,
         ];
     }

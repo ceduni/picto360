@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
 :root {
   /* ── Colours ── */
   --accent:#1c73fa;
   --accent-dark:#001833;
+  --accent-light-bg:#f7f7f7;
   --accent-light:#EBF4FF;
 
   --accent-hover:#1761CF;
-
 
   --accent-secondary: #92D050ff;
   --gunmetal: #404040ff;
@@ -23,17 +25,139 @@
   --space-7: 28px;
   --space-8: 32px;
 
-  /* ── Typography ── */
-  --text-xs:   11px;
-  --text-sm:   13px;
-  --text-md:   15px;
-  --text-lg:   18px;
-  --text-xl:   22px;
+  /* ── Typography — Font family ── */
+  --font-family-base: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --font-normal:  400;
-  --font-medium:  500;
-  --font-semibold: 600;
-  --font-bold:    700;
+  /* ── Typography — Weight primitives ── */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* ── Typography — Size primitives (px) ── */
+  --fs-100: 12px;   /* caption / helper / pills        */
+  --fs-200: 13px;   /* nav subitems / breadcrumb        */
+  --fs-300: 14px;   /* labels / inputs / buttons / body */
+  --fs-400: 18px;   /* card / section headings          */
+  --fs-500: 20px;   /* logo / brand                     */
+  --fs-600: 22px;   /* page title                       */
+
+  /* ── Typography — Line-height primitives (px) ── */
+  --lh-100: 16px;
+  --lh-200: 18px;
+  --lh-300: 20px;
+  --lh-400: 24px;
+  --lh-500: 28px;
+  --lh-600: 28px;
+
+  /* ── Typography — Letter-spacing ── */
+  --ls-tight:  -0.01em;  /* large headings  */
+  --ls-snug:   -0.005em; /* mid headings    */
+  --ls-normal:  0em;     /* body / UI       */
+
+  /* ── Typography — Semantic tokens ── */
+  --type-page-title-size:    var(--fs-600);
+  --type-page-title-line:    var(--lh-600);
+  --type-page-title-weight:  var(--fw-bold);
+  --type-page-title-tracking:var(--ls-tight);
+
+  --type-logo-size:    var(--fs-500);
+  --type-logo-line:    var(--lh-500);
+  --type-logo-weight:  var(--fw-bold);
+  --type-logo-tracking:var(--ls-snug);
+
+  --type-card-heading-size:    var(--fs-400);
+  --type-card-heading-line:    var(--lh-400);
+  --type-card-heading-weight:  var(--fw-semibold);
+  --type-card-heading-tracking:var(--ls-snug);
+
+  --type-subtitle-size:   var(--fs-300);
+  --type-subtitle-line:   var(--lh-300);
+  --type-subtitle-weight: var(--fw-regular);
+  --type-subtitle-tracking:var(--ls-normal);
+
+  --type-label-size:    var(--fs-300);
+  --type-label-line:    var(--lh-300);
+  --type-label-weight:  var(--fw-medium);
+  --type-label-tracking:var(--ls-normal);
+
+  --type-input-size:    var(--fs-300);
+  --type-input-line:    var(--lh-300);
+  --type-input-weight:  var(--fw-regular);
+  --type-input-tracking:var(--ls-normal);
+
+  --type-button-size:    var(--fs-300);
+  --type-button-line:    var(--lh-300);
+  --type-button-weight:  var(--fw-medium);
+  --type-button-tracking:var(--ls-normal);
+
+  --type-nav-item-size:   var(--fs-300);
+  --type-nav-item-line:   var(--lh-300);
+  --type-nav-item-weight: var(--fw-medium);
+
+  --type-nav-subitem-size:   var(--fs-200);
+  --type-nav-subitem-line:   var(--lh-200);
+  --type-nav-subitem-weight: var(--fw-regular);
+
+  --type-breadcrumb-size:   var(--fs-200);
+  --type-breadcrumb-line:   var(--lh-200);
+  --type-breadcrumb-weight: var(--fw-regular);
+
+  --type-summary-label-size:   var(--fs-100);
+  --type-summary-label-line:   var(--lh-100);
+  --type-summary-label-weight: var(--fw-regular);
+
+  --type-summary-value-size:   var(--fs-300);
+  --type-summary-value-line:   var(--lh-300);
+  --type-summary-value-weight: var(--fw-medium);
+
+  --type-preview-title-size:   var(--fs-300);
+  --type-preview-title-line:   var(--lh-300);
+  --type-preview-title-weight: var(--fw-semibold);
+
+  --type-preview-body-size:   var(--fs-200);
+  --type-preview-body-line:   var(--lh-200);
+  --type-preview-body-weight: var(--fw-regular);
+
+  --type-preview-timestamp-size:   var(--fs-100);
+  --type-preview-timestamp-line:   var(--lh-100);
+  --type-preview-timestamp-weight: var(--fw-regular);
+
+  --type-helper-size:   var(--fs-100);
+  --type-helper-line:   var(--lh-100);
+  --type-helper-weight: var(--fw-regular);
+
+  --type-pill-size:   var(--fs-100);
+  --type-pill-line:   var(--lh-100);
+  --type-pill-weight: var(--fw-medium);
+
+  /* Overline — uppercase section labels ("ACTIVITÉS") */
+  --type-overline-size:     var(--fs-100);
+  --type-overline-line:     var(--lh-100);
+  --type-overline-weight:   var(--fw-semibold);
+  --type-overline-tracking: 0.04em;
+
+  /* Tab — segmented controls (Solo / Équipes) */
+  --type-tab-size:   var(--fs-400);
+  --type-tab-line:   var(--lh-400);
+  --type-tab-weight: var(--fw-semibold);
+
+  /* Stat number — large counter displays */
+  --type-stat-number-size:   var(--fs-400);
+  --type-stat-number-line:   var(--lh-400);
+  --type-stat-number-weight: var(--fw-bold);
+
+  /* ── Legacy aliases (backward compat — keep old names pointing at new tokens) ── */
+  --font-normal:   var(--fw-regular);
+  --font-medium:   var(--fw-medium);
+  --font-semibold: var(--fw-semibold);
+  --font-bold:     var(--fw-bold);
+  --text-xs:  var(--fs-100);
+  --text-sm:  var(--fs-200);
+  --text-md:  var(--fs-300);
+  --text-lg:  var(--fs-400);
+  --text-xl:  var(--fs-600);
+  --btn-font-size: var(--type-button-size);
 
   /* ── Radii ── */
   --radius-sm: 4px;
@@ -46,7 +170,13 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,.10);
 
   --shadow-centered-sm: 0 0 3px rgba(0,0,0,.10);
-  --shadow-centered-md: 0 4 12px rgba(0,0,0,.15);  
+  --shadow-centered-md: 0 4 12px rgba(0,0,0,.15);
+
+  /* ── Button heights ── */
+  --btn-height-lg: 44px;   /* CTA: max-visibility hero actions  */
+  --btn-height-md: 40px;   /* Standard: form submits, navigation */
+  --btn-height-sm: 32px;   /* Small: utility links, dense UIs   */
+  --btn-padding: 2;
 
   /* ── Layout ── */
   --sidebar-width: 220px;
@@ -66,9 +196,52 @@
   --gradient-radial: radial-gradient(#92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
 }
 
+/* ── Typography utility classes ── */
+.t-page-title {
+  font: var(--type-page-title-weight) var(--type-page-title-size) /
+    var(--type-page-title-line) var(--font-family-base);
+  letter-spacing: var(--type-page-title-tracking);
+}
+.t-card-heading {
+  font: var(--type-card-heading-weight) var(--type-card-heading-size) /
+    var(--type-card-heading-line) var(--font-family-base);
+  letter-spacing: var(--type-card-heading-tracking);
+}
+.t-subtitle {
+  font: var(--type-subtitle-weight) var(--type-subtitle-size) /
+    var(--type-subtitle-line) var(--font-family-base);
+}
+.t-label {
+  font: var(--type-label-weight) var(--type-label-size) /
+    var(--type-label-line) var(--font-family-base);
+}
+.t-input,
+.t-body {
+  font: var(--type-input-weight) var(--type-input-size) /
+    var(--type-input-line) var(--font-family-base);
+}
+.t-button {
+  font: var(--type-button-weight) var(--type-button-size) /
+    var(--type-button-line) var(--font-family-base);
+}
+.t-nav-item {
+  font: var(--type-nav-item-weight) var(--type-nav-item-size) /
+    var(--type-nav-item-line) var(--font-family-base);
+}
+.t-nav-subitem {
+  font: var(--type-nav-subitem-weight) var(--type-nav-subitem-size) /
+    var(--type-nav-subitem-line) var(--font-family-base);
+}
+.t-helper,
+.t-caption {
+  font: var(--type-helper-weight) var(--type-helper-size) /
+    var(--type-helper-line) var(--font-family-base);
+}
+
 html,
 body,
 #root {
+  font-family: var(--font-family-base);
   width: 100%;
   min-height: 100%;
   margin: 0;
@@ -87,7 +260,6 @@ body,
 .app__header {
   position: absolute;
   width: 100%;
-  /* Matching the toolbar's height*/
   height: 55px;
 }
 

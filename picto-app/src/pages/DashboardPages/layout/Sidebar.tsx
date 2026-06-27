@@ -78,7 +78,7 @@ const Sidebar: React.FC = () => {
             <span className="sidebar-section__title">Activités</span>
             <button
               className="sidebar-section__add"
-              onClick={() => navigate("/activity_creation")}
+              onClick={() => navigate("/dashboard/activity-creation")}
               aria-label="Nouvelle activité"
               >
               <PlusIcon width={14} height={14} />

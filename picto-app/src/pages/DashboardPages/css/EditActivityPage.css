@@ -58,7 +58,7 @@
 }
 
 .edit-activity-main-content{
-    font-family: 'Inter' sans-serif;
+    font-family: var(--font-family-base) sans-serif;
 }
 
 .edit-activity-input_field{

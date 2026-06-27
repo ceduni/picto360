@@ -19,7 +19,7 @@
   display: grid;
   grid-template-rows: 1fr 2fr 1fr;
   align-items: center;
-  font-family: "Inter",sans-serif;
+  font-family: var(--font-family-base),sans-serif;
 }
 
 .login-page__logo {
@@ -152,7 +152,7 @@
     height: 8vh;
   color: #ffffff;
   cursor: pointer;
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-family-base), sans-serif;
   font-weight: 800;
   font-style: normal;
   font-size: 1.2vw;
@@ -169,7 +169,7 @@
     height: 8vh;
     color: #364A9D;
     cursor: pointer;
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-family-base), sans-serif;
     font-weight: 800;
     font-style: normal;
     font-size: 1.2vw;
@@ -225,7 +225,7 @@ input {
     color: #364A9D;
     opacity: 20%;
     font-size: 15px;
-    font-family: 'Inter' sans-serif;
+    font-family: var(--font-family-base) sans-serif;
 }
 
 .login_dialog_box:focus {

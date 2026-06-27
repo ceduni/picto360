@@ -89,16 +89,21 @@
 }
 
 .sidebar-logo-name {
-  font-size: var(--text-md);
-  font-weight: var(--font-bold);
+  font-size: var(--type-logo-size);
+  line-height: var(--type-logo-line);
+  font-weight: var(--type-logo-weight);
   color: var(--accent);
-  letter-spacing: -0.3px;
+  letter-spacing: var(--type-logo-tracking);
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+}
+
+.sidebar--collapsed .sidebar-nav {
+  flex: 1;
 }
 
 .sidebar-item {
@@ -110,8 +115,9 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   color: var(--blue-slate);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-size: var(--type-nav-item-size);
+  line-height: var(--type-nav-item-line);
+  font-weight: var(--type-nav-item-weight);
   transition: background-color 0.15s ease, color 0.15s ease;
   user-select: none;
 }
@@ -124,7 +130,7 @@
 .sidebar-item--active {
   background-color: var(--accent-light);
   color: var(--accent);
-  font-weight: var(--font-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .sidebar-bottom {
@@ -156,11 +162,12 @@
 }
 
 .sidebar-section__title {
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
+  font-size: var(--type-overline-size);
+  line-height: var(--type-overline-line);
+  font-weight: var(--type-overline-weight);
   color: var(--blue-slate);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--type-overline-tracking);
 }
 
 .sidebar-section__add {
@@ -190,7 +197,7 @@
 }
 
 .sidebar-section__empty {
-  font-size: var(--text-xs);
+  font-size: var(--fs-100);
   color: var(--blue-slate);
   opacity: 0.4;
   padding: var(--space-1) var(--space-3);
@@ -224,9 +231,9 @@
 }
 
 .sidebar-activity__name {
-  font-size: var(--text-sm);
+  font-size: var(--fs-200);
   color: var(--blue-slate);
-  font-weight: var(--font-medium);
+  font-weight: var(--fw-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,5 +1,5 @@
 :root {
-    --font-family: 'Inter', sans-serif;
+    --font-family: var(--font-family-base), sans-serif;
     --font-size: 1rem;
     --font-weight-bold: bold;
     --transition-color: color 0.5s ease-in-out;

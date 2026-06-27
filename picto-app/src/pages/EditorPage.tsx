@@ -94,13 +94,15 @@ const EditorPage = ({ view: initialView = "editor" }: EditorPageProps = {}) => {
                             <ViewfinderCircleIcon width={15} height={15} />
                             Éditeur
                         </button>
-                        <button
-                            className={`editor-view-tab${view === "auth" ? " editor-view-tab--active" : ""}`}
-                            onClick={() => setView("auth")}
-                        >
-                            <UserIcon width={15} height={15} />
-                            Se connecter
-                        </button>
+                         {__ENABLE_ADMIN__ && (
+                            <button
+                                className={`editor-view-tab${view === "auth" ? " editor-view-tab--active" : ""}`}
+                                onClick={() => setView("auth")}
+                            >
+                                <UserIcon width={15} height={15} />
+                                Se connecter
+                            </button>
+                        )}
                     </div>
 
                     {view === "editor" ? (
