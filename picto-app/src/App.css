@@ -6,7 +6,7 @@
 
   --accent-hover:#1761CF;
 
-  
+
   --accent-secondary: #92D050ff;
   --gunmetal: #404040ff;
   --azure-blue: #3682FCff;
@@ -44,6 +44,9 @@
   /* ── Shadows ── */
   --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
   --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+
+  --shadow-centered-sm: 0 0 3px rgba(0,0,0,.10);
+  --shadow-centered-md: 0 4 12px rgba(0,0,0,.15);  
 
   /* ── Layout ── */
   --sidebar-width: 220px;

@@ -161,7 +161,6 @@
   color: var(--blue-slate);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  opacity: 0.6;
 }
 
 .sidebar-section__add {
@@ -175,7 +174,6 @@
   border-radius: var(--radius-sm);
   color: var(--blue-slate);
   cursor: pointer;
-  opacity: 0.5;
   transition: opacity 0.15s, background-color 0.15s;
 }
 

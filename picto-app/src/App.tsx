@@ -1,10 +1,17 @@
 import React, { lazy, Suspense } from "react";
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
-import { AuthProvider } from "./authContext/authContext";
+import { AuthProvider, useAuth } from "./authContext/authContext";
 import StudioPage from "./pages/DashboardPages/StudioPage";
+
+// Redirects unauthenticated users to /login; renders child routes otherwise.
+// Safe to call here because AuthProvider blocks rendering until auth is resolved.
+const RequireAuth: React.FC = () => {
+    const { userLoggedIn } = useAuth();
+    return userLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
+};
 
 const App = () => {
     // Build routes in a block that only exists when admin is enabled.
@@ -21,18 +28,20 @@ const App = () => {
 
         adminRoutes = [
             <Route key="login" path="/login" element={<LoginPage />} />,
-            <Route key="profile" path="/profile" element={<ProfilePage />} />,
-            <Route key="create" path="/activity_creation" element={<ActivityCreationPage />} />,
-            <Route key="editor" path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />,
-            <Route key="list" path="/dashboard/your-activities" element={<ActivitiesListPage />} />,
-            <Route key="dashboard" path="/dashboard" element={<DashboardPage />} />,
-            <Route key="studio" path="/dashboard/studio" element={<StudioPage />} />,
+            <Route key="protected" element={<RequireAuth />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/dashboard/studio" element={<StudioPage />} />
+                <Route path="/dashboard/profile" element={<ProfilePage />} />
+                <Route path="/dashboard/your-activities" element={<ActivitiesListPage />} />
+                <Route path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />
+                <Route path="/activity_creation" element={<ActivityCreationPage />} />
+            </Route>,
         ];
     }
 
     return (
         <div className="app">
-            <AuthProvider >
+            <AuthProvider>
                 {/* Suspense for the lazy-loaded elements (admin specific pages) */}
                 <Suspense fallback={null}>
                     <Routes>

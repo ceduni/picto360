@@ -16,7 +16,7 @@ const GotoProfile : React.FC<GotoProfileProps> = ({displayType}) =>{
     const navigate = useNavigate();
     const onProfileClick = useCallback(() =>{
 
-        userLoggedIn ? navigate('/profile') : navigate('/login')
+        userLoggedIn ? navigate('/dashboard/profile') : navigate('/login')
     },[]);
 
     return ( 

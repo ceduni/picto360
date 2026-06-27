@@ -1,40 +1,43 @@
 import { useAuth } from "@/authContext/authContext"
-
 import "./css/ProfilePage.css"
 import { doSignOut } from "@/firebase/authentification";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import { ArrowRightOnRectangleIcon, ArrowLeftIcon, CheckIcon, XMarkIcon, PencilIcon, PhotoIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowRightOnRectangleIcon,
+    CheckIcon,
+    XMarkIcon,
+    PencilIcon,
+    UserIcon,
+    EnvelopeIcon,
+    CalendarIcon,
+    BoltIcon,
+    UsersIcon,
+} from "@heroicons/react/24/outline";
+import {
+    CheckBadgeIcon,
+} from "@heroicons/react/24/solid";
+
 import { updateUserName } from "@/firebase/userProfileUpdates";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
+import { useFetchActivities } from "@/hooks/useGetUserActivities";
 import ErrorBanner from "@/components/FeedbackBanner";
+import DashboardLayout from "./DashboardPages/layout/DashboardLayout";
 
 const ProfilePage: React.FC = () => {
-
     const navigate = useNavigate();
-
     const { userLoggedIn, currentUser } = useAuth();
-
+    const { userActivities } = useFetchActivities();
     const [uname, setUname] = useState<string | null | undefined>(currentUser?.displayName);
-    const [isTyping, setIsTyping] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const { setBannerMessage, bannerRef } = useFeedbackBanner();
 
-    const onLoggOut = async (e: { preventDefault: () => void }) => {
-        e.preventDefault();
+    const onLoggOut = async () => {
         if (userLoggedIn) {
             await doSignOut();
             navigate('/', { replace: true });
         }
-    }
-
-    const handleGoBack = () => {
-        navigate(-1); // Goes back one step in the history stack
-    };
-
-    const onTypingUname = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUname(e.target.value);
-        setIsTyping(true);
     };
 
     const handleUpdateUserName = async (newName: string) => {
@@ -42,165 +45,190 @@ const ProfilePage: React.FC = () => {
             if (currentUser) {
                 await updateUserName(newName);
                 setBannerMessage({ message: "Nom actualisé avec succès", type: "success" });
-
             } else {
                 setBannerMessage({ message: "Utilisateur pas connecté", type: "failure" });
-                // console.log("User not logged in")
             }
         } catch (error) {
-            console.error("Error on Update name: ", error)
+            console.error("Error on Update name: ", error);
             setBannerMessage({ message: "Erreur lors de la mise à jour du nom, Réessayer", type: "failure" });
         }
-    }
-
-    const handleBlur = () => {
-        setIsTyping(false);
     };
 
-    const handleFocus = () => {
-        if (!isTyping) {
-            setIsTyping(true);
-        }
+    const handleSave = async () => {
+        if (uname) await handleUpdateUserName(uname);
+        setIsEditing(false);
     };
 
-    const getUnameFromEmail = () => {
-        const email = currentUser?.email;
-        const splitEmail = email?.split("@");
-        return splitEmail?.at(0);
-    }
+    const handleCancel = () => {
+        setUname(currentUser?.displayName);
+        setIsEditing(false);
+    };
 
+    const getUnameFromEmail = () => currentUser?.email?.split("@")[0];
+
+    const formatMemberSince = (creationTime?: string) => {
+        if (!creationTime) return "—";
+        return new Date(creationTime).toLocaleDateString("fr-FR", {
+            year: "numeric",
+            month: "long",
+        });
+    };
 
     return (
-        <div className="profile_page-background">
-            <div className="profile_page-content">
-                <ErrorBanner ref={bannerRef} />
-                <div className="profile_top">
+        <DashboardLayout title="Mon Profil">
+            <ErrorBanner ref={bannerRef} />
+            <div className="profile_main_content">
+                <div className="profile_card">
 
-                    <div onClick={handleGoBack} className="back_button">
-                        <ArrowLeftIcon width={24} height={24} />
-                    </div>
-                    <h1 className="profile_title">Mon Profil</h1>
-                </div>
-
-                <div className="profile_main_content">
-
-                    <div className="profile_background">
-                        <img src="/images/profile_background_image.png"
-                            className="profile_background_image"
-                            alt="background_picture" />
+                    {/* Banner */}
+                    <div className="profile_banner">
+                        <img
+                            src="/images/profile_background_image.png"
+                            className="profile_banner__img"
+                            alt=""
+                        />
                     </div>
 
-                    <div className="profile_context">
-                        <div className="profile_context-top">
-                            <img src={(currentUser?.photoURL === null) ? "https://picsum.photos/200/300" : currentUser?.photoURL}
-                                alt="profile_pictute"
-                                className="profile_picture" />
-                            <div className="profile_context_top-content">
-                                <div className="profile_info">
-                                    <div className="user_name_container">
-                                        <input
-                                            type="text"
-                                            value={uname || getUnameFromEmail()}
-                                            onFocus={handleFocus}
-                                            onKeyDown={(e) => e.key === "Enter" && handleBlur}
-                                            onChange={onTypingUname}
-                                            className={
-                                                isTyping ?
-                                                    "user_name_typing"
-                                                    :
-                                                    "user_name"
-                                            }
-                                        />
-                                        {
-                                            isTyping ?
-                                                <div className="icons-name-change-container">
-                                                    <CheckIcon
-                                                        width={20}
-                                                        height={20}
-                                                        onClick={() => {
-                                                            if (uname && uname != undefined) {
-                                                                handleUpdateUserName(uname)
-                                                            };
-                                                            setIsTyping(false)
-                                                        }
-                                                        }
-                                                        className="icon-name-change"
-                                                    />
-                                                    <XMarkIcon
-                                                        width={20}
-                                                        height={20}
-                                                        onClick={
-                                                            () => {
-                                                                setIsTyping(false);
-                                                                setUname(currentUser?.displayName)
-                                                            }
-                                                        }
-                                                        className="icon-name-change"
-                                                    />
-                                                </div>
-                                                :
-                                                <PencilIcon
-                                                    width={15}
-                                                    height={15}
-                                                    className="icon-name-change"
-                                                    onClick={() => setIsTyping(true)} />
-                                        }
-                                    </div>
+                    {/* Hero row: avatar (overlaps banner) + edit/save controls */}
+                    <div className="profile_hero">
+                        <img
+                            src={currentUser?.photoURL ?? "https://picsum.photos/200/300"}
+                            alt="Photo de profil"
+                            className="profile_avatar"
+                        />
+                        {isEditing ? (
+                            <div className="profile_hero__edit-actions">
+                                <button className="profile_save-btn" onClick={handleSave}>
+                                    <CheckIcon width={14} height={14} />
+                                    Enregistrer
+                                </button>
+                                <button className="profile_cancel-btn" onClick={handleCancel}>
+                                    <XMarkIcon width={14} height={14} />
+                                </button>
+                            </div>
+                        ) : (
+                            <button className="profile_edit-btn" onClick={() => setIsEditing(true)}>
+                                <PencilIcon width={14} height={14} />
+                                Modifier le profil
+                            </button>
+                        )}
+                    </div>
 
-                                    <h2 className="user_email">
-                                        {userLoggedIn && currentUser?.email}
-                                    </h2>
+                    {/* Identity: display name + verified badge + member since */}
+                    <div className="profile_identity">
+                        <div className="profile_name-badge-row">
+                            <h2 className="profile_display-name">
+                                {uname || getUnameFromEmail()}
+                            </h2>
+                            {currentUser?.emailVerified && (
+                                <span className="profile_verified-badge">
+                                    <CheckBadgeIcon width={12} height={12} />
+                                    Profil vérifié
+                                </span>
+                            )}
+                        </div>
+                        <p className="profile_member-since-line">
+                            <CalendarIcon width={14} height={14} />
+                            Membre depuis {formatMemberSince(currentUser?.metadata?.creationTime)}
+                        </p>
+                    </div>
+
+                    {/* Section 1: Profile details */}
+                    <div className="profile_section">
+                        <div className="profile_section__header">
+                            <h3 className="profile_section__title">Détails du profil</h3>
+                            {isEditing && (
+                                <span className="profile_section__editing-hint">Mode édition</span>
+                            )}
+                        </div>
+                        <div className="profile_fields-grid">
+
+                            <div className="profile_field">
+                                <div className="profile_field__label-row">
+                                    <UserIcon width={13} height={13} />
+                                    <span>Nom complet</span>
                                 </div>
-                                <div className="profile_top_right">
-                                    <div className="profile_top_right_group">
-                                        <p>Activités</p>
-                                        <h2>03</h2>
-                                    </div>
+                                {isEditing ? (
+                                    <input
+                                        className="profile_field__input"
+                                        value={uname ?? ""}
+                                        onChange={(e) => setUname(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handleSave()}
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <span className="profile_field__value">
+                                        {uname || getUnameFromEmail()}
+                                    </span>
+                                )}
+                            </div>
 
-                                    <div className="profile_top_right_group">
-                                        <p>Groupes</p>
-                                        <h2>03</h2>
-                                    </div>
-                                    <div title="Se déconnecter" className="profile_logout-button" onClick={onLoggOut}>
-                                        <ArrowRightOnRectangleIcon width={18} height={18} />
-                                        <p>
-                                            Déconnexion
-                                        </p>
-                                    </div>
-
+                            <div className="profile_field">
+                                <div className="profile_field__label-row">
+                                    <EnvelopeIcon width={13} height={13} />
+                                    <span>Email</span>
                                 </div>
-
+                                <div className="profile_field__value-row">
+                                    <span className="profile_field__value">{currentUser?.email}</span>
+                                    {currentUser?.emailVerified && (
+                                        <span className="profile_badge profile_badge--green">
+                                            <CheckBadgeIcon width={10} height={10} />
+                                            Email vérifié
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="context_options">
-                            <div className="option_baniere" onClick={() => navigate("/dashboard/your-activities")}>
-                                <ListBulletIcon width={20} height={20} />
-                                <p>
-                                    Voir toutes vos activité
-                                </p>
+
+                            <div className="profile_field">
+                                <div className="profile_field__label-row">
+                                    <CalendarIcon width={13} height={13} />
+                                    <span>Membre depuis</span>
+                                </div>
+                                <span className="profile_field__value">
+                                    {formatMemberSince(currentUser?.metadata?.creationTime)}
+                                </span>
                             </div>
 
-                            {/* <div className="option_baniere">
-                                <Icon icon="dashicons:groups" width="22" height="22" />
-                                <p> Voir touts vos groupes </p>
-                            </div>        */}
-
-                            <div className="option_baniere">
-                                <PhotoIcon width={20} height={20} />
-                                <p> Voir vos images récentes </p>
-                            </div>
                         </div>
-
-                        <div className="option_baniere_delete_account">
-                            <Icon icon="fluent:delete-16-filled" width="20" height="20" />
-                            <p> Supprimer mon compte </p>
-                        </div>
-
                     </div>
+
+                    {/* Section 2: Metrics */}
+                    <div className="profile_section profile_section--last">
+                        <div className="profile_section__header">
+                            <h3 className="profile_section__title">Métriques</h3>
+                        </div>
+                        <div className="profile_metrics">
+                            <div className="profile_metric">
+                                <BoltIcon width={22} height={22} className="profile_metric__icon" />
+                                <span className="profile_metric__value">
+                                    {userActivities?.length ?? 0}
+                                </span>
+                                <span className="profile_metric__label">Activités créées</span>
+                            </div>
+                            <div className="profile_metric">
+                                <UsersIcon width={22} height={22} className="profile_metric__icon" />
+                                <span className="profile_metric__value">0</span>
+                                <span className="profile_metric__label">Groupes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Danger zone */}
+                    <div className="profile_danger">
+                        <button className="profile_logout-btn" onClick={onLoggOut}>
+                            <ArrowRightOnRectangleIcon width={15} height={15} />
+                            Déconnexion
+                        </button>
+                        <button className="profile_danger-btn">
+                            <Icon icon="fluent:delete-16-filled" width="15" height="15" />
+                            Supprimer mon compte
+                        </button>
+                    </div>
+
                 </div>
             </div>
-        </div>
-    )
-}
+        </DashboardLayout>
+    );
+};
 
-export default ProfilePage
+export default ProfilePage;

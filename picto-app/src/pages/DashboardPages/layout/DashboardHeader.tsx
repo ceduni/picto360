@@ -37,7 +37,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title }) => {
 
         <div
           className="dash-header-avatar"
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate("/dashboard/profile")}
           title={currentUser?.displayName ?? "Profil"}
         >
           {currentUser?.photoURL ? (
