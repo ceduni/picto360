@@ -1,19 +1,24 @@
 import "./css/HomePage.css";
 import ImageUploader from "@/components/ImageUploader";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/authContext/authContext";
-import GotoProfile from "@/components/GotoProfile";
 import { putViewerItem, compressBeforeUpload } from "@/utils/storedImageData";
 import { CustomFileExporter } from "@/pictoFileExtention/PictoFileFormat";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "@/components/FeedbackBanner";
+import AuthCard from "./AuthCard";
+import { ViewfinderCircleIcon, UserIcon } from "@heroicons/react/24/outline";
 
+type View = "editor" | "auth";
 
-const EditorPage = () => {
-    const { userLoggedIn } = useAuth();
+interface EditorPageProps {
+    view?: View;
+}
+
+const EditorPage = ({ view: initialView = "editor" }: EditorPageProps = {}) => {
     const { setBannerMessage, bannerRef } = useFeedbackBanner();
     const navigate = useNavigate();
+    const [view, setView] = useState<View>(initialView);
 
     const handleImageUpload = useCallback(async (newImageSrc: File): Promise<boolean> => {
         if (!ImageUploader) return false;
@@ -49,8 +54,8 @@ const EditorPage = () => {
                 setBannerMessage({ message: "Image chargé avec succès", type: "success" });
                 break;
             default:
-                setBannerMessage({ message: "Format de fichier Invalide", type: "failure" })
-                return false
+                setBannerMessage({ message: "Format de fichier Invalide", type: "failure" });
+                return false;
         }
 
         await navigate(`/view/${viewerId}`);
@@ -63,18 +68,6 @@ const EditorPage = () => {
 
         return true;
     }, [navigate, setBannerMessage]);
-
-    const handleLogClick = useCallback(() => {
-        navigate('/login');
-    }, [navigate]);
-
-    const onCreateActivityClick = () => {
-        if (userLoggedIn) {
-            navigate('/activity_creation');
-        } else {
-            handleLogClick();
-        }
-    };
 
     return (
         <div className="home-page">
@@ -89,15 +82,32 @@ const EditorPage = () => {
                         Annotez librement vos images 360 avec <br />
                         du texte, des liens, des images et des vidéos.
                     </p>
-                    {__ENABLE_ADMIN__ && (
-                        <div>
-                            <GotoProfile displayType={userLoggedIn ? undefined : "name"} />
-                        </div>
-                    )}
                 </header>
 
                 <section className="home-page__content">
-                    <ImageUploader onImageUpload={handleImageUpload} />
+                    {/* View selector */}
+                    <div className="editor-view-tabs">
+                        <button
+                            className={`editor-view-tab${view === "editor" ? " editor-view-tab--active" : ""}`}
+                            onClick={() => setView("editor")}
+                        >
+                            <ViewfinderCircleIcon width={15} height={15} />
+                            Éditeur
+                        </button>
+                        <button
+                            className={`editor-view-tab${view === "auth" ? " editor-view-tab--active" : ""}`}
+                            onClick={() => setView("auth")}
+                        >
+                            <UserIcon width={15} height={15} />
+                            Se connecter
+                        </button>
+                    </div>
+
+                    {view === "editor" ? (
+                        <ImageUploader onImageUpload={handleImageUpload} />
+                    ) : (
+                        <AuthCard />
+                    )}
                 </section>
             </div>
 

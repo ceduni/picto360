@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/authContext/authContext";
-import StudioPage from "./EditorPage";
+import EditorPage from "./EditorPage";
 
 const HomePage = () => {
     const { userLoggedIn } = useAuth();
@@ -10,7 +10,7 @@ const HomePage = () => {
         return <Navigate to="/dashboard" replace />;
     }
 
-    return <StudioPage />;
+    return <EditorPage />;
 };
 
 export default React.memo(HomePage);
