@@ -4,7 +4,7 @@ import "./css/LoginPage.css"
 import { doSignInWithEmailAndPassword, doSighInWithGoogle, doCreateUserWithEmailAndPassword, doSignInWithFacebook } from "@/firebase/authentification"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { LuChevronDown, LuChevronRight } from "react-icons/lu";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import ErrorBanner from "../components/FeedbackBanner";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
@@ -210,7 +210,7 @@ const LoginPage = () => {
                         <h1 className="login-page_option-text">
                             {isSubscribing ? "S'inscrire" : "Se connecter"}  avec google
                         </h1>
-                        <LuChevronRight size={24} strokeWidth={2.5} />
+                        <ChevronRightIcon width={24} height={24} />
                     </div>
 
 
@@ -219,7 +219,7 @@ const LoginPage = () => {
                         <h1 className="login-page_option-text">
                             {isSubscribing ? "S'inscrire" : "Se connecter"}  avec facebook
                         </h1>
-                        <LuChevronRight size={24} strokeWidth={2.5} />
+                        <ChevronRightIcon width={24} height={24} />
                     </div>
 
 
@@ -231,9 +231,9 @@ const LoginPage = () => {
                             </h1>
                             {
                                 loginWithEmailBoxes ?
-                                    <LuChevronDown size={24} strokeWidth={2.5} />
+                                    <ChevronDownIcon width={24} height={24} />
                                     :
-                                    <LuChevronRight size={24} strokeWidth={2.5} />
+                                    <ChevronRightIcon width={24} height={24} />
                             }
 
                         </div>

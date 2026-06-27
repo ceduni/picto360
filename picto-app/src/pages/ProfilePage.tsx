@@ -5,8 +5,7 @@ import { doSignOut } from "@/firebase/authentification";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import { FaArrowRightToBracket } from "react-icons/fa6";
-import { LuArrowLeft, LuCheck, LuGitFork, LuImageDown, LuPenLine, LuX } from "react-icons/lu";
+import { ArrowRightOnRectangleIcon, ArrowLeftIcon, CheckIcon, XMarkIcon, PencilIcon, PhotoIcon, ListBulletIcon } from "@heroicons/react/24/outline";
 import { updateUserName } from "@/firebase/userProfileUpdates";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import ErrorBanner from "@/components/FeedbackBanner";
@@ -78,7 +77,7 @@ const ProfilePage: React.FC = () => {
                 <div className="profile_top">
 
                     <div onClick={handleGoBack} className="back_button">
-                        <LuArrowLeft size={24} strokeWidth={3} />
+                        <ArrowLeftIcon width={24} height={24} />
                     </div>
                     <h1 className="profile_title">Mon Profil</h1>
                 </div>
@@ -115,8 +114,9 @@ const ProfilePage: React.FC = () => {
                                         {
                                             isTyping ?
                                                 <div className="icons-name-change-container">
-                                                    <LuCheck strokeWidth={3}
-                                                        size={20}
+                                                    <CheckIcon
+                                                        width={20}
+                                                        height={20}
                                                         onClick={() => {
                                                             if (uname && uname != undefined) {
                                                                 handleUpdateUserName(uname)
@@ -126,8 +126,9 @@ const ProfilePage: React.FC = () => {
                                                         }
                                                         className="icon-name-change"
                                                     />
-                                                    <LuX strokeWidth={3}
-                                                        size={20}
+                                                    <XMarkIcon
+                                                        width={20}
+                                                        height={20}
                                                         onClick={
                                                             () => {
                                                                 setIsTyping(false);
@@ -138,8 +139,9 @@ const ProfilePage: React.FC = () => {
                                                     />
                                                 </div>
                                                 :
-                                                <LuPenLine size={15}
-                                                    strokeWidth={2.2}
+                                                <PencilIcon
+                                                    width={15}
+                                                    height={15}
                                                     className="icon-name-change"
                                                     onClick={() => setIsTyping(true)} />
                                         }
@@ -160,7 +162,7 @@ const ProfilePage: React.FC = () => {
                                         <h2>03</h2>
                                     </div>
                                     <div title="Se déconnecter" className="profile_logout-button" onClick={onLoggOut}>
-                                        <FaArrowRightToBracket size={18} />
+                                        <ArrowRightOnRectangleIcon width={18} height={18} />
                                         <p>
                                             Déconnexion
                                         </p>
@@ -172,7 +174,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                         <div className="context_options">
                             <div className="option_baniere" onClick={() => navigate("/dashboard/your-activities")}>
-                                <LuGitFork size={20} strokeWidth={2.5} />
+                                <ListBulletIcon width={20} height={20} />
                                 <p>
                                     Voir toutes vos activité
                                 </p>
@@ -184,7 +186,7 @@ const ProfilePage: React.FC = () => {
                             </div>        */}
 
                             <div className="option_baniere">
-                                <LuImageDown size={20} strokeWidth={2.5} />
+                                <PhotoIcon width={20} height={20} />
                                 <p> Voir vos images récentes </p>
                             </div>
                         </div>

@@ -17,6 +17,7 @@ const App = () => {
         const ActivityCreationPage = lazy(() => import('./pages/ActivityCreationPage'));
         const EditActivityPage = lazy(() => import('./pages/DashboardPages/EditActivityPage'));
         const ActivitiesListPage = lazy(() => import('./pages/DashboardPages/ActivitiesListPage'));
+        const DashboardPage = lazy(() => import('./pages/DashboardPages/DashboardPage'));
 
         adminRoutes = [
             <Route key="login" path="/login" element={<LoginPage />} />,
@@ -24,6 +25,7 @@ const App = () => {
             <Route key="create" path="/activity_creation" element={<ActivityCreationPage />} />,
             <Route key="editor" path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />,
             <Route key="list" path="/dashboard/your-activities" element={<ActivitiesListPage />} />,
+            <Route key="dashboard" path="/dashboard" element={<DashboardPage />} />,
         ];
     }
 

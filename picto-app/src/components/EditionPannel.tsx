@@ -6,8 +6,7 @@ import TextEditor from "./editors/TextEditor";
 import HyperlinkEditor from "./editors/HyperlinkEditor";
 import ImageEditor from "./editors/ImageEditor";
 import VideoEditor from "./editors/VideoEditor";
-import { BsTrash3Fill } from "react-icons/bs";
-import {  MdClose, MdImage, MdLink, MdOndemandVideo,  MdTextSnippet } from "react-icons/md";
+import { TrashIcon, XMarkIcon, PhotoIcon, LinkIcon, VideoCameraIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 
 
@@ -148,14 +147,14 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
         switch (type) {
             case "text":
             case "label":
-                return <MdTextSnippet size={20} />;
+                return <DocumentTextIcon width={20} height={20} />;
             case "hyperlink":
-                return <MdLink size={20} />;
+                return <LinkIcon width={20} height={20} />;
             case "gif":
             case "image":
-                return <MdImage size={20} />;
+                return <PhotoIcon width={20} height={20} />;
             case "video":
-                return <MdOndemandVideo size={20} />;
+                return <VideoCameraIcon width={20} height={20} />;
 
             // add more cases as needed
             default:
@@ -173,7 +172,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                     </div>
 
                     <button className="close-button" onClick={onClose} aria-label="Fermer le pannel d'édition sans sauvegarder">
-                        <MdClose />
+                        <XMarkIcon width={20} height={20} />
                     </button>
 
                     {/* <IoCloseCircleOutline size={40} className="close_icon"/> */}
@@ -185,7 +184,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                     {
                         pannelState == "editing" &&
                         <button type="button" title="delete" className="delete_button" onClick={handleDelete}>
-                            <BsTrash3Fill />
+                            <TrashIcon width={18} height={18} />
                         </button>
                     }
                     <div className="bottom_pannel">

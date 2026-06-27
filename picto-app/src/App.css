@@ -1,4 +1,5 @@
 :root {
+  /* ── Colours ── */
   --accent:#1c73fa;
   --accent-dark:#001833;
   --accent-light:#EBF4FF;
@@ -7,6 +8,45 @@
   --azure-blue: #3682FCff;
   --blue-slate: #4E5A6Dff;
   --dust-grey: #D8D8D8ff;
+
+  /* ── Spacing scale ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+
+  /* ── Typography ── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-md:   15px;
+  --text-lg:   18px;
+  --text-xl:   22px;
+
+  --font-normal:  400;
+  --font-medium:  500;
+  --font-semibold: 600;
+  --font-bold:    700;
+
+  /* ── Radii ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+
+  /* ── Layout ── */
+  --sidebar-width: 220px;
+  --header-height: 60px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
 
   --gradient-top: linear-gradient(0deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);
   --gradient-right: linear-gradient(90deg, #92D050ff, #404040ff, #3682FCff, #4E5A6Dff, #D8D8D8ff);

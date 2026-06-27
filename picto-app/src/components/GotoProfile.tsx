@@ -1,6 +1,6 @@
 import { useAuth } from "@/authContext/authContext";
 import React, { useCallback } from "react";
-import { MdKeyboardArrowRight } from "react-icons/md";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import "./css/GotoProfile.css"
 
@@ -35,7 +35,7 @@ const GotoProfile : React.FC<GotoProfileProps> = ({displayType}) =>{
                 <p>
                     {userLoggedIn ? currentUser?.displayName: "Se connecter"}
                 </p>
-                <MdKeyboardArrowRight size={24} />
+                <ChevronRightIcon width={24} height={24} />
             </div>
         }
         

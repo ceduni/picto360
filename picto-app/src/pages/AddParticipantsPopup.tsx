@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { IoIosClose } from "react-icons/io";
+import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import "./css/AddParticipantsPopup.css"
 import { handleParticipantNameChange, handleDeleteParticipant, handleAddParticipToTeam } from "@/utils/ActivityCreactionUtils";
 import { TeamInstance, ActivityIstance } from "@/utils/Types";
 import ParticipantCard from "./PagesUiComponents/ParticipantCard";
-import { FaPlus } from "react-icons/fa";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 
@@ -108,7 +107,7 @@ const AddParticipantsPopup: React.FC<AddParticipantsPopupProps> = ({ onClose, te
             <div className="popup_window">
                 {errorMessagePopup.isDisplayed &&
                     <div className="error_message_window">
-                        <IoIosClose size={30} onClick={onCloseError} />
+                        <XMarkIcon width={30} height={30} onClick={onCloseError} />
                         <p>{errorMessagePopup.err}</p>
                     </div>
                 }
@@ -116,7 +115,7 @@ const AddParticipantsPopup: React.FC<AddParticipantsPopupProps> = ({ onClose, te
                 <div className="popup_window_content">
                     <div className="popup_window_content-top">
                         <div className="popup_close_button" onClick={onClose}>
-                            <IoIosClose size={45} />
+                            <XMarkIcon width={45} height={45} />
                         </div>
                         <input key={teamIdx}
                             name="team_card_name"
@@ -165,7 +164,7 @@ const AddParticipantsPopup: React.FC<AddParticipantsPopupProps> = ({ onClose, te
                                 min={0}
                                 max={50} />
                             <div className="add_one" onClick={() => onAddParticipToTeam(1)}>
-                                <FaPlus size={14} />
+                                <PlusIcon width={14} height={14} />
                                 <p>1</p>
                             </div>
                         </div>

@@ -1,9 +1,7 @@
 import "@css/SettingsPopupWindow.css";
 
 import React, { useState } from "react";
-import { FaGoogleDrive } from "react-icons/fa";
-import { IoFileTrayFull } from "react-icons/io5";
-import { MdClose } from "react-icons/md";
+import { XMarkIcon, CloudArrowUpIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import { getExportService } from "@/utils/ExportFileUtils";
 import { savePendingDriveExport, useDriveAuth } from "@/hooks/useDriveAuth";
 import { getViewerItem } from "@/utils/storedImageData";
@@ -207,7 +205,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
             onClick={handlePopupClose}
             aria-label="Fermer les parametres"
           >
-            <MdClose />
+            <XMarkIcon width={20} height={20} />
           </button>
         </div>
 
@@ -298,7 +296,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
               }}
               disabled={exportInProgress}
             >
-              <FaGoogleDrive size={20} />
+              <CloudArrowUpIcon width={20} height={20} />
               Google Drive
             </button>
 
@@ -311,7 +309,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
                 setIsPopupOpen(false);
               }}
             >
-              <IoFileTrayFull size={20} />
+              <InboxArrowDownIcon width={20} height={20} />
               Ordinateur
             </button>
           </div>

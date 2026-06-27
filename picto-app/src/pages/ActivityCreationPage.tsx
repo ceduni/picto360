@@ -1,13 +1,21 @@
 import React, {  useEffect, useRef, useState } from "react"
-import { MdDescription,MdModeEditOutline  } from "react-icons/md";
-import { FaEdit , FaPlus} from "react-icons/fa";
-import { RxDragHandleDots2, RxPerson ,RxLapTimer} from "react-icons/rx";
-import { HiTrash } from "react-icons/hi2";
-import { IoMdPricetag  } from "react-icons/io";
-import { GoPeople, GoTasklist } from "react-icons/go";
-import { FaAngleLeft } from "react-icons/fa6";
+import {
+    DocumentTextIcon,
+    PencilIcon,
+    PencilSquareIcon,
+    PlusIcon,
+    Bars3Icon,
+    TrashIcon,
+    TagIcon,
+    UsersIcon,
+    ClipboardDocumentListIcon,
+    ChevronLeftIcon,
+    InformationCircleIcon,
+    XMarkIcon,
+    UserIcon,
+    ClockIcon,
+} from "@heroicons/react/24/outline";
 import  { Tooltip } from "react-tooltip"
-import { IoClose } from "react-icons/io5";
 
 import Switch from "react-switch";
 import "./css/ActivityCreationPage.css"
@@ -47,7 +55,6 @@ import ErrorBanner from "../components/FeedbackBanner";
 import  {  MessageBannerRef,ActivityIstance,TeamInstance,TaskData } from "../utils/Types";
 import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
 import { useCreateActivity } from "@/hooks/useActivityCreation";
-import { TiInfoLarge } from "react-icons/ti";
 
 
 
@@ -187,13 +194,13 @@ const ActivityCreationPage : React.FC = () => {
             className="task_card"
             >
 
-            <RxDragHandleDots2 size={18} {...listeners} {...attributes} className="drag-handle"/>
+            <Bars3Icon width={18} height={18} {...listeners} {...attributes} className="drag-handle" />
             <div className="task-chip">
                 <span>
                     {task.title}
                 </span>
                 <div className="delete_task" onClick={()=>setFormValues(handleRemoveTask(formValues,task.title))}>
-                    <HiTrash size={18}/>
+                    <TrashIcon width={18} height={18} />
                 </div>                                            
             </div>
             </div>
@@ -250,7 +257,7 @@ const ActivityCreationPage : React.FC = () => {
                 <div className="activity_creation_top">
                     <div className="icon_route-back_container" >
                         <div className="icon_route-back" onClick={()=>navigate(-1)}>
-                            <FaAngleLeft size={22} />
+                            <ChevronLeftIcon width={22} height={22} />
                         </div>
                     </div>
                     <div className="activity_cration_top-middle">
@@ -273,7 +280,7 @@ const ActivityCreationPage : React.FC = () => {
                         <div className="main-left-fields">
                             <div className="section-card">
                                 <div className="section-header">
-                                    <FaEdit />
+                                    <PencilSquareIcon width={18} height={18} />
                                     <p>Titre</p>
                                 </div>
                                 <input  type="text" 
@@ -287,7 +294,7 @@ const ActivityCreationPage : React.FC = () => {
 
                             <div className="section-card">
                                 <div className="section-header">
-                                    <IoMdPricetag />
+                                    <TagIcon width={18} height={18} />
                                     <p>Tags</p>
                                 </div>
                                     <input  type="text" 
@@ -307,7 +314,7 @@ const ActivityCreationPage : React.FC = () => {
                                                 {tag}
                                             </span>
                                             <div className="tag-chip_delete" onClick={() => setFormValues(handleRemoveTag(formValues,tag))}>
-                                                <IoClose size={20}/>                                            
+                                                <XMarkIcon width={20} height={20} />
                                             </div>
                                         </div>
                                     ))}
@@ -318,7 +325,7 @@ const ActivityCreationPage : React.FC = () => {
 
                             <div className="section-card">
                                     <div className="section-header">
-                                        <MdDescription />
+                                        <DocumentTextIcon width={18} height={18} />
                                         <p>Description</p>
                                     </div>
                                 <textarea   title="descrition" 
@@ -332,7 +339,7 @@ const ActivityCreationPage : React.FC = () => {
                             <div className="edition_and_chrono_container">
                                 <div className="main-left_section-card">
                                     <div className="section-header">
-                                        <MdModeEditOutline />
+                                        <PencilIcon width={18} height={18} />
                                         <p>Autoriser l'edition</p>
                                     </div>
                                         <label className="toggle_authorise">
@@ -342,7 +349,7 @@ const ActivityCreationPage : React.FC = () => {
                                 
                                 <div className="main-left_section-card">
                                         <div className="section-header">
-                                            <RxLapTimer/>
+                                            <ClockIcon width={18} height={18} />
                                             <p>Chronomètre</p>
                                         </div>
                                         
@@ -399,7 +406,7 @@ const ActivityCreationPage : React.FC = () => {
                         <div className="participant_numbers_board">
                                 <div className="numbers_board_container">
                                     <div className="board_icon">
-                                        <RxPerson size={20}/>
+                                        <UserIcon width={20} height={20} />
                                     </div>
                                     <div className="board_text">
                                           <p className="board_mini_title">Participants</p> 
@@ -411,7 +418,7 @@ const ActivityCreationPage : React.FC = () => {
 
                                 <div className="numbers_board_container">
                                     <div className="board_icon">
-                                        <GoPeople size={20} />
+                                        <UsersIcon width={20} height={20} />
                                     </div>
                                     <div className="board_text">
                                           <p className="board_mini_title">Groupes</p>  
@@ -461,7 +468,7 @@ const ActivityCreationPage : React.FC = () => {
                                                                             setFormValues(addNewParticipants(formValues,formValues.participantsList.length+1)),
                                                                             setEnteredValue(0)
                                                                         }}>
-                                            <FaPlus size={14}/>
+                                            <PlusIcon width={14} height={14} />
                                             <p>1</p>
                                         </div>
                                     </div>                                      
@@ -504,7 +511,7 @@ const ActivityCreationPage : React.FC = () => {
                                                 className="enter_number_field"/>
 
                                         <div className="add_one" onClick={() =>setFormValues(handleAddTeamsToActivity(formValues,1))}>
-                                            <FaPlus size={14}/>
+                                            <PlusIcon width={14} height={14} />
                                             <p>1</p>
                                         </div>
                                     </div>                                    
@@ -544,7 +551,7 @@ const ActivityCreationPage : React.FC = () => {
                         <div className="participant_numbers_board">
                                 <div className="numbers_board_container">
                                     <div className="board_icon">
-                                        <GoTasklist size={22}/>
+                                        <ClipboardDocumentListIcon width={22} height={22} />
                                     </div>
                                     <div className="board_text">
                                           <p className="board_mini_title">Tâches</p> 
@@ -564,7 +571,7 @@ const ActivityCreationPage : React.FC = () => {
                                     placeholder="Ajouter une description de tâche..." 
                                     className="text_field-task"/>
                                 <div className="add_button" onClick={()=>setFormValues(handleAddTask(formValues))}>
-                                    <FaPlus size={15} />
+                                    <PlusIcon width={15} height={15} />
                                 </div>
                             </div>
                         </div>
@@ -578,10 +585,10 @@ const ActivityCreationPage : React.FC = () => {
                                     </h3>
                                     
                                     <div className="tool-tip-tasks"
-                                        data-tooltip-id="task-tooltip" 
+                                        data-tooltip-id="task-tooltip"
                                         data-tooltip-content="Vous pouvez re-ordonner vos tache avec un drag"
                                     >
-                                        <TiInfoLarge className="tool-tip_content"/>
+                                        <InformationCircleIcon className="tool-tip_content" width={18} height={18} />
                                         <Tooltip id="task-tooltip"/>
 
                                     </div>

@@ -2,7 +2,9 @@ import "./css/Toolbar.css";
 import logo from "/images/logo_picto360.png";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { MdSettings, MdOutlineFileDownload, MdLogout, MdEdit, MdRemoveRedEye } from "react-icons/md";
+import { Cog6ToothIcon, ArrowDownTrayIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, EyeIcon } from "@heroicons/react/24/solid";
+
 import { useNavigate } from "react-router-dom";
 import ToggleSwitch from "./ui/ToggleSwitch";
 import ExportPopupWindow from "./ui/ExportPopupWindow";
@@ -115,7 +117,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     </div>
 
                     <button className="toolbar__icon-button has-helper" title="Paramètres du projet" onClick={() => { setShowSettingsOptions(true) }}>
-                        <MdSettings className="toolbar__settings-icon" />
+                        <Cog6ToothIcon width={18} height={18} strokeWidth={2} className="toolbar__settings-icon" />
                         <span className="helper">Paramètres du projet</span>
                     </button>
 
@@ -125,7 +127,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                         title="Exporter"
                         disabled={exportInProgress}
                     >
-                        <MdOutlineFileDownload className="toolbar__export-icon" />
+                        <ArrowDownTrayIcon width={18} height={18} strokeWidth={2} className="toolbar__export-icon" />
                         <span className="helper">Exporter le projet</span>
                     </button>
                 </div>
@@ -137,7 +139,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     </button> */}
 
                     <div className="toolbar__mode-switcher">
-                        <ToggleSwitch id="edit-mode" checked={isEditMode} onChange={handleToggleEditMode} variant="icon" checkedIcon={<MdEdit />} uncheckedIcon={<MdRemoveRedEye />} />
+                        <ToggleSwitch id="edit-mode" checked={isEditMode} onChange={handleToggleEditMode} variant="icon" checkedIcon={<PencilIcon width={16} height={16} />} uncheckedIcon={<EyeIcon width={16} height={16} />} />
                         <span onClick={toggleEditMode} className="toolbar__mode-switcher__label">{(isEditMode ? "Mode annotation" : "Mode visualisation")}</span>
                     </div>
 
@@ -161,7 +163,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     {
                         driveAuthStatus?.isAuthenticated &&
                         <button className="toolbar__icon-button" onClick={async () => { await logoutFromDrive(); }} title="Déconnexion">
-                            <MdLogout />
+                            <ArrowRightOnRectangleIcon width={20} height={20} />
                         </button>
                     }
                 </div>

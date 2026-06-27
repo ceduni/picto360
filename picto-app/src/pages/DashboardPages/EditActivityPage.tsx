@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import NavigationBar from "./NavigationBar";
 import "./css/EditActivityPage.css"
-import { LuPencilLine } from "react-icons/lu";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import { useGetActivityById } from "@/hooks/useGetUserActivities";
 // import { v4 as uuid4 } from "uuid";
 
@@ -88,7 +88,7 @@ const EditActivityPage :React.FC<EditActivityPageProps> = ()=>{
                 <div className="edit-activity-main-content_top">
                     <div className="actitivity-title">
                         <p> {newActivityDetails.title}</p>
-                        <LuPencilLine size={22}/>
+                        <PencilIcon width={22} height={22} />
                     </div>
                     <div className="close-button">
                         <p>Fermer</p>

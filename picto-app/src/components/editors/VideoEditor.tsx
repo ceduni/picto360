@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { EditorRef, HotspotData } from "../../utils/Types";
 import ReactPlayer from "react-player";
 import SegmentedControl, { SegmentOption } from "@ui/SegmentedControl";
-import { MdAdd, MdLaptopChromebook, MdLink } from "react-icons/md";
+import { PlusIcon, ComputerDesktopIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { isValidVideoUrl, isValidYouTubeUrl } from "@/utils/FormInputvalidators";
 import { useBanner } from "@/hooks/useBanner";
 
@@ -21,8 +21,8 @@ const VideoEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
     const { setBannerMessage } = useBanner();
 
     const annotationOptions: SegmentOption[] = [
-        { value: "url", label: "Lien", icon: <MdLink /> },
-        { value: "disk", label: "Disque", icon: <MdLaptopChromebook /> },
+        { value: "url", label: "Lien", icon: <LinkIcon width={18} height={18} /> },
+        { value: "disk", label: "Disque", icon: <ComputerDesktopIcon width={18} height={18} /> },
     ];
 
     useEffect(() => {
@@ -143,7 +143,7 @@ const VideoEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
                                 setContent(previewUrl);
                             }}
                         />
-                        <MdAdd className="file_upload_icon" />
+                        <PlusIcon className="file_upload_icon" width={20} height={20} />
                         <span>Choisir une vidéo</span>
                     </label>
                 )}

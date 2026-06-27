@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LuGitFork, LuSquarePen } from "react-icons/lu";
+import { ListBulletIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import "./css/NavigationBar.css"
 import { useNavigate } from "react-router-dom";
 import GotoProfile from "@/components/GotoProfile";
@@ -42,11 +42,11 @@ const NavigationBar :React.FC<NavigationBarProps> = ({selected}) =>{
 
             <div className="nav-bar-icons">
                 <div className={selectedIcon==="activities"? "nav-bar_button-field" : "nav-bar_button-field-inactive"} onClick={handleActivitiesClick}>
-                    <LuGitFork size={20} strokeWidth={ selectedIcon==="activities" ? 2.5 : 1}/>
+                    <ListBulletIcon width={20} height={20} />
                     <p>Activités</p>
                 </div>
                 <div className={selectedIcon==="edit"? "nav-bar_button-field" : "nav-bar_button-field-inactive"} onClick={handleEditiActivityClick}>
-                    <LuSquarePen size={20} strokeWidth={ selectedIcon==="edit" ? 2.5 : 1}/>
+                    <PencilSquareIcon width={20} height={20} />
                     <p>Editer</p>
                 </div>
             </div>

@@ -2,7 +2,7 @@ import "@css/SettingsPopupWindow.css";
 import "@css/ExportProgressPopupWindow.css";
 
 import React from "react";
-import { MdCheckCircle, MdClose, MdCloudUpload, MdErrorOutline, MdFolder } from "react-icons/md";
+import { CheckCircleIcon, XMarkIcon, CloudArrowUpIcon, ExclamationCircleIcon, FolderIcon } from "@heroicons/react/24/outline";
 import { ExportProgressState } from "@/utils/Types";
 
 interface ExportProgressPopupWindowProps {
@@ -13,18 +13,18 @@ interface ExportProgressPopupWindowProps {
 function getPhaseIcon(phase: ExportProgressState["phase"]) {
   switch (phase) {
     case "folder_created":
-      return <MdFolder className="export-progress-modal__status-icon" />;
+      return <FolderIcon className="export-progress-modal__status-icon" width={24} height={24} />;
     case "uploading":
     case "finalizing":
     case "preparing":
-      return <MdCloudUpload className="export-progress-modal__status-icon" />;
+      return <CloudArrowUpIcon className="export-progress-modal__status-icon" width={24} height={24} />;
     case "success":
-      return <MdCheckCircle className="export-progress-modal__status-icon export-progress-modal__status-icon--success" />;
+      return <CheckCircleIcon className="export-progress-modal__status-icon export-progress-modal__status-icon--success" width={24} height={24} />;
     case "failure":
-      return <MdErrorOutline className="export-progress-modal__status-icon export-progress-modal__status-icon--failure" />;
+      return <ExclamationCircleIcon className="export-progress-modal__status-icon export-progress-modal__status-icon--failure" width={24} height={24} />;
     case "idle":
     default:
-      return <MdCloudUpload className="export-progress-modal__status-icon" />;
+      return <CloudArrowUpIcon className="export-progress-modal__status-icon" width={24} height={24} />;
   }
 }
 
@@ -62,7 +62,7 @@ const ExportProgressPopupWindow: React.FC<ExportProgressPopupWindowProps> = ({
             aria-label="Close export progress"
             disabled={progressState.isActive}
           >
-            <MdClose />
+            <XMarkIcon width={20} height={20} />
           </button>
         </div>
 

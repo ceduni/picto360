@@ -1,8 +1,6 @@
 import { TeamInstance } from "@/utils/Types";
 import React from "react";
-import { HiTrash } from "react-icons/hi2";
-
-import { LuUserRoundPlus } from "react-icons/lu";
+import { TrashIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 
 interface TeamCardProps {
     index:number,
@@ -35,12 +33,12 @@ const TeamCard : React.FC<TeamCardProps> = ({index,teamData,supervised,setSelect
                     {
                         supervised && 
                         <div className="add-participants_to_group-button">
-                            <LuUserRoundPlus strokeWidth={2}/>
+                            <UserPlusIcon width={18} height={18} />
                         </div>
                     }
                 </div>
                 <span className="delete_team" onClick={()=>handleDeleteTeam(index)}>
-                    <HiTrash size={18} />
+                    <TrashIcon width={18} height={18} />
                 </span>
             </div>
 

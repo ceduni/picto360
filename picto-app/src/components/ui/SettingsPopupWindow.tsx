@@ -1,7 +1,7 @@
 import "@css/SettingsPopupWindow.css";
 
 import React, { useState } from "react";
-import { MdClose, MdAdd } from "react-icons/md";
+import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 interface SettingsPopupProps {
     isOpen: boolean;
@@ -60,7 +60,7 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                 <div className="settings-modal__header">
                     <h2 className="settings-modal__title">Paramètres du projet</h2>
                     <button className="settings-modal__close-button" onClick={handlePopupClose} aria-label="Fermer les paramètres">
-                        <MdClose />
+                        <XMarkIcon width={18} height={18} />
                     </button>
                 </div>
 
@@ -136,7 +136,7 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                                     type="button"
                                     aria-label="Ajouter étiquette"
                                 >
-                                    <MdAdd />
+                                    <PlusIcon width={18} height={18} />
                                 </button>
                             </div>
                             {tags.length > 0 && (
@@ -149,7 +149,7 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                                                 className="settings-modal__tag-remove"
                                                 aria-label={`Supprimer ${tag}`}
                                             >
-                                                <MdClose />
+                                                <XMarkIcon width={18} height={18} />
                                             </button>
                                         </span>
                                     ))}
