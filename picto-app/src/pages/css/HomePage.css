@@ -152,51 +152,51 @@
 }
 
 .home-page__btn-login {
-    color: #364A9D;
+    color: var(--accent-dark);
     background-color: white;
     border: 2px solid transparent;
 }
 
-    .home-page__btn-login:hover {
-        background-color: #fbfcff;
-        border-color: #364A9D;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.2);
-    }
-
-    .home-page__btn-login:active {
-        transform: translateY(0);
-    }
-
-.home-page__btn-create-group {
-    color: #364A9D;
-    background-color: #D8E0FF;
+.home-page__btn-login:hover {
+    background-color: var(--accent-light);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 74, 157, 0.2);
 }
 
-    .home-page__btn-create-group:hover {
-        background-color: #c5d1ff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.25);
-    }
+.home-page__btn-login:active {
+    transform: translateY(0);
+}
 
-    .home-page__btn-create-group:active {
-        transform: translateY(0);
-    }
+.home-page__btn-create-group {
+    color: var(--accent-dark);
+    background-color: var(--accent-light);
+}
+
+.home-page__btn-create-group:hover {
+    background-color: var(--accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 74, 157, 0.25);
+}
+
+.home-page__btn-create-group:active {
+    transform: translateY(0);
+}
 
 .home-page__btn-create-activity {
     color: white;
-    background-color: #364A9D;
+    background-color: var(--accent);
 }
 
-    .home-page__btn-create-activity:hover {
-        background-color: #2a3a7d;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(54, 74, 157, 0.35);
-    }
+.home-page__btn-create-activity:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(54, 74, 157, 0.35);
+}
 
-    .home-page__btn-create-activity:active {
-        transform: translateY(0);
-    }
+.home-page__btn-create-activity:active {
+    transform: translateY(0);
+}
 
 .material-icons {
     color: #364A9D;
@@ -235,14 +235,6 @@
     .panorama-background::before {
         animation-duration: 90s;
     }
-}
-
-/* Accessibility improvements */
-.home-page__btn-login:focus,
-.home-page__btn-create-group:focus,
-.home-page__btn-create-activity:focus {
-    outline: 3px solid #364A9D;
-    outline-offset: 2px;
 }
 
 /* Optional: Add a subtle vignette effect over the panorama */

@@ -1,21 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {
   Squares2X2Icon,
   BoltIcon,
   UsersIcon,
-  EyeIcon,
+  ViewfinderCircleIcon,
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
+  PlusIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
+import { useFetchActivities } from "@/hooks/useGetUserActivities";
 import "./Sidebar.css";
 
+const ACTIVITY_COLORS = [
+  "#7c5cbf", "#4e9af1", "#f4a023", "#3dbf7c", "#e05c7f",
+  "#5bc8d4", "#a07cde", "#f16a4e", "#7db854", "#c45cbf",
+];
+
 const MAIN_ITEMS = [
-  { key: "dashboard",   label: "Dashboard",  Icon: Squares2X2Icon, path: "/dashboard" },
-  { key: "activities",  label: "Activités",  Icon: BoltIcon,       path: "/dashboard/your-activities" },
-  { key: "groups",      label: "Groupes",    Icon: UsersIcon,      path: "/dashboard/groupes" },
-  { key: "viewer",      label: "Viewer",     Icon: EyeIcon,        path: "/" },
+  { key: "studio",      label: "Studio",     Icon: ViewfinderCircleIcon, path: "/dashboard/studio" },
+  { key: "dashboard",   label: "Dashboard",  Icon: Squares2X2Icon,  path: "/dashboard" },
+  { key: "activities",  label: "Activités",  Icon: BoltIcon,        path: "/dashboard/your-activities" },
+  { key: "groups",      label: "Groupes",    Icon: UsersIcon,       path: "/dashboard/groupes" },
 ] as const;
 
 const BOTTOM_ITEMS = [
@@ -26,6 +35,8 @@ const BOTTOM_ITEMS = [
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { userActivities } = useFetchActivities();
+  const [isOpen, setIsOpen] = useState(true);
 
   const isActive = (path: string) =>
     path === "/" || path === "/dashboard"
@@ -33,10 +44,18 @@ const Sidebar: React.FC = () => {
       : pathname.startsWith(path);
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo" onClick={() => navigate("/")}>
+    <aside className={`sidebar${isOpen ? "" : " sidebar--collapsed"}`}>
+      <button
+        className="sidebar-toggle"
+        onClick={() => setIsOpen(o => !o)}
+        aria-label={isOpen ? "Réduire la barre" : "Ouvrir la barre"}
+      >
+        {isOpen ? <ChevronLeftIcon width={14} height={14} /> : <ChevronRightIcon width={14} height={14} />}
+      </button>
+
+      <div className="sidebar-logo" onClick={() => navigate("/dashboard/studio")}>
         <img src="/images/logo_picto360.png" alt="Picto360" className="sidebar-logo-img" />
-        <span className="sidebar-logo-name">Picto360</span>
+        {isOpen && <span className="sidebar-logo-name">Picto360</span>}
       </div>
 
       <nav className="sidebar-nav">
@@ -51,6 +70,43 @@ const Sidebar: React.FC = () => {
           </div>
         ))}
       </nav>
+
+      {isOpen && 
+      <div className="sidebar-section-list">
+        <div className="sidebar-section">
+          <div className="sidebar-section__header">
+            <span className="sidebar-section__title">Activités</span>
+            <button
+              className="sidebar-section__add"
+              onClick={() => navigate("/activity_creation")}
+              aria-label="Nouvelle activité"
+              >
+              <PlusIcon width={14} height={14} />
+            </button>
+          </div>
+
+          <div className="sidebar-section__list">
+            {!userActivities || userActivities.length === 0 ? (
+              <p className="sidebar-section__empty">Aucune activité</p>
+            ) : (
+              userActivities.slice(0, 8).map((activity, i) => (
+                <div
+                key={activity._id}
+                className={`sidebar-activity${pathname === `/dashboard/activity-editor/${activity._id}` ? " sidebar-activity--active" : ""}`}
+                onClick={() => navigate(`/dashboard/activity-editor/${activity._id}`)}
+                >
+                  <span
+                    className="sidebar-activity__dot"
+                    style={{ background: ACTIVITY_COLORS[i % ACTIVITY_COLORS.length] }}
+                    />
+                  <span className="sidebar-activity__name">{activity.title}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+      }
 
       <div className="sidebar-bottom">
         {BOTTOM_ITEMS.map(({ key, label, Icon, path }) => (

@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
 import { AuthProvider } from "./authContext/authContext";
-
+import StudioPage from "./pages/DashboardPages/StudioPage";
 
 const App = () => {
     // Build routes in a block that only exists when admin is enabled.
@@ -26,6 +26,7 @@ const App = () => {
             <Route key="editor" path="/dashboard/activity-editor/:id" element={<EditActivityPage />} />,
             <Route key="list" path="/dashboard/your-activities" element={<ActivitiesListPage />} />,
             <Route key="dashboard" path="/dashboard" element={<DashboardPage />} />,
+            <Route key="studio" path="/dashboard/studio" element={<StudioPage />} />,
         ];
     }
 
