@@ -10,7 +10,7 @@ import { ActivityIstance, ParticipantData, TeamInstance } from "@/utils/Types";
 import { handleParticipantNameChange, handleDeleteParticipant } from "@/utils/ActivityCreactionUtils";
 import ParticipantCard from "../DashboardPages/layout/ParticipantCard";
 import IOSSwitch from "../PagesUiComponents/IOSSwitch";
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivity } from "@/contexts/ActivityContext";
 import { useUserSearch, UserSearchResult } from "@/hooks/useUserSearch";
 
 interface Props {
@@ -297,7 +297,7 @@ const EditTeamListDrawer: React.FC<Props> = ({ open, onClose, formValues, setFor
     const [expandedKey, setExpandedKey] = useState<ExpandedKey | null>(
         initialTeamIdx != null ? `c-${initialTeamIdx}` : null
     );
-    const { userActivities } = useFetchActivities();
+    const { userActivities } = useActivity();
 
     const importableTeams = useMemo(() => {
         if (!userActivities) return [];

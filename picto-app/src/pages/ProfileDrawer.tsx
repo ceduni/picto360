@@ -2,7 +2,7 @@ import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
 import { updateUserName } from "@/firebase/userProfileUpdates";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivity } from "@/contexts/ActivityContext";
 import ErrorBanner from "@/components/FeedbackBanner";
 import {
     ArrowRightOnRectangleIcon,
@@ -34,7 +34,7 @@ interface ProfileDrawerProps {
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
     const navigate = useNavigate();
     const { userLoggedIn, currentUser } = useAuth();
-    const { userActivities } = useFetchActivities();
+    const { userActivities } = useActivity();
     const [uname, setUname] = useState<string | null | undefined>(currentUser?.displayName);
     const [isEditing, setIsEditing] = useState(false);
     const { setBannerMessage, bannerRef } = useFeedbackBanner();
