@@ -5,10 +5,11 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 import { BannerProvider } from "./contexts/BannerContext";
 import { AuthProvider, useAuth } from "./authContext/authContext";
-import { ActivityDraftProvider } from "./contexts/ActivityDraftContext";
+import { ActivityProvider } from "./contexts/ActivityContext";
 import HomePage from "./pages/HomePage";
 import VisualisationPage from "./pages/VisualisationPage";
 import StudioPage from "./pages/DashboardPages/StudioPage";
+import HomePageSignedOutView from "./pages/HomePageSignedOutView";
 
 const RequireAuth: React.FC = () => {
     const { userLoggedIn } = useAuth();
@@ -18,16 +19,14 @@ const RequireAuth: React.FC = () => {
 const adminRouteObjects = (() => {
     if (!__ENABLE_ADMIN__) return [];
 
-    const LoginPage           = lazy(() => import("./pages/LoginPage"));
     const ActivityCreationPage = lazy(() => import("./pages/ActivityCreationPage"));
-    const EditActivityPage    = lazy(() => import("./pages/DashboardPages/EditActivityPage"));
     const ActivitiesListPage  = lazy(() => import("./pages/DashboardPages/ActivitiesListPage"));
     const DashboardPage       = lazy(() => import("./pages/DashboardPages/DashboardPage"));
 
     return [
         {
             path: "/login",
-            element: <Suspense fallback={null}><LoginPage /></Suspense>,
+            element: <Suspense fallback={null}> <HomePageSignedOutView view="auth" /></Suspense>,
         },
         {
             element: <RequireAuth />,
@@ -35,7 +34,7 @@ const adminRouteObjects = (() => {
                 { path: "/dashboard",                    element: <Suspense fallback={null}><DashboardPage /></Suspense> },
                 { path: "/dashboard/studio",             element: <StudioPage /> },
                 { path: "/dashboard/your-activities",    element: <Suspense fallback={null}><ActivitiesListPage /></Suspense> },
-                { path: "/dashboard/activity-editor/:id",element: <Suspense fallback={null}><EditActivityPage /></Suspense> },
+                { path: "/dashboard/activity-editor/:id",element: <Suspense fallback={null}><ActivityCreationPage /></Suspense> },
                 { path: "/dashboard/activity-creation",  element: <Suspense fallback={null}><ActivityCreationPage /></Suspense> },
             ],
         },
@@ -52,9 +51,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BannerProvider>
             <AuthProvider>
-                <ActivityDraftProvider>
+                <ActivityProvider>
                     <RouterProvider router={router} />
-                </ActivityDraftProvider>
+                </ActivityProvider>
             </AuthProvider>
         </BannerProvider>
     </React.StrictMode>

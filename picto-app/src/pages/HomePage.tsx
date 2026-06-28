@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/authContext/authContext";
-import EditorPage from "./EditorPage";
+import HomePageSignedOutView from "./HomePageSignedOutView";
 
 const HomePage = () => {
     const { userLoggedIn } = useAuth();
@@ -10,7 +10,7 @@ const HomePage = () => {
         return <Navigate to="/dashboard" replace />;
     }
 
-    return <EditorPage />;
+    return <HomePageSignedOutView />;
 };
 
 export default React.memo(HomePage);

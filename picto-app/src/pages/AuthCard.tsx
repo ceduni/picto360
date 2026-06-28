@@ -8,11 +8,11 @@ import {
 } from "@/firebase/authentification";
 import ErrorBanner from "@/components/FeedbackBanner";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import "./css/AuthPage.css";
+import "./css/AuthCard.css";
 
 type Tab = "login" | "register";
 
-// Reusable auth form card — used standalone in AuthPage and embedded in EditorPage.
+// Reusable auth form card — used standalone in embedded in EditorPage.
 const AuthCard = () => {
     const navigate = useNavigate();
     const { userLoggedIn } = useAuth();
