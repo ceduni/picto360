@@ -116,7 +116,7 @@ const VideoEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
                 {videoType === "url" ? (
                     <input
                         type="url"
-                        className="text-field"
+                        className="modal__input"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="https://www.youtube.com/watch?v=vA..."

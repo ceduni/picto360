@@ -44,20 +44,20 @@ const ExportProgressPopupWindow: React.FC<ExportProgressPopupWindowProps> = ({
 
   return (
     <div
-      className="settings-modal-backdrop settings-modal-backdrop--open export-progress-modal-backdrop"
+      className="popup_background popup_background--open export-progress-modal-backdrop"
       onClick={handleBackdropClick}
     >
-      <div className="settings-modal settings-modal--open export-progress-modal">
-        <div className="settings-modal__header">
+      <div className="modal modal--open export-progress-modal">
+        <div className="modal__header">
           <div className="export-progress-modal__title-block">
-            <h2 className="settings-modal__title">{progressState.title}</h2>
+            <h2 className="t-page-title">{progressState.title}</h2>
             <p className="export-progress-modal__subtitle">
               {progressState.isActive ? "Export in progress" : "Export status"}
             </p>
           </div>
 
           <button
-            className="settings-modal__close-button"
+            className="modal__close-button"
             onClick={onClose}
             aria-label="Close export progress"
             disabled={progressState.isActive}
@@ -66,7 +66,7 @@ const ExportProgressPopupWindow: React.FC<ExportProgressPopupWindowProps> = ({
           </button>
         </div>
 
-        <div className="settings-modal__content export-progress-modal__content">
+        <div className="popup_window_content export-progress-modal__content">
           <div className="export-progress-modal__status-row">
             {getPhaseIcon(progressState.phase)}
             <div className="export-progress-modal__status-copy">

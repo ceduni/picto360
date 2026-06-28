@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BookmarkSquareIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import "./css/ActivityCreationPage.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useBlocker } from "react-router-dom";
 import DashboardLayout from "./DashboardPages/layout/DashboardLayout";
 import AddParticipantsPopup from "./AddParticipantsPopup";
 import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
@@ -13,6 +13,7 @@ import ActivityDetailsCard from "./ActivityCreation/ActivityDetailsCard";
 import ActivityOptionsCard from "./ActivityCreation/ActivityOptionsCard";
 import ParticipantsColumn from "./ActivityCreation/ParticipantsColumn";
 import TasksColumn from "./ActivityCreation/TasksColumn";
+import { useActivityDraft } from "@/contexts/ActivityDraftContext";
 
 const ActivityCreationPage: React.FC = () => {
     const [formValues, setFormValues] = useState<ActivityIstance>({
@@ -35,11 +36,25 @@ const ActivityCreationPage: React.FC = () => {
     const [teamsTotalParticipantsCount, setTeamsTotalParticipantsCount] = useState(0);
     const [selectedTeam, setSelectedTeam] = useState<{ indx: number; teamData: TeamInstance }>();
     const [confirmationMessage, setConfirmationMessage] = useState<{ title: string; details?: string } | null>(null);
+    const [isDirty, setIsDirty] = useState(false);
+    const actionButtonUsed = useRef(false);
+    const savedAsDraft = useRef(false);
 
     const { createActivity, activityId } = useCreateActivity();
     const navigate = useNavigate();
     const bannerRef = useRef<MessageBannerRef>(null);
     const createActivityButtonRef = useRef<HTMLButtonElement>(null);
+    const { startDraft, updateDraftTitle, clearDraft } = useActivityDraft();
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            isDirty && !actionButtonUsed.current && currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+        startDraft();
+        return () => { if (!savedAsDraft.current) clearDraft(); };
+    }, []);
 
     useEffect(() => {
         let count = 0;
@@ -54,15 +69,38 @@ const ActivityCreationPage: React.FC = () => {
         }
     }, [formValues]);
 
+    useEffect(() => {
+        updateDraftTitle(formValues.title);
+    }, [formValues.title]);
+
+    const handleSetFormValues = (updater: React.SetStateAction<ActivityIstance>) => {
+        setIsDirty(true);
+        setFormValues(updater);
+    };
+
     const validateForm = async () => {
         const check = validateActivityValues(formValues);
         if (check.state) {
+            actionButtonUsed.current = true;
+            clearDraft();
             createActivity(formValues);
             setIsPopupOpen(true);
             setConfirmationMessage({ title: "Félicitations !!!", details: "Votre activité a été créée avec succès" });
         } else {
             bannerRef.current?.trigger(check.message, "failure");
         }
+    };
+
+    const handleCancel = () => {
+        actionButtonUsed.current = true;
+        clearDraft();
+        navigate("/dashboard");
+    };
+
+    const handleSaveDraft = () => {
+        actionButtonUsed.current = true;
+        clearDraft();
+        navigate("/dashboard");
     };
 
     const onCloseParticipantsPopup = () => {
@@ -76,10 +114,10 @@ const ActivityCreationPage: React.FC = () => {
                 <ErrorBanner ref={bannerRef} />
 
                 <div className="activity-page-header">
-                    <button type="button" className="cancel-creation_button" onClick={() => navigate("/dashboard")}>
+                    <button type="button" className="cancel-creation_button" onClick={handleCancel}>
                         Annuler
                     </button>
-                    <button type="button" className="draft-creation_button">
+                    <button type="button" className="draft-creation_button" onClick={handleSaveDraft}>
                         <BookmarkSquareIcon width={15} height={15} />
                         Brouillon
                     </button>
@@ -97,19 +135,19 @@ const ActivityCreationPage: React.FC = () => {
 
                 <div className="activity_creation-main_content">
                     <div className="main-left-col">
-                        <ActivityDetailsCard formValues={formValues} setFormValues={setFormValues} />
-                        <ActivityOptionsCard formValues={formValues} setFormValues={setFormValues} />
+                        <ActivityDetailsCard formValues={formValues} setFormValues={handleSetFormValues} />
+                        <ActivityOptionsCard formValues={formValues} setFormValues={handleSetFormValues} />
                     </div>
 
                     <ParticipantsColumn
                         formValues={formValues}
-                        setFormValues={setFormValues}
+                        setFormValues={handleSetFormValues}
                         teamsTotalParticipantsCount={teamsTotalParticipantsCount}
                         setIsPopupOpen={setIsPopupOpen}
                         setSelectedTeam={setSelectedTeam}
                     />
 
-                    <TasksColumn formValues={formValues} setFormValues={setFormValues} />
+                    <TasksColumn formValues={formValues} setFormValues={handleSetFormValues} />
                 </div>
             </div>
 
@@ -129,6 +167,26 @@ const ActivityCreationPage: React.FC = () => {
                     message={confirmationMessage}
                     type="confirm"
                     handleConfirm={() => navigate(`/dashboard/activity-editor/${activityId}`)}
+                />
+            )}
+            {blocker.state === "blocked" && (
+                <ConfirmationPopup
+                    message={{
+                        title: "Quitter sans sauvegarder ?",
+                        details: "Vous avez des modifications non sauvegardées.",
+                    }}
+                    type="confirm-cancel"
+                    confirmLabel="Sauvegarder en brouillon"
+                    cancelLabel="Quitter"
+                    handleConfirm={() => {
+                        savedAsDraft.current = true;
+                        actionButtonUsed.current = true;
+                        blocker.proceed();
+                    }}
+                    handleCancel={() => {
+                        actionButtonUsed.current = true;
+                        blocker.proceed();
+                    }}
                 />
             )}
         </DashboardLayout>

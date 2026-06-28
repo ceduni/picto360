@@ -55,39 +55,39 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
     if (!isOpen) return null;
 
     return (
-        <div className={`settings-modal-backdrop ${isOpen ? 'settings-modal-backdrop--open' : ''}`} onClick={handleBackdropClick}>
-            <div className={`settings-modal ${isOpen ? 'settings-modal--open' : ''}`}>
-                <div className="settings-modal__header">
-                    <h2 className="settings-modal__title">Paramètres du projet</h2>
-                    <button className="settings-modal__close-button" onClick={handlePopupClose} aria-label="Fermer les paramètres">
+        <div className={`popup_background ${isOpen ? 'popup_background--open' : ''}`} onClick={handleBackdropClick}>
+            <div className={`modal ${isOpen ? 'modal--open' : ''}`}>
+                <div className="modal__header">
+                    <h2 className="t-page-title">Paramètres du projet</h2>
+                    <button className="modal__close-button" onClick={handlePopupClose} aria-label="Fermer les paramètres">
                         <XMarkIcon width={18} height={18} />
                     </button>
                 </div>
 
-                <div className="settings-modal__content">
+                <div className="popup_window_content">
                     {/* File Name */}
-                    <div className="settings-modal__section">
-                        <label htmlFor="file-name" className="settings-modal__label">
+                    <div className="modal__section">
+                        <label htmlFor="file-name" className="t-label">
                             Nom du fichier (pour la sauvegarde)
                         </label>
-                        <div className="settings-modal__filename-wrapper">
-                            <input id="file-name" className="settings-modal__input settings-modal__input--filename"
+                        <div className="modal__filename-wrapper">
+                            <input id="file-name" className="modal__input modal__input--filename"
                                 type="text"
                                 value={fileName}
                                 onChange={setFileName}
                                 placeholder="Entrez le nom du fichier"
                                 maxLength={fileNameMaxLength}
                             />
-                            <code className="settings-modal__file-extension">.picto</code>
+                            <code className="modal__file-extension">.picto</code>
                         </div>
                     </div>
 
                     {/* Project Name */}
-                    <div className="settings-modal__section">
-                        <label htmlFor="project-name" className="settings-modal__label">
+                    <div className="modal__section">
+                        <label htmlFor="project-name" className="t-label">
                             Titre du projet
                         </label>
-                        <input id="project-name" className="settings-modal__input"
+                        <input id="project-name" className="modal__input"
                             type="text"
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
@@ -97,29 +97,29 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                     </div>
 
                     {/* Description */}
-                    <div className="settings-modal__section">
-                        <label htmlFor="description" className="settings-modal__label">
+                    <div className="modal__section">
+                        <label htmlFor="description" className="t-label">
                             Description
                         </label>
-                        <textarea id="description" className="settings-modal__textarea"
+                        <textarea id="description" className="modal__textarea"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Décrivez votre projet"
                             rows={4}
                             maxLength={500}
                         />
-                        <span className="settings-modal__char-count">
+                        <span className="t-helper">
                             {description.length}/500
                         </span>
                     </div>
 
                     {/* Tags */}
                     {__ENABLE_BETA__ && (
-                        <div className="settings-modal__section">
-                            <label htmlFor="tags" className="settings-modal__label">
+                        <div className="modal__section">
+                            <label htmlFor="tags" className="t-label">
                                 Étiquettes
                             </label>
-                            <div className="settings-modal__tag-input-wrapper">
+                            <div className="modal__section_horizontal">
                                 <input
                                     id="tags"
                                     type="text"
@@ -127,12 +127,12 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                                     onChange={(e) => setCurrentTag(e.target.value)}
                                     onKeyDown={handleTagKeyDown}
                                     placeholder="Ajouter une étiquette"
-                                    className="settings-modal__input"
+                                    className="modal__input"
                                     maxLength={20}
                                 />
                                 <button
                                     onClick={handleAddTag}
-                                    className="settings-modal__add-tag-button"
+                                    className="button__primary"
                                     type="button"
                                     aria-label="Ajouter étiquette"
                                 >
@@ -140,13 +140,13 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                                 </button>
                             </div>
                             {tags.length > 0 && (
-                                <div className="settings-modal__tags-list">
+                                <div className="modal__tags-list">
                                     {tags.map((tag) => (
-                                        <span key={tag} className="settings-modal__tag">
+                                        <span key={tag} className="modal__tag">
                                             {tag}
                                             <button
                                                 onClick={() => handleRemoveTag(tag)}
-                                                className="settings-modal__tag-remove"
+                                                className="modal__tag-remove"
                                                 aria-label={`Supprimer ${tag}`}
                                             >
                                                 <XMarkIcon width={18} height={18} />
@@ -157,61 +157,17 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
                             )}
                         </div>
                     )}
-
-                    {/* Language Setting */}
-                    {/* <div className="settings-modal__section">
-                        <label htmlFor="language" className="settings-modal__label">
-                            Langue
-                        </label>
-                        <select
-                            id="language"
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value)}
-                            className="settings-modal__select"
-                        >
-                            <option value="fr">Français</option>
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                        </select>
-                    </div> */}
-
-                    {/* Auto-save Setting */}
-                    {/* <div className="settings-modal__section">
-                        <label htmlFor="auto-save" className="settings-modal__label">
-                            Sauvegarde automatique
-                        </label>
-                        <p className="bare" style={{ fontSize: "1.3em" }}>Cette option est utilisé seulement quand vous être connecté</p>
-                        <div className="settings-modal__toggle-wrapper">
-                            <input
-                                type="checkbox"
-                                id="auto-save"
-                                checked={autoSave}
-                                onChange={(e) => setAutoSave(e.target.checked)}
-                                className="settings-modal__checkbox"
-                            />
-                            <span className="settings-modal__toggle-slider"></span>
-                        </div>
-                    </div> */}
                 </div>
 
-                <div className="settings-modal__footer">
-                    <button className="settings-modal__button settings-modal__button--secondary" onClick={handlePopupClose}>
+                <div className="popup-modal__footer">
+                    <button className="modal__button button__secondary" onClick={handlePopupClose}>
                         Annuler
                     </button>
                     <button
                         onClick={() => {
-                            // Save settings logic here
-                            console.log('Settings saved:', {
-                                fileName,
-                                projectName,
-                                description,
-                                tags,
-                                // language, 
-                                // autoSave
-                            });
                             handlePopupClose();
                         }}
-                        className="settings-modal__button settings-modal__button--primary"
+                        className="modal__button button__primary"
                     >
                         Enregistrer
                     </button>

@@ -13,6 +13,7 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivityDraft } from "@/contexts/ActivityDraftContext";
 import "./Sidebar.css";
 
 const ACTIVITY_COLORS = [
@@ -36,6 +37,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { userActivities } = useFetchActivities();
+  const { currentDraft } = useActivityDraft();
   const [isOpen, setIsOpen] = useState(true);
 
   const isActive = (path: string) =>
@@ -86,10 +88,19 @@ const Sidebar: React.FC = () => {
           </div>
 
           <div className="sidebar-section__list">
-            {!userActivities || userActivities.length === 0 ? (
+            {currentDraft && (
+              <div
+                className={`sidebar-activity${pathname === "/dashboard/activity-creation" ? " sidebar-activity--active" : ""}`}
+                onClick={() => navigate("/dashboard/activity-creation")}
+              >
+                <span className="sidebar-activity__dot sidebar-activity__dot--draft" />
+                <span className="sidebar-activity__name sidebar-activity__name--draft">{currentDraft.title}</span>
+              </div>
+            )}
+            {(!userActivities || userActivities.length === 0) && !currentDraft ? (
               <p className="sidebar-section__empty">Aucune activité</p>
             ) : (
-              userActivities.slice(0, 8).map((activity, i) => (
+              (userActivities ?? []).slice(0, 8).map((activity, i) => (
                 <div
                 key={activity._id}
                 className={`sidebar-activity${pathname === `/dashboard/activity-editor/${activity._id}` ? " sidebar-activity--active" : ""}`}

@@ -35,25 +35,28 @@ const TextEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref)
     return (
         <form onSubmit={handleSubmit} className="annotation_edition_pannel" >
             {isLabel ? (
-                <label className="edition_pannel_field_title">
-                    <span className="label">Étiquette</span>
+                <label className="modal__section">
+                    <span className="t-label">Étiquette</span>
                     <input
                         type="text"
                         value={content}
                         maxLength={LABEL_MAX_LENGTH}
                         onChange={(e) => setContent(e.target.value.slice(0, LABEL_MAX_LENGTH))}
-                        className="text-field"
+                        className="modal__input"
                         placeholder="Tapez votre étiquette..."
                     />
-                    <span className="edition_pannel_field_helper">
+                    <span className="t-helper">
                         {content.length}/{LABEL_MAX_LENGTH} caractères
                     </span>
                 </label>
             ) : (
-                <textarea value={content} onChange={(e) => setContent(e.target.value)}
-                    className="dialog_field"
-                    placeholder="Tapez le contenu de votre annotation..."
-                />
+                <label className="modal__section">
+                    <span className="t-label">Contenu de votre annotation</span>
+                    <textarea value={content} onChange={(e) => setContent(e.target.value)}
+                        className="modal__textarea"
+                        placeholder="Tapez le contenu de votre annotation..."
+                    />
+                </label>
             )}
         </form>
     );

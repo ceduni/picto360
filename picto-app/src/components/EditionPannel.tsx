@@ -165,17 +165,17 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
     return (
         <div id="movable" className="edition_pannel" ref={boxRef}>
             <div id="handle" className="draggable_line" onMouseDown={handleMouseDown}></div>
+            
             <div className="edition_pannel_content">
-                <div className="edition_pannel_top">
-                    <div className="edition_pannel_top_text">
-                        <div className="edition_pannel_icon">{panelIcon}</div> {typeLabel}
+                <div className="modal__header">
+                    <div className="t-page-title">
+                        <div className="edition_pannel_icon">{panelIcon}</div> 
+                        {typeLabel}
                     </div>
-
-                    <button className="close-button" onClick={onClose} aria-label="Fermer le pannel d'édition sans sauvegarder">
-                        <XMarkIcon width={20} height={20} />
+                    <button className="modal__close-button" onClick={onClose} aria-label="Fermer le pannel d'édition sans sauvegarder">
+                        <XMarkIcon width={18} height={18} />
                     </button>
 
-                    {/* <IoCloseCircleOutline size={40} className="close_icon"/> */}
                 </div>
                 <div className="pannel_main_content">
                     {editor}
@@ -187,17 +187,17 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                             <TrashIcon width={18} height={18} />
                         </button>
                     }
-                    <div className="bottom_pannel">
-                        <button type="button" className="cancel_button" onClick={onClose}>Annuler</button>
+                    <div className="popup-modal__footer">
+                        <button type="button" className="modal__button button__secondary" onClick={onClose}>Annuler</button>
                         {
                             pannelState == "editing" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>
+                            <button type="button" className="modal__button button__primary" onClick={handleClickSave}>
                                 Sauvegarder
                             </button>
                         }
                         {
                             pannelState == "creating" &&
-                            <button type="button" className="save_button" onClick={handleClickSave}>
+                            <button type="button" className="modal__button button__primary" onClick={handleClickSave}>
                                 Créer
                             </button>
                         }

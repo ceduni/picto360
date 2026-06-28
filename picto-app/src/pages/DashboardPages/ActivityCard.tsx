@@ -19,7 +19,7 @@ const ActivityCard : React.FC<ActivityCardProps> = ({activityData,handleGotoActi
 
     return(
         <div className="activity-card">
-            <div className="activity-card-text-fields activities-list-content-values"
+            <div className="activity-card-modal__inputs activities-list-content-values"
                 onClick={()=>handleGotoActivity(activityData.id)}>
                 <p className="activity-card-title">{activityData.title}</p>
                 <p className="activity-card-subtitle">{(activityData.creationdate.split("T")[0])}</p>

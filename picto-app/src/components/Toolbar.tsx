@@ -133,33 +133,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 </div>
 
                 <div className="toolbar__right">
-                    {/* <button className="toolbar__icon-button has-helper" onClick={() => { setShowExportOptions(true) }} title="Exporter">
-                        <IoMdTrash className="toolbar__export-icon" />
-                        <span className="helper">Supprimer toutes les annotations</span>
-                    </button> */}
-
                     <div className="toolbar__mode-switcher">
                         <ToggleSwitch id="edit-mode" checked={isEditMode} onChange={handleToggleEditMode} variant="icon" checkedIcon={<PencilIcon width={16} height={16} />} uncheckedIcon={<EyeIcon width={16} height={16} />} />
                         <span onClick={toggleEditMode} className="toolbar__mode-switcher__label">{(isEditMode ? "Mode annotation" : "Mode visualisation")}</span>
                     </div>
 
-                    {/* <button
-                  onClick={!isSaved ? handleSave : undefined}
-                  className="toolbar__icon-button"
-                  disabled={!isEditMode}
-                  title={isEditMode && !isSaved ? "Sauvegarder" : ""}
-                >
-                  {isSaved ? (
-                    <MdCheck className="toolbar__check-icon" />
-                  ) : (
-                    <MdSaveAlt className="toolbar__save-icon" />
-                  )}
-                </button> */}
-
-
-                    {/* <button onClick={()=>{ setShowShareOptions(true)}} className="toolbar__icon-button" title="Partager">
-                <MdShare />
-              </button> */}
                     {
                         driveAuthStatus?.isAuthenticated &&
                         <button className="toolbar__icon-button" onClick={async () => { await logoutFromDrive(); }} title="Déconnexion">

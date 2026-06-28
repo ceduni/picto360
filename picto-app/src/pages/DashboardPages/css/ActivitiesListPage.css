@@ -67,7 +67,7 @@
     width: 59vw;
 }
 
-.activity-card-text-fields{
+.activity-card-modal__inputs{
     background-color: #F1F2FF;
     height: 10vh;
     border-top-left-radius: 1vh;
@@ -76,7 +76,7 @@
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
 }
-.activity-card-text-fields:hover{
+.activity-card-modal__inputs:hover{
     background-color: #e4eaff;
 }
 

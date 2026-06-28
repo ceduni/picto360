@@ -1,46 +1,4 @@
-.popup_background{
-    position: fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1200;
-}
-
-.popup_window{
-    background-color: white;
-    height: 80vh;
-    width: 40vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3vw;
-    border-radius: 4%;
-}
-
-
-.popup_window_content{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: inherit;
-    height: inherit;
-    gap:3vw;
-}
-
-
-.popup_window_content-top{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: inherit;
-}
-
+/*--------Team Popup style ------------*/
 .team-title-input{
     font-size: 1.5vw;
     font-weight: 700;
@@ -50,31 +8,6 @@
 .team-title-input:focus{
     background-color: #f1f2ff7c;
     border: 4px solid #F1F2FF;
-}
-
-.popup_close_button{
-    color: #364a9d;
-    cursor: pointer;
-    align-self: flex-start;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-}
-
-.popup_close_button:hover{
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.popup_particip_number_field{
-    font-weight: 100;
-    font-size: 0.9vw;
-    gap:0.2vw;
-    height: 0vh;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 
 .team_participants_field{

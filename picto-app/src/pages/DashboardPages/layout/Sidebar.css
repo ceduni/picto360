@@ -238,3 +238,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.sidebar-activity__dot--draft {
+  background: transparent !important;
+  border: 1.5px dashed var(--blue-slate);
+  opacity: 0.5;
+}
+
+.sidebar-activity__name--draft {
+  opacity: 0.6;
+  font-style: italic;
+}
