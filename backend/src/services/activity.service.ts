@@ -223,11 +223,9 @@ export const getActivities = async (request: FastifyRequest, reply: FastifyReply
 
     const userId = mongoUser._id;
 
-    const supervisedTeamIds = await Team.find({ supervisorId: uid }).distinct("_id");
+    // const supervisedTeamIds = await Team.find({ supervisorId: uid }).distinct("_id");
 
-    const activities = await Activity.find({
-      $or: [{ createdBy: userId }, { teams: { $in: supervisedTeamIds } }],
-    })
+    const activities = await Activity.find({ createdBy: userId })
       .populate("teams")
       .populate("createdBy")
       .lean();
@@ -270,7 +268,7 @@ export const getActivityById = async (request: FastifyRequest, reply: FastifyRep
       })
       .populate("createdBy")
       .lean();
-
+    
     if (!activity) return reply.status(404).send({ message: "Activity not found" });
 
     const isCreator = String(activity.createdBy._id) === String(mongoUser._id);
