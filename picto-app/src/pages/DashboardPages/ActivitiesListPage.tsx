@@ -3,13 +3,13 @@ import DashboardLayout from "./layout/DashboardLayout"
 import UseAnimations from "react-useanimations";
 import loading2 from 'react-useanimations/lib/loading2';
 import ActivityCard from "./ActivityCard"
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivity } from "@/contexts/ActivityContext";
 import { useNavigate } from "react-router-dom";
 
 
 
 const ActivitiesListPage :React.FC = ()=>{
-    const { userActivities, loading , getActivitiesError} =  useFetchActivities();
+    const { userActivities, loading, error: getActivitiesError } = useActivity();
 
     const navigate = useNavigate();
 

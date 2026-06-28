@@ -34,7 +34,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title, actions, onOpe
         <button
           className="dash-header-icon-btn"
           aria-label="Paramètres"
-          onClick={() => navigate("/dashboard/settings")}
         >
           <Cog6ToothIcon width={19} height={19} />
         </button>

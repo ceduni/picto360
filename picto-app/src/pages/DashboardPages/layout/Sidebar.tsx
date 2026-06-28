@@ -12,8 +12,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
-import { useActivityDraft } from "@/contexts/ActivityDraftContext";
+import { useActivity } from "@/contexts/ActivityContext";
 import "./Sidebar.css";
 
 const ACTIVITY_COLORS = [
@@ -25,25 +24,29 @@ const MAIN_ITEMS = [
   { key: "studio",      label: "Studio",     Icon: ViewfinderCircleIcon, path: "/dashboard/studio" },
   { key: "dashboard",   label: "Dashboard",  Icon: Squares2X2Icon,  path: "/dashboard" },
   { key: "activities",  label: "Activités",  Icon: BoltIcon,        path: "/dashboard/your-activities" },
-  { key: "groups",      label: "Groupes",    Icon: UsersIcon,       path: "/dashboard/groupes" },
+  { key: "groups",      label: "Groupes",    Icon: UsersIcon,       path: "#" },
 ] as const;
 
 const BOTTOM_ITEMS = [
-  { key: "settings", label: "Paramètres", Icon: Cog6ToothIcon,          path: "/dashboard/settings" },
-  { key: "help",     label: "Aide",       Icon: QuestionMarkCircleIcon, path: "/dashboard/help" },
+  { key: "settings", label: "Paramètres", Icon: Cog6ToothIcon,          path: "#" },
+  { key: "help",     label: "Aide",       Icon: QuestionMarkCircleIcon, path: "#" },
 ] as const;
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { userActivities } = useFetchActivities();
-  const { currentDraft } = useActivityDraft();
+  const { userActivities, currentDraft } = useActivity();
   const [isOpen, setIsOpen] = useState(true);
 
   const isActive = (path: string) =>
     path === "/" || path === "/dashboard"
       ? pathname === path
       : pathname.startsWith(path);
+
+  // All server activities except ARCHIVED
+  const serverActivities = (userActivities ?? []).filter(
+    a => a.status !== "ARCHIVED"
+  );
 
   return (
     <aside className={`sidebar${isOpen ? "" : " sidebar--collapsed"}`}>
@@ -73,7 +76,7 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {isOpen && 
+      {isOpen &&
       <div className="sidebar-section-list">
         <div className="sidebar-section">
           <div className="sidebar-section__header">
@@ -82,38 +85,47 @@ const Sidebar: React.FC = () => {
               className="sidebar-section__add"
               onClick={() => navigate("/dashboard/activity-creation")}
               aria-label="Nouvelle activité"
-              >
+            >
               <PlusIcon width={14} height={14} />
             </button>
           </div>
 
           <div className="sidebar-section__list">
+            {/* In-progress draft (shows immediately while backend creates it, then tracks by backendId) */}
             {currentDraft && (
               <div
                 className={`sidebar-activity${pathname === "/dashboard/activity-creation" ? " sidebar-activity--active" : ""}`}
                 onClick={() => navigate("/dashboard/activity-creation")}
               >
                 <span className="sidebar-activity__dot sidebar-activity__dot--draft" />
-                <span className="sidebar-activity__name sidebar-activity__name--draft">{currentDraft.title}</span>
+                <span className="sidebar-activity__name sidebar-activity__name--draft">
+                  {currentDraft.title}
+                </span>
               </div>
             )}
-            {(!userActivities || userActivities.length === 0) && !currentDraft ? (
+
+            {serverActivities.length === 0 && !currentDraft && (
               <p className="sidebar-section__empty">Aucune activité</p>
-            ) : (
-              (userActivities ?? []).slice(0, 8).map((activity, i) => (
-                <div
-                key={activity._id}
-                className={`sidebar-activity${pathname === `/dashboard/activity-editor/${activity._id}` ? " sidebar-activity--active" : ""}`}
-                onClick={() => navigate(`/dashboard/activity-editor/${activity._id}`)}
-                >
-                  <span
-                    className="sidebar-activity__dot"
-                    style={{ background: ACTIVITY_COLORS[i % ACTIVITY_COLORS.length] }}
-                    />
-                  <span className="sidebar-activity__name">{activity.title}</span>
-                </div>
-              ))
             )}
+
+            {serverActivities.slice(0, 8).map((activity, i) => {
+              const isDraft = activity.status === "DRAFT";
+              return (
+                <div
+                  key={activity._id}
+                  className={`sidebar-activity${pathname === `/dashboard/activity-editor/${activity._id}` ? " sidebar-activity--active" : ""}`}
+                  onClick={() => navigate(`/dashboard/activity-editor/${activity._id}`)}
+                >
+                  {isDraft
+                    ? <span className="sidebar-activity__dot sidebar-activity__dot--draft" />
+                    : <span className="sidebar-activity__dot" style={{ background: ACTIVITY_COLORS[i % ACTIVITY_COLORS.length] }} />
+                  }
+                  <span className={`sidebar-activity__name${isDraft ? " sidebar-activity__name--draft" : ""}`}>
+                    {activity.title}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

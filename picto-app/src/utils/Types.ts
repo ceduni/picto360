@@ -74,6 +74,29 @@ export type ActivityStatus = {
   status: "created" | "open" | "closed";
 }
 
+export interface ActivityFull {
+  _id: string;
+  title: string;
+  description?: string;
+  mode: "SOLO" | "COLLABORATIVE" | "COMPETITIVE";
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  tags: string[];
+  tasks: { _id: string; title: string; level: "EASY" | "MEDIUM" | "HARD"; points?: number }[];
+  authoriseEdit: boolean;
+  constraints: { constraint_type: string; constraint_value: Record<string, unknown>; is_enabled: boolean }[];
+  teams: {
+    _id: string;
+    teamName: string;
+    supervisorId: string;
+    participantsList: { participantId: string; name: string; joinLink: string }[];
+  }[];
+  createdBy: { _id: string; uid: string; email: string; displayName?: string };
+  ownership: "creator" | "supervisor";
+  totalParticipants: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FetchedActivity {
   _id: string;
   title: string;
@@ -96,9 +119,11 @@ export interface FetchedActivity {
       joinLink: string;
     }[];
   }[];
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   ownership: "creator" | "supervisor";
   totalParticipants: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 
