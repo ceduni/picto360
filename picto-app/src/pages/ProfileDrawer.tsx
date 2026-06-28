@@ -23,6 +23,7 @@ import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import "./css/DrawerStyle.css";
 import "./css/ProfileDrawer.css";
 
 interface ProfileDrawerProps {

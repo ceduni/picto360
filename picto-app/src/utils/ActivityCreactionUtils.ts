@@ -24,7 +24,7 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
         id: t._id,
         name: t.teamName,
         participantsNumber: t.participantsList.length,
-        supervised: false,
+        supervised: !!t.supervisorId,
         participantsNames: t.participantsList.map(p => ({ id: p.participantId, name: p.name })),
         supervisor_id: t.supervisorId,
       }));
@@ -40,7 +40,6 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
     chrono,
     participantsList,
     teamsList,
-    supervised_teams: false,
     tagInput: "",
     taskInput: "",
   };
@@ -57,7 +56,12 @@ export function buildDraftPayload(formValues: ActivityIstance): UpdateDraftPaylo
 
     const teamsList = formValues.type === "solo"
         ? [{ name: "Team_Default", participants: formValues.participantsList.map(p => ({ id: p.id, name: p.name })), supervised: false }]
-        : formValues.teamsList.map(t => ({ name: t.name, participants: t.participantsNames.map(p => ({ id: p.id, name: p.name })), supervised: t.supervised, supervisor_id: t.supervisor_id }));
+        : formValues.teamsList.map(t => ({
+            name: t.name,
+            participants: t.participantsNames.map(p => ({ id: p.id, name: p.name })),
+            supervised: t.supervised,
+            ...(t.supervised ? { supervisor_id: t.supervisor_id } : {}),
+        }));
 
     return { title: formValues.title, description: formValues.description, mode, tags: formValues.tags, tasks, authoriseEdit: formValues.authoriseEdit, constraints, teamsList };
 }
@@ -219,7 +223,6 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
         const type = formValues.type;
         const participantsList = formValues.participantsList;
         const teamsList = formValues.teamsList;
-        const supervised_teams = formValues.supervised_teams;
         const chrono = formValues.chrono;
 
         let errorMessage = "";
@@ -238,19 +241,17 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
                 if(teamsList.length<=0){
                     errorMessage = "Erreure: Vous devez rentrer au moins une équipe";
                 }
-                if(supervised_teams){
-                    teamsList.map((team)=>{
-                        if(!team.supervisor_id || team.supervisor_id===""){
+                teamsList.forEach((team) => {
+                    if (team.supervised) {
+                        if (!team.supervisor_id || team.supervisor_id === "") {
                             errorMessage = "Erreure: Vous devez ajouter le superviseur de l'équipe : " + team.name;
                         }
-                    })
-                }else{
-                    teamsList.map((team)=>{
-                        if(!team.participantsNames || team.participantsNames.length===0){
+                    } else {
+                        if (!team.participantsNames || team.participantsNames.length === 0) {
                             errorMessage = "Erreure: Vous devez ajouter les participants de l'équipe : " + team.name;
                         }
-                    })
-                }
+                    }
+                });
 
             }
         }

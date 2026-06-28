@@ -66,7 +66,6 @@ type ActivityData = {
 export interface ActivityIstance extends ActivityData {
   tagInput: string,
   taskInput: string,
-  supervised_teams: boolean,
   chrono: { isEnabled: boolean, minutes: number, seconds: number }
 }
 
