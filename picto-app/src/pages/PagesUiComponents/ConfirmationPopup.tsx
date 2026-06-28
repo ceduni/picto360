@@ -14,12 +14,12 @@ const ConfirmationPopup : React.FC<ConfirmationPopupProps> = ({message,type,hand
     return(
         <div className="popup_background">
             <div className="popup_window">
-                <div className="popup_window-header">
+                <div className="popup_window-header_column">
                     <p className="t-page-title">{message.title}</p>
                     <p className="t-subtitle">{message.details}</p>
                 </div>
 
-                <div className="popup_buttons-container">
+                <div className="popup-modal__footer">
                     {
                         (type==="cancel" || type === "confirm-cancel") &&
                         <button type="button" 

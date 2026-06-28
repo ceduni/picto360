@@ -193,7 +193,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
 
   return (
     <div
-      className={`popup_background ${isOpen ? "popup_background--open" : ""}`}
+      className={`popup_background`}
       onClick={handleBackdropClick}
     >
       <ErrorBanner ref={bannerRef} />

@@ -44,7 +44,7 @@ const ExportProgressPopupWindow: React.FC<ExportProgressPopupWindowProps> = ({
 
   return (
     <div
-      className="popup_background popup_background--open export-progress-modal-backdrop"
+      className="popup_background export-progress-modal-backdrop"
       onClick={handleBackdropClick}
     >
       <div className="modal modal--open export-progress-modal">

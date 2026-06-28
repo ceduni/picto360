@@ -55,7 +55,7 @@ const SettingsPopupWindow: React.FC<SettingsPopupProps> = ({ isOpen, setIsPopupO
     if (!isOpen) return null;
 
     return (
-        <div className={`popup_background ${isOpen ? 'popup_background--open' : ''}`} onClick={handleBackdropClick}>
+        <div className={`popup_background `} onClick={handleBackdropClick}>
             <div className={`modal ${isOpen ? 'modal--open' : ''}`}>
                 <div className="modal__header">
                     <h2 className="t-page-title">Paramètres du projet</h2>
