@@ -84,7 +84,8 @@ async function upsertTeams(
 
     const fields = {
       teamName: team.name,
-      supervisorId: team.supervisor_id || supervisorUid,
+      supervised: team.supervised,
+      supervisorId: team.supervised ? (team.supervisor_id ?? "") : "",
       participantsList,
     };
 

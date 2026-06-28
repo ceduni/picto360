@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import {
     XMarkIcon, PlusIcon, ChevronDownIcon, TrashIcon,
     ArrowDownTrayIcon, UsersIcon, UserIcon,
@@ -11,6 +11,7 @@ import { handleParticipantNameChange, handleDeleteParticipant } from "@/utils/Ac
 import ParticipantCard from "../DashboardPages/layout/ParticipantCard";
 import IOSSwitch from "../PagesUiComponents/IOSSwitch";
 import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useUserSearch, UserSearchResult } from "@/hooks/useUserSearch";
 
 interface Props {
     open: boolean;
@@ -30,6 +31,103 @@ function addParticipants(team: TeamInstance, count: number): TeamInstance {
         name: `Participant ${existing.length + i + 1}`,
     }));
     return { ...team, participantsNames: [...existing, ...entries] };
+}
+
+// ── Supervisor search picker ─────────────────────────────────────────────────
+
+function SupervisorPicker({ value, onChange }: { value: string; onChange: (uid: string) => void }) {
+    const { search, getByUid, results, loading } = useUserSearch();
+    const [query, setQuery] = useState("");
+    const [resolvedName, setResolvedName] = useState<string | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Resolve display name for an already-assigned supervisor
+    useEffect(() => {
+        if (!value) { setResolvedName(null); return; }
+        getByUid(value).then(u => setResolvedName(u ? (u.displayName || u.email) : value));
+    }, [value, getByUid]);
+
+    // Debounced search
+    useEffect(() => {
+        const t = setTimeout(() => { if (query.length >= 2) search(query); }, 300);
+        return () => clearTimeout(t);
+    }, [query, search]);
+
+    // Close on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node))
+                setIsOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const select = (u: UserSearchResult) => {
+        onChange(u.uid);
+        setResolvedName(u.displayName || u.email);
+        setQuery("");
+        setIsOpen(false);
+    };
+
+    const clear = () => {
+        onChange("");
+        setResolvedName(null);
+        setQuery("");
+        setIsOpen(true);
+    };
+
+    // Assigned state — show name + change button
+    if (value && !isOpen) {
+        return (
+            <div className="etdrawer__supervisor-selected">
+                <span className="etdrawer__supervisor-name">{resolvedName ?? "…"}</span>
+                <button className="etdrawer__supervisor-change" onClick={clear} type="button">
+                    Changer
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="etdrawer__supervisor-picker" ref={containerRef}>
+            <input
+                className="etdrawer__input"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setIsOpen(true); }}
+                placeholder="Rechercher par nom ou email…"
+                autoFocus
+            />
+            {isOpen && query.length >= 2 && (
+                <div className="etdrawer__supervisor-dropdown">
+                    {loading && <div className="etdrawer__supervisor-hint">Recherche…</div>}
+                    {!loading && results.length === 0 && (
+                        <div className="etdrawer__supervisor-hint">Aucun résultat</div>
+                    )}
+                    {results.map(u => (
+                        <button
+                            key={u.uid}
+                            className="etdrawer__supervisor-result"
+                            onMouseDown={() => select(u)}
+                            type="button"
+                        >
+                            {u.photoUrl
+                                ? <img src={u.photoUrl} className="etdrawer__supervisor-avatar" alt="" />
+                                : <span className="etdrawer__supervisor-avatar etdrawer__supervisor-avatar--fallback">
+                                    <UserIcon width={12} height={12} />
+                                  </span>
+                            }
+                            <span className="etdrawer__supervisor-info">
+                                <span className="etdrawer__supervisor-display">{u.displayName || "—"}</span>
+                                <span className="etdrawer__supervisor-email">{u.email}</span>
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
 
 // ── Editable team row (current activity) ────────────────────────────────────
@@ -118,12 +216,10 @@ function TeamRow({ team, isExpanded, onToggle, onUpdate, onDelete }: {
                         </div>
                         {team.supervised && (
                             <div className="etdrawer__field">
-                                <label className="etdrawer__label">Identifiant du superviseur</label>
-                                <input
-                                    className="etdrawer__input"
+                                <label className="etdrawer__label">Superviseur</label>
+                                <SupervisorPicker
                                     value={team.supervisor_id ?? ""}
-                                    onChange={(e) => onUpdate({ ...team, supervisor_id: e.target.value })}
-                                    placeholder="ID ou nom du superviseur…"
+                                    onChange={(uid) => onUpdate({ ...team, supervisor_id: uid })}
                                 />
                             </div>
                         )}
