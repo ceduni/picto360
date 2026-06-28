@@ -8,18 +8,21 @@ import {
     ArrowRightOnRectangleIcon,
     CheckIcon,
     XMarkIcon,
-    PencilIcon,
     UserIcon,
     EnvelopeIcon,
     CalendarIcon,
     BoltIcon,
     UsersIcon,
 } from "@heroicons/react/24/outline";
+
+import{
+    PencilIcon
+} from "@heroicons/react/24/solid";
+
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import "./css/ProfilePage.css";
 import "./css/ProfileDrawer.css";
 
 interface ProfileDrawerProps {
@@ -104,16 +107,16 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
                             />
                             {isEditing ? (
                                 <div className="profile_hero__edit-actions">
-                                    <button className="profile_save-btn" onClick={handleSave}>
+                                    <button className="button__primary" onClick={handleSave}>
                                         <CheckIcon width={14} height={14} /> Enregistrer
                                     </button>
-                                    <button className="profile_cancel-btn" onClick={handleCancel}>
+                                    <button className="button__secondary" onClick={handleCancel}>
                                         <XMarkIcon width={14} height={14} />
                                     </button>
                                 </div>
                             ) : (
-                                <button className="profile_edit-btn" onClick={() => setIsEditing(true)}>
-                                    <PencilIcon width={14} height={14} /> Modifier le profil
+                                <button className="button__primary" onClick={() => setIsEditing(true)}>
+                                    <PencilIcon width={14} height={14} /> Editer
                                 </button>
                             )}
                         </div>
@@ -204,7 +207,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
 
                         {/* Danger zone */}
                         <div className="profile_danger">
-                            <button className="profile_logout-btn" onClick={onLogOut}>
+                            <button className="btn__outlined" onClick={onLogOut}>
                                 <ArrowRightOnRectangleIcon width={15} height={15} /> Déconnexion
                             </button>
                             <button className="profile_danger-btn">
