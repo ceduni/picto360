@@ -3,14 +3,14 @@ import { constraintSchema, IConstraint } from './activity.model';
 
 
 export interface TeamParticipant{
-  praticipantName:string,
+  name:string,
   joinLink:string,
 }
 
 const teamParticipantSchema = new Schema<TeamParticipant>(
     {
-        praticipantName: { type: String, required: true, trim: true },
-        joinLink: {type:String,required:true},
+        name: { type: String, required: true, trim: true },
+        joinLink: {type:String,default:""},
     },
     { 
       _id: true,

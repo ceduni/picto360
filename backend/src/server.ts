@@ -48,7 +48,7 @@ const setupServer = async () => {
         if (allowed.includes(origin)) cb(null, true);
         else cb(new Error("Not allowed by CORS"), false);
       },
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true, // <-- critical when using credentials: 'include'
       maxAge: 86400,
