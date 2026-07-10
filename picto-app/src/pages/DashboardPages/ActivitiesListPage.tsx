@@ -251,7 +251,7 @@ const ActivitiesListPage: React.FC = () => {
                     {/*-- Activity List Header --*/}
                     <div className="alpage__table-header">
                         <div className="modal__section_horizontal">
-                            <BoltIcon width={16} height={16} />
+                            <BoltIcon width={16} height={16} className="alpage__table-header-icon"/>
                             <p className="t-card-heading">Liste d'activités</p>
                         </div>
                         <div className="modal__section_horizontal">
