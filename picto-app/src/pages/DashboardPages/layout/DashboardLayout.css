@@ -4,6 +4,7 @@
   height: 100vh;
   overflow: hidden;
   background-color: var(--accent-light-bg);
+  padding: var(--space-2);
 }
 
 .dashboard-layout-body {
@@ -11,6 +12,9 @@
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .dashboard-layout-content {
