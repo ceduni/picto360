@@ -87,7 +87,7 @@ export interface ActivityFull {
     _id: string;
     teamName: string;
     supervisorId: string;
-    participantsList: { participantId: string; name: string; joinLink: string }[];
+    participantsList: { _id: string; name: string; joinLink: string }[];
   }[];
   createdBy: { _id: string; uid: string; email: string; displayName?: string };
   ownership: "creator" | "supervisor";
@@ -113,7 +113,7 @@ export interface FetchedActivity {
     teamName: string;
     supervisorId: string;
     participantsList: {
-      participantId: string;
+      _id: string;
       name: string;
       joinLink: string;
     }[];

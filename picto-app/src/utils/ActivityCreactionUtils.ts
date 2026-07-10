@@ -15,7 +15,7 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
     : { isEnabled: false, minutes: 0, seconds: 0 };
 
   const participantsList = isSolo
-    ? (activity.teams[0]?.participantsList ?? []).map(p => ({ id: p.participantId, name: p.name }))
+    ? (activity.teams[0]?.participantsList ?? []).map(p => ({ id: p._id, name: p.name }))
     : [];
 
   const teamsList: TeamInstance[] = isSolo
@@ -25,7 +25,7 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
         name: t.teamName,
         participantsNumber: t.participantsList.length,
         supervised: !!t.supervisorId,
-        participantsNames: t.participantsList.map(p => ({ id: p.participantId, name: p.name })),
+        participantsNames: t.participantsList.map(p => ({ id: p._id, name: p.name })),
         supervisor_id: t.supervisorId,
       }));
 
