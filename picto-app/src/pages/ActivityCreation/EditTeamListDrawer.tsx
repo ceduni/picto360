@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
     XMarkIcon, PlusIcon, ChevronDownIcon, TrashIcon,
     ArrowDownTrayIcon, UsersIcon, UserIcon,
@@ -9,7 +9,7 @@ import "../css/EditTeamListDrawer.css";
 import { ActivityIstance, ParticipantData, TeamInstance } from "@/utils/Types";
 import { handleParticipantNameChange, handleDeleteParticipant } from "@/utils/ActivityCreactionUtils";
 import ParticipantCard from "../DashboardPages/layout/ParticipantCard";
-import IOSSwitch from "../PagesUiComponents/IOSSwitch";
+import IOSSwitch from "../../components/IOSSwitch";
 import { useActivity } from "@/contexts/ActivityContext";
 import { useUserSearch, UserSearchResult } from "@/hooks/useUserSearch";
 
@@ -240,7 +240,7 @@ function TeamRow({ team, isExpanded, onToggle, onUpdate, onDelete }: {
 
 function ImportableRow({ teamName, participants, activityTitle, isExpanded, onToggle, onImport }: {
     teamName: string;
-    participants: { participantId: string; name: string }[];
+    participants: { _id: string; name: string }[];
     activityTitle: string;
     isExpanded: boolean;
     onToggle: () => void;
@@ -269,7 +269,7 @@ function ImportableRow({ teamName, participants, activityTitle, isExpanded, onTo
                     <div className="etdrawer__expand-content">
                         <div className="etdrawer__import-chips">
                             {participants.slice(0, 8).map((p) => (
-                                <span key={p.participantId} className="etdrawer__import-chip">
+                                <span key={p._id} className="etdrawer__import-chip">
                                     <UserIcon width={10} height={10} />
                                     {p.name || "Participant"}
                                 </span>
@@ -338,7 +338,7 @@ const EditTeamListDrawer: React.FC<Props> = ({ open, onClose, formValues, setFor
             participantsNumber: t.participants.length,
             supervised: !!t.supervisorId,
             supervisor_id: t.supervisorId ?? "",
-            participantsNames: t.participants.map(p => ({ id: p.participantId, name: p.name })),
+            participantsNames: t.participants.map(p => ({ id: p._id, name: p.name })),
         };
         setFormValues(prev => ({ ...prev, teamsList: [...prev.teamsList, newTeam] }));
     };

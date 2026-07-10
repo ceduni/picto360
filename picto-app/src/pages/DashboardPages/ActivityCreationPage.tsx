@@ -4,7 +4,7 @@ import "./css/ActivityCreationPage.css";
 import { useNavigate, useBlocker, useParams, useLocation } from "react-router-dom";
 import DashboardLayout from "./layout/DashboardLayout";
 import EditTeamListDrawer from "../ActivityCreation/EditTeamListDrawer";
-import ConfirmationPopup from "../PagesUiComponents/ConfirmationPopup";
+import ConfirmationPopup from "../../components/ConfirmationPopup";
 import ErrorBanner from "../../components/FeedbackBanner";
 import {
     validateActivityValues,
