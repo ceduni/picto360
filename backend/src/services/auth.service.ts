@@ -1,10 +1,61 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { AuthStatus, OAuthProviderType, OAuthCallbackResult } from "@/types/auth.types";
 import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import { AuthConfig } from "@/providers/auth/AuthConfig";
 import { getNotificationHubService } from "./notificationHub.service";
 import { IAuthProvider } from "@/providers/auth/BaseAuthProvider";
+import { getExportService } from "./export.service";
+import { randomUUID } from "crypto";
 
+interface OAuthRedirectMetadata {
+  returnTo?: string;
+  viewerId?: string;
+  autoExport?: boolean;
+}
+
+const frontend_server = process.env.FRONTEND_SERVER || "http://localhost:3000";
+
+
+function getSafeFrontendPath(metadata?: OAuthRedirectMetadata, fallbackPath = "/") {
+  const frontendUrl = new URL(frontend_server);
+  const safeFallbackPath =   metadata?.viewerId ? `/view/${encodeURIComponent(metadata.viewerId)}` :  fallbackPath;
+
+  if (! metadata?.returnTo) {
+    return safeFallbackPath;
+  }
+
+  try {
+    const candidateUrl = new URL(metadata.returnTo, frontendUrl);
+
+    if (candidateUrl.origin !== frontendUrl.origin) {
+      return safeFallbackPath;
+    }
+
+    return `${candidateUrl.pathname}${candidateUrl.search}${candidateUrl.hash}`;
+  } catch (_error) {
+    return safeFallbackPath;
+  }
+}
+
+function buildFrontendRedirectUrl(
+  status: "success" | "error",
+  metadata?: OAuthRedirectMetadata,
+  fallbackPath = "/",
+  message?: string,
+) {
+  const redirectUrl = new URL(
+    getSafeFrontendPath(metadata, fallbackPath),
+    frontend_server,
+  );
+
+  redirectUrl.searchParams.set("driveAuth", status);
+
+  if (metadata?.autoExport) {
+    redirectUrl.searchParams.set("autoExport", "drive");
+  }
+
+  return redirectUrl.toString();
+}
 
 /**
  * Unified auth service supporting multiple OAuth providers
@@ -14,6 +65,7 @@ export class AuthService {
   private notificationHub = getNotificationHubService();
   private activeProvider: IAuthProvider;
   private providerType: OAuthProviderType;
+  private exportService = getExportService();
 
   constructor(providerType: OAuthProviderType = "google") {
     this.providerType = providerType;
@@ -38,14 +90,93 @@ export class AuthService {
   /**
    * Generate OAuth URL for user
    */
-  generateAuthUrl(state: string): string {
-    return this.activeProvider.generateAuthUrl(state);
+
+  generateAuthUrl = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const { returnTo, viewerId, autoExport } = request.body as {
+        returnTo?: string;
+        viewerId?: string;
+        autoExport?: boolean;
+      };
+      const state = randomUUID(); // State for CSRF protection
+
+      // Generate auth URL
+      const authUrl = this.activeProvider.generateAuthUrl(state);
+
+      // Store state in session for validation during callback
+      (request.session as any).oauth_state = state;
+      (request.session as any).oauth_metadata = {
+        returnTo,
+        viewerId,
+        autoExport: autoExport === true,
+      };
+      await request.session.save?.();
+
+      reply.status(200).send({ authUrl });
+    } catch (error) {
+      reply.status(500).send({ error: "Failed to generate auth URL" });
+    }
   }
+
+
 
   /**
    * Exchange authorization code for tokens and save to session
    */
-  async handleOAuthCallback(req: FastifyRequest, code: string): Promise<OAuthCallbackResult> {
+  handleOauthCallBack = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const { code, state, error } = request.query as {
+        code?: string;
+        state?: string;
+        error?: string;
+      };
+
+      const session = request.session as any;
+      const oauthMetadata = session.oauth_metadata as OAuthRedirectMetadata | undefined;
+      
+      const clearOAuthState = async () => {
+        delete session.oauth_state;
+        delete session.oauth_metadata;
+        await session.save?.();
+      };
+
+      if (error) {
+        await clearOAuthState();
+        return reply.redirect(buildFrontendRedirectUrl("error", oauthMetadata, "/", error));
+      }
+
+      // Verify state matches
+      if (state !== session.oauth_state) {
+        await clearOAuthState();
+        return reply.redirect(
+          buildFrontendRedirectUrl("error", oauthMetadata, "/", "state_mismatch"),
+        );
+      }
+
+      // Exchange code for tokens
+      const result = await this.exchangeCodeToToken(request, code!);
+
+      // Clear temporary state
+      await clearOAuthState();
+
+      return reply.redirect(
+        buildFrontendRedirectUrl("success", oauthMetadata, result.redirectTo),
+      );
+    } catch (error) {
+      const session = request.session as any;
+      const oauthMetadata = session.oauth_metadata as OAuthRedirectMetadata | undefined;
+
+      delete session.oauth_state;
+      delete session.oauth_metadata;
+      await session.save?.();
+
+      return reply.status(500).redirect(
+        buildFrontendRedirectUrl("error", oauthMetadata, "/", "oauth_failed"),
+      );
+    }
+  }
+
+  async exchangeCodeToToken(req: FastifyRequest, code: string): Promise<OAuthCallbackResult> {
     try {
       const tokens = await this.activeProvider.getTokensFromCode(code);
       const userInfo = await this.activeProvider.getUserInfo(tokens.access_token);
@@ -108,7 +239,7 @@ export class AuthService {
       session[sessionKey] = {
         ...connection,
         access_token: newTokens.access_token,
-        refresh_token: newTokens.refresh_token || connection.refresh_token,
+        refresh_token: newTokens.refresh_token ,
         expiry: newTokens.expiry_date ?? Date.now() + 3600 * 1000,
       };
 
@@ -237,6 +368,46 @@ export class AuthService {
   getProvider(): OAuthProviderType {
     return this.providerType;
   }
+
+  /**
+   * Start an sse stream to transfer updates to the front-end 
+   */
+  startSSEstream = async (request: FastifyRequest, reply: FastifyReply) => {
+    // CORS headers
+    const origin = request.headers.origin;
+    const allowed = [process.env.FRONTEND_SERVER || "http://localhost:3000"];
+
+    if (origin && allowed.includes(origin)) {
+      reply.raw.setHeader("Access-Control-Allow-Origin", origin);
+      reply.raw.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    // SSE headers
+    reply.raw.setHeader("Content-Type", "text/event-stream");
+    reply.raw.setHeader("Cache-Control", "no-cache");
+    reply.raw.setHeader("Connection", "keep-alive");
+
+    // Get scope for this session
+    const scope = this.getSessionScope(request);
+    const clientId = randomUUID();
+    const client = {
+      id: clientId,
+      write: (chunk: string) => reply.raw.write(chunk),
+    };
+
+    // Register client with notification hub
+    this.notificationHub.addClient(scope, client);
+
+    // Send initial auth status
+    const status = await this.getAuthStatus(request);
+    client.write(`event: auth-status\ndata: ${JSON.stringify(status)}\n\n`);
+
+    // Cleanup on disconnect
+    request.raw.on("close", () => {
+      this.notificationHub.removeClient(scope, client);
+    });
+  }
+
 }
 
 // Singleton cache for auth service instances
