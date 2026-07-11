@@ -1,4 +1,47 @@
-import { IAuthProvider, AuthToken, OAuthProviderType, AuthProviderConfig, AuthUserInfo } from "@/types/auth.types";
+import { AuthToken, OAuthProviderType, AuthProviderConfig, AuthUserInfo } from "@/types/auth.types";
+
+/**
+ * OAuth provider interface - all implementations must follow this contract
+ */
+export interface IAuthProvider {
+  get provider(): OAuthProviderType;
+  get scopes(): string[];
+
+  /**
+   * Generate auth URL for user to visit
+   */
+  generateAuthUrl(state: string): string;
+
+  /**
+   * Exchange authorization code for tokens
+   */
+  getTokensFromCode(code: string): Promise<AuthToken>;
+
+  /**
+   * Refresh access token using refresh token
+   */
+  refreshAccessToken(refreshToken: string): Promise<AuthToken>;
+
+  /**
+   * Verify and get current token validity
+   */
+  verifyToken(token: AuthToken): Promise<boolean>;
+
+  /**
+   * Revoke token and cleanup
+   */
+  revokeToken(token: string): Promise<void>;
+
+  /**
+   * Get user info from provider
+   */
+  getUserInfo(accessToken: string): Promise<AuthUserInfo>;
+
+  /**
+   * Set auth client with credentials
+   */
+  setCredentials(token: AuthToken): void;
+}
 
 /**
  * Abstract base class for OAuth providers

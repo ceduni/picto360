@@ -17,18 +17,13 @@ import "@/config/env"; // Ensure environment variables are loaded
 export class ExportService {
   private authService = getAuthService("google");
   private notificationHub = getNotificationHubService();
-  private googleStorageProvider : GoogleDriveStorageProvider | undefined = undefined;
 
   constructor(authService : AuthService,
               notificationHub : ReturnType<typeof getNotificationHubService>,
-              googleStorageProvider? : GoogleDriveStorageProvider,
               authProviderFactory? : AuthProviderFactory
             ){
     this.authService = authService;
     this.notificationHub = notificationHub;
-    if (googleStorageProvider) {
-      this.googleStorageProvider = googleStorageProvider;
-    }
   }
 
   /**
@@ -54,7 +49,6 @@ export class ExportService {
 
       // Create storage provider
       const storage = new GoogleDriveStorageProvider(oauth2Client);
-      this.googleStorageProvider = storage; // Store for potential reuse
 
       // Create export folder
       const folderName = input.options.folderName || "360° Image Annotations";

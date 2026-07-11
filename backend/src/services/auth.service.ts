@@ -1,8 +1,9 @@
 import { FastifyRequest } from "fastify";
-import { IAuthProvider, AuthStatus, SessionConnection, OAuthProviderType, OAuthCallbackResult } from "@/types/auth.types";
+import { AuthStatus, OAuthProviderType, OAuthCallbackResult } from "@/types/auth.types";
 import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import { AuthConfig } from "@/providers/auth/AuthConfig";
 import { getNotificationHubService } from "./notificationHub.service";
+import { IAuthProvider } from "@/providers/auth/BaseAuthProvider";
 
 
 /**
