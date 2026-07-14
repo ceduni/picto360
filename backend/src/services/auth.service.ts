@@ -4,7 +4,6 @@ import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import { AuthConfig } from "@/providers/auth/AuthConfig";
 import { getNotificationHubService } from "./notificationHub.service";
 import { IAuthProvider } from "@/providers/auth/BaseAuthProvider";
-import { getExportService } from "./export.service";
 import { randomUUID } from "crypto";
 
 interface OAuthRedirectMetadata {
@@ -65,7 +64,6 @@ export class AuthService {
   private notificationHub = getNotificationHubService();
   private activeProvider: IAuthProvider;
   private providerType: OAuthProviderType;
-  private exportService = getExportService();
 
   constructor(providerType: OAuthProviderType = "google") {
     this.providerType = providerType;

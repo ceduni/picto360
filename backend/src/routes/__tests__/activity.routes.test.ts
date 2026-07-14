@@ -2,10 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, jest } from "@jest/globals
 import { FastifyRequest, FastifyReply } from "fastify";
 
 // ── Mocks (factory functions prevent schema cross-import errors) ───────────
-jest.mock("@/middlewares/firebaseAuth", () => ({
-  authenticate: jest.fn(),
-}));
-
 jest.mock("@/models/user.model", () => ({
   User: { findOne: jest.fn() },
 }));
@@ -41,12 +37,10 @@ import {
   getActivityById,
 } from "@/services/activity.service";
 
-import { authenticate } from "@/middlewares/firebaseAuth";
-import { User }         from "@/models/user.model";
-import ActivityModels   from "@/models/activity.model";
-import Team             from "@/models/team.model";
+import { User }        from "@/models/user.model";
+import ActivityModels  from "@/models/activity.model";
+import Team            from "@/models/team.model";
 
-const mockAuthenticate = authenticate        as jest.MockedFunction<typeof authenticate>;
 const mockUserFindOne  = User.findOne        as jest.MockedFunction<typeof User.findOne>;
 const Activity         = ActivityModels.Activity;
 
@@ -92,7 +86,7 @@ function makeReply(): jest.Mocked<FastifyReply> {
 }
 
 function setupAuth(request: jest.Mocked<FastifyRequest>) {
-  mockAuthenticate.mockImplementation(async (req: any) => { req.user = { uid: FIREBASE_UID }; });
+  (request as any).user = { uid: FIREBASE_UID };
   mockUserFindOne.mockResolvedValue(mockUser as any);
 }
 
@@ -107,7 +101,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ body: { title: "Nouvelle activité" } });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.create as jest.Mock).mockResolvedValue(baseDraftActivity as any);
+      (Activity.create as jest.Mock<any>).mockResolvedValue(baseDraftActivity as any);
 
       await createDraft(request as any, reply);
 
@@ -145,7 +139,7 @@ describe("Activity Service", () => {
     it("returns 401 when authentication sets no user", async () => {
       const request = makeRequest({ body: { title: "Test" } });
       const reply   = makeReply();
-      mockAuthenticate.mockImplementation(async () => {}); // does not set request.user
+      // request.user intentionally left unset
 
       await createDraft(request as any, reply);
 
@@ -156,7 +150,7 @@ describe("Activity Service", () => {
     it("returns 404 when authenticated user has no DB account", async () => {
       const request = makeRequest({ body: { title: "Test" } });
       const reply   = makeReply();
-      mockAuthenticate.mockImplementation(async (req: any) => { req.user = { uid: FIREBASE_UID }; });
+      (request as any).user = { uid: FIREBASE_UID };
       mockUserFindOne.mockResolvedValue(null as any);
 
       await createDraft(request as any, reply);
@@ -168,7 +162,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ body: { title: "Test" } });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.create as jest.Mock).mockRejectedValue(new Error("DB error") as never);
+      (Activity.create as jest.Mock<any>).mockRejectedValue(new Error("DB error") as never);
 
       await createDraft(request as any, reply);
 
@@ -183,7 +177,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID }, body: { title: "Nouveau titre", tags: ["sport"] } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await updateDraft(request as any, reply);
 
@@ -197,7 +191,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ params: { id: ACTIVITY_ID }, body: {} });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(null as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(null as any);
 
       await updateDraft(request as any, reply);
 
@@ -209,7 +203,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID }, body: { title: "X" } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await updateDraft(request as any, reply);
 
@@ -222,7 +216,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID }, body: {} });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await updateDraft(request as any, reply);
 
@@ -234,7 +228,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID }, body: { teamsList: "not-array" } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await updateDraft(request as any, reply);
 
@@ -250,8 +244,8 @@ describe("Activity Service", () => {
       });
       const reply = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
-      (Team.create as jest.Mock).mockResolvedValue(newTeam as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
+      (Team.create as jest.Mock<any>).mockResolvedValue(newTeam as any);
 
       await updateDraft(request as any, reply);
 
@@ -268,9 +262,9 @@ describe("Activity Service", () => {
       });
       const reply = makeReply();
       setupAuth(request);
-      (Activity.findById     as jest.Mock).mockResolvedValue(activity as any);
-      (Team.findByIdAndUpdate as jest.Mock).mockResolvedValue(updatedTeam as any);
-      (Team.deleteMany       as jest.Mock).mockResolvedValue({} as any);
+      (Activity.findById     as jest.Mock<any>).mockResolvedValue(activity as any);
+      (Team.findByIdAndUpdate as jest.Mock<any>).mockResolvedValue(updatedTeam as any);
+      (Team.deleteMany       as jest.Mock<any>).mockResolvedValue({} as any);
 
       await updateDraft(request as any, reply);
 
@@ -287,8 +281,8 @@ describe("Activity Service", () => {
       const request   = makeRequest({ params: { id: ACTIVITY_ID }, body: { teamsList: [] } });
       const reply     = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
-      (Team.deleteMany   as jest.Mock).mockResolvedValue({} as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
+      (Team.deleteMany   as jest.Mock<any>).mockResolvedValue({} as any);
 
       await updateDraft(request as any, reply);
 
@@ -301,7 +295,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ params: { id: ACTIVITY_ID }, body: {} });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockRejectedValue(new Error("DB error") as never);
+      (Activity.findById as jest.Mock<any>).mockRejectedValue(new Error("DB error") as never);
 
       await updateDraft(request as any, reply);
 
@@ -316,7 +310,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await publishActivity(request as any, reply);
 
@@ -329,7 +323,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ params: { id: ACTIVITY_ID } });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(null as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(null as any);
 
       await publishActivity(request as any, reply);
 
@@ -341,7 +335,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await publishActivity(request as any, reply);
 
@@ -354,7 +348,7 @@ describe("Activity Service", () => {
       const request  = makeRequest({ params: { id: ACTIVITY_ID } });
       const reply    = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockResolvedValue(activity as any);
+      (Activity.findById as jest.Mock<any>).mockResolvedValue(activity as any);
 
       await publishActivity(request as any, reply);
 
@@ -365,7 +359,7 @@ describe("Activity Service", () => {
       const request = makeRequest({ params: { id: ACTIVITY_ID } });
       const reply   = makeReply();
       setupAuth(request);
-      (Activity.findById as jest.Mock).mockRejectedValue(new Error("DB error") as never);
+      (Activity.findById as jest.Mock<any>).mockRejectedValue(new Error("DB error") as never);
 
       await publishActivity(request as any, reply);
 
@@ -456,8 +450,11 @@ describe("Activity Service", () => {
       const request = makeRequest();
       const reply   = makeReply();
       setupAuth(request);
-      const chain = { distinct: jest.fn<() => Promise<never>>().mockRejectedValue(new Error("DB error")) };
-      (Team.find as jest.Mock).mockReturnValue(chain as any);
+      const chain = {
+        populate: jest.fn<() => typeof chain>().mockReturnThis(),
+        lean:     jest.fn<() => Promise<never>>().mockRejectedValue(new Error("DB error")),
+      };
+      (Activity.find as jest.Mock).mockReturnValue(chain as any);
 
       await getActivities(request as any, reply);
 

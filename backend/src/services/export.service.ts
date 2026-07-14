@@ -14,8 +14,8 @@ import "@/config/env"; // Ensure environment variables are loaded
  * Uses pluggable formatters and storage providers
  */
 export class ExportService {
-  private authService = getAuthService("google");
-  private notificationHub = getNotificationHubService();
+  private authService: AuthService;
+  private notificationHub: ReturnType<typeof getNotificationHubService>;
 
   constructor(authService : AuthService,
               notificationHub : ReturnType<typeof getNotificationHubService>,
