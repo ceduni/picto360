@@ -1,0 +1,12 @@
+{
+  "name": "picto360",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Monorepo root — hosts repo-wide tooling (git hooks) for backend/ and picto-app/.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

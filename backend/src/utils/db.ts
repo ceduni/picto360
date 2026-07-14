@@ -38,3 +38,4 @@ export const getDb = (): Db => {
 };
 
 export default connectToDatabase;
+

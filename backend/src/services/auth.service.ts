@@ -31,7 +31,7 @@ function getSafeFrontendPath(metadata?: OAuthRedirectMetadata, fallbackPath = "/
     }
 
     return `${candidateUrl.pathname}${candidateUrl.search}${candidateUrl.hash}`;
-  } catch (_error) {
+  } catch {
     return safeFallbackPath;
   }
 }
@@ -40,7 +40,7 @@ function buildFrontendRedirectUrl(
   status: "success" | "error",
   metadata?: OAuthRedirectMetadata,
   fallbackPath = "/",
-  message?: string,
+  _message?: string,
 ) {
   const redirectUrl = new URL(
     getSafeFrontendPath(metadata, fallbackPath),
@@ -111,7 +111,7 @@ export class AuthService {
       await request.session.save?.();
 
       reply.status(200).send({ authUrl });
-    } catch (error) {
+    } catch {
       reply.status(500).send({ error: "Failed to generate auth URL" });
     }
   }
@@ -160,7 +160,7 @@ export class AuthService {
       return reply.redirect(
         buildFrontendRedirectUrl("success", oauthMetadata, result.redirectTo),
       );
-    } catch (error) {
+    } catch {
       const session = request.session as any;
       const oauthMetadata = session.oauth_metadata as OAuthRedirectMetadata | undefined;
 
@@ -304,7 +304,7 @@ export class AuthService {
         connectedAt: new Date().toISOString(),
         user: userInfo,
       };
-    } catch (error) {
+    } catch {
       return {
         isAuthenticated: false,
         provider: this.providerType,

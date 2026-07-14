@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, jest, afterEach } from "@jest/globals";
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest } from "fastify";
 import { AuthService } from "@/services/auth.service";
 import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import { AuthStatus, OAuthCallbackResult } from "@/types/auth.types";
@@ -25,18 +25,11 @@ type MockAuthService = Pick<
 >;
 
 describe("OAuth Routes", () => {
-  let mockApp: jest.Mocked<FastifyInstance>;
   let mockRequest: jest.Mocked<FastifyRequest>;
-  let mockReply: jest.Mocked<FastifyReply>;
   let mockAuthService: jest.Mocked<MockAuthService>;
   let authProvider: ReturnType<typeof AuthProviderFactory.getProvider>;
 
   beforeEach(() => {
-    mockApp = {
-      get: jest.fn(),
-      post: jest.fn(),
-    } as unknown as jest.Mocked<FastifyInstance>;
-
     mockAuthService = {
       generateAuthUrl: jest
         .fn()
@@ -76,13 +69,6 @@ describe("OAuth Routes", () => {
         state: "state-123",
       },
     } as unknown as jest.Mocked<FastifyRequest>;
-
-    mockReply = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis(),
-      redirect: jest.fn().mockReturnThis(),
-      code: jest.fn().mockReturnThis(),
-    } as unknown as jest.Mocked<FastifyReply>;
 
     const provider_name = "google";
     AuthProviderFactory.createProvider(provider_name, {

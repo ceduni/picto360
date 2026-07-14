@@ -60,7 +60,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
             });
             setBannerMessage({message:"Profile créé avec succès",type:"success"});
 
-        }catch(error){
+        }catch{
             setBannerMessage({message:"Erreur de connexion.",type:"failure"});
         }
     } 

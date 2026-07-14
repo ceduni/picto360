@@ -1,6 +1,5 @@
 import { AuthProviderConfig, OAuthProviderType } from "@/types/auth.types";
 import { GoogleAuthProvider } from "./GoogleAuthProvider";
-import { OnedriveAuthProvider } from "./OnedriveAuthProvider";
 import { IAuthProvider } from "./BaseAuthProvider";
 
 /**

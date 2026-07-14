@@ -217,7 +217,7 @@ export const getActivities = async (request: FastifyRequest, reply: FastifyReply
   try {
     const resolved = await resolveUser(request, reply);
     if (!resolved) return;
-    const { user: mongoUser, uid } = resolved;
+    const { user: mongoUser } = resolved;
 
     const userId = mongoUser._id;
 

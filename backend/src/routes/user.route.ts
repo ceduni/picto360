@@ -30,7 +30,7 @@ const createNewUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>
                 displayName:user_name,
                 photoUrl:picture,
             })
-        }catch(error:any){
+        }catch{
             return reply.status(500).send({message:"Error while creating user Profile, try again"})
         }
     }
@@ -63,7 +63,7 @@ const updateUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
     try{
         await User.updateOne({uid:uid},{$set:update})
         return reply.send({message:"User updated"})
-    }catch(error:any){
+    }catch{
         return reply.status(500).send("Error on user update")
     }
 

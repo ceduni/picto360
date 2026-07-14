@@ -15,7 +15,6 @@ import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
 import activityRoutes from "./routes/activity.routes";
-import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
 import exportRoutes from "./routes/export.routes";
 import fastifyCookie  from "@fastify/cookie";
