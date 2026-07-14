@@ -1,7 +1,7 @@
-import { MongoClient, Db , ServerApiVersion} from "mongodb";
+import { Db } from "mongodb";
 import mongoose from "mongoose";
 
-let db: Db | null = null;
+const db: Db | null = null;
 
 const connectToDatabase = async (): Promise<void> => {
   try {
