@@ -3,19 +3,23 @@ import { User } from "@/models/user.model";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function userRoutes (app:FastifyInstance){
-    app.post("/users",{preHandler: authenticate},postUsers);
-    app.put("/users",{preHandler: authenticate},putUserProfile);
-    app.put("/user",{preHandler: authenticate},putUserProfile);
+    app.post("/users",{preHandler: authenticate},createNewUserProfile);
+    app.put("/users",{preHandler: authenticate},updateUserProfile);
     app.get("/users",{preHandler: authenticate}, async () =>{return User.find()} )
 }
 
 
-const postUsers = async (request:FastifyRequest,reply:FastifyReply)=>{
+const createNewUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
     const userData = request.user;
 
     if(!userData) return reply.status(401).send({message:"Unauthorised"});
 
     const {uid,email,name,picture} = userData;
+    let user_name = name
+
+    if( !name || name==undefined || name==""){
+        user_name = email?.split("@")[0]
+    }
 
     let user = await User.findOne({uid:uid});
     if(!user) {
@@ -23,17 +27,17 @@ const postUsers = async (request:FastifyRequest,reply:FastifyReply)=>{
             user = await User.create({
                 uid:uid,
                 email,
-                displayName:name,
+                displayName:user_name,
                 photoUrl:picture,
             })
         }catch(error:any){
-            return reply.status(500).send({message:"Error while creating user, try again"})
+            return reply.status(500).send({message:"Error while creating user Profile, try again"})
         }
     }
 }
 
 
-const putUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
+const updateUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
     const userData = request.user;
 
     if(!userData) return reply.status(401).send({message:"Unauthorised"});

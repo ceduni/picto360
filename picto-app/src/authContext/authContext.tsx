@@ -46,7 +46,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     const createUserInDatabase = async (user:User|null) =>{
         try{
             if(!user) {
-                setBannerMessage({message:"Le compte utilisateur n'a pas été trouvé.",type:"failure"});
+                setBannerMessage({message:"Le compte utilisateur n'a pas été créé.",type:"failure"});
                 return;
             };
 
@@ -55,13 +55,12 @@ export function AuthProvider ({ children }: { children: ReactNode }){
             await fetch(`${import.meta.env.VITE_BACKEND_URL}/users`, {
                 method: "POST",
                 headers: {
-                    // "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 }
             });
-            // return response;
+            setBannerMessage({message:"Profile créé avec succès",type:"success"});
+
         }catch(error){
-                console.error("Failed to update hotspot:", error);
             setBannerMessage({message:"Erreur de connexion.",type:"failure"});
         }
     } 
