@@ -9,6 +9,7 @@
     "test:export": "jest src/routes/__tests__/export.routes.test.ts src/services/__tests__/export.service.test.ts",
     "test:auth": "jest src/routes/__tests__/oauth.routes.test.ts src/services/__tests__/auth.service.test.ts",
     "test:sse": "jest src/services/__tests__/sse-notifications.test.ts",
+    "prebuild": "npm install",
     "build": "rimraf ./build && tsc",
     "start": "npx nodemon",
     "postinstall": "patch-package"
