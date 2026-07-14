@@ -9,7 +9,6 @@ admin.initializeApp({
 export const authenticate = async (request, response) => {
   const token = request.headers.authorization?.split("Bearer ")[1];
   if (!token) {
-    console.warn("🚫 No token provided");
     throw request.server.httpErrors.unauthorized("No token provided");
   }
 
@@ -17,8 +16,6 @@ export const authenticate = async (request, response) => {
     const decodedToken = await admin.auth().verifyIdToken(token);
     request.user = decodedToken;
   } catch (err) {
-    console.log("❌ Token verification failed:", err);
-
     return response.status(401).send({ message: "Invalid token" });
   }
 };

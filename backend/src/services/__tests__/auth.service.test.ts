@@ -10,8 +10,6 @@ import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import { getNotificationHubService } from "@/services/notificationHub.service";
 import { FastifyRequest } from "fastify";
 import { AuthToken, AuthUserInfo, SessionConnection } from "@/types/auth.types";
-import { UserInfo } from "firebase-admin/lib/auth/user-record";
-import { mock } from "node:test";
 
 // Mock dependencies
 jest.mock("@/providers/auth/AuthProviderFactory");

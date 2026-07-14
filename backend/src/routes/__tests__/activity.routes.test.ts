@@ -98,8 +98,8 @@ function setupAuth(request: jest.Mocked<FastifyRequest>) {
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 describe("Activity Service", () => {
-  beforeEach(() => jest.clearAllMocks());
-  afterEach(()  => jest.clearAllMocks());
+  beforeEach(async () => jest.clearAllMocks());
+  afterEach(async () => jest.clearAllMocks());
 
   // ─────────────────────────────────────────────────────────────────────────
   describe("createDraft — POST /activities", () => {
