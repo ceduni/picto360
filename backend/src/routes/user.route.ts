@@ -3,16 +3,15 @@ import { User } from "@/models/user.model";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 export default async function userRoutes (app:FastifyInstance){
-    app.post("/users",postUsers);
-    app.put("/users",putUserProfile);
-    app.put("/user",putUserProfile);
-    app.get("/users",async () =>{return User.find()} )
+    app.post("/users",{preHandler: authenticate},postUsers);
+    app.put("/users",{preHandler: authenticate},putUserProfile);
+    app.put("/user",{preHandler: authenticate},putUserProfile);
+    app.get("/users",{preHandler: authenticate}, async () =>{return User.find()} )
 }
 
 
 const postUsers = async (request:FastifyRequest,reply:FastifyReply)=>{
-    await authenticate(request, reply);
-    const userData = (request as any).user;
+    const userData = request.user;
 
     if(!userData) return reply.status(401).send({message:"Unauthorised"});
 
@@ -35,8 +34,7 @@ const postUsers = async (request:FastifyRequest,reply:FastifyReply)=>{
 
 
 const putUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
-    await authenticate(request, reply);
-    const userData = (request as any).user;
+    const userData = request.user;
 
     if(!userData) return reply.status(401).send({message:"Unauthorised"});
 
