@@ -39,12 +39,12 @@
   --fw-bold:     700;
 
   /* ── Typography — Size primitives (px) ── */
-  --fs-100: 14px;   /* caption / helper / pills        */
+  --fs-100: 12px;   /* caption / helper / pills        */
   --fs-200: 13px;   /* nav subitems / breadcrumb        */
-  --fs-300: 15px;   /* labels / inputs / buttons / body */
-  --fs-400: 22px;   /* card / section headings          */
-  --fs-500: 18px;   /* logo / brand                     */
-  --fs-600: 26px;   /* page title                       */
+  --fs-300: 14px;   /* labels / inputs / buttons / body */
+  --fs-400: 18px;   /* card / section headings          */
+  --fs-500: 20px;   /* logo / brand                     */
+  --fs-600: 22px;   /* page title                       */
   --fs-700: 24px;
   --fs-800: 26px;
   --fs-900: 28px;
