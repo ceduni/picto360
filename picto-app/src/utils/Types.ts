@@ -70,10 +70,6 @@ export interface ActivityIstance extends ActivityData {
   chrono: { isEnabled: boolean, minutes: number, seconds: number }
 }
 
-export type ActivityStatus = {
-  status: "created" | "open" | "closed";
-}
-
 export interface ActivityFull {
   _id: string;
   title: string;

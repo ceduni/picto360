@@ -1,4 +1,4 @@
-import Content, { ContentDocument } from "@/models/content/content.model";
+import Content, { ContentDocument } from "@/models/content/baseContent.model";
 
 class ContentService {
   async createContent(content: ContentDocument) {

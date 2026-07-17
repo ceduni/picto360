@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { baseContentFields, ContentDocument } from "./content.model";
+import { Schema } from "mongoose";
+import Content, { ContentDocument } from "./baseContent.model";
 
 export interface LinkContentDocument extends ContentDocument {
   url: string;
@@ -7,12 +7,11 @@ export interface LinkContentDocument extends ContentDocument {
 }
 
 const linkContentSchema = new Schema<LinkContentDocument>({
-  ...baseContentFields,
   url: { type: String, required: true },
   description: { type: String }, // Optional field
 });
 
-const LinkContent = mongoose.model<LinkContentDocument>(
+const LinkContent = Content.discriminator<LinkContentDocument>(
   "LinkContent",
   linkContentSchema
 );

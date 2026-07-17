@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import ContentService from '@/services/content/content.service';
-import { ContentDocument } from '@/models/content/content.model';
+import { ContentDocument } from '@/models/content/baseContent.model';
 
 async function createContent(request: FastifyRequest<{ Body: ContentDocument }>, reply: FastifyReply) {
   try {

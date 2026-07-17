@@ -1,36 +1,34 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { ContentDocument } from "./content/content.model";
+import mongoose, { Document, Schema, Types } from "mongoose";
+import { ContentDocument } from "./content/baseContent.model";
+import { ProjectDocument } from "./project.model";
+import { ActivityDocument } from "./activity.model";
 
-export interface PositionDocument extends Document {
-  x: number;
-  y: number;
-}
+export type AnnotationAssetSource = "url" | "local";
+export type AnnotationType = "TEXT" | "LABEL" | "IMAGE" | "GIF" | "VIDEO" | "LINK"
 
 export interface AnnotationDocument extends Document {
-  id: string;
-  type: string;
-  label: string;
-  visible: boolean;
-  creationDate: Date;
-  lastModificationDate: Date;
-  position: PositionDocument;
-  content: ContentDocument;
+  pitch: number;
+  yaw: number;
+  type: AnnotationType;  
+  content: Types.ObjectId | ContentDocument; // Contains the data related to the hotspot
+  project: ProjectDocument ; // is inside a project
+  visible: boolean;   // for activities where the participants have to find it
+  label?: string;
+  cssClass?: string;
 }
 
-const positionSchema = new Schema({
-  x: { type: Number, required: true },
-  y: { type: Number, required: true },
-});
-
 const annotationSchema = new Schema<AnnotationDocument>({
-  id: { type: String, required: true },
-  type: { type: String, required: true },
-  label: { type: String, required: true },
+  pitch: { type: Number, required: true },
+  yaw: { type: Number, required: true },
+  type: {type:String, enum:["TEXT", "LABEL", "IMAGE", "GIF", "VIDEO", "LINK"], required : true},
+  content: { type: Types.ObjectId, ref:"Content", required: true }, // assumes 'content' is a dynamic object
+  project:{type:Types.ObjectId, ref:"PictoProject", required: true},
   visible: { type: Boolean, required: true },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
-  position: { type: positionSchema, required: true }, // use the Position schema
-  content: { type: Schema.Types.Mixed, required: true }, // assumes 'content' is a dynamic object
+  label:{type:String},
+  cssClass:{type:String},
+},{
+  _id:true,
+  timestamps:true,
 });
 
 const Annotation = mongoose.model<AnnotationDocument>(

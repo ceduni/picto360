@@ -42,19 +42,9 @@ async function deleteAnnotation(request: FastifyRequest<{ Params: { id: string }
   }
 }
 
-async function getAllAnnotations(_request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const annotations = await AnnotationService.getAllAnnotations();
-    reply.send(annotations);
-  } catch (error: any) {
-    reply.code(500).send({ error: error.message });
-  }
-}
-
 export default async function annotationRoutes(server: FastifyInstance) {
   server.post('/annotations', createAnnotation);
   server.get('/annotations/:id', getAnnotation);
   server.put('/annotations/:id', updateAnnotation);
   server.delete('/annotations/:id', deleteAnnotation);
-  server.get('/annotations', getAllAnnotations);
 }

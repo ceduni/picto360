@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ITeam } from "./team.model";
 import { UserDocument } from "./user.model";
+import { ProjectDocument } from "./project.model";
 
 /*
 ========================== Activity Task ==========================
@@ -110,6 +111,7 @@ const ActivityParticipantProgressModel = mongoose.model(
 export interface ActivityDocument extends Document {
   title: string,
   description: string,
+  playground:ProjectDocument, // Activity playground where the avtivity happens
   mode: "SOLO" | "COLLABORATIVE" | "COMPETITIVE",
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED",
   constraints:IConstraint[],
@@ -125,6 +127,7 @@ const activitySchema = new Schema<ActivityDocument> (
   {
     title: {type: String , required:true},
     description: {type:String},
+    playground:{type:mongoose.Types.ObjectId, ref:"PictoProject"},
     mode:{type: String ,enum: ["SOLO", "COLLABORATIVE", "COMPETITIVE"], default:"SOLO"},
     status: { type: String, enum: ["DRAFT", "PUBLISHED", "ARCHIVED"], default: "DRAFT" },    
     constraints:{type:[constraintSchema]},

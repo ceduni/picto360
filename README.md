@@ -124,6 +124,6 @@ Frontend développé avec React et TypeScript.
 Supervision par [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
 
 ### Contributeurs
-
+- Jeff Pendy [@Pejjp] (https://github.com/Pejjp)
 - Mathis MORRA-FISCHER [@Mathiiis](https://github.com/Mathiiis)
 - Tarik BENAKEZOUH [@TBAce11](https://github.com/TBAce11)

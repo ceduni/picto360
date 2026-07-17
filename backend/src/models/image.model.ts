@@ -1,21 +1,17 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface ImageDocument extends Document {
-  id: string;
   url: string;
-  description: string;
-  creationDate: Date;
-  lastModificationDate: Date;
+  name: string;
 }
 
 const imageSchema = new Schema<ImageDocument>({
-  id: { type: String, required: true },
   url: { type: String, required: true },
-  description: { type: String, required: false },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
+  name: { type: String, required: false },
+},{
+  timestamps:true
 });
 
-const Image = mongoose.model<ImageDocument>("Image", imageSchema);
+const PictoImage = mongoose.model<ImageDocument>("PictoImage", imageSchema);
 
-export default Image;
+export default PictoImage;

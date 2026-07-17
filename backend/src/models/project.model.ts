@@ -1,21 +1,22 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
+import { AnnotationDocument } from "./annotation.model";
+import { ImageDocument } from "./image.model";
 
 export interface ProjectDocument extends Document {
-  id: string;
   name: string;
-  description: string;
-  creationDate: Date;
-  lastModificationDate: Date;
+  annotations:[AnnotationDocument]
+  images:[ImageDocument]
 }
 
 const projectSchema = new Schema<ProjectDocument>({
-  id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  description: { type: String, required: true },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
+  images:{type:[Types.ObjectId], ref:"PictoImage",  required:true},
+  annotations:{type: [Types.ObjectId], ref:"Annotation"},
+},{
+  _id:true,
+  timestamps:true
 });
 
-const Project = mongoose.model<ProjectDocument>("Project", projectSchema);
+const PictoProject = mongoose.model<ProjectDocument>("PictoProject", projectSchema);
 
-export default Project;
+export default PictoProject;
