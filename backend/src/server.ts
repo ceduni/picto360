@@ -2,12 +2,7 @@ import Fastify from "fastify";
 import  { fastifyCors } from "@fastify/cors";
 import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
-import formContentRoutes from "./routes/content/shapeContent.routes";
-import linkContentRoutes from "./routes/content/linkContent.routes";
 import imageCompressionRoutes from "./routes/imageCompression.routes";
-import mediaContentRoutes from "./routes/content/mediaContent.routes";
-import textContentRoutes from "./routes/content/textContent.routes";
-import dimensionRoutes from "./routes/dimension.routes";
 import imageRoutes from "./routes/image.routes";
 import projectRoutes from "./routes/project.routes";
 import sharingLinkRoutes from "./routes/sharingLink.routes";
@@ -15,7 +10,6 @@ import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
 import activityRoutes from "./routes/activity.routes";
-import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
 import exportRoutes from "./routes/export.routes";
 import fastifyCookie  from "@fastify/cookie";
@@ -73,7 +67,6 @@ const setupServer = async () => {
       limits: { fileSize: 50 * 1024 * 1024 }
     });
 
-    console.log("Registering routes")
     // Register the OAuth + export routes (require Google credentials)
     if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       fastify.register(oauthRoutes);
@@ -84,20 +77,14 @@ const setupServer = async () => {
 
     fastify.register(imageCompressionRoutes);
     fastify.register(contentRoutes);
-    fastify.register(formContentRoutes);
-    fastify.register(linkContentRoutes);
-    fastify.register(mediaContentRoutes);
-    fastify.register(textContentRoutes);
 
     fastify.register(activityRoutes);
     fastify.register(userRoutes);
 
     fastify.register(annotationRoutes);
-    fastify.register(dimensionRoutes);
     fastify.register(imageRoutes);
     fastify.register(projectRoutes);
     fastify.register(sharingLinkRoutes);
-    console.log("Routes registered")
 
     fastify.get("/", async (_request, reply) => {
       reply.send({ message: "Welcome to Picto360 API" });

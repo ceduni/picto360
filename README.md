@@ -97,6 +97,30 @@ Code serveur et logique métier.
 - **`utils/`** : Utilitaires généraux.
 - **`middlewares/`** : Vérifications avant l'exécution de la logique .
 
+#### Configuration Cloudflare
+
+Le backend utilise Cloudflare pour stocker les fichiers liés aux projets et aux contenus média :
+
+- **R2 bucket images** : images principales des projets.
+- **R2 bucket media** : contenus média des annotations, comme les vidéos, GIFs ou fichiers.
+
+Ajoutez les variables suivantes dans `backend/.env` :
+
+```env
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_API_TOKEN=
+R2_MEDIA_BUCKET_NAME=picto-media
+```
+
+Pour créer les buckets R2 nécessaires à l'environnement courant :
+
+```bash
+cd backend
+npm run setup:cloudflare
+```
+
+La commande peut être relancée sans risque : si un bucket existe déjà, le script continue.
+
 ### **`docs/`**
 Documentation du projet.
 
