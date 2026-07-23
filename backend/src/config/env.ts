@@ -18,5 +18,7 @@ export const env = {
   CLOUDFLARE_ACCOUNT_ID: requiredEnv("CLOUDFLARE_ACCOUNT_ID"),
   CLOUDFLARE_API_TOKEN: requiredEnv("CLOUDFLARE_API_TOKEN"),
   CLOUDFLARE_IMAGES_ACCOUNT_HASH: requiredEnv("CLOUDFLARE_IMAGES_ACCOUNT_HASH"),
-  R2_MEDIA_BUCKET_NAME: process.env.R2_MEDIA_BUCKET_NAME || "picto-media",
+  R2_ACCESS_KEY_ID: requiredEnv(""),
+  R2_SECRET_ACCESS_KEY : requiredEnv("R2_SECRET_ACCESS_KEY"),
+  R2_MEDIA_BUCKET_NAME: process.env.R2_BUCKET || "picto360-uploads",
 };
