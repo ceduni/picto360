@@ -1,14 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { HotspotData, PannellumViewer } from "@/utils/Types";
-import { putViewerItem, getViewerItem } from "@/utils/storedImageData";
 import { createHotspotInstance, deleteHotspotInstance } from "@/utils/HotspotUtils";
-import { resolveHotspotPersistence } from "@/utils/HotspotAssetUtils";
+import type { ViewerDataSource } from "@/utils/viewerDataSource";
 
 interface UseHotspotManagerProps {
     viewerId: string;
     viewerInstance: PannellumViewer | null;
     initialHotspots: HotspotData[];
     onHotspotClick: (event: MouseEvent, hotspot: HotspotData) => void;
+    dataSource: ViewerDataSource;
 }
 
 interface UseHotspotManagerReturn {
@@ -27,6 +27,7 @@ export const useHotspotManager = ({
     viewerInstance,
     initialHotspots,
     onHotspotClick,
+    dataSource,
 }: UseHotspotManagerProps): UseHotspotManagerReturn => {
     const [hotspots, setHotspots] = useState<HotspotData[]>(initialHotspots);
     const [selectedHotspot, setSelectedHotspot] = useState<HotspotData | null>(null);
@@ -104,27 +105,18 @@ export const useHotspotManager = ({
             }
 
             try {
-                const viewerItem = await getViewerItem(viewerId);
                 const newHotspotList = [...hotspots, hotspotData];
-                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
-                const runtimeHotspot = resolved.runtimeHotspots[resolved.runtimeHotspots.length - 1];
+                const runtimeHotspots = await dataSource.createHotspot(viewerId, newHotspotList);
+                const runtimeHotspot = runtimeHotspots[runtimeHotspots.length - 1];
 
-                await putViewerItem(
-                    viewerId,
-                    undefined,
-                    undefined,
-                    resolved.storedHotspots,
-                    undefined,
-                    resolved.assets,
-                );
-                setHotspots(resolved.runtimeHotspots);
+                setHotspots(runtimeHotspots);
                 addHotspotToViewer(runtimeHotspot);
             } catch (error) {
                 console.error("Failed to create hotspot:", error);
                 throw error;
             }
         },
-        [hotspots, viewerId, addHotspotToViewer]
+        [hotspots, viewerId, dataSource, addHotspotToViewer]
     );
 
     const updateHotspot = useCallback(
@@ -134,19 +126,10 @@ export const useHotspotManager = ({
             );
 
             try {
-                const viewerItem = await getViewerItem(viewerId);
-                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
-                const runtimeHotspot = resolved.runtimeHotspots.find((hs) => hs.id === updatedHotspot.id);
+                const runtimeHotspots = await dataSource.updateHotspot(viewerId, newHotspotList);
+                const runtimeHotspot = runtimeHotspots.find((hs) => hs.id === updatedHotspot.id);
 
-                await putViewerItem(
-                    viewerId,
-                    undefined,
-                    undefined,
-                    resolved.storedHotspots,
-                    undefined,
-                    resolved.assets,
-                );
-                setHotspots(resolved.runtimeHotspots);
+                setHotspots(runtimeHotspots);
 
                 if (runtimeHotspot) {
                     addHotspotToViewer(runtimeHotspot);
@@ -156,7 +139,7 @@ export const useHotspotManager = ({
                 throw error;
             }
         },
-        [hotspots, viewerId, addHotspotToViewer]
+        [hotspots, viewerId, dataSource, addHotspotToViewer]
     );
 
     const deleteHotspot = useCallback(
@@ -168,18 +151,8 @@ export const useHotspotManager = ({
             const newHotspotList = hotspots.filter((hs) => hs.id !== toDeleteHotspot.id);
 
             try {
-                const viewerItem = await getViewerItem(viewerId);
-                const resolved = resolveHotspotPersistence(newHotspotList, viewerItem?.assets);
-
-                await putViewerItem(
-                    viewerId,
-                    undefined,
-                    undefined,
-                    resolved.storedHotspots,
-                    undefined,
-                    resolved.assets,
-                );
-                setHotspots(resolved.runtimeHotspots);
+                const runtimeHotspots = await dataSource.deleteHotspot(viewerId, newHotspotList);
+                setHotspots(runtimeHotspots);
 
                 viewerInstance.removeHotSpot(toDeleteHotspot.id);
                 deleteHotspotInstance(viewerInstance, toDeleteHotspot);
@@ -189,7 +162,7 @@ export const useHotspotManager = ({
                 throw error;
             }
         },
-        [hotspots, viewerId, viewerInstance]
+        [hotspots, viewerId, viewerInstance, dataSource]
     );
 
     const generateHotspotId = useCallback((): string => {

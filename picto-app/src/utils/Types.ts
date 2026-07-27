@@ -31,6 +31,7 @@ export interface HotspotData {
   mimeType?: string;
   fileName?: string;
   pendingAsset?: PendingHotspotAsset;
+  visible?: boolean; // whether this hotspot is shown to participants (server-enforced by ApiDataSource; unused by Studio's local flow)
   meta?: Record<string, unknown>; // optional metadata for custom cases
 }
 
@@ -60,7 +61,9 @@ type ActivityData = {
   type: string,
   authoriseEdit: boolean;
   participantsList: ParticipantData[],
-  teamsList: TeamInstance[]
+  teamsList: TeamInstance[],
+  playgroundProjectId?: string,
+  playgroundImageUrl?: string,
 }
 
 export interface ActivityIstance extends ActivityData {
@@ -91,6 +94,11 @@ export interface ActivityFull {
   totalParticipants: number;
   createdAt: string;
   updatedAt: string;
+  playground?: {
+    _id: string;
+    name: string;
+    images: { _id: string; url: string; name?: string }[];
+  };
 }
 
 export interface FetchedActivity {
