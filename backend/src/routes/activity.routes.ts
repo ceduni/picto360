@@ -7,6 +7,8 @@ import {
   publishActivity,
   getActivities,
   getActivityById,
+  AttachPlaygroundImageBody,
+  attachPlaygroundImage,
 } from "@/services/activity.service";
 import { authenticate } from "@/middlewares/firebaseAuth";
 
@@ -16,4 +18,9 @@ export default async function activityRoutes(app: FastifyInstance) {
   app.post<{ Params: { id: string } }>("/activities/:id/publish", { preHandler: authenticate }, publishActivity);
   app.get("/activities", { preHandler: authenticate }, getActivities);
   app.get("/activities/:id", { preHandler: authenticate }, getActivityById);
+  app.post<{ Params: { id: string }; Body: AttachPlaygroundImageBody }>(
+    "/activities/:id/playground/image",
+    { preHandler: authenticate },
+    attachPlaygroundImage
+  );
 }

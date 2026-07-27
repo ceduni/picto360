@@ -3,6 +3,14 @@ import ActivityModels, { IConstraint } from "../models/activity.model";
 import { User } from "@/models/user.model";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
+import PictoProject, { ProjectDocument } from "@/models/project.model";
+import PictoImage from "@/models/image.model";
+import Permission from "@/models/user_perm.model";
+// ImageService is imported lazily inside attachPlaygroundImage below: it
+// transitively pulls in the Cloudflare middleware, which eagerly reads
+// Cloudflare env vars at module load. A static top-level import here would
+// make every consumer of activity.service.ts (including tests that don't
+// touch images) require a full Cloudflare config just to load this module.
 
 const { Activity } = ActivityModels;
 
@@ -213,6 +221,94 @@ export const publishActivity = async (
   }
 };
 
+export interface AttachPlaygroundImageBody {
+  imageId: string;
+}
+
+/**
+ * Attach an already-uploaded PictoImage to an activity's playground scene.
+ * Creates the playground PictoProject on first use (and grants the creator
+ * OLP UPLOAD/EDIT/VIEW/DELETE rights on it, since a freshly created project
+ * has no permission record yet and would otherwise 403 its own owner).
+ */
+export const attachPlaygroundImage = async (
+  request: FastifyRequest<{ Params: { id: string }; Body: AttachPlaygroundImageBody }>,
+  reply: FastifyReply
+) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user } = resolved;
+
+  const { id } = request.params;
+  const { imageId } = request.body;
+
+  if (!imageId?.trim()) {
+    return reply.status(400).send({ message: "'imageId' is required" });
+  }
+
+  try {
+    const activity = await Activity.findById(id);
+    if (!activity) return reply.status(404).send({ message: "Activity not found" });
+    // This behaviore could change if we introduce collaborative ediation (with supervisors e.g)
+    if (String(activity.createdBy) !== String(user._id))
+      return reply.status(403).send({ message: "Forbidden" });
+
+    const image = await PictoImage.findById(imageId);
+    if (!image) return reply.status(404).send({ message: "Image not found" });
+
+    let project: ProjectDocument | null;
+
+    if (activity.playground) {
+      project = await PictoProject.findById(activity.playground);
+      if (!project) return reply.status(404).send({ message: "Playground project not found" });
+    } else {
+      project = await PictoProject.create({
+        name: `${activity.title} - Playground`,
+        images: [],
+      });
+
+      // A brand-new project has no OLP record for anyone yet. Grant the
+      // activity's creator full rights on it so the permission check in
+      // ImageService.linkImageToProject doesn't reject their own upload.
+      await Permission.create({
+        subjectType: "USER",
+        subjectId: user._id,
+        objectType: "PictoProject",
+        objectId: project._id,
+        actions: ["VIEW", "EDIT", "UPLOAD", "DELETE"],
+      });
+
+      activity.playground = project._id as any;
+    }
+
+    try {
+      // Lazily required: image.service.ts pulls in the Cloudflare middleware,
+      // which eagerly reads Cloudflare env vars at module load. 
+      const ImageService = (require("./image.service") as typeof import("./image.service")).default;
+      await ImageService.linkImageToProject(image, project, user);
+    } catch (err) {
+      if (err instanceof Error && /permission/i.test(err.message)) {
+        return reply.status(403).send({ message: err.message });
+      }
+      throw err;
+    }
+
+    await activity.save();
+
+    const populated = await Activity.findById(activity._id)
+      .populate({ path: "playground", populate: { path: "images" } })
+      .lean();
+
+    return reply.send(populated);
+  } catch (err) {
+    console.error("Error attaching image to playground:", err);
+    return reply.status(500).send({
+      error: "Server error",
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+};
+
 export const getActivities = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
     const resolved = await resolveUser(request, reply);
@@ -226,6 +322,7 @@ export const getActivities = async (request: FastifyRequest, reply: FastifyReply
     const activities = await Activity.find({ createdBy: userId })
       .populate("teams")
       .populate("createdBy")
+      .populate({ path: "playground", populate: { path: "images" } })
       .lean();
 
     const activitiesWithOwnership = activities.map((act) => {
@@ -265,6 +362,7 @@ export const getActivityById = async (request: FastifyRequest, reply: FastifyRep
         populate: [{ path: "participantsList" }],
       })
       .populate("createdBy")
+      .populate({ path: "playground", populate: { path: "images" } })
       .lean();
     
     if (!activity) return reply.status(404).send({ message: "Activity not found" });
