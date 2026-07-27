@@ -1,8 +1,13 @@
 .image-uploader__content {
-    width: 90vw;
+    /* Fills whatever container it's placed in (a full-page wrapper, a
+       compact card, ...) instead of assuming near-fullscreen viewport
+       sizing — the parent decides how large that container is, e.g. via
+       its own max-width. */
+    width: 100%;
     max-width: 800px;
+    box-sizing: border-box;
     position: relative;
-    padding: 2vw;
+    padding: 4%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,9 +25,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 2vh 0 3vh 0;
-    height: 45vh;
+    margin: 16px 0 24px 0;
     width: 100%;
+    /* Scales with the container's width instead of a fixed viewport-height
+       slice, so it stays proportional whether it's filling a full page or a
+       narrow card; the min/max keep it from becoming unusably short or
+       comically tall at the extremes. */
+    aspect-ratio: 16 / 10;
+    min-height: 160px;
+    max-height: 420px;
     border: 4px dashed transparent;
 
     cursor: pointer;

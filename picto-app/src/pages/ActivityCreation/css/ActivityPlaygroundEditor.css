@@ -1,0 +1,53 @@
+.playground-editor-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+}
+
+.playground-editor-overlay__header {
+    height: 56px;
+    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 16px;
+    background: #17181c;
+    color: #fff;
+}
+
+.playground-editor-overlay__title {
+    font-weight: 600;
+    flex: 1;
+}
+
+.playground-editor-overlay__mode-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.playground-editor-overlay__mode-label {
+    font-size: 0.85rem;
+}
+
+.playground-editor-overlay__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.playground-editor-overlay__close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
