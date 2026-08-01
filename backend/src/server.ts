@@ -5,7 +5,6 @@ import contentRoutes from "./routes/content/content.routes";
 import imageCompressionRoutes from "./routes/imageCompression.routes";
 import imageRoutes from "./routes/image.routes";
 import projectRoutes from "./routes/project.routes";
-import sharingLinkRoutes from "./routes/sharingLink.routes";
 import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
@@ -84,19 +83,16 @@ const setupServer = async () => {
     fastify.register(annotationRoutes);
     fastify.register(imageRoutes);
     fastify.register(projectRoutes);
-    fastify.register(sharingLinkRoutes);
 
     fastify.get("/", async (_request, reply) => {
       reply.send({ message: "Welcome to Picto360 API" });
     });
-    console.log("Home route")
 
     await fastify.listen({ port: Number(process.env.PORT) || 5001 });
-    console.log("Listening")
 
     fastify.log.info(`Server is running on port ${process.env.FRONTEND_SERVER}`);
   } catch (err) {
-    console.error("❌ Server startup failed:", err);
+    fastify.log.error("❌ Server startup failed:", err);
     process.exit(1);
   }
 
