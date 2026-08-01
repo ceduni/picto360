@@ -1,5 +1,6 @@
 import type { HotspotData } from "@/utils/Types";
 import type { LoadedViewerData, ViewerDataSource } from "@/utils/viewerDataSource";
+import { refreshPrivateImageURL } from "../ImageUploadUtils";
 
 const BASE = import.meta.env.VITE_BACKEND_URL;
 
@@ -149,7 +150,7 @@ export class ApiDataSource implements ViewerDataSource {
         this.cache.set(projectId, projectCache);
 
         return {
-            imageSource: project?.images?.[0]?.url ?? null,
+            imageSource: await refreshPrivateImageURL(project?.images?.[0]?.url,token) ?? null,
             hotspots,
             dispose: () => {},
         };

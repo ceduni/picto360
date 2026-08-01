@@ -7,6 +7,8 @@ export interface UploadedImage {
   name?: string;
 }
 
+type SignedImageResponse = { url: string };
+
 /**
  * Uploads a raw file to the backend, which proxies it to Cloudflare Images
  * and persists a PictoImage record. Panorama files can be large, so this
@@ -51,4 +53,38 @@ export async function attachPlaygroundImage(
     throw new Error("Failed to attach image to activity");
   }
   return res.json() as Promise<ActivityFull>;
+}
+
+
+export async function signPrivateImageURL(imageId:string, token: string) {
+  const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/images/${imageId}/sign-private-image`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+
+  if (!res.ok) {
+    throw new Error("Failed to sign image");
+  }
+  const data = await res.json() as SignedImageResponse;
+  return data.url;  
+}
+
+export async function refreshPrivateImageURL(previousUrl:string, token: string) {
+  const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/images/refresh-secure-url`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ previousUrl }),
+      }
+    )
+
+  if (!res.ok) {
+    throw new Error("Failed to refresh Url");
+  }
+  const data = await res.json() as SignedImageResponse;
+  return data.url;
 }

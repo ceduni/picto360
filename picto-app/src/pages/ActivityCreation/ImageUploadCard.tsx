@@ -6,6 +6,7 @@ import { useActivityDraftApi } from "@/hooks/useActivityDraftApi";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { uploadImageFile, attachPlaygroundImage } from "@/utils/ImageUploadUtils";
 import ActivityPlaygroundEditor from "./ActivityPlaygroundEditor";
+import SecureImageView from "@/components/SecureImageView";
 
 interface Props {
     formValues: ActivityIstance;
@@ -43,8 +44,7 @@ const ImageUploadCard: React.FC<Props> = ({ formValues, setFormValues }) => {
             setFormValues((prev) => ({
                 ...prev,
                 id: activityId,
-                playgroundProjectId: activity.playground?._id,
-                playgroundImageUrl: activity.playground?.images?.[0]?.url,
+                playground: activity.playground,
             }));
             setBannerMessage({ message: "Image ajoutée avec succès", type: "success" });
         } catch (error) {
@@ -63,11 +63,18 @@ const ImageUploadCard: React.FC<Props> = ({ formValues, setFormValues }) => {
             </div>
 
             <div className="list_container">
-                {formValues.playgroundImageUrl ? (
+                {formValues.playground ? (
                     <div className="playground-image-preview">
-                        <img src={formValues.playgroundImageUrl} alt="Aperçu de l'activité" />
+                        {
+                        formValues.playground.images?.length>0?
+                            formValues.playground?.images.map((image)=>{
+                                return <SecureImageView imageId={image.cloudflareImageId} initialUrl={image.url}></SecureImageView>
+                            })
+                        :
+                        <span> No images in the playground</span>
+                        }
                         <div className="playground-image-preview__actions">
-                            {formValues.playgroundProjectId && (
+                            {formValues.playground._id && (
                                 <button
                                     type="button"
                                     className="playground-image-preview__edit"
@@ -91,9 +98,9 @@ const ImageUploadCard: React.FC<Props> = ({ formValues, setFormValues }) => {
                 )}
             </div>
 
-            {isEditorOpen && formValues.playgroundProjectId && (
+            {isEditorOpen && formValues.playground && (
                 <ActivityPlaygroundEditor
-                    projectId={formValues.playgroundProjectId}
+                    projectId={formValues.playground._id}
                     onClose={() => setIsEditorOpen(false)}
                 />
             )}

@@ -1,4 +1,4 @@
-import { uploadFileToImages } from "@/middlewares/cloudflare";
+import { uploadFileToImages, signPrivateImageURL } from "@/middlewares/cloudflare";
 import PictoImage from "@/models/image.model";
 import { ImageDocument } from "@/models/image.model";
 import { ProjectDocument } from "@/models/project.model";
@@ -18,10 +18,10 @@ class ImageService {
         // "private" variant in `variants`. If the account doesn't return one
         // (e.g. variants weren't populated on the response), fall back to
         // building the delivery URL ourselves — same shape used for signing
-        // in signPrivateImageURL: https://imagedelivery.net/<account_id>/<imageId>/private
+        // in signPrivateImageURL: https://imagedelivery.net/<account_id>/<imageId>/public
         const deliveryUrl =
-          cloudflare_status.variants?.find((e) => e.endsWith("private")) ??
-          `https://imagedelivery.net/${env.CLOUDFLARE_ACCOUNT_ID}/${cloudflare_status.id}/private`;
+          cloudflare_status.variants?.find((e) => e.endsWith("public")) ??
+          `https://imagedelivery.net/${env.CLOUDFLARE_IMAGES_ACCOUNT_HASH}/${cloudflare_status.id}/public`;
 
         // store into db
         const store_image = new PictoImage({
@@ -35,10 +35,17 @@ class ImageService {
   }
 
   async createImage(imageData: ImageDocument) {
-
     const newImage = new PictoImage(imageData);
     await newImage.save();
     return newImage;
+  }
+
+  async signPrivateImage(imageId:string){
+    return signPrivateImageURL({imageId:imageId})
+  }
+
+  async refreshImageUrlAccess(prevUrl:string){
+    return signPrivateImageURL({previousUrl:prevUrl})
   }
 
   async getImage(id: string) {

@@ -51,7 +51,7 @@ const permissionSchema = new Schema<PermissionDocument>(
 );
 
 permissionSchema.index(
-  { subjectType: 1, subjectId: 1, resourceType: 1, resourceId: 1 },
+  { subjectType: 1, subjectId: 1, objectType: 1, objectId: 1 },
   { unique: true }
 );
 const Permission = mongoose.model<PermissionDocument>("Permission", permissionSchema);

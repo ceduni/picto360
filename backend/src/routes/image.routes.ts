@@ -52,6 +52,39 @@ async function getImage(
   }
 }
 
+async function signPrivateImageUrl(
+  request: FastifyRequest<{Params:{cloud_imageID:string}}>,
+  reply: FastifyReply
+){
+  try{
+    const url = await ImageService.signPrivateImage(request.params.cloud_imageID)
+    if (url && url.trim() !== ""){
+      reply.send({ url })
+    }else {
+      reply.code(404).send({message:"Invalid Cloudflare Image Id"})
+    }
+  }catch (error: any){
+    reply.code(500).send("Error refreshing the image")
+  }
+}
+
+async function refreshSecureImageUrl(
+  request: FastifyRequest<{ Body: { previousUrl: string } }>,
+  reply: FastifyReply
+) {
+  try{
+    const url = await ImageService.refreshImageUrlAccess(request.body.previousUrl)
+    if (url && url.trim() !== ""){
+      reply.send({ url })
+    }else {
+      reply.code(404).send({message:"Invalid Image Url"})
+    }
+  }catch (error: any){
+    reply.code(500).send("Error refreshing the image")
+  }
+}
+
+
 async function updateImage(
   request: FastifyRequest<{
     Params: { id: string };
@@ -95,6 +128,8 @@ export default async function imageRoutes(server: FastifyInstance) {
   server.post("/images", { preHandler: authenticate }, createImage);
   server.post("/images/upload-url", { preHandler: authenticate }, getUploadUrl);
   server.get<{ Params: { id: string } }>("/images/:id", { preHandler: authenticate }, getImage);
+  server.get<{ Params: { cloud_imageID: string } }>("/images/:cloud_imageID/sign-private-image", { preHandler: authenticate }, signPrivateImageUrl);
+  server.post<{ Body: { previousUrl: string } }>("/images/refresh-secure-url", { preHandler: authenticate }, refreshSecureImageUrl);
   server.put<{ Params: { id: string }; Body: Partial<ImageDocument> }>(
     "/images/:id",
     { preHandler: authenticate },

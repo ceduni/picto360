@@ -62,8 +62,11 @@ type ActivityData = {
   authoriseEdit: boolean;
   participantsList: ParticipantData[],
   teamsList: TeamInstance[],
-  playgroundProjectId?: string,
-  playgroundImageUrl?: string,
+  playground?: {
+    _id: string;
+    name: string;
+    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
+  }
 }
 
 export interface ActivityIstance extends ActivityData {
@@ -97,7 +100,7 @@ export interface ActivityFull {
   playground?: {
     _id: string;
     name: string;
-    images: { _id: string; url: string; name?: string }[];
+    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
   };
 }
 

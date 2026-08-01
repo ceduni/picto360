@@ -13,20 +13,50 @@ export async function getDirectUploadUrl () {
     })
 }
 
+
+function getPrivateImageBaseUrl({
+  previousUrl,
+  imageId,
+}: {
+  previousUrl?: string;
+  imageId?: string;
+}) {
+  if (previousUrl) {
+    const url = new URL(previousUrl);
+
+    // Remove old signature params before re-signing
+    url.searchParams.delete("exp");
+    url.searchParams.delete("sig");
+    url.searchParams.delete("kid");
+
+    return url.toString();
+  }
+
+  if (imageId) {
+    return `https://imagedelivery.net/${env.CLOUDFLARE_IMAGES_ACCOUNT_HASH}/${imageId}/public`;
+  }
+
+  throw new Error("Either previousUrl or imageId is required");
+}
+
+
 /**
  * This helper is used to sign a image url with a tocken 
  * to make the image readable by the front-end
  */
-async function signPrivateImageURL(
-    imageId:string, 
-    expiryMinutes: number = 30 
-) {
+export async function signPrivateImageURL({
+    previousUrl,
+    imageId,
+    expiryMinutes = 30,
+}: {
+    previousUrl?: string;
+    imageId?: string;
+    expiryMinutes?: number;
+}) {
 
-    const account_id = env.CLOUDFLARE_ACCOUNT_ID 
-    const keyId= env.CLOUDFLARE_API_TOKEN
     const keySecret = env.CLOUDFLARE_IMAGES_SIGNING_KEY
 
-    const baseUrl = `https://imagedelivery.net/${account_id}/${imageId}/private`
+    const baseUrl = getPrivateImageBaseUrl({ previousUrl, imageId });
 
     // When will this url expire (in sec)
     const expires = Math.floor(Date.now()/1000)+(60*expiryMinutes)
@@ -51,7 +81,6 @@ async function signPrivateImageURL(
         .map(b=>b.toString(16).padStart(2,'0')).join('');
 
     urlToSign.searchParams.set('sig', signature);
-    urlToSign.searchParams.set('kid',keyId);
 
     return urlToSign.toString();
 }
@@ -80,4 +109,23 @@ export async function uploadFileToImages (
     }
     
     return cloud_image   
+}
+
+const deleteFileFromImages = (imageId:string)=>{
+
+}
+
+/**
+ * This function returns a one time upload url for the front-end
+ * to upload directly to R2 whithout using the Backend
+ */
+const getR2UploadUrl = () =>{
+
+}
+
+/**
+ * 
+ */
+const uploadFileToR2 = ()=>{
+
 }
