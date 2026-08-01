@@ -1,14 +1,13 @@
 import Cloudflare from "cloudflare";
-import "../src/config/env";
+import { env } from "../src/config/env";
 
 const DEFAULT_MEDIA_BUCKET_NAME = "picto-media";
 
-const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+const accountId = env.CLOUDFLARE_ACCOUNT_ID;
+const apiToken = env.CLOUDFLARE_API_TOKEN;
 
 const buckets = [
-  process.env.R2_MEDIA_BUCKET_NAME ||
-    process.env.R2_CONTENT_BUCKET_NAME ||
+  env.R2_MEDIA_BUCKET_NAME ||
     DEFAULT_MEDIA_BUCKET_NAME,
 ];
 
@@ -42,7 +41,27 @@ async function createBucket(bucketName: string) {
   }
 }
 
+async function setVariantsPrivate(variantName:string){
+  try{
+    await cloudflare.images.v1.variants.edit(variantName, {
+      account_id: accountId!,
+      options: {
+        fit: "scale-down",
+        width: 200,
+        height: 200,
+        metadata: "none",
+      },
+      neverRequireSignedURLs: false,
+    });    
+    console.log(`${variantName} access set to private: success`);
+  }catch(error:any){
+    console.log(`Failed to set ${variantName} access to private`);
+    throw error;
+  }
+}
+
 async function setupCloudflare() {
+  await setVariantsPrivate("variant200")
   for (const bucketName of buckets) {
     await createBucket(bucketName);
   }
