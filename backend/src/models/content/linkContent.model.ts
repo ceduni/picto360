@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { baseContentFields, ContentDocument } from "./content.model";
 
 export interface LinkContentDocument extends ContentDocument {
