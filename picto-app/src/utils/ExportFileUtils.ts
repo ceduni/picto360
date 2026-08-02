@@ -18,7 +18,7 @@ class ExportService {
         includeLocalFiles: false,
     };
 
-    constructor(baseUrl: string = import.meta.env.VITE_API_URL || 'http://localhost:5000') {
+    constructor(baseUrl: string = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000') {
         this.baseUrl = baseUrl;
     }
 

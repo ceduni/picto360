@@ -1,6 +1,6 @@
 import { MessageBannerRef, MessageBannerType } from "@/utils/Types";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuX } from "react-icons/lu";
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import "./css/FeedbackBanner.css";
 
 
@@ -30,15 +30,15 @@ const ErrorBanner = forwardRef<MessageBannerRef>((_, ref) => {
     <div hidden={!visible} className={`feedback_banner ${visible ? "visible" : ""} feedback_banner_${messageType}`}>
         {
           messageType ==="success" ?
-            <LuCircleCheck size={22} />
+            <CheckCircleIcon width={22} height={22} />
           :
             messageType ==="failure" ?
-              <LuCircleX size={22} />
+              <XCircleIcon width={22} height={22} />
               :
-              <LuTriangleAlert size={22}/>
+              <ExclamationTriangleIcon width={22} height={22} />
         }
         <p>{message}</p>
-        <LuX size={22} onClick={()=>setVisible(false)} style={{cursor:"pointer"}}/>
+        <XMarkIcon width={22} height={22} onClick={()=>setVisible(false)} style={{cursor:"pointer"}}/>
     </div>
   );
 });

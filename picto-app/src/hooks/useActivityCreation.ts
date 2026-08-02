@@ -63,7 +63,7 @@ export function useCreateActivity () {
                 teamsList: createdTeamList
             };
 
-            const response = await fetch("http://localhost:5000/activities", {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/activities`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

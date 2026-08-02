@@ -2,7 +2,7 @@ import "../css/EditionPannel.css";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { EditorRef, HotspotData } from "../../utils/Types";
 import SegmentedControl, { SegmentOption } from "@ui/SegmentedControl";
-import { MdAdd, MdLaptopChromebook, MdLink } from "react-icons/md";
+import { PlusIcon, ComputerDesktopIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { isValidImageUrl } from "@/utils/FormInputvalidators";
 import { useBanner } from "@/hooks/useBanner";
 
@@ -20,8 +20,8 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
     const { setBannerMessage } = useBanner();
 
     const annotationOptions: SegmentOption[] = [
-        { value: "url", label: "Lien", icon: <MdLink /> },
-        { value: "disk", label: "Disque", icon: <MdLaptopChromebook /> },
+        { value: "url", label: "Lien", icon: <LinkIcon width={18} height={18} /> },
+        { value: "disk", label: "Disque", icon: <ComputerDesktopIcon width={18} height={18} /> },
     ];
 
     const handleSubmit = (e?: React.FormEvent) => {
@@ -111,7 +111,7 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
                 {imageType === "url" ? (
                     <input
                         type="url"
-                        className="text-field"
+                        className="modal__input"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="Lien vers l'image..."
@@ -138,7 +138,7 @@ const ImageEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave }, ref
                                 setContent(previewUrl);
                             }}
                         />
-                        <MdAdd className="file_upload_icon" />
+                        <PlusIcon className="file_upload_icon" width={20} height={20} />
                         <span>Choisir une image</span>
                     </label>
                 )}

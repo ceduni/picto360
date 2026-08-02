@@ -1,9 +1,9 @@
 import React, { useEffect, useCallback, useMemo } from "react";
 import { Menu, MenuItem, Divider, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { IconType } from "react-icons";
-import { AiOutlineFileText, AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineVideoLibrary, MdOutlineGif, MdOutlineLabel } from "react-icons/md";
+import { DocumentTextIcon, LinkIcon, PhotoIcon, VideoCameraIcon, FilmIcon, TagIcon } from "@heroicons/react/24/outline";
+
+type HeroIcon = React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string; titleId?: string } & React.RefAttributes<SVGSVGElement>>;
 
 
 
@@ -52,7 +52,7 @@ type MenuSection = {
 type MenuItemType =
   | {
     type: string;
-    icon: IconType;
+    icon: HeroIcon;
     label: string;
   }
   | { type: "divider" };
@@ -63,14 +63,14 @@ const menuSections: MenuSection[] = [
     items: [
       // { type: "Forme", icon: IoShapesOutline, label: "Forme" },
       { type: "divider" },
-      { type: "Text", icon: AiOutlineFileText, label: "Texte" },
-      { type: "Label", icon: MdOutlineLabel, label: "Étiquette" },
+      { type: "Text", icon: DocumentTextIcon, label: "Texte" },
+      { type: "Label", icon: TagIcon, label: "Étiquette" },
       { type: "divider" },
-      { type: "Image", icon: AiOutlinePicture, label: "Image" },
-      { type: "Gif", icon: MdOutlineGif, label: "GIF" },
-      { type: "Video", icon: MdOutlineVideoLibrary, label: "Vidéo" },
+      { type: "Image", icon: PhotoIcon, label: "Image" },
+      { type: "Gif", icon: FilmIcon, label: "GIF" },
+      { type: "Video", icon: VideoCameraIcon, label: "Vidéo" },
       { type: "divider" },
-      { type: "Hyperlink", icon: AiOutlineLink, label: "Lien" },
+      { type: "Hyperlink", icon: LinkIcon, label: "Lien" },
     ],
   },
   // {
@@ -119,7 +119,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
               <Divider key={`divider-${sectionIndex}-${itemIndex}`} />
             ) : (
               <StyledMenuItem key={item.type} onClick={() => onMenuItemClick(item.type)}>
-                <ListItemIcon>{"icon" in item && <item.icon />}</ListItemIcon>
+                <ListItemIcon>{"icon" in item && <item.icon width={20} height={20}/>}</ListItemIcon>
                 {"label" in item && <ListItemText>{item.label}</ListItemText>}
               </StyledMenuItem>
             )

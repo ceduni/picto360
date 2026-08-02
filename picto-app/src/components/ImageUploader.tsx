@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { MdInfo, MdFileUpload } from "react-icons/md";
+import { InformationCircleIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 // import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
 // import { GrOnedrive } from "react-icons/gr";
 //import WelcomeMessage from "./ui/WelcomeMessage";
@@ -64,12 +64,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
                 {" "}
                 {/*TODO: add clicking action*/}
                 <div className="image-uploader__download-icon">
-                    <MdFileUpload className="image-uploader__download-icon-ico" />
+                    <ArrowUpTrayIcon width={24} height={24} className="image-uploader__download-icon-ico" />
                 </div>
                 <p className="image-uploader__drop-text">
                     <b>Selectionnez une image ou un projet Picto
                         <span className="has-helper">
-                            <MdInfo />
+                            <InformationCircleIcon width={18} height={18} />
                             <span className="helper mid">Fichier <code><b>.picto</b></code></span>
                         </span>
                     </b> 
@@ -80,27 +80,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
 
             <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
 
-
-            {/* 
-        Other ways to import images or picto files
-
-        <div className="image-uploader__icon-container">
-          <div className="image-uploader__icon image-uploader__icon--camera" onClick={triggerFileInput}>
-            <FaCamera />
-          </div>
-          <div className="image-uploader__icon image-uploader__icon--import" onClick={triggerFileInput}>
-            <FaFileImport />
-          </div>
-          <div className="image-uploader__icon image-uploader__icon--drive">
-            <FaGoogleDrive />
-          </div>
-          <div className="image-uploader__icon image-uploader__icon--dropbox">
-            <FaDropbox />
-          </div>
-          <div className="image-uploader__icon image-uploader__icon--onedrive">
-            <GrOnedrive />
-          </div>
-        </div> */}
         </div>
     );
 };

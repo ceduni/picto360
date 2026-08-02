@@ -2,7 +2,7 @@ import "@css/SettingsPopupWindow.css";
 import "@css/ExportProgressPopupWindow.css";
 
 import React from "react";
-import { MdCheckCircle, MdClose, MdCloudUpload, MdErrorOutline, MdFolder } from "react-icons/md";
+import { CheckCircleIcon, XMarkIcon, CloudArrowUpIcon, ExclamationCircleIcon, FolderIcon } from "@heroicons/react/24/outline";
 import { ExportProgressState } from "@/utils/Types";
 
 interface ExportProgressPopupWindowProps {
@@ -13,18 +13,18 @@ interface ExportProgressPopupWindowProps {
 function getPhaseIcon(phase: ExportProgressState["phase"]) {
   switch (phase) {
     case "folder_created":
-      return <MdFolder className="export-progress-modal__status-icon" />;
+      return <FolderIcon className="export-progress-modal__status-icon" width={24} height={24} />;
     case "uploading":
     case "finalizing":
     case "preparing":
-      return <MdCloudUpload className="export-progress-modal__status-icon" />;
+      return <CloudArrowUpIcon className="export-progress-modal__status-icon" width={24} height={24} />;
     case "success":
-      return <MdCheckCircle className="export-progress-modal__status-icon export-progress-modal__status-icon--success" />;
+      return <CheckCircleIcon className="export-progress-modal__status-icon export-progress-modal__status-icon--success" width={24} height={24} />;
     case "failure":
-      return <MdErrorOutline className="export-progress-modal__status-icon export-progress-modal__status-icon--failure" />;
+      return <ExclamationCircleIcon className="export-progress-modal__status-icon export-progress-modal__status-icon--failure" width={24} height={24} />;
     case "idle":
     default:
-      return <MdCloudUpload className="export-progress-modal__status-icon" />;
+      return <CloudArrowUpIcon className="export-progress-modal__status-icon" width={24} height={24} />;
   }
 }
 
@@ -44,29 +44,29 @@ const ExportProgressPopupWindow: React.FC<ExportProgressPopupWindowProps> = ({
 
   return (
     <div
-      className="settings-modal-backdrop settings-modal-backdrop--open export-progress-modal-backdrop"
+      className="popup_background export-progress-modal-backdrop"
       onClick={handleBackdropClick}
     >
-      <div className="settings-modal settings-modal--open export-progress-modal">
-        <div className="settings-modal__header">
+      <div className="modal modal--open export-progress-modal">
+        <div className="modal__header">
           <div className="export-progress-modal__title-block">
-            <h2 className="settings-modal__title">{progressState.title}</h2>
+            <h2 className="t-page-title">{progressState.title}</h2>
             <p className="export-progress-modal__subtitle">
               {progressState.isActive ? "Export in progress" : "Export status"}
             </p>
           </div>
 
           <button
-            className="settings-modal__close-button"
+            className="modal__close-button"
             onClick={onClose}
             aria-label="Close export progress"
             disabled={progressState.isActive}
           >
-            <MdClose />
+            <XMarkIcon width={20} height={20} />
           </button>
         </div>
 
-        <div className="settings-modal__content export-progress-modal__content">
+        <div className="popup_window_content export-progress-modal__content">
           <div className="export-progress-modal__status-row">
             {getPhaseIcon(progressState.phase)}
             <div className="export-progress-modal__status-copy">

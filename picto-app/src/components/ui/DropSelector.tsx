@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MdCheck, MdKeyboardArrowDown } from "react-icons/md";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import "@css/DropSelector.css";
 
 export interface SelectorOption {
@@ -117,7 +117,7 @@ const DropSelector: React.FC<DropSelectorProps> = ({
                         isOpen ? "enhanced-selector__arrow--open" : ""
                     }`}
                 >
-                    <MdKeyboardArrowDown />
+                    <ChevronDownIcon width={18} height={18} />
                 </span>
             </button>
 
@@ -147,7 +147,7 @@ const DropSelector: React.FC<DropSelectorProps> = ({
                             </span>
                             {option.value === value && (
                                 <span className="enhanced-selector__checkmark">
-                                    <MdCheck />
+                                    <CheckIcon width={16} height={16} />
                                 </span>
                             )}
                         </div>

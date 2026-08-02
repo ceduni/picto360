@@ -1,0 +1,12 @@
+.studio-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--space-6);
+}
+
+.studio-page__uploader {
+    width: 100%;
+    max-width: 560px;
+}

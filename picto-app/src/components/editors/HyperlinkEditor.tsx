@@ -44,17 +44,17 @@ const HyperlinkEditor = forwardRef<EditorRef, EditorProps>(({ hotspot, onSave },
             onSubmit={handleSubmit}
             className="annotation_edition_pannel"
         >
-            <label className="edition_pannel_field_title">
+            <label className="t-label">
                 <span className="label">URL</span>
-                <input className="text-field" type="url" value={url}
+                <input className="modal__input" type="url" value={url}
                     onChange={(e) => setURL(e.target.value) }
                     placeholder="Lien URL..."
                 />
             </label>
 
-            <label className="edition_pannel_field_title">
+            <label className="t-label">
                 <span className="label">Texte à afficher</span>
-                <input className="text-field" type="text" value={content}
+                <input className="modal__input" type="text" value={content}
                     onChange={(e) => setContent(e.target.value.trim()) }
                     placeholder="Texte à afficher..."
                 />

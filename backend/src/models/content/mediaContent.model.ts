@@ -1,19 +1,13 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { baseContentFields, ContentDocument } from "./content.model";
 
-export interface MediaContentDocument extends Document {
-  id: string;
-  creationDate: Date;
-  lastModificationDate: Date;
-  title: string;
+export interface MediaContentDocument extends ContentDocument {
   mediaType: string;
   url: string;
 }
 
 const mediaContentSchema = new Schema<MediaContentDocument>({
-  id: { type: String, required: true },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
-  title: { type: String, required: true },
+  ...baseContentFields,
   mediaType: { type: String, required: true }, // e.g., 'image', 'video', etc.
   url: { type: String, required: true },
 });

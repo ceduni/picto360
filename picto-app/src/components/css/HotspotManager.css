@@ -34,7 +34,7 @@
     position: absolute;
     background-color: rgba(0, 0, 0, 0.8);
     color: #FFF;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-family-base), sans-serif;
     font-size: 20px;
     border-radius: 5px;
     white-space: normal;

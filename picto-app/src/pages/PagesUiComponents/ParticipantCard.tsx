@@ -1,5 +1,5 @@
 import React from "react";
-import { HiTrash } from "react-icons/hi2";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface ParticipantCardProps {
     id:string,
@@ -14,12 +14,12 @@ const ParticipantCard : React.FC<ParticipantCardProps> = ({id,participantName,ha
             <input key={id}
                 name="particip_card_name"
                 value = {participantName}
-                placeholder={participantName}
+                placeholder={participantName==="" ?"Renommez le participant": participantName}
                 onChange={(e) => handleParticipantNameChange(id, e.target.value)}
                 autoFocus
             />
             <div className="delete_participant" onClick={()=>handleDeleteParticipant(id)}>
-                <HiTrash size={18}/>
+                <TrashIcon width={14} height={14} />
             </div>
         </div>
     )

@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import  { fastifyCors } from "@fastify/cors";
 import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
-import formContentRoutes from "./routes/content/formContent.routes";
+import formContentRoutes from "./routes/content/shapeContent.routes";
 import linkContentRoutes from "./routes/content/linkContent.routes";
 import imageCompressionRoutes from "./routes/imageCompression.routes";
 import mediaContentRoutes from "./routes/content/mediaContent.routes";
@@ -18,13 +18,19 @@ import activityRoutes from "./routes/activity.routes";
 import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
 import exportRoutes from "./routes/export.routes";
-import authAndExportRoutes from "./routes/auth_and_export.routes";
 import fastifyCookie  from "@fastify/cookie";
 import fastifySession from "@fastify/session";
 
 import 'dotenv/config'; // Load environment variables from .env file
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({
+  logger: {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true, translateTime: "SYS:HH:MM:ss" },
+    },
+  },
+});
 
 const setupServer = async () => {
   try {
@@ -41,7 +47,7 @@ const setupServer = async () => {
         if (allowed.includes(origin)) cb(null, true);
         else cb(new Error("Not allowed by CORS"), false);
       },
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true, // <-- critical when using credentials: 'include'
       maxAge: 86400,
@@ -67,10 +73,14 @@ const setupServer = async () => {
       limits: { fileSize: 50 * 1024 * 1024 }
     });
 
-    // Register the OAuth + export routes
-    fastify.register(oauthRoutes);
-    fastify.register(authAndExportRoutes);
-    fastify.register(exportRoutes);
+    console.log("Registering routes")
+    // Register the OAuth + export routes (require Google credentials)
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      fastify.register(oauthRoutes);
+      fastify.register(exportRoutes);
+    } else {
+      fastify.log.warn("GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Drive/export routes disabled");
+    }
 
     fastify.register(imageCompressionRoutes);
     fastify.register(contentRoutes);
@@ -87,26 +97,19 @@ const setupServer = async () => {
     fastify.register(imageRoutes);
     fastify.register(projectRoutes);
     fastify.register(sharingLinkRoutes);
+    console.log("Routes registered")
 
     fastify.get("/", async (_request, reply) => {
       reply.send({ message: "Welcome to Picto360 API" });
     });
+    console.log("Home route")
 
-    // fastify.get("/teams", async (request, reply) => {
-    // try{
-    //     const teams = await Team.find();
-    //     reply.send(teams);
-    // }catch (err) {
-    //     console.error("❌ GET /activities error:", err);
-    //     reply.status(500).send({ error: 'Failed to fetch teams',
-    //                             message: err instanceof Error ? err.message:JSON.stringify(err) });
-    // }
-    // });
+    await fastify.listen({ port: Number(process.env.PORT) || 5001 });
+    console.log("Listening")
 
-    await fastify.listen({port:5000});
     fastify.log.info(`Server is running on port ${process.env.FRONTEND_SERVER}`);
   } catch (err) {
-    fastify.log.error("❌ Server startup failed:", err);
+    console.error("❌ Server startup failed:", err);
     process.exit(1);
   }
 

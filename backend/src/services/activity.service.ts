@@ -1,216 +1,294 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import Activity from "../models/activity.model";
-import { v4 as uuidv4 } from "uuid";
-import { authenticate } from "@/middlewares/firebaseAuth";
+import ActivityModels, { IConstraint } from "../models/activity.model";
 import { User } from "@/models/user.model";
-import Team,{ITeam} from "@/models/team.model";
+import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
-import { request } from "http";
 
-interface IncomingTeam {
-  id: string;
+const { Activity } = ActivityModels;
+
+export interface ActivityTask {
+  title: string;
+  level: "EASY" | "MEDIUM" | "HARD";
+  points?: number;
+}
+
+export interface IncomingTeam {
+  _id?: string;          // MongoDB ObjectId — present for existing teams, absent for new ones
   name: string;
-  participantsNames: {id: string ,name:string}[];
+  participants: { id: string; name: string }[];
   supervised: boolean;
   supervisor_id?: string;
-  imageUrl?: string;
-  indicesTable?: { object: string; [key: string]: any }[];
 }
 
-
-interface CreateActivityBody {
-  id: string;
+export interface CreateDraftBody {
   title: string;
-  tags: string[];
-  description: string;
-  tasks: string[];
-  type: "group" | "solo";
-  authoriseEdit: boolean;
-  teamsList: IncomingTeam[];
 }
 
-export const postActivity =  async (request:FastifyRequest<{Body:CreateActivityBody}>, reply:FastifyReply) => {
-    await authenticate(request, reply);
-    const userData = (request as any).user;
-    if (!userData) return reply.status(401).send({ message: "Unauthorized" });
+export interface UpdateDraftBody {
+  title?: string;
+  description?: string;
+  mode?: "SOLO" | "COLLABORATIVE" | "COMPETITIVE";
+  tags?: string[];
+  tasks?: ActivityTask[];
+  authoriseEdit?: boolean;
+  constraints?: IConstraint[];
+  deadline?: string;
+  teamsList?: IncomingTeam[];
+}
 
-    const {uid} = userData;
+async function resolveUser(request: FastifyRequest, reply: FastifyReply) {
+  const firebaseUser = request.user;
+  if (!firebaseUser) {
+    reply.status(401).send({ message: "Unauthorized" });
+    return null;
+  }
+  const uid: string = firebaseUser.uid;
+  const user = await User.findOne({ uid });
+  if (!user) {
+    reply.status(404).send({ message: "User account not found" });
+    return null;
+  }
+  return { user, uid };
+}
 
-    let user = await User.findOne({uid:uid});
-    if(!user) {
-        return reply.status(404).send({message:"User Acount not found"});
+async function upsertTeams(
+  teamsList: IncomingTeam[],
+  currentTeamIds: mongoose.Types.ObjectId[],
+  supervisorUid: string,
+  reply: FastifyReply
+): Promise<mongoose.Types.ObjectId[] | null> {
+  const updatedIds = new Set<string>();
+  const resultIds: mongoose.Types.ObjectId[] = [];
+
+  for (const team of teamsList) {
+    if (!team.name || typeof team.name !== "string") {
+      reply.status(400).send({ message: "Each team must have a valid 'name' (string)." });
+      return null;
+    }
+    if (!Array.isArray(team.participants)) {
+      reply.status(400).send({ message: "Each team must have a valid 'participants' array." });
+      return null;
+    }
+    if (typeof team.supervised !== "boolean") {
+      reply.status(400).send({ message: "Each team must have a 'supervised' boolean field." });
+      return null;
     }
 
-    try{
-        const { id, title, description, type, tasks, authoriseEdit, tags, teamsList  } = request.body;
+    const participantsList = team.participants.map((p) => ({
+      participantId: p.id,
+      name: p.name,
+      joinLink: "",
+    }));
 
-        if (!teamsList || !Array.isArray(teamsList)) {
-            console.error("Invalid or missing teamsList:", teamsList);
-            return reply.status(400).send({ message: "Invalid request: 'teamsList' must be an array." });
-        };
+    const fields = {
+      teamName: team.name,
+      supervisorId: team.supervisor_id || supervisorUid,
+      participantsList,
+    };
 
-        const incomingTeams = teamsList;
-        const teamIds :mongoose.Types.ObjectId[] = [];
-
-        for (const team of incomingTeams) {
-            if (!team.id || typeof team.id !== "string") {
-                return reply.status(400).send({ message: "Each team must have a valid 'id' (string)." });
-            }
-            if (!team.name || typeof team.name !== "string") {
-                return reply.status(400).send({ message: "Each team must have a valid 'name' (string)." });
-            }
-            if (!Array.isArray(team.participantsNames)) {
-                return reply.status(400).send({ message: "Each team must have a valid 'participantsNames' array." });
-            }
-            if (typeof team.supervised !== "boolean") {
-                return reply.status(400).send({ message: "Each team must have a 'supervised' boolean field." });
-            }
-            const participantsList = team.participantsNames.map((particip, idx) => ({
-                participantId: particip.id,
-                name:particip.name,
-                joinLink: "",
-            }));
-
-            // const objectstoFind = team.indicesTable.map(({ object, ...indicesMap }) => ({
-            //     objectName: object,
-            //     indices: Object.entries(indicesMap).map(([k, v]) => ({ indiceTitle: k, indiceValue: v }))
-            // }));
-
-            // const imageWithObjects = await mongoose.model("Image").create({ url: team.imageUrl });
-
-            const teamDoc : ITeam = await Team.create({
-                teamId: team.id,
-                teamName: team.name,
-                supervisorId: team.supervisor_id || user.uid,
-                participantsList,
-                // objectsAndImage: {
-                //     objectstoFind,
-                //     imageWithObjects: imageWithObjects._id,
-                // },
-            }) ;
-
-            teamIds.push(teamDoc._id as mongoose.Types.ObjectId);
-        }
-
-        const activity = new Activity({ id,
-                                        title,
-                                        description,
-                                        type,
-                                        tasks,
-                                        authoriseEdit,
-                                        tags,
-                                        teams:teamIds,
-                                        createdBy:user._id});
-        const saved = await activity.save();
-
-        reply.code(201).send(saved);
-    } catch(err)
-     {
-        console.error("Error while post on activities route:" , err);
-        reply.code(500).send({ error: 'Server error', message: err });
-    }
-
-  };
-
-
-
-export const getActivities = async ( request: FastifyRequest , reply:FastifyReply) => {
-    try{
-        await authenticate(request, reply);
-        const firebaseUser = (request as any).user;
-        if (!firebaseUser) return reply.status(401).send({ message: "Unauthorized" });
-
-        const mongoUser = await User.findOne({ uid: firebaseUser.uid });
-        if (!mongoUser) return reply.status(404).send({ message: "User not found" });
-
-        const userId = mongoUser._id;
-
-        // Find teams where this user is a supervisor
-        const supervisedTeamIds = await Team.find({ supervisorId: firebaseUser.uid }).distinct("_id");
-
-        // Find activities created by user or involving their supervised teams
-        const activities = await Activity.find({
-            $or: [
-            { createdBy: userId },
-            { teams: { $in: supervisedTeamIds } }
-            ]
-        })
-            .populate("teams")
-            .populate("createdBy")
-            .lean();
-
-        // Add ownership flag
-        const activitiesWithOwnership = activities.map((act) => {
-            const totalParticipants = act.teams.reduce((sum, team) => {
-                return sum + (team.participantsList?.length || 0);
-            }, 0);
-
-            return {
-                ...act,
-                ownership: String(act.createdBy?._id) === String(userId) ? "creator" : "supervisor",
-                totalParticipants,
-            };
-        });
-
-        reply.send(activitiesWithOwnership);
-    }catch (err) {
-        console.error("❌ GET /activities error:", err);
-        reply.status(500).send({ error: 'Failed to fetch activities',
-                                message: err instanceof Error ? err.message:JSON.stringify(err) });
+    if (team._id) {
+      const updated = await Team.findByIdAndUpdate(team._id, fields, { new: true });
+      if (!updated) {
+        reply.status(404).send({ message: `Team ${team._id} not found` });
+        return null;
+      }
+      updatedIds.add(String(team._id));
+      resultIds.push(updated._id as mongoose.Types.ObjectId);
+    } else {
+      const created: ITeam = await Team.create(fields);
+      resultIds.push(created._id as mongoose.Types.ObjectId);
     }
   }
 
-  export const getActivityById = async (request,reply)=>{
-    await authenticate(request, reply);
-    const firebaseUser = (request as any).user;
-    if (!firebaseUser) return reply.status(401).send({ message: "Unauthorized" });
+  const removedIds = currentTeamIds.filter((id) => !updatedIds.has(String(id)));
+  if (removedIds.length > 0) {
+    await Team.deleteMany({ _id: { $in: removedIds } });
+  }
 
-    const { id } = request.params as { id: string };
+  return resultIds;
+}
 
-    try {
-        const mongoUser = await User.findOne({ uid: firebaseUser.uid });
-        if (!mongoUser) return reply.status(404).send({ message: "User not found" });
+export const createDraft = async (
+  request: FastifyRequest<{ Body: CreateDraftBody }>,
+  reply: FastifyReply
+) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user } = resolved;
 
-        const activity = await Activity.findById(id)
-        .populate({
-            path: "teams",
-            populate: [
-            { path: "participantsList" },
-            // {
-            //     path: "objectsAndImage.imageWithObjects",
-            //     model: "Image", // ensure this model is registered
-            // },
-            ],
-        })
-        .populate("createdBy")
-        .lean();
+  const { title } = request.body;
+  if (!title?.trim()) {
+    return reply.status(400).send({ message: "Title is required" });
+  }
 
-        if (!activity) {
-        return reply.status(404).send({ message: "Activity not found" });
-        }
+  try {
+    const draft = await Activity.create({
+      title: title.trim(),
+      createdBy: user._id,
+      status: "DRAFT",
+    });
+    return reply.code(201).send(draft);
+  } catch (err) {
+    console.error("Error creating draft activity:", err);
+    return reply.code(500).send({ error: "Server error", message: err });
+  }
+};
 
-        const isCreator = String(activity.createdBy._id) === String(mongoUser._id);
-        const isSupervisor = activity.teams.some(
-        (team: any) => team.supervisorId === firebaseUser.uid
-        );
+export const updateDraft = async (
+  request: FastifyRequest<{ Params: { id: string }; Body: UpdateDraftBody }>,
+  reply: FastifyReply
+) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user, uid } = resolved;
 
-        if (!isCreator && !isSupervisor) {
-        return reply.status(403).send({ message: "Access denied" });
-        }
+  const { id } = request.params;
 
-        const totalParticipants = activity.teams.reduce((sum, team: any) => {
+  try {
+    const activity = await Activity.findById(id);
+    if (!activity) return reply.status(404).send({ message: "Activity not found" });
+    if (activity.status !== "DRAFT")
+      return reply.status(400).send({ message: "Only DRAFT activities can be updated" });
+    if (String(activity.createdBy) !== String(user._id))
+      return reply.status(403).send({ message: "Forbidden" });
+
+    const { title, description, mode, tags, tasks, authoriseEdit, constraints, deadline, teamsList } =
+      request.body;
+
+    if (title !== undefined) activity.title = title;
+    if (description !== undefined) activity.description = description;
+    if (mode !== undefined) activity.mode = mode;
+    if (tags !== undefined) activity.tags = tags;
+    if (tasks !== undefined) activity.tasks = tasks as any;
+    if (authoriseEdit !== undefined) activity.authoriseEdit = authoriseEdit;
+    if (constraints !== undefined) activity.constraints = constraints;
+    if (deadline !== undefined) activity.deadline = new Date(deadline);
+
+    if (teamsList !== undefined) {
+      if (!Array.isArray(teamsList)) {
+        return reply.status(400).send({ message: "'teamsList' must be an array." });
+      }
+      const teamIds = await upsertTeams(
+        teamsList,
+        activity.teams as unknown as mongoose.Types.ObjectId[],
+        uid,
+        reply
+      );
+      if (!teamIds) return;
+      activity.teams = teamIds as any;
+    }
+
+    const updated = await activity.save();
+    return reply.send(updated);
+  } catch (err) {
+    console.error("Error updating draft activity:", err);
+    return reply.code(500).send({ error: "Server error", message: err });
+  }
+};
+
+export const publishActivity = async (
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user } = resolved;
+
+  const { id } = request.params;
+
+  try {
+    const activity = await Activity.findById(id);
+    if (!activity) return reply.status(404).send({ message: "Activity not found" });
+    if (activity.status !== "DRAFT")
+      return reply.status(400).send({ message: "Only DRAFT activities can be published" });
+    if (String(activity.createdBy) !== String(user._id))
+      return reply.status(403).send({ message: "Forbidden" });
+
+    activity.status = "PUBLISHED";
+    const published = await activity.save();
+    return reply.send(published);
+  } catch (err) {
+    console.error("Error publishing activity:", err);
+    return reply.code(500).send({ error: "Server error", message: err });
+  }
+};
+
+export const getActivities = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const resolved = await resolveUser(request, reply);
+    if (!resolved) return;
+    const { user: mongoUser, uid } = resolved;
+
+    const userId = mongoUser._id;
+
+    // const supervisedTeamIds = await Team.find({ supervisorId: uid }).distinct("_id");
+
+    const activities = await Activity.find({ createdBy: userId })
+      .populate("teams")
+      .populate("createdBy")
+      .lean();
+
+    const activitiesWithOwnership = activities.map((act) => {
+      const totalParticipants = act.teams.reduce((sum, team) => {
         return sum + (team.participantsList?.length || 0);
-        }, 0);
+      }, 0);
 
-        return reply.send({
-        ...activity,
-        ownership: isCreator ? "creator" : "supervisor",
+      return {
+        ...act,
+        ownership: String(act.createdBy?._id) === String(userId) ? "creator" : "supervisor",
         totalParticipants,
-        });
-    } catch (err) {
-        console.error("Error fetching activity:", err);
-        return reply.status(500).send({ message: "Server error" });
+      };
+    });
+
+    reply.send(activitiesWithOwnership);
+  } catch (err) {
+    console.error("GET /activities error:", err);
+    reply.status(500).send({
+      error: "Failed to fetch activities",
+      message: err instanceof Error ? err.message : JSON.stringify(err),
+    });
+  }
+};
+
+export const getActivityById = async (request: FastifyRequest, reply: FastifyReply) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user: mongoUser, uid } = resolved;
+
+  const { id } = request.params as { id: string };
+
+  try {
+
+    const activity = await Activity.findById(id)
+      .populate({
+        path: "teams",
+        populate: [{ path: "participantsList" }],
+      })
+      .populate("createdBy")
+      .lean();
+    
+    if (!activity) return reply.status(404).send({ message: "Activity not found" });
+
+    const isCreator = String(activity.createdBy._id) === String(mongoUser._id);
+    const isSupervisor = activity.teams.some(
+      (team: any) => team.supervisorId === uid
+    );
+
+    if (!isCreator && !isSupervisor) {
+      return reply.status(403).send({ message: "Access denied" });
     }
 
-  }
+    const totalParticipants = activity.teams.reduce((sum, team: any) => {
+      return sum + (team.participantsList?.length || 0);
+    }, 0);
 
+    return reply.send({
+      ...activity,
+      ownership: isCreator ? "creator" : "supervisor",
+      totalParticipants,
+    });
+  } catch (err) {
+    console.error("Error fetching activity:", err);
+    return reply.status(500).send({ message: "Server error" });
+  }
+};

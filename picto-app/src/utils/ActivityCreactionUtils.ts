@@ -1,6 +1,66 @@
 //TODO: Move the activity global logic here
 import { v4 as uuidv4 } from "uuid";
-import { ActivityIstance, ParticipantData, TaskData, TeamInstance } from "./Types";
+import { ActivityFull, ActivityIstance, ParticipantData, TaskData, TeamInstance } from "./Types";
+import type { UpdateDraftPayload } from "@/hooks/useActivityDraftApi";
+
+export function activityToFormValues(activity: ActivityFull): ActivityIstance {
+  const isSolo = activity.mode === "SOLO";
+
+  const timedConstraint = activity.constraints?.find(
+    c => c.constraint_type === "TIMED" && c.is_enabled
+  );
+  const durationSec = (timedConstraint?.constraint_value as any)?.durationSeconds ?? 0;
+  const chrono = timedConstraint
+    ? { isEnabled: true, minutes: Math.floor(durationSec / 60), seconds: durationSec % 60 }
+    : { isEnabled: false, minutes: 0, seconds: 0 };
+
+  const participantsList = isSolo
+    ? (activity.teams[0]?.participantsList ?? []).map(p => ({ id: p.participantId, name: p.name }))
+    : [];
+
+  const teamsList: TeamInstance[] = isSolo
+    ? []
+    : activity.teams.map(t => ({
+        id: t._id,
+        name: t.teamName,
+        participantsNumber: t.participantsList.length,
+        supervised: false,
+        participantsNames: t.participantsList.map(p => ({ id: p.participantId, name: p.name })),
+        supervisor_id: t.supervisorId,
+      }));
+
+  return {
+    id: activity._id,
+    title: activity.title,
+    description: activity.description ?? "",
+    tags: activity.tags ?? [],
+    tasks: (activity.tasks ?? []).map(t => ({ id: t._id, title: t.title })),
+    type: isSolo ? "solo" : "group",
+    authoriseEdit: activity.authoriseEdit ?? false,
+    chrono,
+    participantsList,
+    teamsList,
+    supervised_teams: false,
+    tagInput: "",
+    taskInput: "",
+  };
+}
+
+export function buildDraftPayload(formValues: ActivityIstance): UpdateDraftPayload {
+    const mode = formValues.type === "solo" ? "SOLO" : "COLLABORATIVE";
+
+    const tasks = formValues.tasks.map(t => ({ title: t.title, level: "EASY" as const }));
+
+    const constraints = formValues.chrono.isEnabled
+        ? [{ constraint_type: "TIMED", constraint_value: { durationSeconds: formValues.chrono.minutes * 60 + formValues.chrono.seconds }, is_enabled: true }]
+        : [];
+
+    const teamsList = formValues.type === "solo"
+        ? [{ name: "Team_Default", participants: formValues.participantsList.map(p => ({ id: p.id, name: p.name })), supervised: false }]
+        : formValues.teamsList.map(t => ({ name: t.name, participants: t.participantsNames.map(p => ({ id: p.id, name: p.name })), supervised: t.supervised, supervisor_id: t.supervisor_id }));
+
+    return { title: formValues.title, description: formValues.description, mode, tags: formValues.tags, tasks, authoriseEdit: formValues.authoriseEdit, constraints, teamsList };
+}
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 //Activity details change 
@@ -152,7 +212,6 @@ export const handleRemoveTask = (formValues:ActivityIstance,taskToRemove: string
 
 // error handlind to display to user
 export const validateActivityValues = (formValues:ActivityIstance) =>{
-        // const idValue = formValues.id;
         const titleVallue = formValues.title;
         const tags = formValues.tags;
         const description = formValues.description;
@@ -218,65 +277,36 @@ export const validateActivityValues = (formValues:ActivityIstance) =>{
         return {state:true,message:""}
 }
 
-// const handleSubmit = async (formValues:ActivityIstance ,e: React.FormEvent) => {
-//     e.preventDefault();
-//     const {setBannerMessage} = useFeedbackBanner();
 
-//     try {
-//       const response = await fetch("http://localhost:5000/activities", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(formValues),
-//       });
-
-//       const data = await response.json();
-//       if (response.ok) {
-//         // console.log("✅ Activity created:", data);
-//         setBannerMessage({message:"Activité créée avec succès",type:"success"});
-//       } else {
-//         setBannerMessage({message:"Erreur de création d'activité",type:"failure"});
-//         // console.error("❌ Failed to create activity:", data);
-//       }
-//     } catch (err) {
-//         setBannerMessage({message:"Erreur de création d'activité, Réessayez",type:"failure"});
-//     }
-// };
-
-
-    const createNewTeamParticipants = (toCreate:number,team:TeamInstance) =>{
-        const oldParticipantsList = team.participantsNames;
-        if (toCreate > 0) {
-        const newEntries :ParticipantData[] = Array.from({ length: toCreate },
-                                        (_, i) => {
-                                            const id =uuidv4();
-                                            return {id, name:`Participant ${oldParticipantsList.length + i + 1}`}
-                                            }
-                                        
-            );
-            return [...oldParticipantsList, ...newEntries];
-        } else {
-            if(oldParticipantsList.length>0) 
-                return oldParticipantsList.slice(0, toCreate)
-            return oldParticipantsList
-        }
+const createNewTeamParticipants = (toCreate:number,team:TeamInstance) =>{
+    const oldParticipantsList = team.participantsNames;
+    if (toCreate > 0) {
+    const newEntries :ParticipantData[] = Array.from({ length: toCreate },
+                                    (_, i) => {
+                                        const id =uuidv4();
+                                        return {id, name:`Participant ${oldParticipantsList.length + i + 1}`}
+                                        }
+                                    
+        );
+        return [...oldParticipantsList, ...newEntries];
+    } else {
+        if(oldParticipantsList.length>0) 
+            return oldParticipantsList.slice(0, toCreate)
+        return oldParticipantsList
     }
+}
 
 export const handleAddParticipToTeam = (toAdd:number,team:TeamInstance) => {
     const {setBannerMessage} = useFeedbackBanner();
 
         if (!team ) {
             setBannerMessage({message:"Erreur d'ajout des participants, Réessayez",type:"failure"});
-
-            // console.log("Erreur de création 2"); 
             return 
         };
         const newTeam = team;
 
         if (team.participantsNames.length <= 0 && toAdd <= 0) {
             setBannerMessage({message:"Erreur d'ajout des participants, Réessayez",type:"failure"});
-            // console.log("Erreur de création 3"); 
             return 
         };
 

@@ -1,0 +1,385 @@
+/* ── Backdrop ── */
+.pdrawer__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 1100;
+  animation: pdrawer-fade-in 0.22s ease;
+}
+
+@keyframes pdrawer-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Panel ── */
+.pdrawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 640px;
+  height: 100vh;
+  background: white;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pdrawer-slide-in 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pdrawer-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Header bar ── */
+.pdrawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--dust-grey);
+  flex-shrink: 0;
+}
+
+.pdrawer__title {
+  font-size: var(--fs-400);
+  font-weight: var(--fw-bold);
+  color: var(--accent-dark);
+  margin: 0;
+}
+
+.pdrawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  color: var(--blue-slate);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.pdrawer__close:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ── Scrollable body ── */
+.pdrawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5);
+}
+
+.pdrawer__body::-webkit-scrollbar { width: 6px; }
+.pdrawer__body::-webkit-scrollbar-thumb {
+  background: var(--dust-grey);
+  border-radius: 3px;
+}
+.pdrawer__body::-webkit-scrollbar-button { display: none; }
+
+/* ── Override: no outer card border inside the narrow drawer ── */
+.pdrawer__body .profile_card {
+  width: 100%;
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid var(--dust-grey);
+  padding-bottom: var(--space-4);  
+  border: none;
+  box-shadow: none;
+}
+
+/* ── Override: 2-col fields grid (3-col is too cramped at 440px) ── */
+.pdrawer__body .profile_fields-grid {
+  grid-template-columns: 1fr 1fr;
+  display: grid;
+  gap: var(--space-5) var(--space-4);  
+}
+
+/* ── Override: tighter banner ── */
+.pdrawer__body .profile_banner {
+  width: 100%;
+  background: linear-gradient(135deg, #1c73fa 0%, #364A9D 55%, #4E5A6D 100%);
+  overflow: hidden;  
+  height: 96px;
+}
+
+.profile_banner__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Hero row ── */
+.profile_hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 var(--space-5) var(--space-2);
+}
+
+.profile_avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  margin-top: -38px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Override: metrics wrap if needed ── */
+.pdrawer__body .profile_metrics {
+  flex-wrap: wrap;
+}
+
+.pdrawer__body .profile_metric {
+  flex: 1;
+  min-width: 100px;
+}
+
+.profile_hero__edit-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-1);
+}
+
+.button__primary {
+  gap: var(--space-2);
+  height: var(--btn-height-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.button__secondary {
+  height: var(--btn-height-sm);
+  border: 1px solid var(--dust-grey);
+}
+
+/* ── Identity ── */
+.profile_identity {
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  margin: var(--space-3) var(--space-4) 0;
+}
+
+.profile_name-badge-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.profile_display-name {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.profile_verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  background: rgba(61, 191, 124, 0.12);
+  color: #1a7a4a;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
+.profile_member-since-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--blue-slate);
+  font-weight: var(--font-medium);
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* ── Sections ── */
+.profile_section {
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-3) var(--space-4) 0;
+  box-shadow: var(--shadow-centered-sm);
+  border-radius: var(--radius-md);
+}
+
+.profile_section--last {
+  margin-bottom: 0;
+}
+
+.profile_section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.profile_section__title {
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  margin: 0;
+  color: inherit;
+}
+
+.profile_section__editing-hint {
+  font-size: var(--text-xs);
+  color: var(--accent);
+  font-weight: var(--font-medium);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--accent-light);
+}
+
+/* ── Profile details fields ── */
+
+.profile_field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile_field__label-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  color: var(--blue-slate);
+  font-weight: var(--font-medium);
+  opacity: 0.65;
+}
+
+.profile_field__value {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.profile_field__value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.profile_field__input {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border: 1px solid #1890ff;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  background: #e6f7ff;
+  outline: none;
+  font-family: inherit;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Badges ── */
+.profile_badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
+.profile_badge--green {
+  background: rgba(61, 191, 124, 0.12);
+  color: #1a7a4a;
+}
+
+/* ── Metrics ── */
+.profile_metrics {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.profile_metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--dust-grey);
+  min-width: 130px;
+}
+
+.profile_metric__icon {
+  color: var(--accent-dark);
+}
+
+.profile_metric__value {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--accent-dark);
+  line-height: 1;
+}
+
+.profile_metric__label {
+  font-size: var(--text-xs);
+  color: var(--blue-slate);
+  font-weight: var(--font-medium);
+  text-align: center;
+}
+
+/* ── Danger zone ── */
+.profile_danger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  margin: var(--space-3) var(--space-4) 0;
+  background: white;
+  border: 1px solid var(--dust-grey);
+  border-radius: var(--radius-md);
+}
+
+.btn__outlined {
+  height: var(--btn-height-lg);
+  padding: var(--space-2) var(--space-4);
+}
+
+.profile_danger-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  height: var(--btn-height-lg);
+  background: rgba(229, 57, 53, 0.06);
+  color: #e53935;
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  font-family: inherit;
+}
+
+.profile_danger-btn:hover {
+  background: #e53935;
+  color: white;
+}
+

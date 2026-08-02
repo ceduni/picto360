@@ -1,26 +1,31 @@
 import React, { JSX } from "react";
 import ReactDOMServer from "react-dom/server";
-import { TiInfoLarge } from "react-icons/ti";
-import { AiOutlineLink, AiOutlinePicture } from "react-icons/ai";
-import { MdOutlineGif, MdOutlineVideoLibrary } from "react-icons/md";
+import {
+    InformationCircleIcon,
+    TagIcon,
+    LinkIcon,
+    PhotoIcon,
+    FilmIcon,
+    VideoCameraIcon,
+    RectangleGroupIcon,
+} from "@heroicons/react/24/outline";
 import { HotspotData, HotspotInstance } from "./Types";
-import { IoShapesOutline } from "react-icons/io5";
-import { BiSolidLabel } from "react-icons/bi";
 import { createRoot } from "react-dom/client";
 import { VideoTooltip } from "@/components/ui/VideoTooltip";
 
 
 
 export const getIconForType = (type: string): JSX.Element => {
+    const props = { width: 16, height: 16 };
     switch (type) {
-        case "text": return React.createElement(TiInfoLarge);
-        case "label": return React.createElement(BiSolidLabel);
-        case "hyperlink": return React.createElement(AiOutlineLink);
-        case "image": return React.createElement(AiOutlinePicture);
-        case "gif": return React.createElement(MdOutlineGif);
-        case "video": return React.createElement(MdOutlineVideoLibrary);
-        case "forme": return React.createElement(IoShapesOutline);
-        default: return React.createElement(TiInfoLarge);
+        case "text": return React.createElement(InformationCircleIcon, props);
+        case "label": return React.createElement(TagIcon, props);
+        case "hyperlink": return React.createElement(LinkIcon, props);
+        case "image": return React.createElement(PhotoIcon, props);
+        case "gif": return React.createElement(FilmIcon, props);
+        case "video": return React.createElement(VideoCameraIcon, props);
+        case "forme": return React.createElement(RectangleGroupIcon, props);
+        default: return React.createElement(InformationCircleIcon, props);
     }
 }
 

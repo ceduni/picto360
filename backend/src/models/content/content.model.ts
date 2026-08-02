@@ -7,11 +7,15 @@ export interface ContentDocument extends Document {
   title: string;
 }
 
-const contentSchema = new Schema<ContentDocument>({
+export const baseContentFields = {
   id: { type: String, required: true },
   creationDate: { type: Date, default: Date.now, required: true },
   lastModificationDate: { type: Date, default: Date.now, required: true },
   title: { type: String, required: true },
+};
+
+const contentSchema = new Schema<ContentDocument>({
+  ...baseContentFields,
 });
 
 const Content = mongoose.model<ContentDocument>("Content", contentSchema);

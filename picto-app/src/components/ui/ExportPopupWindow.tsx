@@ -1,9 +1,7 @@
 import "@css/SettingsPopupWindow.css";
 
 import React, { useState } from "react";
-import { FaGoogleDrive } from "react-icons/fa";
-import { IoFileTrayFull } from "react-icons/io5";
-import { MdClose } from "react-icons/md";
+import { XMarkIcon, CloudArrowUpIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import { getExportService } from "@/utils/ExportFileUtils";
 import { savePendingDriveExport, useDriveAuth } from "@/hooks/useDriveAuth";
 import { getViewerItem } from "@/utils/storedImageData";
@@ -195,25 +193,25 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
 
   return (
     <div
-      className={`settings-modal-backdrop ${isOpen ? "settings-modal-backdrop--open" : ""}`}
+      className={`popup_background`}
       onClick={handleBackdropClick}
     >
       <ErrorBanner ref={bannerRef} />
-      <div className={`settings-modal ${isOpen ? "settings-modal--open" : ""}`}>
-        <div className="settings-modal__header">
-          <h2 className="settings-modal__title">Exporter vers</h2>
+      <div className={`modal ${isOpen ? "modal--open" : ""}`}>
+        <div className="modal__header">
+          <h2 className="t-page-title">Exporter vers</h2>
           <button
-            className="settings-modal__close-button"
+            className="modal__close-button"
             onClick={handlePopupClose}
             aria-label="Fermer les parametres"
           >
-            <MdClose />
+            <XMarkIcon width={20} height={20} />
           </button>
         </div>
 
-        <div className="settings-modal__content">
-          <div className="popup-select-export_format">
-            <label className="settings-modal__label">Type d'export</label>
+        <div className="popup_window_content">
+          <div className="modal__section">
+            <label className="t-label">Type d'export</label>
             <DropSelector
               id="export-type"
               value={exportFormat}
@@ -223,18 +221,18 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
             />
           </div>
 
-          <div className="settings-modal__section">
-            <label htmlFor="file-name" className="settings-modal__label">
+          <div className="modal__section">
+            <label htmlFor="file-name" className="t-label">
               Nom du fichier
             </label>
             <div
-              className={`settings-modal__filename-wrapper ${
-                exportFormat === "picto" ? "settings-modal__filename-wrapper--extension" : ""
+              className={`modal__filename-wrapper ${
+                exportFormat === "picto" ? "modal__filename-wrapper--extension" : ""
               }`}
             >
               <input
                 id="file-name"
-                className="settings-modal__input settings-modal__input--filename"
+                className="modal__input modal__input--filename"
                 type="text"
                 value={projectTitle}
                 onChange={setProjectTitle}
@@ -250,32 +248,32 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
                 }}
               />
               {exportFormat === "picto" && (
-                <code className="settings-modal__file-extension">.picto</code>
+                <code className="modal__file-extension">.picto</code>
               )}
             </div>
           </div>
           {exportFormat === "picto" && (
-            <div className="settings-modal__section_horizontal">
+            <div className="modal__section_horizontal">
               <input
                 id="include-local-files"
                 type="checkbox"
                 checked={includeLocalFiles}
                 onChange={(event) => setIncludeLocalFiles(event.target.checked)}
-                className="settings-modal__checkbox"
+                className="modal__checkbox"
               />
-              <label htmlFor="include-local-files" className="settings-modal__label">
+              <label htmlFor="include-local-files" className="t-label">
                 Inclure les fichiers locaux intégrés
               </label>
             </div>
           )}
         </div>
 
-        <div className="settings-modal__footer" style={{ justifyContent: "space-between" }}>
-          <p style={{ width: "100%" }} className="export-instruction">
+        <div className="popup-modal__footer" >
+          <p style={{ width: "100%" }} className="t-label">
             Choisissez une destination d'exportation :
           </p>
           <button
-            className="settings-modal__button settings-modal__button--secondary"
+            className="modal__button button__secondary"
             onClick={handlePopupClose}
           >
             Annuler
@@ -283,7 +281,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
           <div style={{ flexGrow: 2, display: "flex", justifyContent: "flex-end", gap: "6px" }}>
             <button
               type="button"
-              className="settings-modal__button settings-modal__button--primary"
+              className="modal__button button__primary"
               onClick={async () => {
                 if (exportInProgress) {
                   return;
@@ -298,20 +296,20 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
               }}
               disabled={exportInProgress}
             >
-              <FaGoogleDrive size={20} />
+              <CloudArrowUpIcon width={20} height={20} />
               Google Drive
             </button>
 
             <button
               type="button"
-              className="settings-modal__button settings-modal__button--primary"
+              className="modal__button button__primary"
               disabled={exportInProgress}
               onClick={async () => {
                 await handleExportTo("disk");
                 setIsPopupOpen(false);
               }}
             >
-              <IoFileTrayFull size={20} />
+              <InboxArrowDownIcon width={20} height={20} />
               Ordinateur
             </button>
           </div>

@@ -1,25 +1,24 @@
 import React from "react"
-import NavigationBar from "./NavigationBar"
+import DashboardLayout from "./layout/DashboardLayout"
 import UseAnimations from "react-useanimations";
 import loading2 from 'react-useanimations/lib/loading2';
 import ActivityCard from "./ActivityCard"
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivity } from "@/contexts/ActivityContext";
 import { useNavigate } from "react-router-dom";
 
 
 
 const ActivitiesListPage :React.FC = ()=>{
-    const { userActivities, loading , getActivitiesError} =  useFetchActivities();
+    const { userActivities, loading, error: getActivitiesError } = useActivity();
 
     const navigate = useNavigate();
-    
+
     const goToActivity = (activityId: string) => {
         navigate(`/dashboard/activity-editor/${activityId}`);
     };
 
     return(
-        <div className="dashboard_page">
-            <NavigationBar selected="activities"/>
+        <DashboardLayout title="Activités">
             <div className="activities-list-content-container">
                 {
                     loading ?
@@ -63,7 +62,7 @@ const ActivitiesListPage :React.FC = ()=>{
                     </div>
                 }
             </div>
-        </div>
+        </DashboardLayout>
     )
 }
 

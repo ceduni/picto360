@@ -1,7 +1,7 @@
 import "./css/PanoramaViewer.css";
 
 import React, { useRef, useCallback, useEffect } from "react";
-import { PiTargetBold } from "react-icons/pi";
+import { CursorArrowRaysIcon } from "@heroicons/react/24/outline";
 import ContextMenu from "./ContextMenu";
 import EditionPannel from "./EditionPannel";
 import type { HotspotData } from "@/utils/Types";
@@ -244,7 +244,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                     }}
                     className="panorama-viewer__target-icon"
                 >
-                    <PiTargetBold />
+                    <CursorArrowRaysIcon width={20} height={20} />
                 </div>
             )}
 

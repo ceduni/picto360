@@ -3,7 +3,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: #f8f9ff;
     width: 100%;
     height: 100%;
 }
@@ -101,7 +100,10 @@
 
 .home-page__intro-text {
     max-width: 800px;
-    font-weight: 500; font-size: 2em;
+    font-weight: 500; 
+    font-size: var(--type-page-title-size);
+    line-height : var(--type-page-title-line);
+    font-weight:var(--fw-medium);
     text-align: center;
     line-height: 1.65;
 }
@@ -140,7 +142,7 @@
     min-width: 200px;
     height: 56px;
     cursor: pointer;
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-family-base), sans-serif;
     font-weight: 700;
     font-style: normal;
     font-size: clamp(1.5rem, 1.2vw, 1.1rem);
@@ -152,51 +154,51 @@
 }
 
 .home-page__btn-login {
-    color: #364A9D;
+    color: var(--accent-dark);
     background-color: white;
     border: 2px solid transparent;
 }
 
-    .home-page__btn-login:hover {
-        background-color: #fbfcff;
-        border-color: #364A9D;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.2);
-    }
-
-    .home-page__btn-login:active {
-        transform: translateY(0);
-    }
-
-.home-page__btn-create-group {
-    color: #364A9D;
-    background-color: #D8E0FF;
+.home-page__btn-login:hover {
+    background-color: var(--accent-light);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 74, 157, 0.2);
 }
 
-    .home-page__btn-create-group:hover {
-        background-color: #c5d1ff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(54, 74, 157, 0.25);
-    }
+.home-page__btn-login:active {
+    transform: translateY(0);
+}
 
-    .home-page__btn-create-group:active {
-        transform: translateY(0);
-    }
+.home-page__btn-create-group {
+    color: var(--accent-dark);
+    background-color: var(--accent-light);
+}
+
+.home-page__btn-create-group:hover {
+    background-color: var(--accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 74, 157, 0.25);
+}
+
+.home-page__btn-create-group:active {
+    transform: translateY(0);
+}
 
 .home-page__btn-create-activity {
     color: white;
-    background-color: #364A9D;
+    background-color: var(--accent);
 }
 
-    .home-page__btn-create-activity:hover {
-        background-color: #2a3a7d;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(54, 74, 157, 0.35);
-    }
+.home-page__btn-create-activity:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(54, 74, 157, 0.35);
+}
 
-    .home-page__btn-create-activity:active {
-        transform: translateY(0);
-    }
+.home-page__btn-create-activity:active {
+    transform: translateY(0);
+}
 
 .material-icons {
     color: #364A9D;
@@ -237,14 +239,6 @@
     }
 }
 
-/* Accessibility improvements */
-.home-page__btn-login:focus,
-.home-page__btn-create-group:focus,
-.home-page__btn-create-activity:focus {
-    outline: 3px solid #364A9D;
-    outline-offset: 2px;
-}
-
 /* Optional: Add a subtle vignette effect over the panorama */
 .home-page:after {
     content: '';
@@ -263,4 +257,44 @@
     .panorama-background:before {
         animation: none;
     }
+}
+
+/* ── Editor / Auth view selector tabs ── */
+.editor-view-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    box-shadow: var(--shadow-sm);
+}
+
+.editor-view-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-200);
+    font-weight: var(--fw-medium);
+    color: var(--blue-slate);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.editor-view-tab--active {
+    background: white;
+    color: var(--accent);
+    font-weight: var(--fw-semibold);
+    box-shadow: var(--shadow-sm);
+}
+
+.editor-view-tab:hover:not(.editor-view-tab--active) {
+    background: rgba(255, 255, 255, 0.5);
 }

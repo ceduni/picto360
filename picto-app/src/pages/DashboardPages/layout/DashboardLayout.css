@@ -1,0 +1,21 @@
+.dashboard-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--accent-light-bg);
+}
+
+.dashboard-layout-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.dashboard-layout-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-7);
+  box-sizing: border-box;
+}
