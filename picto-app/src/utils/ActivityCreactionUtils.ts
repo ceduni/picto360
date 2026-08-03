@@ -43,8 +43,6 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
     supervised_teams: false,
     tagInput: "",
     taskInput: "",
-    playgroundProjectId: activity.playground?._id,
-    playgroundImageUrl: activity.playground?.images?.[0]?.url,
   };
 }
 

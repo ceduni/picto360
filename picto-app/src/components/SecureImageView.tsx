@@ -38,7 +38,7 @@ function SecureImage( {imageId, initialUrl} : SecureImageProps) {
 
             setRetryCount (prev => prev +1)
             setSrc (fresh_url); // update the image source with the new valid signature
-        }catch(err){
+        }catch{
             setBannerMessage({ message:"Vous n'avex pas accès à cette image !", type: "failure"})
         }
     }
