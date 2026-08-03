@@ -1,0 +1,38 @@
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+BACKEND_TOUCHED=false
+FRONTEND_TOUCHED=false
+
+if echo "$STAGED_FILES" | grep -q '^backend/'; then
+  BACKEND_TOUCHED=true
+fi
+
+if echo "$STAGED_FILES" | grep -q '^picto-app/'; then
+  FRONTEND_TOUCHED=true
+fi
+
+if [ "$BACKEND_TOUCHED" = true ]; then
+  echo "▶ backend: type-checking..."
+  (cd "$ROOT_DIR/backend" && npx tsc --noEmit) || { echo "✖ backend type-check failed"; exit 1; }
+
+  echo "▶ backend: linting..."
+  (cd "$ROOT_DIR/backend" && npx eslint .) || { echo "✖ backend lint failed"; exit 1; }
+
+  echo "▶ backend: running tests..."
+  (cd "$ROOT_DIR/backend" && npx jest) || { echo "✖ backend tests failed"; exit 1; }
+
+  echo "✔ backend checks passed"
+fi
+
+if [ "$FRONTEND_TOUCHED" = true ]; then
+  echo "▶ picto-app: type-checking..."
+  (cd "$ROOT_DIR/picto-app" && npx tsc -b) || { echo "✖ picto-app type-check failed"; exit 1; }
+
+  echo "▶ picto-app: linting..."
+  (cd "$ROOT_DIR/picto-app" && npx eslint . --ext ts,tsx) || { echo "✖ picto-app lint failed"; exit 1; }
+
+  echo "✔ picto-app checks passed"
+fi
+
+exit 0

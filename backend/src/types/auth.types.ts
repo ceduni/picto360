@@ -1,5 +1,3 @@
-import { FastifyRequest } from "fastify";
-
 /**
  * Auth token information
  */

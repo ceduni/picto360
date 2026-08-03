@@ -60,7 +60,6 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
       // Generator function yields buffer chunks
       const chunkGenerator = function* () {
         let offset = 0;
-        let chunkNumber = 0;
 
         while (offset < fileBuffer.length) {
           const chunk = fileBuffer.slice(
@@ -70,7 +69,6 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
 
           yield chunk;
           offset += CHUNK_SIZE;
-          chunkNumber++;
         }
       };
 

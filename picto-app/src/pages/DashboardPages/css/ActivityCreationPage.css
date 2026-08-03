@@ -48,6 +48,22 @@
   margin: 0;
 }
 
+.list_manage-link {
+  all: unset;
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--accent);
+  cursor: pointer;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s;
+}
+
+.list_manage-link:hover {
+  background: var(--accent-light-bg);
+}
+
 .card-title-group {
   display: flex;
   flex-direction: column;
@@ -146,7 +162,7 @@
   background: white;
   border-radius: var(--radius-lg);
   padding: var(--space-5);
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--snooze-border-color);
 }
 
 /* Options card — grows to fill remaining left-col height */
@@ -156,7 +172,7 @@
   gap: var(--space-4);
   flex: 1;
   background: white;
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--snooze-border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
 }
@@ -298,79 +314,67 @@
 }
 
 /* ── Chrono field ── */
-.chrono-toggle_and_field {
-  display: flex;
-  flex-direction: row;
+/* ── Chronometer picker ── */
+.chrono-picker {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
-.add_clock-field {
+.chrono-icon { color: var(--blue-slate); flex-shrink: 0; }
+
+.chrono-box {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--accent-light);
-  border: 1px solid rgba(28, 115, 250, 0.2);
-  border-radius: var(--radius-full);
-  padding: var(--space-1) var(--space-3);
-  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--dust-grey);
+  border-radius: var(--radius-md);
+  background: white;
+  transition: border-color 0.15s;
 }
 
-.chrono-icon { color: var(--accent); flex-shrink: 0; }
-
-.chrono-inputs {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+.chrono-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(28, 115, 250, 0.08);
 }
 
-.chrono-field-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.chrono-label {
-  font-size: 9px;
-  font-weight: var(--fw-medium);
-  color: var(--accent);
-  opacity: 0.7;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-
-.chrono-separator {
-  font-size: var(--fs-300);
-  font-weight: var(--fw-bold);
-  color: var(--accent);
-  line-height: 1;
-}
-
-.chrono_field {
-  width: 32px;
-  padding: 2px 0;
-  background: transparent;
+.chrono-box__input {
+  width: 40px;
   border: none;
-  border-radius: 0;
-  text-align: center;
-  font-size: var(--fs-200);
+  background: transparent;
+  font-size: var(--fs-300);
   font-weight: var(--fw-semibold);
   color: var(--accent-dark);
-  font-family: var(--font-family-base);
-  transition: color 0.15s ease;
+  text-align: center;
+  font-family: var(--font-family-mono, monospace);
+  padding: 0;
+  -moz-appearance: textfield;
 }
 
-.chrono_field:focus {
-  outline: none;
-  color: var(--accent);
+.chrono-box__input:focus { outline: none; }
+
+.chrono-box__input::-webkit-inner-spin-button,
+.chrono-box__input::-webkit-outer-spin-button {
+  -webkit-appearance: auto;
+  opacity: 1;
 }
 
-/* Hide number spinners */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
+.chrono-box__unit {
+  font-size: var(--fs-100);
+  font-weight: var(--fw-medium);
+  color: var(--blue-slate);
+  line-height: 1;
+  user-select: none;
+}
+
+.chrono-colon {
+  font-size: var(--fs-300);
+  font-weight: var(--fw-semibold);
+  color: var(--blue-slate);
+  line-height: 1;
+  user-select: none;
 }
 
 
@@ -384,7 +388,7 @@ input[type="number"]::-webkit-outer-spin-button {
   flex-direction: column;
   gap: var(--space-3);
   background: white;
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--snooze-border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-4);
 }
@@ -762,7 +766,7 @@ input[type="number"]::-webkit-outer-spin-button {
   flex-direction: column;
   gap: var(--space-3);
   background: white;
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--snooze-border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-4);
 }

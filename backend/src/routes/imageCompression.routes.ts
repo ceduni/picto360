@@ -1,6 +1,4 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { readFile, unlink } from "fs/promises";
-import path from "path";
 import sharp from "sharp";
 
 export default async function imageCompressionRoutes(app: FastifyInstance) {

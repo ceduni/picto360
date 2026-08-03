@@ -149,7 +149,7 @@ export function prepareHotspotsForPictoExport(
   hotspots: HotspotData[] = [],
   includeLocalFiles: boolean,
 ): HotspotData[] {
-  return hotspots.map(({ pendingAsset, ...hotspot }) => {
+  return hotspots.map(({ pendingAsset: _pendingAsset, ...hotspot }) => {
     if (hotspot.assetSource === "local") {
       return {
         ...hotspot,

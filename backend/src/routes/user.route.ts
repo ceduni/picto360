@@ -5,9 +5,9 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 export default async function userRoutes (app:FastifyInstance){
     app.post("/users",{preHandler: authenticate},createNewUserProfile);
     app.put("/users",{preHandler: authenticate},updateUserProfile);
-    app.get("/users",{preHandler: authenticate}, async () =>{return User.find()} )
+    app.get("/users/search", {preHandler: authenticate}, searchUsers);
+    app.get("/users/by-uid/:uid",{preHandler: authenticate}, getUserByUid);
 }
-
 
 const createNewUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
     const userData = request.user;
@@ -30,7 +30,7 @@ const createNewUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>
                 displayName:user_name,
                 photoUrl:picture,
             })
-        }catch(error:any){
+        }catch{
             return reply.status(500).send({message:"Error while creating user Profile, try again"})
         }
     }
@@ -63,9 +63,39 @@ const updateUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
     try{
         await User.updateOne({uid:uid},{$set:update})
         return reply.send({message:"User updated"})
-    }catch(error:any){
+    }catch{
         return reply.status(500).send("Error on user update")
     }
-
-
 }
+
+const SAFE_USER_FIELDS = "uid email displayName photoUrl";
+
+const searchUsers = async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!(request as any).user) return reply.status(401).send({ message: "Unauthorised" });
+
+    const q = (request.query as any).q as string | undefined;
+    if (!q || q.trim().length < 2) {
+        return reply.status(400).send({ message: "Query must be at least 2 characters" });
+    }
+
+    const regex = new RegExp(q.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    const users = await User.find({
+        $or: [{ displayName: regex }, { email: regex }],
+    })
+        .select(SAFE_USER_FIELDS)
+        .limit(10)
+        .lean();
+
+    return reply.send(users);
+};
+
+const getUserByUid = async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!(request as any).user) return reply.status(401).send({ message: "Unauthorised" });
+
+    const { uid } = request.params as { uid: string };
+    const user = await User.findOne({ uid }).select(SAFE_USER_FIELDS).lean();
+    if (!user) return reply.status(404).send({ message: "User not found" });
+
+    return reply.send(user);
+};
+

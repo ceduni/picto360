@@ -34,22 +34,17 @@ export function useCreateActivity () {
                     name: "Team_Default",
                     supervised:false,
                     participantsNames: formValues.participantsList,
-                    supervisor_id:currentUser.uid,
                 } 
                 createdTeamList.push(participantsToTeam );
             }else{
-                if(formValues.supervised_teams){
-                    // TODO : Add supervisors is obligatory when supervised teams
-                    formValues.teamsList.map((team)=>{
-                        if (!team.supervisor_id) team.supervisor_id = currentUser.uid ;
-                        createdTeamList.push(team);
-                    })
-                }else{
-                    formValues.teamsList.map((team)=>{
-                        team.supervisor_id = currentUser.uid;
-                        createdTeamList.push(team);
-                    })
-                }
+              
+                // If the supervisor is not set explicitly, fallsback to the creator 
+                formValues.teamsList.map((team)=>{
+                    if (team.supervised && !team.supervisor_id) {
+                        team.supervisor_id = currentUser.uid
+                    }
+                    createdTeamList.push(team);
+                })
             }
             
             const newActivity = {
@@ -85,7 +80,7 @@ export function useCreateActivity () {
                 setBannerMessage({message:"Activité créée avec succès",type:"success"})
                 // console.log("Activity created successfully:", created);
             }
-        } catch (err:any) {
+        } catch {
                 setBannerMessage({message:"Erreur lors de la créaction d'activité",type:"failure"})
 
                 // setError(err);

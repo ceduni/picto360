@@ -1,7 +1,7 @@
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import { useFetchActivities } from "@/hooks/useGetUserActivities";
+import { useActivity } from "@/contexts/ActivityContext";
 import ErrorBanner from "@/components/FeedbackBanner";
 import {
     ArrowRightOnRectangleIcon,
@@ -12,7 +12,6 @@ import {
     CalendarIcon,
     BoltIcon,
     UsersIcon,
-    PhotoIcon,
 } from "@heroicons/react/24/outline";
 
 import{
@@ -23,6 +22,7 @@ import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import "./css/DrawerStyle.css";
 import "./css/ProfileDrawer.css";
 
 interface ProfileDrawerProps {
@@ -33,7 +33,7 @@ interface ProfileDrawerProps {
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
     const navigate = useNavigate();
     const { userLoggedIn, currentUser, updateUserName, updateUserProfilePic } = useAuth();
-    const { userActivities } = useFetchActivities();
+    const { userActivities } = useActivity();
     const [uname, setUname] = useState<string | null | undefined>(currentUser?.displayName);
     const [profilePic, setProfilePic] = useState<string>(currentUser?.photoURL ?? "");
     const [isEditing, setIsEditing] = useState(false);

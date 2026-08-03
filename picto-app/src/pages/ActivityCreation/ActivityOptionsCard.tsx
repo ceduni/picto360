@@ -2,7 +2,7 @@ import React from "react";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { FormControlLabel } from "@mui/material";
 import { ActivityIstance } from "@/utils/Types";
-import IOSSwitch from "../PagesUiComponents/IOSSwitch";
+import IOSSwitch from "../../components/IOSSwitch";
 
 interface Props {
     formValues: ActivityIstance;
@@ -69,28 +69,32 @@ const ActivityOptionsCard: React.FC<Props> = ({ formValues, setFormValues }) => 
                         </div>
                     </div>
                     {formValues.chrono.isEnabled && (
-                        <div className="add_clock-field">
-                            <ClockIcon width={15} height={15} className="chrono-icon" />
-                            <div className="chrono-inputs">
-                                <div className="chrono-field-group">
-                                    <input type="number" name="minutes"
-                                        value={formValues.chrono.minutes}
-                                        min={0} max={60}
-                                        onChange={onChangeChronoTime}
-                                        className="chrono_field"
-                                        placeholder="00" />
-                                    <span className="chrono-label">min</span>
-                                </div>
-                                <span className="chrono-separator">:</span>
-                                <div className="chrono-field-group">
-                                    <input type="number" name="seconds"
-                                        value={formValues.chrono.seconds}
-                                        min={0} max={60}
-                                        onChange={onChangeChronoTime}
-                                        className="chrono_field"
-                                        placeholder="00" />
-                                    <span className="chrono-label">sec</span>
-                                </div>
+                        <div className="chrono-picker">
+                            <ClockIcon width={17} height={17} className="chrono-icon" />
+                            <div className="chrono-box">
+                                <input
+                                    type="number"
+                                    name="minutes"
+                                    value={formValues.chrono.minutes}
+                                    min={0}
+                                    max={99}
+                                    onChange={onChangeChronoTime}
+                                    className="chrono-box__input"
+                                />
+                                <span className="chrono-box__unit">min</span>
+                            </div>
+                            <span className="chrono-colon">:</span>
+                            <div className="chrono-box">
+                                <input
+                                    type="number"
+                                    name="seconds"
+                                    value={formValues.chrono.seconds}
+                                    min={0}
+                                    max={59}
+                                    onChange={onChangeChronoTime}
+                                    className="chrono-box__input"
+                                />
+                                <span className="chrono-box__unit">sec</span>
                             </div>
                         </div>
                     )}

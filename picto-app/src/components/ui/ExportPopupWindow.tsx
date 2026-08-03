@@ -86,7 +86,7 @@ const ExportPopupWindow: React.FC<ExportPopupProps> = ({
       });
 
       await startDriveAuth(viewerId, { autoExport: true });
-    } catch (_error) {
+    } catch {
       setBannerMessage({ message: "Authentication failed, try again", type: "failure" });
     }
   };

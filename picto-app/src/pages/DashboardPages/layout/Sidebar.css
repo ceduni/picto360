@@ -2,8 +2,6 @@
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
   height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid var(--dust-grey);
   display: flex;
   flex-direction: column;
   padding: var(--space-5) var(--space-3);
@@ -28,7 +26,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--blue-slate);
+  color: var(--accent-dark);
   box-shadow: var(--shadow-sm);
   z-index: 10;
   transition: color 0.15s, background-color 0.15s;
@@ -78,7 +76,7 @@
   gap: var(--space-2);
   padding: var(--space-1) var(--space-2) var(--space-5);
   cursor: pointer;
-  border-bottom: 1px solid var(--dust-grey);
+  border-bottom: 1px solid var(--snooze-border-color);
   margin-bottom: var(--space-2);
 }
 
@@ -138,7 +136,7 @@
   flex-direction: column;
   gap: var(--space-1);
   padding-top: var(--space-3);
-  border-top: 1px solid var(--dust-grey);
+  border-top: 1px solid var(--snooze-border-color);
 }
 
 /* ── Activities section ── */
@@ -150,7 +148,7 @@
 
 .sidebar-section {
   padding: var(--space-3) 0 var(--space-2);
-  border-top: 1px solid var(--dust-grey);
+  border-top: 1px solid var(--snooze-border-color);
 }
 
 .sidebar-section__header {
