@@ -147,7 +147,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             try {
                 await createHotspot(hotspotData);
                 clearTargetIcon();
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la sauvegarde", type: "failure" });
             }
         },
@@ -158,7 +158,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         async (updatedHotspot: HotspotData): Promise<void> => {
             try {
                 await updateHotspot(updatedHotspot);
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la mise à jour", type: "failure" });
             }
         },
@@ -169,7 +169,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         async (toDeleteHotspot: HotspotData): Promise<void> => {
             try {
                 await deleteHotspot(toDeleteHotspot);
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la suppression", type: "failure" });
             }
         },

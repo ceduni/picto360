@@ -1,6 +1,7 @@
 picto-app/public/images/Manhattan.jpg
 
 # Node dependencies
+node_modules/
 */node_modules/
 
 # vite mudules cache

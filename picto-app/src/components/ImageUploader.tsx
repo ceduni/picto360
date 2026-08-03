@@ -34,7 +34,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
         try {
             onImageUpload(file);
             setBannerMessage({ message: "Fichier chargé avec succès", type: "success" })
-        } catch (error) {
+        } catch {
             setBannerMessage({ message: "Erreur de chargement de fichier", type: "failure" })
             return;
         }

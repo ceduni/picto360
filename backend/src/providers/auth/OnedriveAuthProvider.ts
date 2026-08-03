@@ -36,38 +36,38 @@ export class OnedriveAuthProvider extends BaseAuthProvider {
     return this.SCOPES;
   }
 
-  generateAuthUrl(state: string): string {
+  generateAuthUrl(_state: string): string {
     // TODO: Implement OneDrive auth URL generation
     // Example: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  async getTokensFromCode(code: string): Promise<AuthToken> {
+  async getTokensFromCode(_code: string): Promise<AuthToken> {
     // TODO: Implement token exchange with Microsoft Graph
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<AuthToken> {
+  async refreshAccessToken(_refreshToken: string): Promise<AuthToken> {
     // TODO: Implement token refresh
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  async verifyToken(token: AuthToken): Promise<boolean> {
+  async verifyToken(_token: AuthToken): Promise<boolean> {
     // TODO: Implement token verification
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  async revokeToken(token: string): Promise<void> {
+  async revokeToken(_token: string): Promise<void> {
     // TODO: Implement token revocation
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  async getUserInfo(accessToken: string): Promise<AuthUserInfo> {
+  async getUserInfo(_accessToken: string): Promise<AuthUserInfo> {
     // TODO: Implement user info retrieval from Microsoft Graph
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }
 
-  setCredentials(token: AuthToken): void {
+  setCredentials(_token: AuthToken): void {
     // TODO: Implement credentials setup
     throw new Error("OnedriveAuthProvider: Not yet implemented");
   }

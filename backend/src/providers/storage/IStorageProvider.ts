@@ -1,4 +1,4 @@
-import { ExportResult, UploadProgressCallback } from "@/types/export.types";
+import { UploadProgressCallback } from "@/types/export.types";
 
 /**
  * File metadata for storage

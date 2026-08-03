@@ -377,7 +377,7 @@ class ExportService {
     private async selectDirectory(): Promise<FileSystemDirectoryHandle> {
         try {
             return await (window as any).showDirectoryPicker({ mode: "readwrite" });
-        } catch (error) {
+        } catch {
             throw new Error("Failed to select directory");
         }
     }

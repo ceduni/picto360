@@ -22,10 +22,6 @@ const activityTaskSchema = new Schema<ActivityTask>(
 );
 
 // =========== Activity constraints =====================
-// Each constraint type has a known shape
-interface TimedConstraintValue    { durationSeconds: number; }
-interface ObjectsConstraintValue  { objects: string[]; cluesEnabled: boolean; }
-
 // constraint_value becomes Schema.Types.Mixed but validated at the app layer
 // — or use Mongoose discriminators 
 

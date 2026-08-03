@@ -1,7 +1,6 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyInstance } from "fastify";
 
 import { getExportService } from "@/services/export.service";
-import { ExportFormat, HotspotData } from "@/types/export.types";
 
 export default async function exportRoutes(app: FastifyInstance) {
   const exportService = getExportService();
