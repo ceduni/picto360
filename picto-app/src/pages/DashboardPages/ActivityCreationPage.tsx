@@ -36,7 +36,7 @@ const EMPTY_FORM: ActivityIstance = {
 };
 
 const hasContent = (fv: ActivityIstance) =>
-    fv.title.trim() !== "" && (
+    fv.title.trim() !== "" || (
     fv.description.trim() !== "" ||
     fv.tasks.length > 0 ||
     fv.tags.length > 0 ||
@@ -45,7 +45,7 @@ const hasContent = (fv: ActivityIstance) =>
 
 const ActivityCreationPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
-    const isEditMode = !!id;
+    const isEditMode = !!id;    // tells the page whether it is editing an existing activity or creating a new one
     const { key: locationKey } = useLocation();
 
     const [formValues, setFormValues] = useState<ActivityIstance>(EMPTY_FORM);
@@ -55,7 +55,7 @@ const ActivityCreationPage: React.FC = () => {
     const [initialTeamIdx, setInitialTeamIdx] = useState<number | undefined>();
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState<{ title: string; details?: string } | null>(null);
-    const [isDirty, setIsDirty] = useState(false);
+    const [isDirty, setIsDirty] = useState(false); //tracks whether the activity form has unsaved user changes
     const actionButtonUsed = useRef(false);
     const publishedActivityId = useRef<string | null>(null);
 

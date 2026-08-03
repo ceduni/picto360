@@ -101,8 +101,7 @@ export const handleAddTeamsToActivity = (formValues:ActivityIstance,newCount: nu
 
 export const handleDeleteTeamFromActivity = (formValues:ActivityIstance,indexToremove:number) =>{
     if (formValues.teamsList.length <= 0 || !formValues.teamsList.at(indexToremove) ) return formValues;
-    return {...formValues,teamsList : formValues.teamsList.filter(
-                                                                             (_,index) => index!=indexToremove )}
+    return {...formValues,teamsList : formValues.teamsList.filter((_,index) => index!=indexToremove )}
 }
 
 export const handleTeamNameChange = (formValues:ActivityIstance,index:number,newName:string)=>{

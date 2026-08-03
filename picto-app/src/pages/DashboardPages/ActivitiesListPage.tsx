@@ -62,9 +62,8 @@ const STATUS_MAP: Record<string, { label: string; cls: string }> = {
 
 type BadgeColor = "green" | "accent" | "slate" | "amber";
 
-function StatCard({ label, value, badge, badgeColor, subtitle, icon }: {
-    label: string; value: number; badge: string; badgeColor: BadgeColor;
-    subtitle: string; icon: React.ReactNode;
+function StatCard({ label, value, badge, badgeColor, icon }: {
+    label: string; value: number; badge: string; badgeColor: BadgeColor; icon: React.ReactNode;
 }) {
     return (
         <div className="alpage__stat">
@@ -219,7 +218,6 @@ const ActivitiesListPage: React.FC = () => {
                             value={stats.total}
                             badge="toutes catégories"
                             badgeColor="accent"
-                            subtitle="activités créées"
                             icon={<ClipboardDocumentListIcon width={16} height={16} />}
                         />
                         <StatCard
@@ -227,7 +225,6 @@ const ActivitiesListPage: React.FC = () => {
                             value={stats.participants}
                             badge="au total"
                             badgeColor="accent"
-                            subtitle="toutes activités confondues"
                             icon={<UserGroupIcon width={16} height={16} />}
                         />
                         <StatCard
@@ -235,7 +232,6 @@ const ActivitiesListPage: React.FC = () => {
                             value={stats.published}
                             badge={`${stats.pctPublished}% du total`}
                             badgeColor="green"
-                            subtitle="disponibles aux participants"
                             icon={<BoltIcon width={16} height={16} />}
                         />
                         <StatCard
@@ -243,7 +239,6 @@ const ActivitiesListPage: React.FC = () => {
                             value={stats.drafts}
                             badge={`${stats.pctDrafts}% du total`}
                             badgeColor="slate"
-                            subtitle="en cours de création"
                             icon={<DocumentIcon width={16} height={16} />}
                         />
                     </div>
