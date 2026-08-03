@@ -5,8 +5,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 export default async function userRoutes (app:FastifyInstance){
     app.post("/users",{preHandler: authenticate},createNewUserProfile);
     app.put("/users",{preHandler: authenticate},updateUserProfile);
-    app.get("/users/search", searchUsers);
-    app.get("/users/by-uid/:uid", getUserByUid);
+    app.get("/users/search", {preHandler: authenticate}, searchUsers);
+    app.get("/users/by-uid/:uid",{preHandler: authenticate}, getUserByUid);
 }
 
 const createNewUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
@@ -71,7 +71,6 @@ const updateUserProfile = async (request:FastifyRequest,reply:FastifyReply)=>{
 const SAFE_USER_FIELDS = "uid email displayName photoUrl";
 
 const searchUsers = async (request: FastifyRequest, reply: FastifyReply) => {
-    await authenticate(request, reply);
     if (!(request as any).user) return reply.status(401).send({ message: "Unauthorised" });
 
     const q = (request.query as any).q as string | undefined;
@@ -91,7 +90,6 @@ const searchUsers = async (request: FastifyRequest, reply: FastifyReply) => {
 };
 
 const getUserByUid = async (request: FastifyRequest, reply: FastifyReply) => {
-    await authenticate(request, reply);
     if (!(request as any).user) return reply.status(401).send({ message: "Unauthorised" });
 
     const { uid } = request.params as { uid: string };

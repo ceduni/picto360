@@ -34,22 +34,17 @@ export function useCreateActivity () {
                     name: "Team_Default",
                     supervised:false,
                     participantsNames: formValues.participantsList,
-                    supervisor_id:currentUser.uid,
                 } 
                 createdTeamList.push(participantsToTeam );
             }else{
-                if(formValues.supervised_teams){
-                    // TODO : Add supervisors is obligatory when supervised teams
-                    formValues.teamsList.map((team)=>{
-                        if (!team.supervisor_id) team.supervisor_id = currentUser.uid ;
-                        createdTeamList.push(team);
-                    })
-                }else{
-                    formValues.teamsList.map((team)=>{
-                        team.supervisor_id = currentUser.uid;
-                        createdTeamList.push(team);
-                    })
-                }
+              
+                // If the supervisor is not set explicitly, fallsback to the creator 
+                formValues.teamsList.map((team)=>{
+                    if (team.supervised && !team.supervisor_id) {
+                        team.supervisor_id = currentUser.uid
+                    }
+                    createdTeamList.push(team);
+                })
             }
             
             const newActivity = {

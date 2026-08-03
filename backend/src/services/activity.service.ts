@@ -54,7 +54,6 @@ async function resolveUser(request: FastifyRequest, reply: FastifyReply) {
 async function upsertTeams(
   teamsList: IncomingTeam[],
   currentTeamIds: mongoose.Types.ObjectId[],
-  supervisorUid: string,
   reply: FastifyReply
 ): Promise<mongoose.Types.ObjectId[] | null> {
   const updatedIds = new Set<string>();
@@ -83,7 +82,7 @@ async function upsertTeams(
     const fields = {
       teamName: team.name,
       supervised: team.supervised,
-      supervisorId: team.supervised ? (team.supervisor_id ?? "") : "",
+      supervisorId: team.supervisor_id ?? undefined,
       participantsList,
     };
 
@@ -141,7 +140,7 @@ export const updateDraft = async (
 ) => {
   const resolved = await resolveUser(request, reply);
   if (!resolved) return;
-  const { user, uid } = resolved;
+  const { user } = resolved;
 
   const { id } = request.params;
 
@@ -172,7 +171,6 @@ export const updateDraft = async (
       const teamIds = await upsertTeams(
         teamsList,
         activity.teams as unknown as mongoose.Types.ObjectId[],
-        uid,
         reply
       );
       if (!teamIds) return;
