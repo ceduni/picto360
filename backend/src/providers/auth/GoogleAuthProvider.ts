@@ -1,6 +1,6 @@
 import { BaseAuthProvider } from "./BaseAuthProvider";
 import { AuthToken, OAuthProviderType, AuthProviderConfig, AuthUserInfo } from "@/types/auth.types";
-import { Auth, google } from "googleapis";
+import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 
 export class GoogleAuthProvider extends BaseAuthProvider {
@@ -92,7 +92,7 @@ export class GoogleAuthProvider extends BaseAuthProvider {
       });
 
       return response.ok;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

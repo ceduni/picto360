@@ -44,14 +44,7 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
   ): Promise<{ id: string; name: string }> {
     const drive = google.drive({ version: "v3", auth: this.oauth2Client });
 
-    // ✅ LOG 1: Starting upload with file info
-    console.log("📤 [UPLOAD START]", {
-      fileName: metadata.name,
-      fileSize: fileBuffer.length,
-      mimeType: metadata.mimeType,
-      timestamp: new Date().toISOString(),
-    });
-
+    // Starting upload with file info
     const fileMetadata = {
       name: metadata.name,
       parents: [folderId],
@@ -63,17 +56,10 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
     const CHUNK_SIZE = 64 * 1024; // 64KB chunks
 
     try {
-      // ✅ LOG 2: Creating readable stream from buffer chunks
-      console.log("🔧 [STREAM SETUP]", {
-        chunkSize: CHUNK_SIZE,
-        totalChunks: Math.ceil(fileSize / CHUNK_SIZE),
-        totalSize: fileSize,
-      });
-
-      // ✅ Generator function yields buffer chunks
+      // Creating readable stream from buffer chunks
+      // Generator function yields buffer chunks
       const chunkGenerator = function* () {
         let offset = 0;
-        let chunkNumber = 0;
 
         while (offset < fileBuffer.length) {
           const chunk = fileBuffer.slice(
@@ -81,33 +67,19 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
             Math.min(offset + CHUNK_SIZE, fileBuffer.length)
           );
 
-          // ✅ LOG 3: Each chunk being yielded
-          console.log(`📦 [CHUNK ${chunkNumber}]`, {
-            offset,
-            chunkSize: chunk.length,
-            progress: `${((offset + chunk.length) / fileSize * 100).toFixed(1)}%`,
-          });
-
           yield chunk;
           offset += CHUNK_SIZE;
-          chunkNumber++;
         }
       };
 
-      // ✅ LOG 4: Creating Readable stream from generator
-      console.log("🌊 [READABLE STREAM] Creating from generator");
+      // Creating Readable stream from generator
       const readableStream = Readable.from(chunkGenerator());
 
-      // ✅ LOG 5: Track data as it flows through stream
+      // Track data as it flows through stream
+      // Each time a chunk is read by the providor API, we update the percentage and an SSE is sent
       readableStream.on("data", (chunk: Buffer) => {
         uploadedBytes += chunk.length;
         const percent = ((uploadedBytes / fileSize) * 100).toFixed(2);
-
-        console.log(`📊 [DATA EVENT] Chunk read by API`, {
-          bytesRead: chunk.length,
-          totalUploaded: uploadedBytes,
-          progress: `${percent}%`,
-        });
 
         if (onProgress) {
           onProgress("upload-progress", {
@@ -119,20 +91,13 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
         }
       });
 
-      // ✅ LOG 6: Stream events
-      readableStream.on("end", () => {
-        console.log("✅ [STREAM END] All data has been read");
-      });
-
       readableStream.on("error", (err) => {
-        console.error("❌ [STREAM ERROR]", err);
+        throw(`An Error occured during the upload, please try again:` + err)
       });
 
-      // ✅ LOG 7: Before API call
-      console.log("🚀 [API CALL] Sending to Google Drive API");
-      const startTime = Date.now();
+      // Sending stream to Google Drive APIs;
 
-      // ✅ Pass stream to API - no race condition because generator is lazy
+      // Pass stream to API - no race condition because generator is lazy
       const response = await drive.files.create(
         {
           requestBody: fileMetadata,
@@ -147,17 +112,6 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
         },
       );
 
-      const uploadTime = Date.now() - startTime;
-
-      // ✅ LOG 8: Success response
-      console.log("✨ [UPLOAD SUCCESS]", {
-        fileId: response.data.id,
-        fileName: response.data.name,
-        uploadTimeMs: uploadTime,
-        finalSize: uploadedBytes,
-        expectedSize: fileSize,
-        sizeMatch: uploadedBytes === fileSize,
-      });
 
       if (onProgress) {
         onProgress("upload-complete", { fileId: response.data.id });
@@ -168,14 +122,6 @@ export class GoogleDriveStorageProvider extends BaseStorageProvider {
         name: response.data.name!,
       };
     } catch (error) {
-      // ✅ LOG 9: Detailed error logging
-      console.error("❌ [UPLOAD FAILED]", {
-        fileName: metadata.name,
-        fileSize,
-        uploadedBytes,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
       throw new Error(`GoogleDrive: Failed to upload file: ${error}`);
     }
   }

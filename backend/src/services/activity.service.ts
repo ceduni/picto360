@@ -1,19 +1,18 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import ActivityModels, { IConstraint } from "../models/activity.model";
-import { authenticate } from "@/middlewares/firebaseAuth";
 import { User } from "@/models/user.model";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
 
 const { Activity } = ActivityModels;
 
-interface ActivityTask {
+export interface ActivityTask {
   title: string;
   level: "EASY" | "MEDIUM" | "HARD";
   points?: number;
 }
 
-interface IncomingTeam {
+export interface IncomingTeam {
   _id?: string;          // MongoDB ObjectId — present for existing teams, absent for new ones
   name: string;
   participants: { id: string; name: string }[];
@@ -21,11 +20,11 @@ interface IncomingTeam {
   supervisor_id?: string;
 }
 
-interface CreateDraftBody {
+export interface CreateDraftBody {
   title: string;
 }
 
-interface UpdateDraftBody {
+export interface UpdateDraftBody {
   title?: string;
   description?: string;
   mode?: "SOLO" | "COLLABORATIVE" | "COMPETITIVE";
@@ -38,8 +37,7 @@ interface UpdateDraftBody {
 }
 
 async function resolveUser(request: FastifyRequest, reply: FastifyReply) {
-  await authenticate(request, reply);
-  const firebaseUser = (request as any).user;
+  const firebaseUser = request.user;
   if (!firebaseUser) {
     reply.status(401).send({ message: "Unauthorized" });
     return null;
@@ -220,7 +218,7 @@ export const getActivities = async (request: FastifyRequest, reply: FastifyReply
   try {
     const resolved = await resolveUser(request, reply);
     if (!resolved) return;
-    const { user: mongoUser, uid } = resolved;
+    const { user: mongoUser } = resolved;
 
     const userId = mongoUser._id;
 

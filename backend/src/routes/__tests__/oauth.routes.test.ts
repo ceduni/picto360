@@ -4,35 +4,41 @@
  */
 
 import { describe, it, expect, beforeEach, jest, afterEach } from "@jest/globals";
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest } from "fastify";
 import { AuthService } from "@/services/auth.service";
 import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
+import { AuthStatus, OAuthCallbackResult } from "@/types/auth.types";
 
 // Mock dependencies
 jest.mock("@/services/auth.service");
 
+type OAuthTestQuery = {
+  code?: string;
+  state?: string;
+  error?: string;
+  error_description?: string;
+};
+
+type MockAuthService = Pick<
+  AuthService,
+  "generateAuthUrl" | "exchangeCodeToToken" | "getAuthStatus" | "disconnect"
+>;
+
 describe("OAuth Routes", () => {
-  let mockApp: jest.Mocked<FastifyInstance>;
   let mockRequest: jest.Mocked<FastifyRequest>;
-  let mockReply: jest.Mocked<FastifyReply>;
-  let mockAuthService: jest.Mocked<AuthService>;
+  let mockAuthService: jest.Mocked<MockAuthService>;
   let authProvider: ReturnType<typeof AuthProviderFactory.getProvider>;
 
   beforeEach(() => {
-    mockApp = {
-      get: jest.fn(),
-      post: jest.fn(),
-    } as unknown as jest.Mocked<FastifyInstance>;
-
     mockAuthService = {
       generateAuthUrl: jest
         .fn()
         .mockReturnValue("https://accounts.google.com/oauth/authorize?state=random-state&client_id=..."),
-      handleOAuthCallback: jest.fn<() => Promise<{ redirectTo: string; provider: string }>>().mockResolvedValue({
+      exchangeCodeToToken: jest.fn<(request: FastifyRequest, code: string) => Promise<OAuthCallbackResult>>().mockResolvedValue({
         redirectTo: "/?auth=success",
         provider: "google",
       }),
-      getAuthStatus: jest.fn<() => Promise<{ isAuthenticated: boolean; provider: string; scopes: string[] }>>().mockResolvedValue({
+      getAuthStatus: jest.fn<(request: FastifyRequest) => Promise<AuthStatus>>().mockResolvedValue({
         isAuthenticated: true,
         provider: "google",
         scopes: ["profile", "email"],
@@ -42,25 +48,27 @@ describe("OAuth Routes", () => {
 
     mockRequest = {
       session: {
-        google: {
+        sessionId: "session-123",
+        encryptedSessionId: "encrypted-session-123",
+        touch: jest.fn(),
+        regenerate: jest.fn(),
+        reload: jest.fn(),
+        save: jest.fn(),
+        destroy: jest.fn(),
+        cookie: {},
+        auth_google: {
           access_token: "mock-token",
           refresh_token: "mock-refresh",
           expiry: Date.now() + 3600000,
+          provider: "google",
+          user_id: "user-123",
         },
       },
       query: {
         code: "auth-code-123",
         state: "state-123",
       },
-      sessionId: "session-123",
     } as unknown as jest.Mocked<FastifyRequest>;
-
-    mockReply = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis(),
-      redirect: jest.fn().mockReturnThis(),
-      code: jest.fn().mockReturnThis(),
-    } as unknown as jest.Mocked<FastifyReply>;
 
     const provider_name = "google";
     AuthProviderFactory.createProvider(provider_name, {
@@ -108,77 +116,77 @@ describe("OAuth Routes", () => {
 
   describe("GET /oauth/google/callback", () => {
     it("should extract authorization code from query", () => {
-      const code = mockRequest.query.code as string;
+      const code = (mockRequest.query as OAuthTestQuery).code;
       expect(code).toBe("auth-code-123");
     });
 
     it("should extract state parameter from query", () => {
-      const state = mockRequest.query.state as string;
+      const state = (mockRequest.query as OAuthTestQuery).state;
       expect(state).toBe("state-123");
     });
 
     it("should handle callback with code and state", async () => {
-      const result = await mockAuthService.handleOAuthCallback(
+      const result = await mockAuthService.exchangeCodeToToken(
         mockRequest,
-        mockRequest.query.code as string
+        (mockRequest.query as OAuthTestQuery).code as string
       );
 
       expect(result.provider).toBe("google");
-      expect(mockAuthService.handleOAuthCallback).toHaveBeenCalledWith(mockRequest, "auth-code-123");
+      expect(mockAuthService.exchangeCodeToToken).toHaveBeenCalledWith(mockRequest, "auth-code-123");
     });
 
     it("should store tokens in session", async () => {
-      mockRequest.session.save = jest.fn().mockResolvedValue(undefined);
+      mockRequest.session.save = jest.fn<any>().mockResolvedValue(undefined);
 
-      await mockAuthService.handleOAuthCallback(mockRequest, mockRequest.query.code as string);
+      await mockAuthService.exchangeCodeToToken(mockRequest, (mockRequest.query as OAuthTestQuery).code as string);
 
-      expect(mockAuthService.handleOAuthCallback).toHaveBeenCalled();
+      expect(mockAuthService.exchangeCodeToToken).toHaveBeenCalled();
     });
 
     it("should redirect to success page on success", async () => {
-      const result = await mockAuthService.handleOAuthCallback(mockRequest, "auth-code-123");
+      const result = await mockAuthService.exchangeCodeToToken(mockRequest, "auth-code-123");
 
       expect(result.redirectTo).toContain("/?auth=success");
     });
 
     it("should handle invalid authorization code", async () => {
-      mockAuthService.handleOAuthCallback = jest
-        .fn()
+      mockAuthService.exchangeCodeToToken = jest
+        .fn<(request: FastifyRequest, code: string) => Promise<OAuthCallbackResult>>()
         .mockRejectedValue(new Error("Invalid authorization code"));
 
-      await expect(mockAuthService.handleOAuthCallback(mockRequest, "invalid-code")).rejects.toThrow(
+      await expect(mockAuthService.exchangeCodeToToken(mockRequest, "invalid-code")).rejects.toThrow(
         "Invalid authorization code"
       );
     });
 
     it("should handle missing authorization code", async () => {
-      mockRequest.query.code = undefined;
+      (mockRequest.query as OAuthTestQuery).code = undefined;
 
       // Should either throw or handle gracefully
-      expect(mockRequest.query.code).toBeUndefined();
+      expect((mockRequest.query as OAuthTestQuery).code).toBeUndefined();
     });
 
     it("should handle expired authorization code", async () => {
-      mockAuthService.handleOAuthCallback = jest
-        .fn()
+      mockAuthService.exchangeCodeToToken = jest
+        .fn<(request: FastifyRequest, code: string) => Promise<OAuthCallbackResult>>()
         .mockRejectedValue(new Error("Authorization code expired"));
 
-      await expect(mockAuthService.handleOAuthCallback(mockRequest, "expired-code")).rejects.toThrow(
+      await expect(mockAuthService.exchangeCodeToToken(mockRequest, "expired-code")).rejects.toThrow(
         "Authorization code expired"
       );
     });
 
     it("should handle callback error parameter", async () => {
-      mockRequest.query.error = "access_denied";
+      (mockRequest.query as OAuthTestQuery).error = "access_denied";
 
-      expect(mockRequest.query.error).toBe("access_denied");
+      expect((mockRequest.query as OAuthTestQuery).error).toBe("access_denied");
     });
 
     it("should handle callback error_description", async () => {
-      mockRequest.query.error = "invalid_scope";
-      mockRequest.query.error_description = "The user denied access";
+      (mockRequest.query as OAuthTestQuery).error = "invalid_scope";
+      (mockRequest.query as OAuthTestQuery).error_description = "The user denied access";
 
-      expect(mockRequest.query.error_description).toBe("The user denied access");
+      expect((mockRequest.query as OAuthTestQuery).error_description).toBe("The user denied access");
     });
   });
 
@@ -203,10 +211,11 @@ describe("OAuth Routes", () => {
     });
 
     it("should return not authenticated when no session", async () => {
-      mockRequest.session.google = undefined;
-      mockAuthService.getAuthStatus = jest.fn().mockResolvedValue({
+      mockRequest.session.auth_google = undefined;
+      mockAuthService.getAuthStatus = jest.fn<(request: FastifyRequest) => Promise<AuthStatus>>().mockResolvedValue({
         isAuthenticated: false,
         provider: "google",
+        scopes: [],
       });
 
       const status = await mockAuthService.getAuthStatus(mockRequest);
@@ -215,9 +224,10 @@ describe("OAuth Routes", () => {
     });
 
     it("should include token expiry", async () => {
-      mockAuthService.getAuthStatus = jest.fn().mockResolvedValue({
+      mockAuthService.getAuthStatus = jest.fn<(request: FastifyRequest) => Promise<AuthStatus>>().mockResolvedValue({
         isAuthenticated: true,
         provider: "google",
+        scopes: [],
         expiresAt: Date.now() + 3600000,
       });
 
@@ -227,10 +237,11 @@ describe("OAuth Routes", () => {
     });
 
     it("should include user information", async () => {
-      mockAuthService.getAuthStatus = jest.fn().mockResolvedValue({
+      mockAuthService.getAuthStatus = jest.fn<(request: FastifyRequest) => Promise<AuthStatus>>().mockResolvedValue({
         isAuthenticated: true,
         provider: "google",
-        user: { id: "user-123" },
+        scopes: [],
+        user: { uid: "user-123", providerId: "google" },
       });
 
       const status = await mockAuthService.getAuthStatus(mockRequest);
@@ -239,7 +250,7 @@ describe("OAuth Routes", () => {
     });
 
     it("should refresh token if expiring", async () => {
-      mockRequest.session.google = {
+      mockRequest.session.auth_google = {
         access_token: "expiring-token",
         refresh_token: "refresh-token",
         expiry: Date.now() + 5000, // Expiring soon
@@ -280,8 +291,8 @@ describe("OAuth Routes", () => {
     });
 
     it("should handle disconnect when not authenticated", async () => {
-      mockRequest.session.google = undefined;
-      mockAuthService.disconnect = jest.fn().mockResolvedValue(false);
+      mockRequest.session.auth_google = undefined;
+      mockAuthService.disconnect = jest.fn<() => Promise<boolean>>().mockResolvedValue(false);
 
       const result = await mockAuthService.disconnect(mockRequest);
 
@@ -289,7 +300,7 @@ describe("OAuth Routes", () => {
     });
 
     it("should handle revocation failure gracefully", async () => {
-      mockAuthService.disconnect = jest.fn().mockResolvedValue(true);
+      mockAuthService.disconnect = jest.fn<() => Promise<boolean>>().mockResolvedValue(true);
 
       const result = await mockAuthService.disconnect(mockRequest);
 
@@ -299,7 +310,7 @@ describe("OAuth Routes", () => {
 
   describe("Multi-Provider Support", () => {
     it("should support Google provider", () => {
-      expect(mockRequest.session.google).toBeDefined();
+      expect(mockRequest.session.auth_google).toBeDefined();
     });
 
     it("should support JWT provider", () => {
@@ -326,33 +337,33 @@ describe("OAuth Routes", () => {
 
   describe("Error Handling", () => {
     it("should handle missing credentials", async () => {
-      mockAuthService.handleOAuthCallback = jest
-        .fn()
+      mockAuthService.exchangeCodeToToken = jest
+        .fn<(request: FastifyRequest, code: string) => Promise<OAuthCallbackResult>>()
         .mockRejectedValue(new Error("Missing OAuth credentials"));
 
-      await expect(mockAuthService.handleOAuthCallback(mockRequest, "code")).rejects.toThrow(
+      await expect(mockAuthService.exchangeCodeToToken(mockRequest, "code")).rejects.toThrow(
         "Missing OAuth credentials"
       );
     });
 
     it("should handle network errors", async () => {
-      mockAuthService.handleOAuthCallback = jest
-        .fn()
+      mockAuthService.exchangeCodeToToken = jest
+        .fn<(request: FastifyRequest, code: string) => Promise<OAuthCallbackResult>>()
         .mockRejectedValue(new Error("Network error"));
 
-      await expect(mockAuthService.handleOAuthCallback(mockRequest, "code")).rejects.toThrow(
+      await expect(mockAuthService.exchangeCodeToToken(mockRequest, "code")).rejects.toThrow(
         "Network error"
       );
     });
 
     it("should handle invalid session", async () => {
-      mockRequest.session = null;
+      (mockRequest as unknown as { session: null }).session = null;
 
       expect(mockRequest.session).toBeNull();
     });
 
     it("should handle token refresh errors in status check", async () => {
-      mockAuthService.getAuthStatus = jest.fn().mockRejectedValue(new Error("Token refresh failed"));
+      mockAuthService.getAuthStatus = jest.fn<(request: FastifyRequest) => Promise<AuthStatus>>().mockRejectedValue(new Error("Token refresh failed"));
 
       await expect(mockAuthService.getAuthStatus(mockRequest)).rejects.toThrow(
         "Token refresh failed"
@@ -375,7 +386,7 @@ describe("OAuth Routes", () => {
     });
 
     it("should not expose tokens in logs", async () => {
-      const result = await mockAuthService.handleOAuthCallback(mockRequest, "code");
+      const result = await mockAuthService.exchangeCodeToToken(mockRequest, "code");
 
       expect(result.redirectTo).toBeDefined();
       // Token should NOT be in the redirect URL
@@ -383,8 +394,8 @@ describe("OAuth Routes", () => {
     });
 
     it("should require authenticated session for disconnect", async () => {
-      mockRequest.session.google = undefined;
-      mockAuthService.disconnect = jest.fn().mockResolvedValue(false);
+      mockRequest.session.auth_google = undefined;
+      mockAuthService.disconnect = jest.fn<() => Promise<boolean>>().mockResolvedValue(false);
 
       const result = await mockAuthService.disconnect(mockRequest);
 
@@ -392,7 +403,7 @@ describe("OAuth Routes", () => {
     });
 
     it("should validate state parameter on callback", () => {
-      const state = mockRequest.query.state as string;
+      const state = (mockRequest.query as OAuthTestQuery).state;
 
       expect(state).toBeDefined();
       expect(typeof state).toBe("string");
@@ -407,7 +418,7 @@ describe("OAuth Routes", () => {
 
   describe("Session Management", () => {
     it("should preserve session across requests", async () => {
-      const sessionId = mockRequest.sessionId;
+      const sessionId = mockRequest.session.sessionId;
 
       expect(sessionId).toBe("session-123");
     });

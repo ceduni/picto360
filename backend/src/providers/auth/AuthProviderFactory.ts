@@ -1,7 +1,6 @@
-import { IAuthProvider, AuthProviderConfig, OAuthProviderType } from "@/types/auth.types";
+import { AuthProviderConfig, OAuthProviderType } from "@/types/auth.types";
 import { GoogleAuthProvider } from "./GoogleAuthProvider";
-import { JWTAuthProvider } from "./JWTAuthProvider";
-import { OnedriveAuthProvider } from "./OnedriveAuthProvider";
+import { IAuthProvider } from "./BaseAuthProvider";
 
 /**
  * Factory for creating auth provider instances
@@ -23,12 +22,6 @@ export class AuthProviderFactory {
     switch (type) {
       case "google":
         provider = new GoogleAuthProvider(config);
-        break;
-      case "jwt":
-        provider = new JWTAuthProvider(config);
-        break;
-      case "onedrive":
-        provider = new OnedriveAuthProvider(config);
         break;
       default:
         throw new Error(`Unknown auth provider type: ${type}`);

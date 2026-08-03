@@ -15,10 +15,8 @@ import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
 import oauthRoutes from "./routes/oauth.routes";
 import activityRoutes from "./routes/activity.routes";
-import Team from "./models/team.model";
 import userRoutes from "./routes/user.route";
 import exportRoutes from "./routes/export.routes";
-import authAndExportRoutes from "./routes/auth_and_export.routes";
 import fastifyCookie  from "@fastify/cookie";
 import fastifySession from "@fastify/session";
 
@@ -78,7 +76,6 @@ const setupServer = async () => {
     // Register the OAuth + export routes (require Google credentials)
     if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       fastify.register(oauthRoutes);
-      fastify.register(authAndExportRoutes);
       fastify.register(exportRoutes);
     } else {
       fastify.log.warn("GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Drive/export routes disabled");

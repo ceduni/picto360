@@ -85,7 +85,7 @@ export function useCreateActivity () {
                 setBannerMessage({message:"Activité créée avec succès",type:"success"})
                 // console.log("Activity created successfully:", created);
             }
-        } catch (err:any) {
+        } catch {
                 setBannerMessage({message:"Erreur lors de la créaction d'activité",type:"failure"})
 
                 // setError(err);

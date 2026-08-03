@@ -7,7 +7,6 @@ import {
     addNewParticipants,
     handleAddTeamsToActivity,
     handleDeleteTeamFromActivity,
-    handleTeamNameChange,
     handleParticipantNameChange,
     handleDeleteParticipant,
 } from "@/utils/ActivityCreactionUtils";
@@ -30,9 +29,6 @@ const ParticipantsColumn: React.FC<Props> = ({
 
     const deleteTeam = (index: number) =>
         setFormValues(handleDeleteTeamFromActivity(formValues, index));
-
-    const changeTeamName = (index: number, name: string) =>
-        setFormValues(handleTeamNameChange(formValues, index, name));
 
     const setTypeSolo = () => {
         if (formValues.type === "group") setFormValues({ ...formValues, type: "solo" });

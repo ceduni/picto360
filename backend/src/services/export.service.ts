@@ -1,11 +1,10 @@
-import { FastifyRequest } from "fastify";
-import { ExportInput, ExportResult } from "@/types/export.types";
+import { FastifyReply, FastifyRequest } from "fastify";
+import { ExportFormat, ExportInput, HotspotData } from "@/types/export.types";
 import { AuthService, getAuthService } from "./auth.service";
 import { getNotificationHubService } from "./notificationHub.service";
 import { GoogleDriveStorageProvider } from "@/providers/storage/GoogleDriveStorageProvider";
 import { ExportFormatterFactory } from "@/providers/export/ExportFormatterFactory";
 import { google } from "googleapis";
-import { auth } from "firebase-admin";
 import { AuthProviderFactory } from "@/providers/auth/AuthProviderFactory";
 import "@/config/env"; // Ensure environment variables are loaded
 
@@ -15,19 +14,58 @@ import "@/config/env"; // Ensure environment variables are loaded
  * Uses pluggable formatters and storage providers
  */
 export class ExportService {
-  private authService = getAuthService("google");
-  private notificationHub = getNotificationHubService();
-  private googleStorageProvider : GoogleDriveStorageProvider | undefined = undefined;
+  private authService: AuthService;
+  private notificationHub: ReturnType<typeof getNotificationHubService>;
 
   constructor(authService : AuthService,
               notificationHub : ReturnType<typeof getNotificationHubService>,
-              googleStorageProvider? : GoogleDriveStorageProvider,
-              authProviderFactory? : AuthProviderFactory
+              _authProviderFactory? : AuthProviderFactory
             ){
     this.authService = authService;
     this.notificationHub = notificationHub;
-    if (googleStorageProvider) {
-      this.googleStorageProvider = googleStorageProvider;
+  }
+
+  async buildExportOptions (request: FastifyRequest, reply: FastifyReply):Promise<ExportInput>{
+    const formFields: Record<string, string> = {};
+    let fileBuffer: Buffer | null = null;
+
+    // Iterate through ALL multipart parts
+    const parts = request.parts();
+    for await (const part of parts) {
+      if (part.type === 'file') {
+        // Handle file part
+        fileBuffer = await part.toBuffer();
+      } else if (part.type === 'field') {
+        // Handle text field parts
+        formFields[part.fieldname] = part.value as string;
+      }
+    }
+
+    if (!fileBuffer || fileBuffer.length === 0) {
+      return reply.status(400).send({ error: 'Image or picto file required' });
+    }
+
+    const format = formFields.format as ExportFormat || 'picto';
+    let annotations: HotspotData[] | undefined = undefined;
+
+    if (format === "raw" && formFields.annotations) {
+      try {
+        annotations = JSON.parse(formFields.annotations);
+      } catch {
+        return reply.status(400).send('Error: Invalid annotations JSON');
+      }
+    }
+    const options = { 
+      format,
+      fileName: formFields.fileName || undefined,
+      folderName: formFields.folderName || undefined,
+      includeMetadata: formFields.includeMetadata === 'true'
+    }
+
+    return {
+      fileBuffer,
+      annotations,
+      options,
     }
   }
 
@@ -35,8 +73,10 @@ export class ExportService {
    * Export file to Google Drive
    * Handles auth, storage provider setup, and format selection
    */
-  async exportToGoogleDrive(request: FastifyRequest, input: ExportInput): Promise<ExportResult> {
+  async exportToGoogleDrive(request: FastifyRequest, reply: FastifyReply){
     try {
+      const export_input :ExportInput= await this.buildExportOptions(request,reply);
+
       // Ensure valid auth and get access token
       const accessToken = await this.authService.ensureConnection(request);
       const scope = this.authService.getSessionScope(request);
@@ -54,10 +94,9 @@ export class ExportService {
 
       // Create storage provider
       const storage = new GoogleDriveStorageProvider(oauth2Client);
-      this.googleStorageProvider = storage; // Store for potential reuse
 
       // Create export folder
-      const folderName = input.options.folderName || "360° Image Annotations";
+      const folderName = export_input.options.folderName || "360° Image Annotations";
       const folderId = await storage.createFolder(folderName);
 
       // Notify client: folder created
@@ -68,12 +107,12 @@ export class ExportService {
       });
 
       // Get formatter and export
-      const format = input.options.format;
+      const format = export_input.options.format;
       const formatter = ExportFormatterFactory.getFormatter(format);
       const exportResult = await formatter.export(
-        input.fileBuffer,
-        input.annotations,
-        input.options,
+        export_input.fileBuffer,
+        export_input.annotations,
+        export_input.options,
         storage,
         folderId,
         (event, data) => {
@@ -101,10 +140,9 @@ export class ExportService {
         },
       );
 
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Export failed",
-      };
+      reply.status(500).send({
+        error: error instanceof Error ? error.message : 'Export failed'
+      });
     }
   }
 }

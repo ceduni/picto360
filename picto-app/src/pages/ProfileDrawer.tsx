@@ -1,6 +1,5 @@
 import { useAuth } from "@/authContext/authContext";
 import { doSignOut } from "@/firebase/authentification";
-import { updateUserName } from "@/firebase/userProfileUpdates";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { useActivity } from "@/contexts/ActivityContext";
 import ErrorBanner from "@/components/FeedbackBanner";
@@ -33,11 +32,18 @@ interface ProfileDrawerProps {
 
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
     const navigate = useNavigate();
-    const { userLoggedIn, currentUser } = useAuth();
+    const { userLoggedIn, currentUser, updateUserName, updateUserProfilePic } = useAuth();
     const { userActivities } = useActivity();
     const [uname, setUname] = useState<string | null | undefined>(currentUser?.displayName);
+    const [profilePic, setProfilePic] = useState<string>(currentUser?.photoURL ?? "");
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const { setBannerMessage, bannerRef } = useFeedbackBanner();
+
+    useEffect(() => {
+        setUname(currentUser?.displayName);
+        setProfilePic(currentUser?.photoURL ?? "");
+    }, [currentUser?.displayName, currentUser?.photoURL]);
 
     if (!open) return null;
 
@@ -48,24 +54,43 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
         }
     };
 
-    const handleUpdateUserName = async (newName: string) => {
+    const handleSave = async () => {
+        if (!currentUser) return;
+
+        const nextName = uname?.trim();
+        const nextProfilePic = profilePic.trim() || null;
+        const profileUpdates: Promise<void>[] = [];
+
+        if (!nextName) {
+            setBannerMessage({ message: "Le nom ne peut pas être vide", type: "failure" });
+            return;
+        }
+
+        if (nextName !== (currentUser.displayName ?? "")) {
+            profileUpdates.push(updateUserName(nextName));
+        }
+
+        if (nextProfilePic !== (currentUser.photoURL ?? null)) {
+            profileUpdates.push(updateUserProfilePic(nextProfilePic));
+        }
+
         try {
-            if (currentUser) {
-                await updateUserName(newName);
-                setBannerMessage({ message: "Nom actualisé avec succès", type: "success" });
-            }
+            setIsSaving(true);
+            await Promise.all(profileUpdates);
+            setUname(nextName);
+            setProfilePic(nextProfilePic ?? "");
+            setBannerMessage({ message: "Profil actualisé avec succès", type: "success" });
+            setIsEditing(false);
         } catch {
             setBannerMessage({ message: "Erreur lors de la mise à jour", type: "failure" });
+        } finally {
+            setIsSaving(false);
         }
-    };
-
-    const handleSave = async () => {
-        if (uname) await handleUpdateUserName(uname);
-        setIsEditing(false);
     };
 
     const handleCancel = () => {
         setUname(currentUser?.displayName);
+        setProfilePic(currentUser?.photoURL ?? "");
         setIsEditing(false);
     };
 
@@ -102,16 +127,16 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ open, onClose }) => {
                         {/* Hero */}
                         <div className="profile_hero">
                             <img
-                                src={currentUser?.photoURL ?? "https://picsum.photos/200/300"}
+                                src={profilePic || currentUser?.photoURL || "https://picsum.photos/200/300"}
                                 alt="Photo de profil"
                                 className="profile_avatar"
                             />
                             {isEditing ? (
                                 <div className="profile_hero__edit-actions">
-                                    <button className="button__primary" onClick={handleSave}>
-                                        <CheckIcon width={14} height={14} /> Enregistrer
+                                    <button className="button__primary" onClick={handleSave} disabled={isSaving}>
+                                        <CheckIcon width={14} height={14} /> {isSaving ? "Enregistrement" : "Enregistrer"}
                                     </button>
-                                    <button className="button__secondary" onClick={handleCancel}>
+                                    <button className="button__secondary" onClick={handleCancel} disabled={isSaving}>
                                         <XMarkIcon width={14} height={14} />
                                     </button>
                                 </div>
