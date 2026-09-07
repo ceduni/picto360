@@ -4,19 +4,29 @@ import { getViewerItem } from "@/utils/storedImageData";
 import { hydrateStoredHotspots } from "@/utils/HotspotAssetUtils";
 import type { HotspotData } from "@/utils/Types";
 
+export type ViewerMediaType = "image" | "video";
+
 interface UseViewerDataProps {
     viewerId: string;
 }
 
 interface UseViewerDataReturn {
-    imageSource: string | null;
+    imageSource: string | null; // deprecated alias of mediaSource, kept for callers
+    mediaSource: string | null;
+    mediaType: ViewerMediaType;
     hotspots: HotspotData[];
     isLoading: boolean;
     error: Error | null;
 }
 
+const resolveMediaType = (item?: { mimeType?: string; blob?: Blob; compressedBlob?: Blob }): ViewerMediaType => {
+    const mimeType = item?.mimeType ?? item?.compressedBlob?.type ?? item?.blob?.type ?? "";
+    return mimeType.startsWith("video/") ? "video" : "image";
+};
+
 export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataReturn => {
     const [imageSource, setImageSource] = useState<string | null>(null);
+    const [mediaType, setMediaType] = useState<ViewerMediaType>("image");
     const [hotspots, setHotspots] = useState<HotspotData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -51,6 +61,11 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
 
                 objectUrl = URL.createObjectURL(compressedImage);
                 setImageSource(objectUrl);
+                setMediaType(resolveMediaType({
+                    mimeType: viewerItem?.mimeType,
+                    blob: viewerItem?.blob,
+                    compressedBlob: compressedImage,
+                }));
 
                 if (annotations && Array.isArray(annotations)) {
                     const hydratedHotspots = hydrateStoredHotspots(annotations, assets);
@@ -82,5 +97,5 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
         };
     }, [viewerId, navigate]);
 
-    return { imageSource, hotspots, isLoading, error };
+    return { imageSource, mediaSource: imageSource, mediaType, hotspots, isLoading, error };
 };

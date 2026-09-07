@@ -225,6 +225,7 @@ export interface ViewerItem {
   annotations?: HotspotData[];
   compressedBlob?: Blob;
   assets?: StoredViewerAsset[];
+  mimeType?: string;
 }
 
 //---------------- Hotspots -------------------------

@@ -1,0 +1,76 @@
+/* Video 360 engine (three.js) - container, hotspot layer and controls */
+
+.v360-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #000;
+}
+
+.v360-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+.v360-container canvas:active {
+    cursor: grabbing;
+}
+
+/*
+ * Hotspot layer: positioned divs updated each frame from the sphere projection.
+ * The hotspot divs reuse the pannellum classes (pnlm-hotspot-base) plus the
+ * app's own hotspot-manager classes so existing annotation CSS applies.
+ */
+.v360-hotspot-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.v360-hotspot-layer .pnlm-hotspot-base {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Minimal playback controls (autoplay policies require a muted start) */
+.v360-controls {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 80;
+}
+
+.v360-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.v360-controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.v360-controls svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}

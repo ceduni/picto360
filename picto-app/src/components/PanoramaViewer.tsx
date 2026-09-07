@@ -8,6 +8,7 @@ import type { HotspotData } from "@/utils/Types";
 import { useHotspotCreation } from "@/hooks/useHotspotCreation";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { usePannellumViewer } from "@/hooks/usePannellumViewer";
+import { useVideoViewer } from "@/hooks/useVideoViewer";
 import { useViewerData } from "@/hooks/useViewerData";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useHotspotManager } from "@/hooks/useHotspotManager";
@@ -31,13 +32,24 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     const { setBannerMessage } = useFeedbackBanner();
 
     // Load viewer data
-    const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId });
+    const {
+        mediaSource,
+        mediaType,
+        hotspots: initialHotspots,
+        isLoading,
+        error,
+    } = useViewerData({ viewerId });
 
-    // Initialize Pannellum
-    const { viewerInstance } = usePannellumViewer({
+    // Initialize the engine matching the media type (image: Pannellum, video: three.js)
+    const { viewerInstance: imageViewerInstance } = usePannellumViewer({
         viewerRef,
-        imageSource,
+        imageSource: mediaType === "image" ? mediaSource : null,
     });
+    const { viewerInstance: videoViewerInstance } = useVideoViewer({
+        viewerRef,
+        videoSource: mediaType === "video" ? mediaSource : null,
+    });
+    const viewerInstance = mediaType === "video" ? videoViewerInstance : imageViewerInstance;
 
     const {
         visible: contextMenuVisible,
