@@ -66,7 +66,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     } 
 
     const updateUserInDatabase = async (updates: { displayName?: string; photoUrl?: string | null }) => {
-        const user = auth.currentUser;
+        const user = auth?.currentUser;
         if (!user) {
             setBannerMessage({message:"Le compte utilisateur n'a pas été trouvé.",type:"failure"});
             throw new Error("No authenticated user");
@@ -88,12 +88,15 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     }
 
     const refreshCurrentUser = () => {
+        if (!auth) {
+            return;
+        }
         setCurrentUser(auth.currentUser);
         setProfileRevision((revision) => revision + 1);
     }
 
     const updateUserName = async (newName : string) => {
-        const user = auth.currentUser; 
+        const user = auth?.currentUser;
         if(!user) {
             setBannerMessage({message:"Le compte utilisateur n'a pas été trouvé.",type:"failure"});
             throw new Error("No authenticated user");
@@ -105,7 +108,7 @@ export function AuthProvider ({ children }: { children: ReactNode }){
     }
 
     const updateUserProfilePic = async (newPicture : string | null) => {
-        const user = auth.currentUser; 
+        const user = auth?.currentUser;
         if(!user) {
             setBannerMessage({message:"Le compte utilisateur n'a pas été trouvé.",type:"failure"});
             throw new Error("No authenticated user");
@@ -118,8 +121,25 @@ export function AuthProvider ({ children }: { children: ReactNode }){
 
 
     useEffect(()=>{
+        // Firebase non configuré: mode local, aucune session à attendre.
+        if (!auth) {
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth,initializeUser);
-        return unsubscribe;
+
+        // Fail-safe: without a reachable Firebase backend the auth state may
+        // never arrive; unblock rendering so the local (signed-out) features
+        // stay usable. Real environments resolve in milliseconds.
+        const authTimeout = setTimeout(() => {
+            setLoading(false);
+        }, 4000);
+
+        return () => {
+            clearTimeout(authTimeout);
+            unsubscribe();
+        }
     },[])
 
     
