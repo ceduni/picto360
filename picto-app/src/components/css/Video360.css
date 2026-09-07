@@ -39,7 +39,7 @@
 /* Minimal playback controls (autoplay policies require a muted start) */
 .v360-controls {
     position: absolute;
-    bottom: 12px;
+    bottom: 56px; /* above the timeline bar */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -73,4 +73,91 @@
     width: 18px;
     height: 18px;
     pointer-events: none;
+}
+
+/* Timeline bar: playhead, scrubbing and annotation time ranges */
+.v360-timeline {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(560px, calc(100% - 32px));
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 80;
+    box-sizing: border-box;
+}
+
+.v360-timeline__time,
+.v360-timeline__duration {
+    color: #fff;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    min-width: 34px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.v360-timeline__track {
+    position: relative;
+    flex: 1;
+    height: 18px;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.v360-timeline__track::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 8px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.v360-timeline__progress {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    height: 3px;
+    width: 0;
+    border-radius: 2px;
+    background: #fff;
+    pointer-events: none;
+}
+
+.v360-timeline__playhead {
+    position: absolute;
+    top: 9px;
+    left: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.v360-timeline__marker {
+    position: absolute;
+    top: 6px;
+    height: 7px;
+    min-width: 0.75%;
+    border-radius: 3px;
+    background: rgba(255, 193, 7, 0.9);
+    transform: translateY(0);
+    cursor: pointer;
+}
+
+.v360-timeline__marker:hover {
+    background: rgba(255, 193, 7, 1);
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.6);
 }

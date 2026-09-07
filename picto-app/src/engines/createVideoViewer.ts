@@ -19,6 +19,8 @@ interface HotspotConfig {
     pitch: number;
     yaw: number;
     cssClass?: string;
+    /** Visible only within this time window (video projects). */
+    timeRange?: { start: number; end?: number };
     createTooltipFunc?: (hotSpotDiv: HTMLElement) => void;
     clickHandlerFunc?: (event: MouseEvent, args: unknown) => void;
     clickHandlerArgs?: unknown;
@@ -29,6 +31,7 @@ interface ManagedHotspot {
     div: HTMLDivElement;
     worldPosition: THREE.Vector3;
     clickListener: (event: MouseEvent) => void;
+    markerDiv: HTMLDivElement | null;
 }
 
 export interface VideoViewerOptions {
@@ -219,6 +222,14 @@ export function createVideoViewer(
     resizeObserver.observe(container);
 
     // --- Hotspot projection ------------------------------------------------
+    const isWithinTimeRange = (timeRange: { start: number; end?: number } | undefined): boolean => {
+        if (!timeRange) {
+            return true;
+        }
+        const t = video.currentTime;
+        return t >= timeRange.start && (timeRange.end === undefined || t <= timeRange.end);
+    };
+
     const updateHotspotPositions = (): void => {
         if (hotspots.size === 0) {
             return;
@@ -228,6 +239,10 @@ export function createVideoViewer(
         camera.getWorldDirection(cameraDirection);
 
         hotspots.forEach((hotspot) => {
+            if (!isWithinTimeRange(hotspot.config.timeRange)) {
+                hotspot.div.style.visibility = "hidden";
+                return;
+            }
             const inFront = hotspot.worldPosition.dot(cameraDirection) > 0;
             if (!inFront) {
                 hotspot.div.style.visibility = "hidden";
@@ -257,6 +272,7 @@ export function createVideoViewer(
         updateVideoFrame();
         applyCamera();
         updateHotspotPositions();
+        updateTimeline();
         renderer.render(scene, camera);
         rafId = requestAnimationFrame(render);
     };
@@ -413,6 +429,101 @@ export function createVideoViewer(
     syncPlayIcon();
     syncMuteIcon();
 
+    // --- Timeline bar (playhead, seek, annotation time ranges) -------------
+    const formatTime = (seconds: number): string => {
+        if (!Number.isFinite(seconds)) {
+            return "0:00";
+        }
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s.toString().padStart(2, "0")}`;
+    };
+
+    const timeline = document.createElement("div");
+    timeline.className = "v360-timeline";
+    const timeLabel = document.createElement("span");
+    timeLabel.className = "v360-timeline__time";
+    const track = document.createElement("div");
+    track.className = "v360-timeline__track";
+    const progress = document.createElement("div");
+    progress.className = "v360-timeline__progress";
+    const playhead = document.createElement("div");
+    playhead.className = "v360-timeline__playhead";
+    const durationLabel = document.createElement("span");
+    durationLabel.className = "v360-timeline__duration";
+    track.appendChild(progress);
+    track.appendChild(playhead);
+    timeline.appendChild(timeLabel);
+    timeline.appendChild(track);
+    timeline.appendChild(durationLabel);
+    container.appendChild(timeline);
+
+    const updateTimeline = (): void => {
+        const duration = video.duration;
+        if (!Number.isFinite(duration) || duration <= 0) {
+            return;
+        }
+        const ratio = THREE.MathUtils.clamp(video.currentTime / duration, 0, 1);
+        progress.style.width = `${ratio * 100}%`;
+        playhead.style.left = `${ratio * 100}%`;
+        timeLabel.textContent = formatTime(video.currentTime);
+        durationLabel.textContent = formatTime(duration);
+    };
+
+    const seekFromPointerEvent = (event: PointerEvent): void => {
+        const rect = track.getBoundingClientRect();
+        const ratio = THREE.MathUtils.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+        if (Number.isFinite(video.duration) && video.duration > 0) {
+            video.currentTime = ratio * video.duration;
+        }
+    };
+
+    let scrubbing = false;
+    const onTrackPointerDown = (event: PointerEvent): void => {
+        scrubbing = true;
+        autoRotateActive = false;
+        seekFromPointerEvent(event);
+        track.setPointerCapture(event.pointerId);
+    };
+    const onTrackPointerMove = (event: PointerEvent): void => {
+        if (scrubbing) {
+            seekFromPointerEvent(event);
+        }
+    };
+    const onTrackPointerUp = (): void => {
+        scrubbing = false;
+    };
+    track.addEventListener("pointerdown", onTrackPointerDown);
+    track.addEventListener("pointermove", onTrackPointerMove);
+    track.addEventListener("pointerup", onTrackPointerUp);
+    track.addEventListener("pointercancel", onTrackPointerUp);
+
+    const syncMarker = (marker: HTMLDivElement, timeRange: { start: number; end?: number }): void => {
+        const duration = video.duration;
+        if (!Number.isFinite(duration) || duration <= 0) {
+            marker.style.display = "none";
+            return;
+        }
+        marker.style.display = "block";
+        const startRatio = THREE.MathUtils.clamp(timeRange.start / duration, 0, 1) * 100;
+        const end = timeRange.end ?? duration;
+        const endRatio = THREE.MathUtils.clamp(end / duration, 0, 1) * 100;
+        marker.style.left = `${startRatio}%`;
+        marker.style.width = `${Math.max(endRatio - startRatio, 0.75)}%`;
+    };
+
+    const syncAllMarkers = (): void => {
+        hotspots.forEach((hotspot) => {
+            if (hotspot.markerDiv && hotspot.config.timeRange) {
+                syncMarker(hotspot.markerDiv, hotspot.config.timeRange);
+            }
+        });
+    };
+    video.addEventListener("loadedmetadata", () => {
+        syncAllMarkers();
+        updateTimeline();
+    });
+
     // --- "load" event --------------------------------------------------------
     const fireLoad = (): void => {
         if (loadFired || destroyed) {
@@ -454,12 +565,30 @@ export function createVideoViewer(
             hotspotConfig.createTooltipFunc?.(div);
 
             hotspotLayer.appendChild(div);
+
+            // Timeline marker for timed annotations; clicking it seeks to the start.
+            let markerDiv: HTMLDivElement | null = null;
+            if (hotspotConfig.timeRange) {
+                markerDiv = document.createElement("div");
+                markerDiv.className = "v360-timeline__marker";
+                markerDiv.title = `${formatTime(hotspotConfig.timeRange.start)} → ${
+                    hotspotConfig.timeRange.end !== undefined ? formatTime(hotspotConfig.timeRange.end) : "fin"
+                }`;
+                markerDiv.addEventListener("pointerdown", (event) => {
+                    event.stopPropagation();
+                    video.currentTime = hotspotConfig.timeRange!.start;
+                });
+                track.appendChild(markerDiv);
+                syncMarker(markerDiv, hotspotConfig.timeRange);
+            }
+
             hotspots.set(hotspotConfig.id, {
                 config: hotspotConfig,
                 div,
                 worldPosition: directionFromPitchYaw(hotspotConfig.pitch, hotspotConfig.yaw)
                     .multiplyScalar(SPHERE_RADIUS),
                 clickListener,
+                markerDiv,
             });
             updateHotspotPositions();
         },
@@ -471,6 +600,7 @@ export function createVideoViewer(
             }
             hotspot.div.removeEventListener("click", hotspot.clickListener);
             hotspot.div.remove();
+            hotspot.markerDiv?.remove();
             hotspots.delete(id);
         },
 
@@ -500,6 +630,8 @@ export function createVideoViewer(
         getYaw: (): number => yaw,
         getPitch: (): number => pitch,
         getHfov: (): number => hfov,
+        getCurrentTime: (): number => video.currentTime,
+        getDuration: (): number => video.duration,
 
         on(event: string, handler: () => void): void {
             if (event === "load") {

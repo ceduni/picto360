@@ -3,8 +3,17 @@ import { HotspotData, ExportOptions, ExportResult } from "@/types/export.types";
 import { IStorageProvider, StorageFileMetadata } from "@/providers/storage/IStorageProvider";
 import { UploadProgressCallback } from "@/types/export.types";
 
+const MEDIA_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "video/quicktime": "mov",
+};
+
 /**
- * Raw format exporter - separates image and annotations into separate files
+ * Raw format exporter - separates media and annotations into separate files
  */
 export class RawFormatExporter extends BaseExportFormatter {
   async export(
@@ -16,27 +25,38 @@ export class RawFormatExporter extends BaseExportFormatter {
     onProgress?: UploadProgressCallback,
   ): Promise<Partial<ExportResult>> {
     const { fileName = "annotated_360_image", includeMetadata = true } = options;
-    const imageFileName = `${fileName}.jpg`;
+
+    // v2: the media may be an image OR a video — name the file from its
+    // actual MIME type instead of assuming a .jpg.
+    const mimeType = options.mimeType && MEDIA_EXTENSIONS[options.mimeType]
+      ? options.mimeType
+      : "image/jpeg";
+    const extension = MEDIA_EXTENSIONS[mimeType];
+    const isVideo = mimeType.startsWith("video/");
+    const baseName = fileName.includes(".")
+      ? fileName.replace(/\.[a-zA-Z0-9]+$/, "")
+      : fileName;
+    const mediaFileName = `${baseName}.${extension}`;
 
     if (!annotations) {
       annotations = [];
     }
 
-    // Upload image
+    // Upload media
     const imageMetadata: StorageFileMetadata = includeMetadata
       ? {
-          name: imageFileName,
-          mimeType: "image/jpeg",
+          name: mediaFileName,
+          mimeType,
           metadata: {
             app: "picto360",
             annotationCount: annotations.length.toString(),
             exportDate: new Date().toISOString(),
-            imageType: "360degree",
+            imageType: isVideo ? "360degree-video" : "360degree",
           },
         }
       : {
-          name: imageFileName,
-          mimeType: "image/jpeg",
+          name: mediaFileName,
+          mimeType,
           metadata: {
             app: "picto360",
           },
@@ -56,7 +76,7 @@ export class RawFormatExporter extends BaseExportFormatter {
       },
     };
 
-    const annotationFileName = `${fileName}_annotations.json`;
+    const annotationFileName = `${baseName}_annotations.json`;
     const annotationBuffer = Buffer.from(JSON.stringify(annotationData, null, 2));
 
     const annotationMetadata : StorageFileMetadata = {
