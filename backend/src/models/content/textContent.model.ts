@@ -1,16 +1,15 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { baseContentFields, ContentDocument } from "./content.model";
+import { Schema } from "mongoose";
+import Content, { ContentDocument } from "./baseContent.model";
 
 export interface TextContentDocument extends ContentDocument {
   body: string;
 }
 
 const textContentSchema = new Schema<TextContentDocument>({
-  ...baseContentFields,
   body: { type: String, required: true },
 });
 
-const TextContent = mongoose.model<TextContentDocument>(
+const TextContent = Content.discriminator<TextContentDocument>(
   "TextContent",
   textContentSchema
 );

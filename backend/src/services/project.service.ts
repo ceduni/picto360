@@ -8,7 +8,7 @@ class ProjectService {
   }
 
   async getProject(id: string) {
-    return Project.findById(id);
+    return Project.findById(id).populate("images");
   }
 
   async updateProject(id: string, update: Partial<ProjectDocument>) {

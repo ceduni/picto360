@@ -12,6 +12,7 @@ import { useViewerData } from "@/hooks/useViewerData";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useHotspotManager } from "@/hooks/useHotspotManager";
 import { useEditionPanel } from "@/hooks/useEditionPanel";
+import type { ViewerDataSource } from "@/utils/viewerDataSource";
 
 
 interface PanoramaViewerProps {
@@ -19,6 +20,8 @@ interface PanoramaViewerProps {
     height: string;
     viewerId: string;
     isEditMode: boolean;
+    dataSource: ViewerDataSource;
+    showVisibilityToggle?: boolean;
 }
 
 const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
@@ -26,12 +29,14 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     height,
     viewerId,
     isEditMode,
+    dataSource,
+    showVisibilityToggle,
 }) => {
     const viewerRef = useRef<HTMLDivElement>(null);
     const { setBannerMessage } = useFeedbackBanner();
 
     // Load viewer data
-    const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId });
+    const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId, dataSource });
 
     // Initialize Pannellum
     const { viewerInstance } = usePannellumViewer({
@@ -84,6 +89,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         viewerInstance,
         initialHotspots,
         onHotspotClick: handleHotspotClick,
+        dataSource,
     });
 
     // Edition panel
@@ -141,7 +147,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             try {
                 await createHotspot(hotspotData);
                 clearTargetIcon();
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la sauvegarde", type: "failure" });
             }
         },
@@ -152,7 +158,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         async (updatedHotspot: HotspotData): Promise<void> => {
             try {
                 await updateHotspot(updatedHotspot);
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la mise à jour", type: "failure" });
             }
         },
@@ -163,7 +169,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
         async (toDeleteHotspot: HotspotData): Promise<void> => {
             try {
                 await deleteHotspot(toDeleteHotspot);
-            } catch (error) {
+            } catch {
                 setBannerMessage({ message: "Erreur lors de la suppression", type: "failure" });
             }
         },
@@ -256,6 +262,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                     onDelete={handleHotspotDelete}
                     onCreate={handleHotspotCreate}
                     pannelState={panelState.state}
+                    showVisibilityToggle={showVisibilityToggle}
                 />
             )}
         </div>

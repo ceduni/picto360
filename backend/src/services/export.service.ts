@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ExportFormat, ExportInput, ExportResult, HotspotData } from "@/types/export.types";
+import { ExportFormat, ExportInput, HotspotData } from "@/types/export.types";
 import { AuthService, getAuthService } from "./auth.service";
 import { getNotificationHubService } from "./notificationHub.service";
 import { GoogleDriveStorageProvider } from "@/providers/storage/GoogleDriveStorageProvider";
@@ -19,7 +19,7 @@ export class ExportService {
 
   constructor(authService : AuthService,
               notificationHub : ReturnType<typeof getNotificationHubService>,
-              authProviderFactory? : AuthProviderFactory
+              _authProviderFactory? : AuthProviderFactory
             ){
     this.authService = authService;
     this.notificationHub = notificationHub;
@@ -28,8 +28,6 @@ export class ExportService {
   async buildExportOptions (request: FastifyRequest, reply: FastifyReply):Promise<ExportInput>{
     const formFields: Record<string, string> = {};
     let fileBuffer: Buffer | null = null;
-    let filename = '';
-    let mimetype = '';
 
     // Iterate through ALL multipart parts
     const parts = request.parts();
@@ -37,8 +35,6 @@ export class ExportService {
       if (part.type === 'file') {
         // Handle file part
         fileBuffer = await part.toBuffer();
-        filename = part.filename;
-        mimetype = part.mimetype;
       } else if (part.type === 'field') {
         // Handle text field parts
         formFields[part.fieldname] = part.value as string;
@@ -55,7 +51,7 @@ export class ExportService {
     if (format === "raw" && formFields.annotations) {
       try {
         annotations = JSON.parse(formFields.annotations);
-      } catch (err) {
+      } catch {
         return reply.status(400).send('Error: Invalid annotations JSON');
       }
     }

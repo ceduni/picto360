@@ -1,8 +1,5 @@
 import React, { useState, useRef } from "react";
 import { InformationCircleIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-// import { FaCamera, FaFileImport, FaGoogleDrive, FaDropbox } from "react-icons/fa";
-// import { GrOnedrive } from "react-icons/gr";
-//import WelcomeMessage from "./ui/WelcomeMessage";
 import "./css/ImageUploader.css";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
@@ -11,7 +8,6 @@ interface ImageUploaderProps {
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
-    //TODO: manage errors + add red color to the drop zone
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { setBannerMessage } = useFeedbackBanner()
@@ -35,11 +31,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     };
 
     const processFile = (file: File) => {
-        // const url = URL.createObjectURL(file);
         try {
             onImageUpload(file);
             setBannerMessage({ message: "Fichier chargé avec succès", type: "success" })
-        } catch (error) {
+        } catch {
             setBannerMessage({ message: "Erreur de chargement de fichier", type: "failure" })
             return;
         }
@@ -62,7 +57,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
                 onClick={triggerFileInput}
             >
                 {" "}
-                {/*TODO: add clicking action*/}
                 <div className="image-uploader__download-icon">
                     <ArrowUpTrayIcon width={24} height={24} className="image-uploader__download-icon-ico" />
                 </div>
@@ -73,7 +67,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
                             <span className="helper mid">Fichier <code><b>.picto</b></code></span>
                         </span>
                     </b> 
-                    <br /> ou glissez là simplement ici
+                    <br/> ou glissez là simplement ici
                 </p>
                 {/*TODO: mention the supported files format + file size limit*/}
             </div>

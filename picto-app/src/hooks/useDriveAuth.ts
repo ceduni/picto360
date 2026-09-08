@@ -32,7 +32,7 @@ export function getPendingDriveExport(): PendingDriveExport | null {
 
   try {
     return JSON.parse(rawValue) as PendingDriveExport;
-  } catch (_error) {
+  } catch {
     sessionStorage.removeItem(PENDING_DRIVE_EXPORT_KEY);
     return null;
   }

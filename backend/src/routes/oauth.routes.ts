@@ -31,7 +31,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
                                       authenticated: status.isAuthenticated,
                                       provider: status.provider })
               : reply.status(401).send({ authenticated: false });
-    } catch (error) {
+    } catch {
       return reply.status(500).send({ error: "Failed to get auth status" });
     }
   });
@@ -54,7 +54,7 @@ export default async function oauthRoutes(app: FastifyInstance) {
       }
 
       return reply.send({ ok: true });
-    } catch (error) {
+    } catch {
       return reply.status(500).send({ error: "Failed to logout" });
     }
   });

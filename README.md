@@ -97,6 +97,30 @@ Code serveur et logique métier.
 - **`utils/`** : Utilitaires généraux.
 - **`middlewares/`** : Vérifications avant l'exécution de la logique .
 
+#### Configuration Cloudflare
+
+Le backend utilise Cloudflare pour stocker les fichiers liés aux projets et aux contenus média :
+
+- **R2 bucket images** : images principales des projets.
+- **R2 bucket media** : contenus média des annotations, comme les vidéos, GIFs ou fichiers.
+
+Ajoutez les variables suivantes dans `backend/.env` :
+
+```env
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_API_TOKEN=
+R2_MEDIA_BUCKET_NAME=picto-media
+```
+
+Pour créer les buckets R2 nécessaires à l'environnement courant :
+
+```bash
+cd backend
+npm run setup:cloudflare
+```
+
+La commande peut être relancée sans risque : si un bucket existe déjà, le script continue.
+
 ### **`docs/`**
 Documentation du projet.
 
@@ -119,11 +143,38 @@ Frontend développé avec React et TypeScript.
 - **`README.md`** : Description générale.
 - **`TIMELINE.md`** : Suivi hebdomadaire.
 
+## 🔒 Hook pre-commit
+
+Un hook Git `pre-commit` (via [Husky](https://typicode.github.io/husky/)) vérifie automatiquement le typage, le lint et les tests avant chaque commit.
+
+### Configuration initiale
+
+Après avoir cloné le dépôt, installez les dépendances aux trois niveaux (racine, `backend/`, `picto-app/`) :
+
+```bash
+npm install                     # à la racine — active le hook via le script `prepare` de Husky
+npm install --prefix backend
+npm install --prefix picto-app
+```
+
+Aucune autre étape n'est requise : le hook est activé automatiquement dès le `npm install` à la racine et s'applique à tous les clones locaux du dépôt.
+
+### Ce que le hook vérifie
+
+À chaque `git commit`, le hook regarde quels dossiers (`backend/`, `picto-app/`) contiennent des fichiers indexés (`staged`) et exécute, uniquement pour ces dossiers :
+
+- **`backend/`** : `tsc --noEmit` (typage) → `eslint .` (lint) → `jest` (tests)
+- **`picto-app/`** : `tsc -b` (typage) → `eslint . --ext ts,tsx` (lint) — pas encore de tests automatisés côté frontend
+
+Le commit est bloqué si une de ces étapes échoue. La règle `no-explicit-any` est en avertissement (non bloquante) le temps de réduire la dette existante ; les autres erreurs de lint bloquent le commit.
+
+Le script du hook se trouve dans `.husky/pre-commit`. En cas d'urgence, il peut être contourné avec `git commit --no-verify`, mais c'est déconseillé.
+
 ## 🌟 Contribution
 
 Supervision par [Louis-Edouard LAFONTANT](mailto:louis.edouard.lafontant@umontreal.ca).
 
 ### Contributeurs
-
+- Jeff Pendy [@Pejjp] (https://github.com/Pejjp)
 - Mathis MORRA-FISCHER [@Mathiiis](https://github.com/Mathiiis)
 - Tarik BENAKEZOUH [@TBAce11](https://github.com/TBAce11)

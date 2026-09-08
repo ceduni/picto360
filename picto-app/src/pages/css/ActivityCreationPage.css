@@ -132,21 +132,11 @@
    LEFT COLUMN — Détails de l'activité
    ═══════════════════════════════════════════════ */
 
-.main-left-col {
+.main-col {
   flex: 0 0 33%;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-}
-
-.main-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-sm);
 }
 
 /* Options card — grows to fill remaining left-col height */
@@ -378,7 +368,7 @@ input[type="number"]::-webkit-outer-spin-button {
    MIDDLE COLUMN — Participants
    ═══════════════════════════════════════════════ */
 
-.main-middle {
+.main-card {
   flex: 0 0 33%;
   display: flex;
   flex-direction: column;
@@ -949,4 +939,51 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
   gap: var(--space-1);
   cursor: pointer;
+}
+
+/* ── Playground image preview (ImageUploadCard) ── */
+.playground-image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.playground-image-preview img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--dust-grey);
+}
+
+.playground-image-preview__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.playground-image-preview__replace,
+.playground-image-preview__edit {
+  all: unset;
+  flex: 1;
+  text-align: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--type-button-size);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+.playground-image-preview__edit {
+  background: var(--accent);
+  color: white;
+}
+
+.playground-image-preview__edit:hover {
+  background: var(--accent-hover);
+}
+
+.playground-image-preview__replace {
+  background: var(--accent-light-bg);
+  color: var(--blue-slate);
+  border: 1px solid var(--dust-grey);
 }

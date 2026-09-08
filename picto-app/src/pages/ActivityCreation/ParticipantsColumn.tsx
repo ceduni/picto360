@@ -43,7 +43,7 @@ const ParticipantsColumn: React.FC<Props> = ({
     const isSolo = formValues.type === "solo";
 
     return (
-        <div className="main-middle">
+        <div className="main-card">
             <div className="card-title-group">
                 <h3 className="main-left_title">Participants</h3>
                 <p className="card-subtitle">Ajoutez les participants/équipes de votre activité.</p>

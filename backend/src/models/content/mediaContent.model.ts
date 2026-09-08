@@ -1,18 +1,26 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { baseContentFields, ContentDocument } from "./content.model";
+import { Schema } from "mongoose";
+import Content, { ContentDocument } from "./baseContent.model";
+
+
+export type MediaContentType = "IMAGE" | "GIF" | "VIDEO";
 
 export interface MediaContentDocument extends ContentDocument {
-  mediaType: string;
-  url: string;
+  r2Key: string;
+  mediaType: MediaContentType;
+  url?: string;
+  size?: number;
+  mimeType?: string;
 }
 
 const mediaContentSchema = new Schema<MediaContentDocument>({
-  ...baseContentFields,
-  mediaType: { type: String, required: true }, // e.g., 'image', 'video', etc.
-  url: { type: String, required: true },
+  r2Key: { type: String, required: true },
+  mediaType: { type: String, enum: ["IMAGE", "VIDEO", "GIF"],  required: true }, // e.g., 'image', 'video', etc.
+  url: { type: String},
+  size:{type:Number},
+  mimeType:{type:String},
 });
 
-const MediaContent = mongoose.model<MediaContentDocument>(
+const MediaContent = Content.discriminator<MediaContentDocument>(
   "MediaContent",
   mediaContentSchema
 );
