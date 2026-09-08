@@ -67,18 +67,19 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
                     <ArrowUpTrayIcon width={24} height={24} className="image-uploader__download-icon-ico" />
                 </div>
                 <p className="image-uploader__drop-text">
-                    <b>Selectionnez une image ou un projet Picto
+                    <b>Sélectionnez une image, une vidéo 360° ou un projet Picto
                         <span className="has-helper">
                             <InformationCircleIcon width={18} height={18} />
                             <span className="helper mid">Fichier <code><b>.picto</b></code></span>
                         </span>
-                    </b> 
-                    <br /> ou glissez là simplement ici
+                    </b>
+                    <br /> ou glissez-la simplement ici
                 </p>
                 {/*TODO: mention the supported files format + file size limit*/}
             </div>
 
-            <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
+            <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input"
+                accept="image/jpeg,image/png,video/mp4,video/webm,video/quicktime,.picto" />
 
         </div>
     );

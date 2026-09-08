@@ -4,6 +4,9 @@ export interface PannellumViewer {
     getYaw: () => number;
     getPitch: () => number;
     getHfov: () => number;
+    /** Video engine only: current playback position in seconds. */
+    getCurrentTime?: () => number;
+    getDuration?: () => number;
     on: (event: string, handler: () => void) => void;
     removeHotSpot: (id: string) => void;
     addHotSpot: (config: unknown) => void;

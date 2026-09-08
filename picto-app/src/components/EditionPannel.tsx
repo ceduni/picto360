@@ -12,6 +12,9 @@ import { TrashIcon, XMarkIcon, PhotoIcon, LinkIcon, VideoCameraIcon, DocumentTex
 
 interface EditionPannelProps {
     hotspot: HotspotData | null;
+    /** Video projects: show the time-range editor. */
+    isVideo?: boolean;
+    duration?: number;
     onSave: (hotspot: HotspotData) => void;
     onClose: () => void;
     onDelete: (hotspot: HotspotData) => void;
@@ -19,10 +22,11 @@ interface EditionPannelProps {
     pannelState: string
 }
 
-const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose, onDelete, onCreate, pannelState }) => {
+const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, isVideo = false, duration, onSave, onClose, onDelete, onCreate, pannelState }) => {
     if (!hotspot) return null;
 
     const [formState, setFormState] = useState<HotspotData | null>(null);
+    const [timeRange, setTimeRange] = useState<{ start: number; end?: number } | undefined>(hotspot.timeRange);
     const editorRef = useRef<EditorRef>(null);
 
     const boxRef = useRef<HTMLDivElement>(null);
@@ -72,6 +76,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
 
     useEffect(() => {
         setFormState(hotspot);
+        setTimeRange(hotspot.timeRange);
     }, [hotspot]);
 
     if (!formState && pannelState == "editing") {
@@ -79,15 +84,19 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
     }
 
     const handleSave = (updatedFields: Partial<HotspotData>) => {
+        // Video: apply the time-range fields to every annotation type.
+        const withTime = isVideo
+            ? { timeRange, ...updatedFields }
+            : updatedFields;
 
         if (pannelState === "editing") {
-            onSave({ ...hotspot, ...updatedFields });
+            onSave({ ...hotspot, ...withTime });
             onClose();
             return;
         }
 
         if (pannelState === "creating") {
-            onCreate({ ...hotspot, ...updatedFields });
+            onCreate({ ...hotspot, ...withTime });
             onClose();
             return;
         }
@@ -179,6 +188,47 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                 </div>
                 <div className="pannel_main_content">
                     {editor}
+                    {isVideo && (
+                        <div className="edition_pannel__timerange">
+                            <label className="edition_pannel__timerange-label">
+                                Visible de
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step={0.5}
+                                    value={timeRange?.start ?? 0}
+                                    onChange={(e) => setTimeRange({
+                                        start: Math.max(0, Number(e.target.value) || 0),
+                                        end: timeRange?.end,
+                                    })}
+                                />
+                                s
+                            </label>
+                            <label className="edition_pannel__timerange-label">
+                                à
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step={0.5}
+                                    placeholder="fin"
+                                    value={timeRange?.end ?? ""}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.trim();
+                                        setTimeRange({
+                                            start: timeRange?.start ?? 0,
+                                            end: raw === "" ? undefined : Math.max(0, Number(raw) || 0),
+                                        });
+                                    }}
+                                />
+                                s
+                                {duration !== undefined && Number.isFinite(duration) && (
+                                    <span className="edition_pannel__timerange-hint">
+                                        (durée: {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, "0")})
+                                    </span>
+                                )}
+                            </label>
+                        </div>
+                    )}
                 </div>
                 <div className="edition_panel_buttons">
                     {
