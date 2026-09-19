@@ -12,10 +12,10 @@ import {
     activityToFormValues,
 } from "@/utils/ActivityCreactionUtils";
 import { ActivityIstance, MessageBannerRef } from "@/utils/Types";
-import ActivityDetailsCard from "../ActivityCreation/ActivityDetailsCard";
-import ActivityOptionsCard from "../ActivityCreation/ActivityOptionsCard";
-import ParticipantsColumn from "../ActivityCreation/ParticipantsColumn";
-import TasksColumn from "../ActivityCreation/TasksCard";
+import ActivityDetailsCard from "@/pages/ActivityCreation/ActivityDetailsCard";
+import ActivityOptionsCard from "@/pages/ActivityCreation/ActivityOptionsCard";
+import ParticipantsColumn from "@/pages/ActivityCreation/ParticipantsColumn";
+import TasksColumn from "@/pages/ActivityCreation/TasksCard";
 import { useActivity } from "@/contexts/ActivityContext";
 import { useActivityDraftApi } from "@/hooks/useActivityDraftApi";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
