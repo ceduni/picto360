@@ -19,7 +19,7 @@ const RequireAuth: React.FC = () => {
 const adminRouteObjects = (() => {
     if (!__ENABLE_ADMIN__) return [];
 
-    const ActivityCreationPage = lazy(() => import("./pages/ActivityCreationPage"));
+    const ActivityCreationPage = lazy(() => import("./pages/DashboardPages/ActivityCreationPage"));
     const ActivitiesListPage  = lazy(() => import("./pages/DashboardPages/ActivitiesListPage"));
     const DashboardPage       = lazy(() => import("./pages/DashboardPages/DashboardPage"));
 

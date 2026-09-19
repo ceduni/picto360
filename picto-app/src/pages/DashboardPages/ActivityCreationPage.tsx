@@ -2,25 +2,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { BookmarkSquareIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import "./css/ActivityCreationPage.css";
 import { useNavigate, useBlocker, useParams, useLocation } from "react-router-dom";
-import DashboardLayout from "./DashboardPages/layout/DashboardLayout";
-import AddParticipantsPopup from "./AddParticipantsPopup";
-import ConfirmationPopup from "./PagesUiComponents/ConfirmationPopup";
-import ErrorBanner from "../components/FeedbackBanner";
+import DashboardLayout from "./layout/DashboardLayout";
+import EditTeamListDrawer from "../ActivityCreation/EditTeamListDrawer";
+import ConfirmationPopup from "../../components/ConfirmationPopup";
+import ErrorBanner from "../../components/FeedbackBanner";
 import {
     validateActivityValues,
-    handleTeamNameChange,
     buildDraftPayload,
     activityToFormValues,
 } from "@/utils/ActivityCreactionUtils";
-import { ActivityIstance, MessageBannerRef, TeamInstance } from "@/utils/Types";
-import ActivityDetailsCard from "./ActivityCreation/ActivityDetailsCard";
-import ActivityOptionsCard from "./ActivityCreation/ActivityOptionsCard";
-import ParticipantsColumn from "./ActivityCreation/ParticipantsColumn";
-import TasksColumn from "./ActivityCreation/TasksCard";
+import { ActivityIstance, MessageBannerRef } from "@/utils/Types";
+import ActivityDetailsCard from "@/pages/ActivityCreation/ActivityDetailsCard";
+import ActivityOptionsCard from "@/pages/ActivityCreation/ActivityOptionsCard";
+import ParticipantsColumn from "@/pages/ActivityCreation/ParticipantsColumn";
+import TasksColumn from "@/pages/ActivityCreation/TasksCard";
 import { useActivity } from "@/contexts/ActivityContext";
 import { useActivityDraftApi } from "@/hooks/useActivityDraftApi";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import ImageUploadCard from "./ActivityCreation/ImageUploadCard";
+import ImageUploadCard from "@pages/ActivityCreation/ImageUploadCard";
 
 const EMPTY_FORM: ActivityIstance = {
     id: '',
@@ -35,11 +34,10 @@ const EMPTY_FORM: ActivityIstance = {
     chrono: { isEnabled: false, minutes: 0, seconds: 0 },
     participantsList: [],
     teamsList: [],
-    supervised_teams: false,
 };
 
 const hasContent = (fv: ActivityIstance) =>
-    fv.title.trim() !== "" && (
+    fv.title.trim() !== "" || (
     fv.description.trim() !== "" ||
     fv.tasks.length > 0 ||
     fv.tags.length > 0 ||
@@ -48,16 +46,17 @@ const hasContent = (fv: ActivityIstance) =>
 
 const ActivityCreationPage: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
-    const isEditMode = !!id;
+    const isEditMode = !!id;    // tells the page whether it is editing an existing activity or creating a new one
     const { key: locationKey } = useLocation();
 
     const [formValues, setFormValues] = useState<ActivityIstance>(EMPTY_FORM);
     const [isLoadingActivity, setIsLoadingActivity] = useState(isEditMode);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [teamsTotalParticipantsCount, setTeamsTotalParticipantsCount] = useState(0);
-    const [selectedTeam, setSelectedTeam] = useState<{ indx: number; teamData: TeamInstance }>();
+    const [isTeamDrawerOpen, setIsTeamDrawerOpen] = useState(false);
+    const [initialTeamIdx, setInitialTeamIdx] = useState<number | undefined>();
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState<{ title: string; details?: string } | null>(null);
-    const [isDirty, setIsDirty] = useState(false);
+    const [isDirty, setIsDirty] = useState(false); //tracks whether the activity form has unsaved user changes
     const actionButtonUsed = useRef(false);
     const publishedActivityId = useRef<string | null>(null);
 
@@ -122,6 +121,16 @@ const ActivityCreationPage: React.FC = () => {
         setFormValues(updater);
     };
 
+    const openTeamDrawer = (teamIdx?: number) => {
+        setInitialTeamIdx(teamIdx);
+        setIsTeamDrawerOpen(true);
+    };
+
+    const closeTeamDrawer = () => {
+        setIsTeamDrawerOpen(false);
+        setInitialTeamIdx(undefined);
+    };
+
     // Persist form data to backend. formValues.id may already be set even in
     // create mode (no :id in the URL) if an image upload lazily created the
     // draft server-side first — treat that the same as edit mode to avoid
@@ -132,7 +141,6 @@ const ActivityCreationPage: React.FC = () => {
             await updateDraft(existingId, buildDraftPayload(formValues));
             return existingId;
         }
-        // Create mode: POST then PATCH — only called when user explicitly saves
         const draftId = await createDraft(formValues.title.trim() || "Nouvelle activité");
         await updateDraft(draftId, buildDraftPayload(formValues));
         return draftId;
@@ -140,14 +148,12 @@ const ActivityCreationPage: React.FC = () => {
 
     const handleCancel = () => {
         actionButtonUsed.current = true;
-        // clearDraft() is called by the mount-effect cleanup on unmount
         navigate("/dashboard");
     };
 
     const handleSaveDraft = async () => {
         actionButtonUsed.current = true;
 
-        // Nothing to save — abort silently
         if (!isEditMode && !hasContent(formValues)) {
             navigate("/dashboard");
             return;
@@ -155,7 +161,7 @@ const ActivityCreationPage: React.FC = () => {
 
         try {
             await saveDraftToBackend();
-            if (!isEditMode) clearDraft(); // local dummy replaced by server draft
+            if (!isEditMode) clearDraft();
             refresh();
             setBannerMessage({ message: "Activité sauvegardée", type: "success" });
         } catch {
@@ -179,15 +185,10 @@ const ActivityCreationPage: React.FC = () => {
             refresh();
             publishedActivityId.current = activityId;
             setConfirmationMessage({ title: "Félicitations !!!", details: "Votre activité a été créée avec succès" });
-            setIsPopupOpen(true);
+            setIsConfirmationOpen(true);
         } catch {
             setBannerMessage({ message: "Erreur lors de la publication", type: "failure" });
         }
-    };
-
-    const onCloseParticipantsPopup = () => {
-        setIsPopupOpen(false);
-        setSelectedTeam(undefined);
     };
 
     return (
@@ -236,8 +237,7 @@ const ActivityCreationPage: React.FC = () => {
                             formValues={formValues}
                             setFormValues={handleSetFormValues}
                             teamsTotalParticipantsCount={teamsTotalParticipantsCount}
-                            setIsPopupOpen={setIsPopupOpen}
-                            setSelectedTeam={setSelectedTeam}
+                            openTeamDrawer={openTeamDrawer}
                         />
                         <div className="main-col">
                             <TasksColumn formValues={formValues} setFormValues={handleSetFormValues} />
@@ -248,24 +248,24 @@ const ActivityCreationPage: React.FC = () => {
                 )}
             </div>
 
-            {isPopupOpen && selectedTeam != undefined && (
-                <AddParticipantsPopup
-                    teamIdx={selectedTeam.indx}
-                    teamList={formValues.teamsList}
-                    setFormValues={setFormValues}
-                    onClose={onCloseParticipantsPopup}
-                    handleTeamNameChange={(index, newName) =>
-                        setFormValues(handleTeamNameChange(formValues, index, newName))
-                    }
+            {isTeamDrawerOpen && (
+                <EditTeamListDrawer
+                    open={isTeamDrawerOpen}
+                    onClose={closeTeamDrawer}
+                    formValues={formValues}
+                    setFormValues={handleSetFormValues}
+                    initialTeamIdx={initialTeamIdx}
                 />
             )}
-            {isPopupOpen && confirmationMessage && (
+
+            {isConfirmationOpen && confirmationMessage && (
                 <ConfirmationPopup
                     message={confirmationMessage}
                     type="confirm"
                     handleConfirm={() => navigate(`/dashboard/activity-editor/${publishedActivityId.current}`)}
                 />
             )}
+
             {blocker.state === "blocked" && (
                 <ConfirmationPopup
                     message={{
@@ -290,7 +290,6 @@ const ActivityCreationPage: React.FC = () => {
                     }}
                     handleCancel={() => {
                         actionButtonUsed.current = true;
-                        // clearDraft() fires via the mount-effect cleanup when blocker.proceed() unmounts the page
                         blocker.proceed();
                     }}
                 />

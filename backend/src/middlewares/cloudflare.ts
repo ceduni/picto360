@@ -110,22 +110,3 @@ export async function uploadFileToImages (
     
     return cloud_image   
 }
-
-const deleteFileFromImages = (imageId:string)=>{
-
-}
-
-/**
- * This function returns a one time upload url for the front-end
- * to upload directly to R2 whithout using the Backend
- */
-const getR2UploadUrl = () =>{
-
-}
-
-/**
- * 
- */
-const uploadFileToR2 = ()=>{
-
-}

@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 import { ContentDocument } from "./content/baseContent.model";
 import { ProjectDocument } from "./project.model";
-import { ActivityDocument } from "./activity.model";
 
 export type AnnotationAssetSource = "url" | "local";
 export type AnnotationType = "TEXT" | "LABEL" | "IMAGE" | "GIF" | "VIDEO" | "LINK"

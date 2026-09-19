@@ -1,9 +1,8 @@
 import React from "react";
 import { UserIcon, UsersIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { ActivityIstance, TeamInstance } from "@/utils/Types";
-import ParticipantCard from "../PagesUiComponents/ParticipantCard";
-import TeamCard from "../PagesUiComponents/TeamCard";
-import IOSSwitch from "../PagesUiComponents/IOSSwitch";
+import { ActivityIstance } from "@/utils/Types";
+import ParticipantCard from "../DashboardPages/layout/ParticipantCard";
+import TeamCard from "../DashboardPages/layout/TeamCard";
 import {
     addNewParticipants,
     handleAddTeamsToActivity,
@@ -16,12 +15,11 @@ interface Props {
     formValues: ActivityIstance;
     setFormValues: React.Dispatch<React.SetStateAction<ActivityIstance>>;
     teamsTotalParticipantsCount: number;
-    setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    setSelectedTeam: React.Dispatch<React.SetStateAction<{ indx: number; teamData: TeamInstance } | undefined>>;
+    openTeamDrawer: (teamIdx?: number) => void;
 }
 
 const ParticipantsColumn: React.FC<Props> = ({
-    formValues, setFormValues, teamsTotalParticipantsCount, setIsPopupOpen, setSelectedTeam,
+    formValues, setFormValues, teamsTotalParticipantsCount, openTeamDrawer,
 }) => {
     const changeParticipantName = (idx: string, name: string) =>
         setFormValues({ ...formValues, participantsList: handleParticipantNameChange(formValues.participantsList, idx, name) });
@@ -85,17 +83,6 @@ const ParticipantsColumn: React.FC<Props> = ({
                 )}
             </div>
 
-            {/* Supervised toggle (teams only) */}
-            {!isSolo && (
-                <div className="supervised_teams-toggle">
-                    <IOSSwitch
-                        onChange={(_, checked) => setFormValues({ ...formValues, supervised_teams: checked })}
-                        checked={formValues.supervised_teams}
-                    />
-                    <p className="option-row__label">Équipes supervisées ?</p>
-                </div>
-            )}
-
             {/* List */}
             <div className={isSolo ? "list_container" : "list_container list_container-team"}>
                 {isSolo ? (
@@ -132,7 +119,14 @@ const ParticipantsColumn: React.FC<Props> = ({
                     </div>
                 ) : (
                     <div className="list_parent_container">
-                        <h3 className="list_title">Liste des équipes</h3>
+                        <div className="list_title-container">
+                            <h3 className="list_title">Liste des équipes</h3>
+                            {formValues.teamsList.length > 0 && (
+                                <button className="list_manage-link" onClick={() => openTeamDrawer()}>
+                                    Gérer
+                                </button>
+                            )}
+                        </div>
                         {formValues.teamsList.length === 0 ? (
                             <p className="error_board">Pas d'équipes</p>
                         ) : (
@@ -143,9 +137,8 @@ const ParticipantsColumn: React.FC<Props> = ({
                                             key={teamData.id}
                                             index={index}
                                             teamData={teamData}
-                                            supervised={formValues.supervised_teams}
-                                            setSelectedTeam={setSelectedTeam}
-                                            setIsPaticipantsPopupOpen={setIsPopupOpen}
+                                            supervised={teamData.supervised}
+                                            onEdit={() => openTeamDrawer(index)}
                                             handleDeleteTeam={deleteTeam}
                                         />
                                     ))}

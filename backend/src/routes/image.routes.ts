@@ -63,7 +63,7 @@ async function signPrivateImageUrl(
     }else {
       reply.code(404).send({message:"Invalid Cloudflare Image Id"})
     }
-  }catch (error: any){
+  }catch{
     reply.code(500).send("Error refreshing the image")
   }
 }
@@ -79,7 +79,7 @@ async function refreshSecureImageUrl(
     }else {
       reply.code(404).send({message:"Invalid Image Url"})
     }
-  }catch (error: any){
+  }catch{
     reply.code(500).send("Error refreshing the image")
   }
 }

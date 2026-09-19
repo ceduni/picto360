@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import PictoProject, { ProjectDocument } from "@/models/project.model";
 import PictoImage from "@/models/image.model";
 import Permission from "@/models/user_perm.model";
+import type ImageServiceType from "./image.service";
 // ImageService is imported lazily inside attachPlaygroundImage below: it
 // transitively pulls in the Cloudflare middleware, which eagerly reads
 // Cloudflare env vars at module load. A static top-level import here would
@@ -62,7 +63,6 @@ async function resolveUser(request: FastifyRequest, reply: FastifyReply) {
 async function upsertTeams(
   teamsList: IncomingTeam[],
   currentTeamIds: mongoose.Types.ObjectId[],
-  supervisorUid: string,
   reply: FastifyReply
 ): Promise<mongoose.Types.ObjectId[] | null> {
   const updatedIds = new Set<string>();
@@ -90,7 +90,8 @@ async function upsertTeams(
 
     const fields = {
       teamName: team.name,
-      supervisorId: team.supervisor_id || supervisorUid,
+      supervised: team.supervised,
+      supervisorId: team.supervisor_id ?? undefined,
       participantsList,
     };
 
@@ -148,7 +149,7 @@ export const updateDraft = async (
 ) => {
   const resolved = await resolveUser(request, reply);
   if (!resolved) return;
-  const { user, uid } = resolved;
+  const { user } = resolved;
 
   const { id } = request.params;
 
@@ -179,7 +180,6 @@ export const updateDraft = async (
       const teamIds = await upsertTeams(
         teamsList,
         activity.teams as unknown as mongoose.Types.ObjectId[],
-        uid,
         reply
       );
       if (!teamIds) return;
@@ -282,9 +282,9 @@ export const attachPlaygroundImage = async (
     }
 
     try {
-      // Lazily required: image.service.ts pulls in the Cloudflare middleware,
-      // which eagerly reads Cloudflare env vars at module load. 
-      const ImageService = (require("./image.service") as typeof import("./image.service")).default;
+      // Lazily imported: image.service.ts pulls in the Cloudflare middleware,
+      // which eagerly reads Cloudflare env vars at module load.
+      const ImageService = (await import("./image.service.js")).default as unknown as typeof ImageServiceType;
       await ImageService.linkImageToProject(image, project, user);
     } catch (err) {
       if (err instanceof Error && /permission/i.test(err.message)) {

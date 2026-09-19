@@ -1,88 +1,5 @@
-/* ── Backdrop ── */
-.pdrawer__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px);
-  z-index: 1100;
-  animation: pdrawer-fade-in 0.22s ease;
-}
-
-@keyframes pdrawer-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ── Panel ── */
-.pdrawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 640px;
-  height: 100vh;
-  background: white;
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.14);
-  z-index: 1200;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: pdrawer-slide-in 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes pdrawer-slide-in {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
-
-/* ── Header bar ── */
-.pdrawer__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--dust-grey);
-  flex-shrink: 0;
-}
-
-.pdrawer__title {
-  font-size: var(--fs-400);
-  font-weight: var(--fw-bold);
-  color: var(--accent-dark);
-  margin: 0;
-}
-
-.pdrawer__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-md);
-  color: var(--blue-slate);
-  cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
-}
-.pdrawer__close:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-}
-
-/* ── Scrollable body ── */
-.pdrawer__body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-5);
-}
-
-.pdrawer__body::-webkit-scrollbar { width: 6px; }
-.pdrawer__body::-webkit-scrollbar-thumb {
-  background: var(--dust-grey);
-  border-radius: 3px;
-}
-.pdrawer__body::-webkit-scrollbar-button { display: none; }
+/* ── Profile drawer width ── */
+.pdrawer { width: 640px; }
 
 /* ── Override: no outer card border inside the narrow drawer ── */
 .pdrawer__body .profile_card {
@@ -91,7 +8,7 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 2px solid var(--dust-grey);
-  padding-bottom: var(--space-4);  
+  padding-bottom: var(--space-4);
   border: none;
   box-shadow: none;
 }
@@ -100,14 +17,14 @@
 .pdrawer__body .profile_fields-grid {
   grid-template-columns: 1fr 1fr;
   display: grid;
-  gap: var(--space-5) var(--space-4);  
+  gap: var(--space-5) var(--space-4);
 }
 
 /* ── Override: tighter banner ── */
 .pdrawer__body .profile_banner {
   width: 100%;
   background: linear-gradient(135deg, #1c73fa 0%, #364A9D 55%, #4E5A6D 100%);
-  overflow: hidden;  
+  overflow: hidden;
   height: 96px;
 }
 
@@ -382,4 +299,3 @@
   background: #e53935;
   color: white;
 }
-

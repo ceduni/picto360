@@ -18,7 +18,7 @@ const ActivityDetailsCard: React.FC<Props> = ({ formValues, setFormValues }) => 
 
             <div className="main-left-fields">
                 <div className="section-card">
-                    <p className="section-header-title">Titre</p>
+                    <p className="t-label">Titre *</p>
                     <input
                         type="text"
                         name="title"
@@ -31,7 +31,7 @@ const ActivityDetailsCard: React.FC<Props> = ({ formValues, setFormValues }) => 
                 </div>
 
                 <div className="section-card">
-                    <p className="section-header-title">Tags</p>
+                    <p className="t-label">Tags</p>
                     <input
                         type="text"
                         name="tagInput"
@@ -55,7 +55,7 @@ const ActivityDetailsCard: React.FC<Props> = ({ formValues, setFormValues }) => 
                 </div>
 
                 <div className="section-card">
-                    <p className="section-header-title">Description</p>
+                    <p className="t-label">Description *</p>
                     <textarea
                         title="description"
                         name="description"

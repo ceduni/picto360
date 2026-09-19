@@ -4,7 +4,7 @@ import { constraintSchema, IConstraint } from './activity.model';
 
 export interface TeamParticipant{
   name:string,
-  joinLink:string,
+  joinLink:string;
 }
 
 const teamParticipantSchema = new Schema<TeamParticipant>(
@@ -21,6 +21,7 @@ const teamParticipantSchema = new Schema<TeamParticipant>(
 export interface ITeam extends Document {
     teamName: string;
     description:string;
+    supervised:boolean;
     supervisorId: string;
     participantsList: TeamParticipant[];
     constraints:IConstraint[]
@@ -29,7 +30,8 @@ export interface ITeam extends Document {
 const teamSchema = new Schema<ITeam>({
     teamName: { type: String, required: true },
     description:{type:String},
-    supervisorId: { type: String, default: "" },
+    supervised:{type:Boolean,default:false},
+    supervisorId: { type: String},
     participantsList: {type:[teamParticipantSchema], required:true},
     constraints:{type:[constraintSchema]}
     // workspace: { type: ActivityWorkspace, required: false },
