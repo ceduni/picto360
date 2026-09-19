@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getViewerItem } from "@/utils/storedImageData";
-import { hydrateStoredHotspots } from "@/utils/HotspotAssetUtils";
 import type { HotspotData } from "@/utils/Types";
+import type { ViewerDataSource } from "@/utils/viewerDataSource";
 
 interface UseViewerDataProps {
     viewerId: string;
+    dataSource: ViewerDataSource;
 }
 
 interface UseViewerDataReturn {
@@ -15,7 +15,7 @@ interface UseViewerDataReturn {
     error: Error | null;
 }
 
-export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataReturn => {
+export const useViewerData = ({ viewerId, dataSource }: UseViewerDataProps): UseViewerDataReturn => {
     const [imageSource, setImageSource] = useState<string | null>(null);
     const [hotspots, setHotspots] = useState<HotspotData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -28,8 +28,7 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
             return;
         }
 
-        let objectUrl: string | undefined;
-        let hotspotObjectUrls: string[] = [];
+        let dispose: (() => void) | undefined;
         let isMounted = true;
 
         const loadViewerData = async (): Promise<void> => {
@@ -37,26 +36,18 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
                 setIsLoading(true);
                 setError(null);
 
-                const viewerItem = await getViewerItem(viewerId);
-                const compressedImage = viewerItem?.compressedBlob || viewerItem?.blob;
-                const annotations = viewerItem?.annotations;
-                const assets = viewerItem?.assets || [];
+                const loaded = await dataSource.load(viewerId);
+                dispose = loaded.dispose;
 
                 if (!isMounted) return;
 
-                if (!compressedImage) {
+                if (!loaded.imageSource) {
                     navigate("/");
                     return;
                 }
 
-                objectUrl = URL.createObjectURL(compressedImage);
-                setImageSource(objectUrl);
-
-                if (annotations && Array.isArray(annotations)) {
-                    const hydratedHotspots = hydrateStoredHotspots(annotations, assets);
-                    hotspotObjectUrls = hydratedHotspots.objectUrls;
-                    setHotspots(hydratedHotspots.hotspots);
-                }
+                setImageSource(loaded.imageSource);
+                setHotspots(loaded.hotspots);
             } catch (err) {
                 if (!isMounted) return;
 
@@ -75,12 +66,9 @@ export const useViewerData = ({ viewerId }: UseViewerDataProps): UseViewerDataRe
 
         return () => {
             isMounted = false;
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-            }
-            hotspotObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+            dispose?.();
         };
-    }, [viewerId, navigate]);
+    }, [viewerId, dataSource, navigate]);
 
     return { imageSource, hotspots, isLoading, error };
 };

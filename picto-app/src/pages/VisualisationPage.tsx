@@ -9,6 +9,7 @@ import { useExportProgress } from "@/hooks/useExportProgress";
 import { useServerSentAuth } from "@/hooks/useServerSentAuth";
 import ExportProgressPopupWindow from "@/components/ui/ExportProgressPopupWindow";
 import { useExportStatus } from "@/hooks/useExportStatus";
+import { indexedDbDataSource } from "@/utils/dataSources/indexedDbDataSource";
 
 
 const VisualisationPage: React.FC = () => {
@@ -53,8 +54,6 @@ const VisualisationPage: React.FC = () => {
     }, []);
 
     const hasViewerId = Boolean(viewerId);
-    console.log("Drive auth status in toolbar: ", driveAuthStatus)
-
 
     return (
         <div >
@@ -79,6 +78,7 @@ const VisualisationPage: React.FC = () => {
                     isEditMode={isEditMode}
                     width="100vw"
                     height="100vh"
+                    dataSource={indexedDbDataSource}
                 />
             ) : (
                 <div style={{ height: "100vh", display: "grid", placeItems: "center" }}>

@@ -1,21 +1,22 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+export type ContentType = "TextContent" | "LinkContent" | "MediaContent";
+
 export interface ContentDocument extends Document {
-  id: string;
-  creationDate: Date;
-  lastModificationDate: Date;
   title: string;
+  contentType?: ContentType;
 }
 
 export const baseContentFields = {
-  id: { type: String, required: true },
-  creationDate: { type: Date, default: Date.now, required: true },
-  lastModificationDate: { type: Date, default: Date.now, required: true },
   title: { type: String, required: true },
 };
 
 const contentSchema = new Schema<ContentDocument>({
   ...baseContentFields,
+},{
+  _id:true,
+  timestamps:true,
+  discriminatorKey: "contentType",
 });
 
 const Content = mongoose.model<ContentDocument>("Content", contentSchema);

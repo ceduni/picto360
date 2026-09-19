@@ -10,7 +10,7 @@ interface Props {
 
 const ActivityDetailsCard: React.FC<Props> = ({ formValues, setFormValues }) => {
     return (
-        <div className="main-left">
+        <div className="main-card">
             <div className="card-title-group">
                 <h3 className="main-left_title">Détails de l'activité</h3>
                 <p className="card-subtitle">Renseignez les informations générales de votre activité</p>

@@ -7,6 +7,9 @@ node_modules/
 # vite mudules cache
 .vite-cache/
 
+#claude
+.claude
+
 # Environment variables
 .env
 *.env.dev

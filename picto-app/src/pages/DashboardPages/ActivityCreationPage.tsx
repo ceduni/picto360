@@ -15,10 +15,11 @@ import { ActivityIstance, MessageBannerRef } from "@/utils/Types";
 import ActivityDetailsCard from "../ActivityCreation/ActivityDetailsCard";
 import ActivityOptionsCard from "../ActivityCreation/ActivityOptionsCard";
 import ParticipantsColumn from "../ActivityCreation/ParticipantsColumn";
-import TasksColumn from "../ActivityCreation/TasksColumn";
+import TasksColumn from "../ActivityCreation/TasksCard";
 import { useActivity } from "@/contexts/ActivityContext";
 import { useActivityDraftApi } from "@/hooks/useActivityDraftApi";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
+import ImageUploadCard from "@pages/ActivityCreation/ImageUploadCard";
 
 const EMPTY_FORM: ActivityIstance = {
     id: '',
@@ -130,11 +131,15 @@ const ActivityCreationPage: React.FC = () => {
         setInitialTeamIdx(undefined);
     };
 
-    // Persist form data to backend
+    // Persist form data to backend. formValues.id may already be set even in
+    // create mode (no :id in the URL) if an image upload lazily created the
+    // draft server-side first — treat that the same as edit mode to avoid
+    // creating a second, duplicate activity.
     const saveDraftToBackend = async (): Promise<string> => {
-        if (isEditMode) {
-            await updateDraft(id!, buildDraftPayload(formValues));
-            return id!;
+        if (isEditMode || formValues.id) {
+            const existingId = id ?? formValues.id;
+            await updateDraft(existingId, buildDraftPayload(formValues));
+            return existingId;
         }
         const draftId = await createDraft(formValues.title.trim() || "Nouvelle activité");
         await updateDraft(draftId, buildDraftPayload(formValues));
@@ -223,7 +228,7 @@ const ActivityCreationPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="activity_creation-main_content">
-                        <div className="main-left-col">
+                        <div className="main-col">
                             <ActivityDetailsCard formValues={formValues} setFormValues={handleSetFormValues} />
                             <ActivityOptionsCard formValues={formValues} setFormValues={handleSetFormValues} />
                         </div>
@@ -234,8 +239,11 @@ const ActivityCreationPage: React.FC = () => {
                             teamsTotalParticipantsCount={teamsTotalParticipantsCount}
                             openTeamDrawer={openTeamDrawer}
                         />
+                        <div className="main-col">
+                            <TasksColumn formValues={formValues} setFormValues={handleSetFormValues} />
+                            <ImageUploadCard formValues={formValues} setFormValues={handleSetFormValues}/>
+                        </div>
 
-                        <TasksColumn formValues={formValues} setFormValues={handleSetFormValues} />
                     </div>
                 )}
             </div>

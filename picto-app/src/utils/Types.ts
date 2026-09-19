@@ -31,6 +31,7 @@ export interface HotspotData {
   mimeType?: string;
   fileName?: string;
   pendingAsset?: PendingHotspotAsset;
+  visible?: boolean; // whether this hotspot is shown to participants (server-enforced by ApiDataSource; unused by Studio's local flow)
   meta?: Record<string, unknown>; // optional metadata for custom cases
 }
 
@@ -60,17 +61,18 @@ type ActivityData = {
   type: string,
   authoriseEdit: boolean;
   participantsList: ParticipantData[],
-  teamsList: TeamInstance[]
+  teamsList: TeamInstance[],
+  playground?: {
+    _id: string;
+    name: string;
+    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
+  }
 }
 
 export interface ActivityIstance extends ActivityData {
   tagInput: string,
   taskInput: string,
   chrono: { isEnabled: boolean, minutes: number, seconds: number }
-}
-
-export type ActivityStatus = {
-  status: "created" | "open" | "closed";
 }
 
 export interface ActivityFull {
@@ -94,6 +96,11 @@ export interface ActivityFull {
   totalParticipants: number;
   createdAt: string;
   updatedAt: string;
+  playground?: {
+    _id: string;
+    name: string;
+    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
+  };
 }
 
 export interface FetchedActivity {

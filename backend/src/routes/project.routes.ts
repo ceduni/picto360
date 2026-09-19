@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import ProjectService from '@/services/project.service';
 import { ProjectDocument } from '@/models/project.model';
+import { authenticate } from '@/middlewares/firebaseAuth';
 
 async function createProject(request: FastifyRequest<{ Body: ProjectDocument }>, reply: FastifyReply) {
   try {
@@ -52,9 +53,13 @@ async function getAllProjects(_request: FastifyRequest, reply: FastifyReply) {
 }
 
 export default async function projectRoutes(server: FastifyInstance) {
-  server.post('/projects', createProject);
-  server.get('/projects/:id', getProject);
-  server.put('/projects/:id', updateProject);
-  server.delete('/projects/:id', deleteProject);
-  server.get('/projects', getAllProjects);
+  server.post<{ Body: ProjectDocument }>('/projects', { preHandler: authenticate }, createProject);
+  server.get<{ Params: { id: string } }>('/projects/:id', { preHandler: authenticate }, getProject);
+  server.put<{ Params: { id: string }; Body: Partial<ProjectDocument> }>(
+    '/projects/:id',
+    { preHandler: authenticate },
+    updateProject
+  );
+  server.delete<{ Params: { id: string } }>('/projects/:id', { preHandler: authenticate }, deleteProject);
+  server.get('/projects', { preHandler: authenticate }, getAllProjects);
 }

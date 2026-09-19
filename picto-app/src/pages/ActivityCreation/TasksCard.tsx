@@ -42,7 +42,7 @@ const TasksColumn: React.FC<Props> = ({ formValues, setFormValues }) => {
     const removeTask = (title: string) => setFormValues(handleRemoveTask(formValues, title));
 
     return (
-        <div className="main-right">
+        <div className="main-card">
             <div className="card-title-group">
                 <h3 className="main-left_title">Tâches</h3>
                 <p className="card-subtitle">Ajoutez des taches à compléter par les participants.</p>

@@ -17,12 +17,17 @@ interface EditionPannelProps {
     onDelete: (hotspot: HotspotData) => void;
     onCreate: (hotspot: HotspotData) => void;
     pannelState: string
+    // Only meaningful for API-backed (activity) scenes, where visibility is
+    // enforced server-side. Studio's local IndexedDB scenes have no
+    // participant-facing consumer, so the toggle is hidden there.
+    showVisibilityToggle?: boolean
 }
 
-const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose, onDelete, onCreate, pannelState }) => {
+const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose, onDelete, onCreate, pannelState, showVisibilityToggle }) => {
     if (!hotspot) return null;
 
     const [formState, setFormState] = useState<HotspotData | null>(null);
+    const [visible, setVisible] = useState(hotspot.visible ?? true);
     const editorRef = useRef<EditorRef>(null);
 
     const boxRef = useRef<HTMLDivElement>(null);
@@ -72,6 +77,7 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
 
     useEffect(() => {
         setFormState(hotspot);
+        setVisible(hotspot.visible ?? true);
     }, [hotspot]);
 
     if (!formState && pannelState == "editing") {
@@ -81,13 +87,13 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
     const handleSave = (updatedFields: Partial<HotspotData>) => {
 
         if (pannelState === "editing") {
-            onSave({ ...hotspot, ...updatedFields });
+            onSave({ ...hotspot, ...updatedFields, visible });
             onClose();
             return;
         }
 
         if (pannelState === "creating") {
-            onCreate({ ...hotspot, ...updatedFields });
+            onCreate({ ...hotspot, ...updatedFields, visible });
             onClose();
             return;
         }
@@ -179,6 +185,16 @@ const EditionPannel: React.FC<EditionPannelProps> = ({ hotspot, onSave, onClose,
                 </div>
                 <div className="pannel_main_content">
                     {editor}
+                    {showVisibilityToggle && (
+                        <label className="modal__section_horizontal">
+                            <input
+                                type="checkbox"
+                                checked={visible}
+                                onChange={(e) => setVisible(e.target.checked)}
+                            />
+                            <span className="t-label">Visible pour les participants</span>
+                        </label>
+                    )}
                 </div>
                 <div className="edition_panel_buttons">
                     {
