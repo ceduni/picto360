@@ -29,7 +29,6 @@ export async function putViewerItem(
   annotations?: ViewerItem["annotations"],
   compressedBlob?:Blob,
   assets?: StoredViewerAsset[],
-  mimeType?: string,
 ) {
   const db = await open();
   await new Promise<void>((res, rej) => {
@@ -54,7 +53,6 @@ export async function putViewerItem(
         compressedBlob: compressedBlob ?? existing?.compressedBlob ?? blob ?? existing!.blob ,
         annotations: annotations ?? existing?.annotations ?? [],
         assets: assets ?? existing?.assets ?? [],
-        mimeType: mimeType ?? existing?.mimeType ?? blob?.type ?? existing?.blob.type,
       };
 
       const putReq = store.put(updated);
