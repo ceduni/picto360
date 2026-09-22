@@ -3,26 +3,14 @@ import { prepareHotspotsForPictoExport } from "@/utils/HotspotAssetUtils";
 import JSZip from "jszip";
 
 type imageFormat = "picto";
-type MediaKind = "image" | "video";
 
 interface MergedFileMetadata {
   version: string;
   format: imageFormat;
   created: string;
-  /**
-   * v1 files only have imageInfo. v2 files add mediaInfo (image or video)
-   * and keep imageInfo for backward compatibility when the media is an image.
-   */
-  imageInfo?: {
+  imageInfo: {
     filename: string;
     format: string;
-    size: number;
-    dimensions?: { width: number; height: number };
-  };
-  mediaInfo?: {
-    kind: MediaKind;
-    filename: string;
-    mimeType: string;
     size: number;
     dimensions?: { width: number; height: number };
   };
@@ -45,7 +33,7 @@ export class CustomFileExporter {
   private static readonly MIME_TYPE = "application/picto";
 
   static async createPictoFile(
-    mediaBlob: Blob,
+    imageBlob: Blob,
     annotations?: HotspotData[],
     options: {
       filename?: string;
@@ -68,13 +56,8 @@ export class CustomFileExporter {
       viewerAssets = [],
     } = options;
 
-    // v2: the media can be a 360 image or a 360 video, auto-detected from the
-    // blob MIME type so every existing call site keeps working.
-    const mediaKind = this.resolveMediaKind(mediaBlob);
-    const mediaFilename = mediaKind === "video" ? "video.mp4" : `image.${imageFormat}`;
-    const mediaMimeType = mediaBlob.type || (mediaKind === "video" ? "video/mp4" : "image/jpeg");
-
     const zip = new JSZip();
+    const imageFilename = `image.${imageFormat}`;
     const bundledAssets = includeLocalFiles
       ? this.getBundledAssets(annotations || [], viewerAssets)
       : [];
@@ -83,32 +66,23 @@ export class CustomFileExporter {
       includeLocalFiles,
     );
 
-    // Media is already compressed (JPEG/MP4/WebM): storing it without DEFLATE
-    // avoids a useless CPU pass for a size difference measured at ±2%.
-    zip.file(mediaFilename, mediaBlob, { compression: "STORE" });
+    zip.file(imageFilename, imageBlob);
 
     const metadata: MergedFileMetadata = {
-      version: "1.1",
+      version: "1.0",
       format: customExtension.replace(".", "") as imageFormat,
       created: new Date().toISOString(),
-      ...(mediaKind === "image"
-        ? { imageInfo: { filename: mediaFilename, format: imageFormat, size: mediaBlob.size } }
-        : {}),
-      mediaInfo: {
-        kind: mediaKind,
-        filename: mediaFilename,
-        mimeType: mediaMimeType,
-        size: mediaBlob.size,
+      imageInfo: {
+        filename: imageFilename,
+        format: imageFormat,
+        size: imageBlob.size,
       },
       annotationCount: exportedAnnotations?.length || 0,
       bundledAssetCount: bundledAssets.length,
       creator,
     };
 
-    // v2: JSON payloads are minified (they are tiny; indentation only adds bytes).
-    // The caller-provided compression level (default 6) applies to the JSON only.
-    const jsonCompression = { compression: "DEFLATE" as const, compressionOptions: { level: Math.min(compression, 9) } };
-    zip.file("metadata.json", JSON.stringify(metadata), jsonCompression);
+    zip.file("metadata.json", JSON.stringify(metadata, null, 2));
 
     const annotationData = {
       version: "1.0",
@@ -118,7 +92,7 @@ export class CustomFileExporter {
         types: [...new Set(exportedAnnotations?.map((annotation) => annotation.type))],
       },
     };
-    zip.file("annotations.json", JSON.stringify(annotationData), jsonCompression);
+    zip.file("annotations.json", JSON.stringify(annotationData, null, 2));
 
     const assetEntries: PictoAssetManifestEntry[] = bundledAssets.map((asset) => {
       const assetPath = `assets/${asset.id}-${sanitizeFilename(asset.fileName)}`;
@@ -135,13 +109,12 @@ export class CustomFileExporter {
     });
 
     const manifest = {
-      fileType: mediaKind === "video" ? "Annotated Picto 360 Video" : "Annotated Picto 360 Image",
+      fileType: "Annotated Picto 360 Image",
       extension: customExtension,
-      version: "1.2",
+      version: "1.1",
       creator,
-      mediaKind,
       files: [
-        { name: mediaFilename, type: mediaKind, description: `360 panoramic ${mediaKind}` },
+        { name: imageFilename, type: "image", description: "360 panoramic image" },
         { name: "metadata.json", type: "metadata", description: "File metadata and information" },
         { name: "annotations.json", type: "annotations", description: "Annotation data" },
         { name: "manifest.json", type: "manifest", description: "File structure description" },
@@ -153,28 +126,20 @@ export class CustomFileExporter {
       ],
       embeddedAssets: assetEntries,
     };
-    zip.file("manifest.json", JSON.stringify(manifest), jsonCompression);
+    zip.file("manifest.json", JSON.stringify(manifest, null, 2));
 
     const zipBlob = await zip.generateAsync({
       type: "blob",
+      compression: "DEFLATE",
+      compressionOptions: { level: compression },
       mimeType: customMimeType,
     });
 
     return zipBlob;
   }
 
-  private static resolveMediaKind(blob: Blob): MediaKind {
-    if (blob.type.startsWith("video/")) {
-      return "video";
-    }
-    return "image";
-  }
-
   static async extractCustomFile(customBlob: Blob): Promise<{
-    /** 360 media (image or video). `imageBlob` is kept as a deprecated alias. */
-    mediaBlob: Blob;
     imageBlob: Blob;
-    mediaKind: MediaKind;
     annotations: HotspotData[];
     assets: StoredViewerAsset[];
     metadata: MergedFileMetadata;
@@ -200,30 +165,19 @@ export class CustomFileExporter {
     }
     const annotationData = JSON.parse(await annotationsFile.async("string"));
 
-    // v2 files describe their media in mediaInfo; v1 files only have imageInfo.
-    const mediaKind: MediaKind = metadata.mediaInfo?.kind ?? "image";
-    const mediaFilename = metadata.mediaInfo?.filename ?? metadata.imageInfo?.filename;
-    const mediaMimeType = metadata.mediaInfo?.mimeType
-      ?? getImageMimeType(metadata.imageInfo?.format);
-
-    if (!mediaFilename) {
-      throw new Error("Invalid custom 360 file: missing media entry");
+    const imageFile = zip.file(metadata.imageInfo.filename);
+    if (!imageFile) {
+      throw new Error("Invalid custom 360 file: missing image");
     }
-    const mediaFile = zip.file(mediaFilename);
-    if (!mediaFile) {
-      throw new Error(`Invalid custom 360 file: missing media ${mediaFilename}`);
-    }
-    const mediaBlob = new Blob(
-      [await mediaFile.async("arraybuffer")],
-      { type: mediaMimeType || "application/octet-stream" },
+    const imageBlob = new Blob(
+      [await imageFile.async("arraybuffer")],
+      { type: getImageMimeType(metadata.imageInfo.format) },
     );
 
     const assets = await this.extractBundledAssets(zip, manifest?.embeddedAssets);
 
     return {
-      mediaBlob,
-      imageBlob: mediaBlob,
-      mediaKind,
+      imageBlob,
       annotations: annotationData.annotations || [],
       assets,
       metadata,

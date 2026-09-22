@@ -24,11 +24,10 @@ const StudioPage = () => {
                     await putViewerItem(
                         viewerId,
                         fileName,
-                        extractedFile.mediaBlob,
+                        extractedFile.imageBlob,
                         extractedFile.annotations,
                         undefined,
                         extractedFile.assets,
-                        extractedFile.mediaBlob.type,
                     );
                     setBannerMessage({ message: "Fichier chargé avec succès", type: "success" });
                 } catch (error) {
@@ -36,24 +35,12 @@ const StudioPage = () => {
                     console.error("Error on picto file", error);
                 }
                 break;
-            case "mp4":
-            case "m4v":
-            case "MP4":
-            case "webm":
-            case "WEBM":
-            case "mov":
-            case "MOV":
-                await putViewerItem(viewerId, undefined, newImageSrc, undefined, undefined, undefined,
-                    newImageSrc.type || "video/mp4");
-                setBannerMessage({ message: "Vidéo chargée avec succès", type: "success" });
-                break;
             case "jpg":
             case "JPG":
             case "JPEG":
             case "jpeg":
             case "png":
-                await putViewerItem(viewerId, undefined, newImageSrc, undefined, undefined, undefined,
-                    newImageSrc.type || "image/jpeg");
+                await putViewerItem(viewerId, undefined, newImageSrc, undefined);
                 setBannerMessage({ message: "Image chargée avec succès", type: "success" });
                 break;
             default:
@@ -63,7 +50,7 @@ const StudioPage = () => {
 
         await navigate(`/view/${viewerId}`);
 
-        if (filetype !== "picto" && newImageSrc.type.startsWith("image") && newImageSrc.size >= 10_000_000) {
+        if (filetype !== "picto" && newImageSrc.size >= 10_000_000) {
             const compressed = await compressBeforeUpload(newImageSrc);
             if (compressed?.type.includes("image"))
                 await putViewerItem(viewerId, undefined, undefined, undefined, compressed);
