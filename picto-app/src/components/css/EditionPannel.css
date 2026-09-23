@@ -271,3 +271,34 @@
 .file_upload_icon {
     font-size: 1.5em;
 }
+
+/* Time-range editor (video projects only) */
+.edition_pannel__timerange {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--color-grey, #ccc);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.edition_pannel__timerange-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-black, #333);
+}
+
+.edition_pannel__timerange-label input {
+    width: 64px;
+    padding: 4px 6px;
+    border: 1px solid var(--color-grey, #ccc);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.edition_pannel__timerange-hint {
+    color: #777;
+    font-size: 11px;
+}

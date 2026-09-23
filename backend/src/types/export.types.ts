@@ -7,6 +7,8 @@ export interface HotspotData {
   url_text?: string;
   sceneId?: string;
   cssClass?: string;
+  /** Video only: when the annotation is visible. */
+  timeRange?: { start: number; end?: number };
   meta?: Record<string, unknown>;
 }
 
@@ -17,6 +19,8 @@ export interface ExportOptions {
   fileName?: string;
   folderName?: string;
   includeMetadata?: boolean;
+  /** MIME type of the uploaded media (image/jpeg, video/mp4, ...). */
+  mimeType?: string;
 }
 
 export interface ExportedFile {

@@ -28,6 +28,7 @@ export class ExportService {
   async buildExportOptions (request: FastifyRequest, reply: FastifyReply):Promise<ExportInput>{
     const formFields: Record<string, string> = {};
     let fileBuffer: Buffer | null = null;
+    let fileMimeType: string | undefined = undefined;
 
     // Iterate through ALL multipart parts
     const parts = request.parts();
@@ -35,6 +36,7 @@ export class ExportService {
       if (part.type === 'file') {
         // Handle file part
         fileBuffer = await part.toBuffer();
+        fileMimeType = part.mimetype;
       } else if (part.type === 'field') {
         // Handle text field parts
         formFields[part.fieldname] = part.value as string;
@@ -55,11 +57,12 @@ export class ExportService {
         return reply.status(400).send('Error: Invalid annotations JSON');
       }
     }
-    const options = { 
+    const options = {
       format,
       fileName: formFields.fileName || undefined,
       folderName: formFields.folderName || undefined,
-      includeMetadata: formFields.includeMetadata === 'true'
+      includeMetadata: formFields.includeMetadata === 'true',
+      mimeType: fileMimeType
     }
 
     return {
