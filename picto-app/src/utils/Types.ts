@@ -17,6 +17,12 @@ export interface StoredViewerAsset {
   kind: StoredViewerAssetKind;
 }
 
+export interface HotspotTimeRange {
+  /** Seconds into the video when the annotation becomes visible. */
+  start: number;
+  /** Seconds when it hides. Undefined = visible until the end. */
+  end?: number;
+}
 export interface HotspotData {
   id: string;
   pitch: number;
@@ -31,6 +37,8 @@ export interface HotspotData {
   mimeType?: string;
   fileName?: string;
   pendingAsset?: PendingHotspotAsset;
+  /** Video only: when the annotation is visible. Images ignore it. */
+  timeRange?: HotspotTimeRange;
   meta?: Record<string, unknown>; // optional metadata for custom cases
 }
 
@@ -225,6 +233,7 @@ export interface ViewerItem {
   annotations?: HotspotData[];
   compressedBlob?: Blob;
   assets?: StoredViewerAsset[];
+  mimeType?: string;
 }
 
 //---------------- Hotspots -------------------------
@@ -254,6 +263,9 @@ export interface PannellumViewer {
   getYaw: () => number;
   getPitch: () => number;
   getHfov: () => number;
+  /** Video engine only: current playback position in seconds. */
+  getCurrentTime?: () => number;
+  getDuration?: () => number;
   on: (event: string, handler: () => void) => void;
   removeHotSpot: (id: string) => void;
   addHotSpot: (config: unknown) => void;

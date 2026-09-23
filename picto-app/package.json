@@ -46,6 +46,7 @@
     "react-tooltip": "^5.29.1",
     "react-useanimations": "^2.10.0",
     "styled-components": "^6.1.13",
+    "three": "^0.185.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -56,6 +57,7 @@
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@types/react-lazy-load-image-component": "^1.6.4",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react-swc": "^3.7.2",
     "eslint": "^9.17.0",
     "typescript": "^5.7.2",

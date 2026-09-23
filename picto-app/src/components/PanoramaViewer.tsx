@@ -8,6 +8,7 @@ import type { HotspotData } from "@/utils/Types";
 import { useHotspotCreation } from "@/hooks/useHotspotCreation";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 import { usePannellumViewer } from "@/hooks/usePannellumViewer";
+import { useVideoViewer } from "@/hooks/useVideoViewer";
 import { useViewerData } from "@/hooks/useViewerData";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useHotspotManager } from "@/hooks/useHotspotManager";
@@ -31,13 +32,24 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     const { setBannerMessage } = useFeedbackBanner();
 
     // Load viewer data
-    const { imageSource, hotspots: initialHotspots, isLoading, error } = useViewerData({ viewerId });
+    const {
+        mediaSource,
+        mediaType,
+        hotspots: initialHotspots,
+        isLoading,
+        error,
+    } = useViewerData({ viewerId });
 
-    // Initialize Pannellum
-    const { viewerInstance } = usePannellumViewer({
+    // Initialize the engine matching the media type (image: Pannellum, video: three.js)
+    const { viewerInstance: imageViewerInstance } = usePannellumViewer({
         viewerRef,
-        imageSource,
+        imageSource: mediaType === "image" ? mediaSource : null,
     });
+    const { viewerInstance: videoViewerInstance } = useVideoViewer({
+        viewerRef,
+        videoSource: mediaType === "video" ? mediaSource : null,
+    });
+    const viewerInstance = mediaType === "video" ? videoViewerInstance : imageViewerInstance;
 
     const {
         visible: contextMenuVisible,
@@ -103,7 +115,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             });
 
             try {
-                const newHotspot = createNewHotspotData(type, coords);
+                const startTime = mediaType === "video" ? viewerInstance?.getCurrentTime?.() : undefined;
+                const newHotspot = createNewHotspotData(type, coords, startTime);
                 console.log('🎯 New hotspot data created:', newHotspot);
                 setSelectedHotspot(newHotspot);
                 openPanel("creating");
@@ -112,7 +125,7 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                 setBannerMessage({ message: "Erreur lors de la création", type: "failure" });
             }
         },
-        [createNewHotspotData, setSelectedHotspot, openPanel, setBannerMessage]
+        [mediaType, viewerInstance, createNewHotspotData, setSelectedHotspot, openPanel, setBannerMessage]
     );
 
     const { dispatchHotspotEvent } = useHotspotCreation(
@@ -251,6 +264,8 @@ const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
             {isEditMode && panelState?.isOpen && selectedHotspot && (
                 <EditionPannel
                     hotspot={selectedHotspot}
+                    isVideo={mediaType === "video"}
+                    duration={mediaType === "video" ? viewerInstance?.getDuration?.() : undefined}
                     onSave={handleHotspotSave}
                     onClose={handlePanelClose}
                     onDelete={handleHotspotDelete}

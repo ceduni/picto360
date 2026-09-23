@@ -18,7 +18,7 @@ interface UseHotspotManagerReturn {
     createHotspot: (hotspotData: HotspotData) => Promise<void>;
     updateHotspot: (updatedHotspot: HotspotData) => Promise<void>;
     deleteHotspot: (toDeleteHotspot: HotspotData) => Promise<void>;
-    createNewHotspotData: (type: string, coords: [number, number]) => HotspotData;
+    createNewHotspotData: (type: string, coords: [number, number], startTime?: number) => HotspotData;
     decrementCounter: () => void;
 }
 
@@ -207,7 +207,7 @@ export const useHotspotManager = ({
     }, []);
 
     const createNewHotspotData = useCallback(
-        (type: string, coords: [number, number]): HotspotData => {
+        (type: string, coords: [number, number], startTime?: number): HotspotData => {
             if (!type || coords.length !== 2) {
                 throw new Error("Invalid hotspot parameters");
             }
@@ -218,6 +218,9 @@ export const useHotspotManager = ({
                 yaw: coords[1],
                 type: type.toLowerCase(),
                 cssClass: "hotspot-manager__custom_hotspot",
+                // Video: the annotation is visible from the playhead position
+                // at creation time (editable in the panel).
+                ...(startTime !== undefined ? { timeRange: { start: Math.max(0, startTime) } } : {}),
             };
         },
         [generateHotspotId]
