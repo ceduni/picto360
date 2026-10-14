@@ -41,7 +41,7 @@ function getPrivateImageBaseUrl({
 
 
 /**
- * This helper is used to sign a image url with a tocken 
+ * This helper is used to sign an image url with a token
  * to make the image readable by the front-end
  */
 export async function signPrivateImageURL({
@@ -90,7 +90,7 @@ export async function signPrivateImageURL({
  * This function help upload an Image directly to CloudFlare Images
  * @param image - the image to upload
  * @returns boolean / the upload status.
- */ 
+ */
 export async function uploadFileToImages (
     filename:string,
     buffer:Buffer,
@@ -101,12 +101,12 @@ export async function uploadFileToImages (
     const cloud_image = await cloudflare.images.v1.create({
         account_id:env.CLOUDFLARE_ACCOUNT_ID,
         file,
-        requireSignedURLs: true, 
+        requireSignedURLs: true,
     })
 
     if (!cloud_image.id || !cloud_image.uploaded){
         throw new Error("Cloudflare image upload failed")
     }
-    
-    return cloud_image   
+
+    return cloud_image
 }

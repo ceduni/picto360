@@ -2,7 +2,7 @@ import mongoose, { Document, Schema, Types } from "mongoose";
 
 export type PermissionAction = "VIEW" | "EDIT" | "UPLOAD" | "DELETE";
 export type PermissionResourceType =
-  | "PictoProject"
+  | "PictoPlayground"
   | "PictoImage"
   | "Annotation"
   | "Content"
@@ -31,7 +31,7 @@ const permissionSchema = new Schema<PermissionDocument>(
     },
     objectType: {
       type: String,
-      enum: ["PictoProject", "PictoImage", "Annotation", "Content", "Activity"],
+      enum: ["PictoPlayground", "PictoImage", "Annotation", "Content", "Activity"],
       required: true,
       index: true,
     },
@@ -56,4 +56,4 @@ permissionSchema.index(
 );
 const Permission = mongoose.model<PermissionDocument>("Permission", permissionSchema);
 
-export default Permission 
+export default Permission

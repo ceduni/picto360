@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ITeam } from "./team.model";
 import { UserDocument } from "./user.model";
-import { ProjectDocument } from "./project.model";
+import { PlaygroundDocument } from "./pictoPlayground.model";
 
 /*
 ========================== Activity Task ==========================
@@ -23,7 +23,7 @@ const activityTaskSchema = new Schema<ActivityTask>(
 
 // =========== Activity constraints =====================
 // constraint_value becomes Schema.Types.Mixed but validated at the app layer
-// — or use Mongoose discriminators 
+// — or use Mongoose discriminators
 
 
 export type ActivityConstraintType = "TIMED"|"CHASSE_AU_TRESOR"|"OBJECTS_IDENTIFICATION"|"AUTONOMOUS_LEARNING";
@@ -38,12 +38,12 @@ export interface IConstraint{
 export const constraintSchema = new Schema<IConstraint>(
   {
     constraint_type:{
-      type: String, 
-      enum:["TIMED","CHASSE_AU_TRESOR","OBJECTS_IDENTIFICATION","AUTONOMOUS_LEARNING"], 
+      type: String,
+      enum:["TIMED","CHASSE_AU_TRESOR","OBJECTS_IDENTIFICATION","AUTONOMOUS_LEARNING"],
       required:true
     },
     constraint_value:{type:Schema.Types.Mixed,required:true,default:{}},
-    is_enabled : {type: Boolean, required:true, default:false},    
+    is_enabled : {type: Boolean, required:true, default:false},
   }
 )
 
@@ -52,7 +52,7 @@ export const constraintSchema = new Schema<IConstraint>(
 */
 export type ActivityParticipantStatus = "TODO" | "PENDING" | "FINISHED";
 
-export interface ActivityParticipantProgress extends Document{  
+export interface ActivityParticipantProgress extends Document{
   activity: mongoose.Types.ObjectId;
   participant: mongoose.Types.ObjectId;
   team:mongoose.Types.ObjectId;
@@ -107,7 +107,7 @@ const ActivityParticipantProgressModel = mongoose.model(
 export interface ActivityDocument extends Document {
   title: string,
   description: string,
-  playground:ProjectDocument, // Activity playground where the avtivity happens
+  playground:PlaygroundDocument, // Activity playground where the avtivity happens
   mode: "SOLO" | "COLLABORATIVE" | "COMPETITIVE",
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED",
   constraints:IConstraint[],
@@ -123,9 +123,9 @@ const activitySchema = new Schema<ActivityDocument> (
   {
     title: {type: String , required:true},
     description: {type:String},
-    playground:{type:mongoose.Types.ObjectId, ref:"PictoProject"},
+    playground:{type:mongoose.Types.ObjectId, ref:"PictoPlayground"},
     mode:{type: String ,enum: ["SOLO", "COLLABORATIVE", "COMPETITIVE"], default:"SOLO"},
-    status: { type: String, enum: ["DRAFT", "PUBLISHED", "ARCHIVED"], default: "DRAFT" },    
+    status: { type: String, enum: ["DRAFT", "PUBLISHED", "ARCHIVED"], default: "DRAFT" },
     constraints:{type:[constraintSchema]},
     tags: {type:[String]},
     tasks:{type: [activityTaskSchema], default: []},

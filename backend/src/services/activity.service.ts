@@ -3,7 +3,7 @@ import ActivityModels, { IConstraint } from "../models/activity.model";
 import { User } from "@/models/user.model";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
-import PictoProject, { ProjectDocument } from "@/models/project.model";
+import PictoPlayground, { ProjectDocument } from "@/models/project.model";
 import PictoImage from "@/models/image.model";
 import Permission from "@/models/user_perm.model";
 import type ImageServiceType from "./image.service";
@@ -227,7 +227,7 @@ export interface AttachPlaygroundImageBody {
 
 /**
  * Attach an already-uploaded PictoImage to an activity's playground scene.
- * Creates the playground PictoProject on first use (and grants the creator
+ * Creates the playground PictoPlayground on first use (and grants the creator
  * OLP UPLOAD/EDIT/VIEW/DELETE rights on it, since a freshly created project
  * has no permission record yet and would otherwise 403 its own owner).
  */
@@ -259,10 +259,10 @@ export const attachPlaygroundImage = async (
     let project: ProjectDocument | null;
 
     if (activity.playground) {
-      project = await PictoProject.findById(activity.playground);
+      project = await PictoPlayground.findById(activity.playground);
       if (!project) return reply.status(404).send({ message: "Playground project not found" });
     } else {
-      project = await PictoProject.create({
+      project = await PictoPlayground.create({
         name: `${activity.title} - Playground`,
         images: [],
       });
@@ -273,7 +273,7 @@ export const attachPlaygroundImage = async (
       await Permission.create({
         subjectType: "USER",
         subjectId: user._id,
-        objectType: "PictoProject",
+        objectType: "PictoPlayground",
         objectId: project._id,
         actions: ["VIEW", "EDIT", "UPLOAD", "DELETE"],
       });
@@ -364,7 +364,7 @@ export const getActivityById = async (request: FastifyRequest, reply: FastifyRep
       .populate("createdBy")
       .populate({ path: "playground", populate: { path: "images" } })
       .lean();
-    
+
     if (!activity) return reply.status(404).send({ message: "Activity not found" });
 
     const isCreator = String(activity.createdBy._id) === String(mongoUser._id);

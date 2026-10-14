@@ -1,7 +1,6 @@
 import { uploadFileToImages, signPrivateImageURL } from "@/middlewares/cloudflare";
-import PictoImage from "@/models/image.model";
-import { ImageDocument } from "@/models/image.model";
-import { ProjectDocument } from "@/models/project.model";
+import { PictoImage, MediaDocument, ImageDocument } from "@/models/pictoMedia.model";
+import { PlaygroundDocument } from "@/models/pictoPlayground.model";
 import {UserDocument} from "@models/user.model"
 import permisionService from "./permission.service";
 import { PermissionAction } from "@/models/user_perm.model";
@@ -30,11 +29,11 @@ class ImageService {
           url: deliveryUrl,
         })
         await store_image.save()
-        return store_image            
-    }         
+        return store_image
+    }
   }
 
-  async createImage(imageData: ImageDocument) {
+  async createImage(imageData: MediaDocument) {
     const newImage = new PictoImage(imageData);
     await newImage.save();
     return newImage;
@@ -52,7 +51,7 @@ class ImageService {
     return PictoImage.findById(id);
   }
 
-  async updateImage(id: string, update: Partial<ImageDocument>) {
+  async updateImage(id: string, update: Partial<MediaDocument>) {
     const updatedImage = await PictoImage.findByIdAndUpdate(id, update, {
       new: true,
     });
@@ -67,7 +66,7 @@ class ImageService {
     return PictoImage.find();
   }
 
-  async linkImageToProject (image: ImageDocument, project: ProjectDocument, user: UserDocument) {
+  async linkImageToProject (image: ImageDocument, project: PlaygroundDocument, user: UserDocument) {
     const required_perm: PermissionAction[] = ["UPLOAD"]
     const hasPermission = await permisionService.verifyUserPermForProject(user, project, required_perm);
 

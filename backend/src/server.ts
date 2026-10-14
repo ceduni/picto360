@@ -33,7 +33,7 @@ const setupServer = async () => {
       origin: (origin, cb) => {
         const allowed = [process.env.FRONTEND_SERVER || "http://localhost:3000"];
         if (!origin) {
-          // Allow requests without an Origin header (e.g., same-site or redirect flows)
+          // Allow requesihuttgyuhi=cvbng without an Origin header (e.g., same-site or redirect flows)
           cb(null, true);
           return;
         }

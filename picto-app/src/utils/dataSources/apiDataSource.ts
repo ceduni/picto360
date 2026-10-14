@@ -117,7 +117,7 @@ async function request(path: string, token: string, init?: RequestInit) {
 /**
  * `ViewerDataSource` implementation backed by the backend API (Cloudflare
  * Images for the panorama background, Mongo Annotation/Content documents for
- * hotspots). `viewerId` here is a PictoProject id (an activity's
+ * hotspots). `viewerId` here is a PictoPlayground id (an activity's
  * `playground`), not a client-generated UUID like IndexedDbDataSource uses.
  *
  * create/update/deleteHotspot all receive the *full* intended hotspot list

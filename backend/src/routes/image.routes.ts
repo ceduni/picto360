@@ -1,13 +1,13 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import ImageService from "@/services/image.service";
-import { ImageDocument } from "@/models/image.model";
+import { ImageDocument } from "@/models/pictoMedia.model";
 import { getDirectUploadUrl } from "@/middlewares/cloudflare";
 import { authenticate } from "@/middlewares/firebaseAuth";
 
 // Multipart is registered globally (see server.ts, fastify/multipart with no
 // attachFieldsToBody), so the uploaded file must be read via request.file(),
 // not request.body — mirrors imageCompression.routes.ts's working pattern.
-async function createImage(
+async function uploadSaveImage(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
@@ -125,7 +125,7 @@ async function getAllImages(_request: FastifyRequest, reply: FastifyReply) {
 }
 
 export default async function imageRoutes(server: FastifyInstance) {
-  server.post("/images", { preHandler: authenticate }, createImage);
+  server.post("/images", { preHandler: authenticate }, uploadSaveImage);
   server.post("/images/upload-url", { preHandler: authenticate }, getUploadUrl);
   server.get<{ Params: { id: string } }>("/images/:id", { preHandler: authenticate }, getImage);
   server.get<{ Params: { cloud_imageID: string } }>("/images/:cloud_imageID/sign-private-image", { preHandler: authenticate }, signPrivateImageUrl);

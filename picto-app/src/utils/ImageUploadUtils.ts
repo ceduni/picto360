@@ -32,7 +32,7 @@ export async function uploadImageFile(file: File, token: string): Promise<Upload
 
 /**
  * Attaches an already-uploaded image to an activity's playground scene
- * (creating the playground PictoProject on first use). Returns the updated
+ * (creating the playground PictoPlayground on first use). Returns the updated
  * activity, with `playground` populated.
  */
 export async function attachPlaygroundImage(
@@ -69,7 +69,7 @@ export async function signPrivateImageURL(imageId:string, token: string) {
     throw new Error("Failed to sign image");
   }
   const data = await res.json() as SignedImageResponse;
-  return data.url;  
+  return data.url;
 }
 
 export async function refreshPrivateImageURL(previousUrl:string, token: string) {

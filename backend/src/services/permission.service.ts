@@ -16,13 +16,13 @@ class OLPermissionService{
       await Permission.exists({
         subjectType: "USER",
         subjectId: user._id,
-        objectType: "PictoProject",
+        objectType: "PictoPlayground",
         objectId: project._id,
         actions: { $all: requiredActions },
       })
     );
   }
-        
+
 }
 
 export default new OLPermissionService()
