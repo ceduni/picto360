@@ -1,7 +1,7 @@
-import Project, { ProjectDocument } from '@/models/project.model';
+import Project, { PlaygroundDocument } from '@/models/pictoPlayground.model';
 
 class ProjectService {
-  async createProject(project: ProjectDocument) {
+  async createProject(project: PlaygroundDocument) {
     const newProject = new Project(project);
     await newProject.save();
     return newProject;
@@ -11,7 +11,7 @@ class ProjectService {
     return Project.findById(id).populate("images");
   }
 
-  async updateProject(id: string, update: Partial<ProjectDocument>) {
+  async updateProject(id: string, update: Partial<PlaygroundDocument>) {
     const updatedProject = await Project.findByIdAndUpdate(id, update, { new: true });
     return updatedProject;
   }

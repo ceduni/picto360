@@ -1,9 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import ProjectService from '@/services/project.service';
-import { ProjectDocument } from '@/models/project.model';
+import { PlaygroundDocument } from '@/models/pictoPlayground.model';
 import { authenticate } from '@/middlewares/firebaseAuth';
 
-async function createProject(request: FastifyRequest<{ Body: ProjectDocument }>, reply: FastifyReply) {
+async function createProject(request: FastifyRequest<{ Body: PlaygroundDocument }>, reply: FastifyReply) {
   try {
     const project = await ProjectService.createProject(request.body);
     reply.code(201).send(project);
@@ -25,7 +25,7 @@ async function getProject(request: FastifyRequest<{ Params: { id: string } }>, r
   }
 }
 
-async function updateProject(request: FastifyRequest<{ Params: { id: string }; Body: Partial<ProjectDocument> }>, reply: FastifyReply) {
+async function updateProject(request: FastifyRequest<{ Params: { id: string }; Body: Partial<PlaygroundDocument> }>, reply: FastifyReply) {
   try {
     const project = await ProjectService.updateProject(request.params.id, request.body);
     reply.send(project);
@@ -53,9 +53,9 @@ async function getAllProjects(_request: FastifyRequest, reply: FastifyReply) {
 }
 
 export default async function projectRoutes(server: FastifyInstance) {
-  server.post<{ Body: ProjectDocument }>('/projects', { preHandler: authenticate }, createProject);
+  server.post<{ Body: PlaygroundDocument }>('/projects', { preHandler: authenticate }, createProject);
   server.get<{ Params: { id: string } }>('/projects/:id', { preHandler: authenticate }, getProject);
-  server.put<{ Params: { id: string }; Body: Partial<ProjectDocument> }>(
+  server.put<{ Params: { id: string }; Body: Partial<PlaygroundDocument> }>(
     '/projects/:id',
     { preHandler: authenticate },
     updateProject

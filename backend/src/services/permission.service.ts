@@ -1,4 +1,4 @@
-import { ProjectDocument } from "@/models/project.model";
+import { PlaygroundDocument } from "@/models/pictoPlayground.model";
 import { UserDocument } from "@/models/user.model";
 import Permission, { PermissionAction } from "@/models/user_perm.model";
 
@@ -9,7 +9,7 @@ class OLPermissionService{
 
   async verifyUserPermForProject(
     user: UserDocument,
-    project: ProjectDocument,
+    project: PlaygroundDocument,
     requiredActions: PermissionAction[]
   ) {
     return Boolean(

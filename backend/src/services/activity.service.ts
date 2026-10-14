@@ -3,8 +3,8 @@ import ActivityModels, { IConstraint } from "../models/activity.model";
 import { User } from "@/models/user.model";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
-import PictoPlayground, { ProjectDocument } from "@/models/project.model";
-import PictoImage from "@/models/image.model";
+import PictoPlayground, { PlaygroundDocument } from "@/models/pictoPlayground.model";
+import { PictoImage } from "@/models/pictoMedia.model";
 import Permission from "@/models/user_perm.model";
 import type ImageServiceType from "./image.service";
 // ImageService is imported lazily inside attachPlaygroundImage below: it
@@ -256,7 +256,7 @@ export const attachPlaygroundImage = async (
     const image = await PictoImage.findById(imageId);
     if (!image) return reply.status(404).send({ message: "Image not found" });
 
-    let project: ProjectDocument | null;
+    let project: PlaygroundDocument | null;
 
     if (activity.playground) {
       project = await PictoPlayground.findById(activity.playground);

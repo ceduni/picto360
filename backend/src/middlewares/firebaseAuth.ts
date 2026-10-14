@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import admin from "firebase-admin";
-import serviceAccount from "../../picto-360-firebase-adminsdk-fbsvc-542411c36b.json"; // must be in .gitignore
+import serviceAccount from "../../picto-360-firebase-adminsdk-fbsvc-76d12c9ce7.json"; // must be in .gitignore
 
 declare module "fastify" {
   interface FastifyRequest {
