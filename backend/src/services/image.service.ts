@@ -1,4 +1,4 @@
-import { uploadFileToImages, signPrivateImageURL } from "@/middlewares/cloudflare";
+import { uploadFileToImages, signPrivateImageURL } from "@/middlewares/cloudflare.images";
 import { PictoImage, MediaDocument, ImageDocument } from "@/models/pictoMedia.model";
 import { PlaygroundDocument } from "@/models/pictoPlayground.model";
 import {UserDocument} from "@models/user.model"

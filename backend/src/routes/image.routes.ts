@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import ImageService from "@/services/image.service";
 import { ImageDocument } from "@/models/pictoMedia.model";
-import { getDirectUploadUrl } from "@/middlewares/cloudflare";
+import { getDirectUploadUrl } from "@/middlewares/cloudflare.images";
 import { authenticate } from "@/middlewares/firebaseAuth";
 
 // Multipart is registered globally (see server.ts, fastify/multipart with no

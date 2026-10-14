@@ -1,18 +1,12 @@
 import { env } from '@/config/env';
-import Cloudflare from 'cloudflare';
-
-const cloudflare = new Cloudflare({
-  apiToken: env.CLOUDFLARE_API_TOKEN, // This is the default and can be omitted
-});
-
+import cloudflare_client from '@/middlewares/cloudflare.config'
 
 export async function getDirectUploadUrl () {
-    return cloudflare.images.v2.directUploads.create({
+    return cloudflare_client.images.v2.directUploads.create({
         account_id:env.CLOUDFLARE_ACCOUNT_ID,
         requireSignedURLs: true,
     })
 }
-
 
 function getPrivateImageBaseUrl({
   previousUrl,
@@ -98,7 +92,7 @@ export async function uploadFileToImages (
 ){
     const file = new File([buffer], filename, { type: mimeType });
 
-    const cloud_image = await cloudflare.images.v1.create({
+    const cloud_image = await cloudflare_client.images.v1.create({
         account_id:env.CLOUDFLARE_ACCOUNT_ID,
         file,
         requireSignedURLs: true,
