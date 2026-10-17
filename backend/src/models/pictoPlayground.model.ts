@@ -8,12 +8,12 @@ import { MediaDocument } from "./pictoMedia.model";
 export interface PlaygroundDocument extends Document {
   name: string;
   annotations:[AnnotationDocument]
-  images:[MediaDocument]
+  main_medias:[MediaDocument]
 }
 
 const playgroundSchema = new Schema<PlaygroundDocument>({
   name: { type: String, required: true },
-  images:{type:[Types.ObjectId], ref:"PictoMedia",  required:true},
+  main_medias:{type:[Types.ObjectId], ref:"PictoMedia",  required:true},
   annotations:{type: [Types.ObjectId], ref:"Annotation"},
 },{
   _id:true,

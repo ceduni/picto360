@@ -74,7 +74,7 @@ class ImageService {
       throw new Error("User does not have permission to upload images to this project");
     }
 
-    project.images.push(image);
+    project.main_medias.push(image);
     await project.save();
     return project;
   }

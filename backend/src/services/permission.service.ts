@@ -4,7 +4,10 @@ import Permission, { PermissionAction } from "@/models/user_perm.model";
 
 /**
  * Object Level Permission Service
+ * Handles assigning new permissions, verifying and validating permissions
+ * and revoking permisssions on objects
  */
+
 class OLPermissionService{
 
   async verifyUserPermForProject(

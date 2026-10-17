@@ -4,6 +4,7 @@ export type PermissionAction = "VIEW" | "EDIT" | "UPLOAD" | "DELETE";
 export type PermissionResourceType =
   | "PictoPlayground"
   | "PictoImage"
+  | "PictoVideo"
   | "Annotation"
   | "Content"
   | "Activity";
@@ -14,7 +15,7 @@ interface PermissionDocument extends Document{
     subjectId: Types.ObjectId
     objectType: PermissionResourceType,
     objectId: Types.ObjectId;
-    actions:[PermissionAction],
+    actions:PermissionAction[],
 }
 
 const permissionSchema = new Schema<PermissionDocument>(
@@ -31,7 +32,7 @@ const permissionSchema = new Schema<PermissionDocument>(
     },
     objectType: {
       type: String,
-      enum: ["PictoPlayground", "PictoImage", "Annotation", "Content", "Activity"],
+      enum: ["PictoPlayground", "PictoImage", "PictoVideo", "Annotation", "Content", "Activity"],
       required: true,
       index: true,
     },

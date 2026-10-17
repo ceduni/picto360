@@ -1,5 +1,5 @@
 import { env } from '@/config/env';
-import cloudflare_client from '@/middlewares/cloudflare.config'
+import { cloudflare_client } from '@/middlewares/cloudflare.config'
 
 export async function getDirectUploadUrl () {
     return cloudflare_client.images.v2.directUploads.create({
