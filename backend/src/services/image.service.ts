@@ -1,9 +1,5 @@
 import { uploadFileToImages, signPrivateImageURL, buildImageDeliveryUrl } from "@/middlewares/cloudflare.images";
-import { PictoImage, MediaDocument, ImageDocument } from "@/models/pictoMedia.model";
-import { PlaygroundDocument } from "@/models/pictoPlayground.model";
-import {UserDocument} from "@models/user.model"
-import permisionService from "./permission.service";
-import { PermissionAction } from "@/models/user_perm.model";
+import { PictoImage, MediaDocument } from "@/models/pictoMedia.model";
 
 class ImageService {
 
@@ -56,19 +52,6 @@ class ImageService {
 
   async getAllImages() {
     return PictoImage.find();
-  }
-
-  async linkImageToProject (image: ImageDocument, project: PlaygroundDocument, user: UserDocument) {
-    const required_perm: PermissionAction[] = ["UPLOAD"]
-    const hasPermission = await permisionService.verifyUserPermForProject(user, project, required_perm);
-
-    if (!hasPermission) {
-      throw new Error("User does not have permission to upload images to this project");
-    }
-
-    project.main_medias.push(image);
-    await project.save();
-    return project;
   }
 }
 

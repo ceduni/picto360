@@ -3,15 +3,11 @@ import ActivityModels, { IConstraint } from "../models/activity.model";
 import { resolveUser } from "@/utils/resolveUser";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
-import PictoPlayground, { PlaygroundDocument } from "@/models/pictoPlayground.model";
-import { PictoImage } from "@/models/pictoMedia.model";
+import PictoPlayground from "@/models/pictoPlayground.model";
+import { PictoMedia } from "@/models/pictoMedia.model";
 import Permission from "@/models/user_perm.model";
-import type ImageServiceType from "./image.service";
-// ImageService is imported lazily inside attachPlaygroundImage below: it
-// transitively pulls in the Cloudflare middleware, which eagerly reads
-// Cloudflare env vars at module load. A static top-level import here would
-// make every consumer of activity.service.ts (including tests that don't
-// touch images) require a full Cloudflare config just to load this module.
+import { UserDocument } from "@/models/user.model";
+import MediaService, { MediaServiceError } from "./media.service";
 
 const { Activity } = ActivityModels;
 
@@ -206,79 +202,123 @@ export const publishActivity = async (
   }
 };
 
-export interface AttachPlaygroundImageBody {
-  imageId: string;
+/**
+ * Return the activity's playground, creating it on first use. A brand-new
+ * playground has no OLP record for anyone yet, so the activity's creator is
+ * granted full rights on it (otherwise the media upload permission check
+ * would reject their own upload).
+ */
+async function ensurePlayground(activity: InstanceType<typeof Activity>, user: UserDocument) {
+  if (activity.playground) {
+    const existing = await PictoPlayground.findById(activity.playground);
+    if (existing) return { playground: existing, created: false };
+  }
+
+  const playground = await PictoPlayground.create({
+    name: `${activity.title} - Playground`,
+    main_medias: [],
+  });
+
+  await Permission.create({
+    subjectType: "USER",
+    subjectId: user._id,
+    objectType: "PictoPlayground",
+    objectId: playground._id,
+    actions: ["VIEW", "EDIT", "UPLOAD", "DELETE"],
+  });
+
+  activity.playground = playground._id as any;
+  await activity.save();
+
+  return { playground, created: true };
 }
 
 /**
- * Attach an already-uploaded PictoImage to an activity's playground scene.
- * Creates the playground PictoPlayground on first use (and grants the creator
- * OLP UPLOAD/EDIT/VIEW/DELETE rights on it, since a freshly created project
- * has no permission record yet and would otherwise 403 its own owner).
+ * Make sure the activity has a playground, so the client has a playground id
+ * to request a media upload for. Idempotent.
  */
-export const attachPlaygroundImage = async (
-  request: FastifyRequest<{ Params: { id: string }; Body: AttachPlaygroundImageBody }>,
+export const createActivityPlayground = async (
+  request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
 ) => {
   const resolved = await resolveUser(request, reply);
   if (!resolved) return;
   const { user } = resolved;
 
-  const { id } = request.params;
-  const { imageId } = request.body;
-
-  if (!imageId?.trim()) {
-    return reply.status(400).send({ message: "'imageId' is required" });
-  }
-
   try {
-    const activity = await Activity.findById(id);
+    const activity = await Activity.findById(request.params.id);
     if (!activity) return reply.status(404).send({ message: "Activity not found" });
     // This behaviore could change if we introduce collaborative ediation (with supervisors e.g)
     if (String(activity.createdBy) !== String(user._id))
       return reply.status(403).send({ message: "Forbidden" });
 
-    const image = await PictoImage.findById(imageId);
-    if (!image) return reply.status(404).send({ message: "Image not found" });
+    const { playground, created } = await ensurePlayground(activity, user);
+    await playground.populate("main_medias");
+    return reply.code(created ? 201 : 200).send(playground);
+  } catch (err) {
+    console.error("Error creating activity playground:", err);
+    return reply.status(500).send({
+      error: "Server error",
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+};
 
-    let project: PlaygroundDocument | null;
+export interface AttachPlaygroundMediaBody {
+  mediaId: string;
+  // Remove (and delete from storage) the playground's current main media
+  replace?: boolean;
+}
 
-    if (activity.playground) {
-      project = await PictoPlayground.findById(activity.playground);
-      if (!project) return reply.status(404).send({ message: "Playground project not found" });
-    } else {
-      project = await PictoPlayground.create({
-        name: `${activity.title} - Playground`,
-        main_medias: [],
-      });
+/**
+ * Attach an uploaded (READY) image or video as the playground's main media.
+ */
+export const attachPlaygroundMedia = async (
+  request: FastifyRequest<{ Params: { id: string }; Body: AttachPlaygroundMediaBody }>,
+  reply: FastifyReply
+) => {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+  const { user } = resolved;
 
-      // A brand-new project has no OLP record for anyone yet. Grant the
-      // activity's creator full rights on it so the permission check in
-      // ImageService.linkImageToProject doesn't reject their own upload.
-      await Permission.create({
-        subjectType: "USER",
-        subjectId: user._id,
-        objectType: "PictoPlayground",
-        objectId: project._id,
-        actions: ["VIEW", "EDIT", "UPLOAD", "DELETE"],
-      });
+  const { mediaId, replace = false } = request.body ?? {};
+  if (!mediaId?.trim() || !mongoose.Types.ObjectId.isValid(mediaId)) {
+    return reply.status(400).send({ message: "A valid 'mediaId' is required" });
+  }
 
-      activity.playground = project._id as any;
-    }
+  try {
+    const activity = await Activity.findById(request.params.id);
+    if (!activity) return reply.status(404).send({ message: "Activity not found" });
+    // This behaviore could change if we introduce collaborative ediation (with supervisors e.g)
+    if (String(activity.createdBy) !== String(user._id))
+      return reply.status(403).send({ message: "Forbidden" });
+    if (!activity.playground) return reply.status(404).send({ message: "Activity has no playground yet" });
 
-    try {
-      // Lazily imported: image.service.ts pulls in the Cloudflare middleware,
-      // which eagerly reads Cloudflare env vars at module load.
-      const ImageService = (await import("./image.service.js")).default as unknown as typeof ImageServiceType;
-      await ImageService.linkImageToProject(image, project, user);
-    } catch (err) {
-      if (err instanceof Error && /permission/i.test(err.message)) {
-        return reply.status(403).send({ message: err.message });
+    const playground = await PictoPlayground.findById(activity.playground);
+    if (!playground) return reply.status(404).send({ message: "Playground project not found" });
+
+    const media = await PictoMedia.findById(mediaId);
+    if (!media) return reply.status(404).send({ message: "Media not found" });
+    if (String(media.playground) !== String(playground._id))
+      return reply.status(400).send({ message: "Media was uploaded for another playground" });
+    if (media.status !== "READY")
+      return reply.status(409).send({ message: "Media upload is not complete" });
+
+    if (replace) {
+      const previous = playground.main_medias.filter((id) => String(id) !== String(media._id));
+      try {
+        for (const previousId of previous) {
+          await MediaService.deleteMedia(user, String(previousId));
+        }
+      } catch (err) {
+        if (err instanceof MediaServiceError) {
+          return reply.status(err.statusCode).send({ message: err.message });
+        }
+        throw err;
       }
-      throw err;
     }
 
-    await activity.save();
+    await PictoPlayground.updateOne({ _id: playground._id }, { $addToSet: { main_medias: media._id } });
 
     const populated = await Activity.findById(activity._id)
       .populate({ path: "playground", populate: { path: "main_medias" } })
@@ -286,7 +326,7 @@ export const attachPlaygroundImage = async (
 
     return reply.send(populated);
   } catch (err) {
-    console.error("Error attaching image to playground:", err);
+    console.error("Error attaching media to playground:", err);
     return reply.status(500).send({
       error: "Server error",
       message: err instanceof Error ? err.message : String(err),

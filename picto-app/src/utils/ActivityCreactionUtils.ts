@@ -40,6 +40,7 @@ export function activityToFormValues(activity: ActivityFull): ActivityIstance {
     chrono,
     participantsList,
     teamsList,
+    playground: activity.playground,
     tagInput: "",
     taskInput: "",
   };

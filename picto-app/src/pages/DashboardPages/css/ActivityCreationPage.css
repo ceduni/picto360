@@ -955,14 +955,16 @@
   cursor: pointer;
 }
 
-/* ── Playground image preview (ImageUploadCard) ── */
+/* ── Playground media preview (MediaUploadCard) ── */
 .playground-image-preview {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.playground-image-preview img {
+.playground-image-preview .secure-media {
+  display: block;
+  background: var(--accent-light-bg);
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
@@ -1000,4 +1002,40 @@
   background: var(--accent-light-bg);
   color: var(--blue-slate);
   border: 1px solid var(--dust-grey);
+}
+
+.playground-image-preview__hint {
+  flex: 1;
+  align-self: center;
+  text-align: center;
+  font-size: var(--type-button-size);
+  color: var(--blue-slate);
+}
+
+.playground-upload-progress {
+  position: relative;
+  overflow: hidden;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--dust-grey);
+  background: var(--accent-light-bg);
+}
+
+.playground-upload-progress__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent);
+  opacity: 0.25;
+  transition: width 0.2s ease;
+}
+
+.playground-upload-progress__label {
+  position: relative;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--type-button-size);
+  font-weight: var(--fw-medium);
+  color: var(--blue-slate);
 }

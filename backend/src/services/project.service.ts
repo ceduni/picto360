@@ -8,7 +8,7 @@ class ProjectService {
   }
 
   async getProject(id: string) {
-    return Project.findById(id).populate("images");
+    return Project.findById(id).populate("main_medias");
   }
 
   async updateProject(id: string, update: Partial<PlaygroundDocument>) {

@@ -5,9 +5,11 @@ import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
 
 interface ImageUploaderProps {
     onImageUpload: (imageSrc: File) => void;
+    accept?: string;            // file input `accept`, any file when omitted
+    prompt?: React.ReactNode;   // replaces the default drop-zone text
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, accept, prompt }) => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { setBannerMessage } = useFeedbackBanner()
@@ -61,18 +63,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
                     <ArrowUpTrayIcon width={24} height={24} className="image-uploader__download-icon-ico" />
                 </div>
                 <p className="image-uploader__drop-text">
-                    <b>Selectionnez une image ou un projet Picto
-                        <span className="has-helper">
-                            <InformationCircleIcon width={18} height={18} />
-                            <span className="helper mid">Fichier <code><b>.picto</b></code></span>
-                        </span>
-                    </b> 
-                    <br/> ou glissez là simplement ici
+                    {prompt ?? <>
+                        <b>Selectionnez une image ou un projet Picto
+                            <span className="has-helper">
+                                <InformationCircleIcon width={18} height={18} />
+                                <span className="helper mid">Fichier <code><b>.picto</b></code></span>
+                            </span>
+                        </b> 
+                        <br/> ou glissez là simplement ici
+                    </>}
                 </p>
                 {/*TODO: mention the supported files format + file size limit*/}
             </div>
 
-            <input type="file" ref={fileInputRef} onChange={handleImageChange} className="image-uploader__file-input" />
+            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept={accept} className="image-uploader__file-input" />
 
         </div>
     );

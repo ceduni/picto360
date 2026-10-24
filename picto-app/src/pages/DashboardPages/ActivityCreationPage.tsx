@@ -19,7 +19,7 @@ import TasksColumn from "@/pages/ActivityCreation/TasksCard";
 import { useActivity } from "@/contexts/ActivityContext";
 import { useActivityDraftApi } from "@/hooks/useActivityDraftApi";
 import { useFeedbackBanner } from "@/hooks/useFeedbackbanner";
-import ImageUploadCard from "@pages/ActivityCreation/ImageUploadCard";
+import MediaUploadCard from "@pages/ActivityCreation/MediaUploadCard";
 
 const EMPTY_FORM: ActivityIstance = {
     id: '',
@@ -241,7 +241,7 @@ const ActivityCreationPage: React.FC = () => {
                         />
                         <div className="main-col">
                             <TasksColumn formValues={formValues} setFormValues={handleSetFormValues} />
-                            <ImageUploadCard formValues={formValues} setFormValues={handleSetFormValues}/>
+                            <MediaUploadCard formValues={formValues} setFormValues={handleSetFormValues}/>
                         </div>
 
                     </div>

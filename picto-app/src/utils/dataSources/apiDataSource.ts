@@ -1,6 +1,6 @@
-import type { HotspotData } from "@/utils/Types";
+import type { HotspotData, Playground } from "@/utils/Types";
 import type { LoadedViewerData, ViewerDataSource } from "@/utils/viewerDataSource";
-import { refreshPrivateImageURL } from "../ImageUploadUtils";
+import { getMediaAccessUrl, isVideoMedia } from "../MediaUploadUtils";
 
 const BASE = import.meta.env.VITE_BACKEND_URL;
 
@@ -135,7 +135,7 @@ export class ApiDataSource implements ViewerDataSource {
     async load(projectId: string): Promise<LoadedViewerData> {
         const token = await this.getToken();
         const [project, annotations] = await Promise.all([
-            request(`/projects/${projectId}`, token),
+            request(`/projects/${projectId}`, token) as Promise<Playground>,
             request(`/projects/${projectId}/annotations`, token) as Promise<PopulatedAnnotation[]>,
         ]);
 
@@ -149,8 +149,14 @@ export class ApiDataSource implements ViewerDataSource {
         });
         this.cache.set(projectId, projectCache);
 
+        const mainMedia = project?.main_medias?.[0];
+        if (mainMedia && isVideoMedia(mainMedia)) {
+            // Pannellum here has no video support yet (follow-up, see main)
+            throw new Error("360° video playgrounds can't be edited in the viewer yet.");
+        }
+
         return {
-            imageSource: await refreshPrivateImageURL(project?.images?.[0]?.url,token) ?? null,
+            imageSource: mainMedia ? (await getMediaAccessUrl(mainMedia._id, token)).url : null,
             hotspots,
             dispose: () => {},
         };

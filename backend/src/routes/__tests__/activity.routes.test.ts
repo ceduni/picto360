@@ -19,6 +19,15 @@ jest.mock("@/models/activity.model", () => ({
   constraintSchema: {},
 }));
 
+// media.service pulls in the Cloudflare middleware, which needs Cloudflare env
+// vars at module load.
+jest.mock("@/services/media.service", () => {
+  class MediaServiceError extends Error {
+    constructor(message: string, public statusCode: number) { super(message); }
+  }
+  return { __esModule: true, default: { deleteMedia: jest.fn() }, MediaServiceError };
+});
+
 jest.mock("@/models/team.model", () => ({
   __esModule: true,
   default: {

@@ -52,6 +52,26 @@ export type MessageBannerType = "success" | "warning" | "failure"
 
 //--------------- Activity types ----------------
 
+// A playground's media, as returned by the backend (Mongo discriminator in `__t`)
+export type PlaygroundMediaType = "PictoImage" | "PictoVideo" | "PictoGif";
+
+export interface PlaygroundMedia {
+  _id: string;
+  __t: PlaygroundMediaType;
+  name?: string;
+  mimeType?: string;
+  size?: number;
+  status?: "PENDING" | "READY" | "FAILED";
+  url?: string;               // Cloudflare Images only, unsigned
+  cloudflareImageId?: string; // Cloudflare Images only
+}
+
+export interface Playground {
+  _id: string;
+  name: string;
+  main_medias: PlaygroundMedia[];
+}
+
 type ActivityData = {
   id: string,
   title: string,
@@ -62,11 +82,7 @@ type ActivityData = {
   authoriseEdit: boolean;
   participantsList: ParticipantData[],
   teamsList: TeamInstance[],
-  playground?: {
-    _id: string;
-    name: string;
-    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
-  }
+  playground?: Playground;
 }
 
 export interface ActivityIstance extends ActivityData {
@@ -96,11 +112,7 @@ export interface ActivityFull {
   totalParticipants: number;
   createdAt: string;
   updatedAt: string;
-  playground?: {
-    _id: string;
-    name: string;
-    images: { _id: string; cloudflareImageId:string, url: string; name?: string }[];
-  };
+  playground?: Playground;
 }
 
 export interface FetchedActivity {
