@@ -73,7 +73,7 @@ export class ExportService {
    * Export file to Google Drive
    * Handles auth, storage provider setup, and format selection
    */
-  async exportToGoogleDrive(request: FastifyRequest, reply: FastifyReply){
+  exportToGoogleDrive = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const export_input :ExportInput= await this.buildExportOptions(request,reply);
 

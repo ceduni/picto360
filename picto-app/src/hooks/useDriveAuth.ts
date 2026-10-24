@@ -61,7 +61,7 @@ export function useDriveAuth() {
 
   // Get OAuth URL from backend
   async function getAuthUrl(viewerId: string, returnTo: string, autoExport = false): Promise<string> {
-    const endpoint = autoExport ? "/api/drive/auth-and-export-url" : "/api/drive/auth-url";
+    const endpoint = autoExport ? "/api/drive/auth-url" : "/api/drive/auth-url";
 
     try {
       const response = await fetch(`${baseUrl}${endpoint}`, {
