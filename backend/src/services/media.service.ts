@@ -1,12 +1,6 @@
 import path from "node:path";
 import { Types } from "mongoose";
-import {
-  deleteImageFromImages,
-  buildImageDeliveryUrl,
-  getDirectUploadUrl,
-  getImageFromImages,
-  signPrivateImageURL,
-} from "@/middlewares/cloudflare.images";
+import { deleteImageFromImages, signPrivateImageURL } from "@/middlewares/cloudflare.images";
 import { deleteFileFromR2, getR2DownloadUrl, getR2UploadUrl, headR2Object } from "@/middlewares/cloudflare.r2";
 import {
   ImageDocument,
@@ -14,6 +8,7 @@ import {
   PictoGif,
   PictoImage,
   PictoMedia,
+  PictoR2Image,
   PictoVideo,
   R2MediaDocument,
 } from "@/models/pictoMedia.model";
@@ -23,27 +18,24 @@ import { PermissionAction } from "@/models/user_perm.model";
 import permisionService from "./permission.service";
 
 /*
-  Media storage router (creator flow).
+  Media storage (creator flow).
 
-  - Non-GIF images go to Cloudflare Images.
-  - GIFs and videos go to R2, untouched.
+  Every new upload (images, GIFs, videos) is stored as-is in R2. Images
+  uploaded earlier to Cloudflare Images (PictoImage) can still be signed and
+  deleted, but nothing new goes there.
 
-  Uploads never go through Fastify: the browser gets a direct upload URL from
-  createUpload, sends the file straight to Cloudflare, then calls
-  completeUpload so we can verify what actually landed in storage.
+  Uploads never go through Fastify: the browser gets a presigned PUT URL from
+  createUpload, sends the file straight to R2, then calls completeUpload so
+  we can verify what actually landed in storage.
 */
 
 export type MediaKind = "IMAGE" | "GIF" | "VIDEO";
 export type MediaScope = "main" | "annotation";
+export type MediaProvider = "CF_IMAGES" | "R2";
 
-const MB = 1024 * 1024;
-const GB = 1024 * MB;
+const GB = 1024 * 1024 * 1024;
 
-const MAX_SIZE: Record<MediaKind, number> = {
-  IMAGE: 10 * MB, // Cloudflare Images upload limit
-  GIF: 5 * GB,    // single presigned PUT, no multipart for now
-  VIDEO: 5 * GB,
-};
+const MAX_UPLOAD_SIZE = 5 * GB; // single presigned PUT, no multipart for now
 
 // How long a signed read URL stays valid. Videos get longer so playback
 // doesn't break mid-session.
@@ -69,11 +61,18 @@ export function classifyMimeType(mimeType: string): MediaKind | null {
   return null;
 }
 
+const R2_MODELS = { IMAGE: PictoR2Image, GIF: PictoGif, VIDEO: PictoVideo };
+
 function kindOf(media: MediaDocument): MediaKind {
-  if (media instanceof PictoImage) return "IMAGE";
+  if (media instanceof PictoImage || media instanceof PictoR2Image) return "IMAGE";
   if (media instanceof PictoGif) return "GIF";
   if (media instanceof PictoVideo) return "VIDEO";
   throw new MediaServiceError("Unknown media type", 500);
+}
+
+// PictoImage records were uploaded to Cloudflare Images before everything moved to R2
+function providerOf(media: MediaDocument): MediaProvider {
+  return media instanceof PictoImage ? "CF_IMAGES" : "R2";
 }
 
 function fileExtension(filename: string, mimeType: string) {
@@ -100,12 +99,9 @@ export interface CreateUploadInput {
 
 export interface UploadTicket {
   media: MediaDocument;
-  provider: "CF_IMAGES" | "R2";
+  // The browser PUTs the raw file here, with exactly these headers.
   uploadUrl: string;
-  // CF Images: multipart/form-data POST with the file in a `file` field.
-  // R2: raw body PUT, with exactly these headers.
-  method: "POST" | "PUT";
-  headers?: Record<string, string>;
+  headers: Record<string, string>;
 }
 
 class MediaService {
@@ -116,7 +112,7 @@ class MediaService {
     const kind = classifyMimeType(mimeType);
     if (!kind) throw new MediaServiceError(`Unsupported file type: ${mimeType}`, 415);
     if (!Number.isFinite(size) || size <= 0) throw new MediaServiceError("'size' must be a positive number of bytes", 400);
-    if (size > MAX_SIZE[kind]) throw new MediaServiceError(`File too large for ${kind} (max ${MAX_SIZE[kind]} bytes)`, 413);
+    if (size > MAX_UPLOAD_SIZE) throw new MediaServiceError(`File too large (max ${MAX_UPLOAD_SIZE} bytes)`, 413);
 
     if (!Types.ObjectId.isValid(playgroundId)) throw new MediaServiceError("Invalid playground id", 400);
     const playground = await PictoPlayground.findById(playgroundId);
@@ -132,27 +128,18 @@ class MediaService {
       status: "PENDING" as const,
     };
 
-    if (kind === "IMAGE") {
-      const upload = await getDirectUploadUrl();
-      if (!upload.id || !upload.uploadURL) throw new MediaServiceError("Cloudflare did not return an upload URL", 502);
-
-      const media = await PictoImage.create({ ...base, cloudflareImageId: upload.id });
-      return { media, provider: "CF_IMAGES", uploadUrl: upload.uploadURL, method: "POST" };
-    }
-
-    const Model = kind === "GIF" ? PictoGif : PictoVideo;
-    const media = new Model(base);
+    const media = new R2_MODELS[kind](base);
     media.r2Key = buildR2Key(playground._id as Types.ObjectId, scope, media._id as Types.ObjectId, fileExtension(filename, mimeType));
     await media.save();
 
     const uploadUrl = await getR2UploadUrl(mimeType, media.r2Key, R2_UPLOAD_URL_TTL_SECONDS);
-    return { media, provider: "R2", uploadUrl, method: "PUT", headers: { "Content-Type": mimeType } };
+    return { media, uploadUrl, headers: { "Content-Type": mimeType } };
   }
 
   /**
    * Called by the browser once its direct upload finished. Checks the file
-   * actually reached storage (and, for R2, that it matches what was
-   * announced) before marking the media READY.
+   * actually reached R2 and matches what was announced before marking the
+   * media READY.
    */
   async completeUpload(user: UserDocument, mediaId: string) {
     const media = await this.getMedia(mediaId);
@@ -161,17 +148,8 @@ class MediaService {
     if (media.status === "READY") return media;
     if (media.status === "FAILED") throw new MediaServiceError("This upload was rejected, start a new one", 409);
 
-    const kind = kindOf(media);
-
-    if (kind === "IMAGE") {
-      const imageId = (media as ImageDocument).cloudflareImageId!;
-      const image = await getImageFromImages(imageId);
-      if (image.draft || !image.uploaded) throw new MediaServiceError("Upload not finished yet", 409);
-
-      media.url = buildImageDeliveryUrl(imageId);
-      media.status = "READY";
-      await media.save();
-      return media;
+    if (providerOf(media) !== "R2") {
+      throw new MediaServiceError("This upload was started before images moved to R2, start a new one", 409);
     }
 
     const r2Media = media as R2MediaDocument;
@@ -180,7 +158,7 @@ class MediaService {
 
     // The presigned PUT pins the Content-Type but not the size, so the size
     // cap can only be enforced here.
-    if (head.size > MAX_SIZE[kind] || head.contentType !== media.mimeType) {
+    if (head.size > MAX_UPLOAD_SIZE || head.contentType !== media.mimeType) {
       await deleteFileFromR2(r2Media.r2Key!);
       media.status = "FAILED";
       await media.save();
@@ -230,7 +208,7 @@ class MediaService {
     const playground = await this.playgroundOf(media);
     await this.authorize(user, playground, ["DELETE"]);
 
-    if (kindOf(media) === "IMAGE") {
+    if (providerOf(media) === "CF_IMAGES") {
       const imageId = (media as ImageDocument).cloudflareImageId;
       if (imageId) await deleteImageFromImages(imageId);
     } else {
@@ -246,7 +224,7 @@ class MediaService {
     const kind = kindOf(media);
     const ttl = ACCESS_URL_TTL_SECONDS[kind];
 
-    const url = kind === "IMAGE"
+    const url = providerOf(media) === "CF_IMAGES"
       ? await signPrivateImageURL({ imageId: (media as ImageDocument).cloudflareImageId, expiryMinutes: ttl / 60 })
       : await getR2DownloadUrl((media as R2MediaDocument).r2Key!, ttl);
 

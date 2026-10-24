@@ -53,7 +53,9 @@ export type MessageBannerType = "success" | "warning" | "failure"
 //--------------- Activity types ----------------
 
 // A playground's media, as returned by the backend (Mongo discriminator in `__t`)
-export type PlaygroundMediaType = "PictoImage" | "PictoVideo" | "PictoGif";
+// New uploads are PictoR2Image / PictoGif / PictoVideo (all in R2). PictoImage
+// is an older image stored in Cloudflare Images.
+export type PlaygroundMediaType = "PictoImage" | "PictoR2Image" | "PictoVideo" | "PictoGif";
 
 export interface PlaygroundMedia {
   _id: string;
@@ -62,8 +64,8 @@ export interface PlaygroundMedia {
   mimeType?: string;
   size?: number;
   status?: "PENDING" | "READY" | "FAILED";
-  url?: string;               // Cloudflare Images only, unsigned
-  cloudflareImageId?: string; // Cloudflare Images only
+  url?: string;               // PictoImage only (older images), unsigned
+  cloudflareImageId?: string; // PictoImage only
 }
 
 export interface Playground {

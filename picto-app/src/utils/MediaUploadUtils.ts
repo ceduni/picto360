@@ -1,4 +1,3 @@
-import imageCompression from "browser-image-compression";
 import type { ActivityFull, Playground, PlaygroundMedia } from "@/utils/Types";
 
 const BASE = import.meta.env.VITE_BACKEND_URL;
@@ -6,23 +5,16 @@ const BASE = import.meta.env.VITE_BACKEND_URL;
 export type MediaKind = "IMAGE" | "GIF" | "VIDEO";
 export type MediaScope = "main" | "annotation";
 
-const MB = 1024 * 1024;
-const GB = 1024 * MB;
+const GB = 1024 * 1024 * 1024;
 
-// Mirrors the backend limits (media.service.ts): Cloudflare Images caps
-// uploads at 10MB, R2 uploads are single presigned PUTs capped at 5GB.
-const MAX_SIZE: Record<MediaKind, number> = {
-    IMAGE: 10 * MB,
-    GIF: 5 * GB,
-    VIDEO: 5 * GB,
-};
+// Mirrors the backend limit (media.service.ts): every file goes to R2 as a
+// single presigned PUT, uploaded at full quality.
+const MAX_UPLOAD_SIZE = 5 * GB;
 
 interface UploadTicket {
     media: PlaygroundMedia;
-    provider: "CF_IMAGES" | "R2";
-    uploadUrl: string;
-    method: "POST" | "PUT";
-    headers?: Record<string, string>;
+    uploadUrl: string;                 // presigned R2 PUT
+    headers: Record<string, string>;   // must be sent as-is (part of the signature)
 }
 
 export interface MediaAccess {
@@ -70,8 +62,8 @@ function sendFile(
 ): Promise<void> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open(ticket.method, ticket.uploadUrl);
-        Object.entries(ticket.headers ?? {}).forEach(([name, value]) => xhr.setRequestHeader(name, value));
+        xhr.open("PUT", ticket.uploadUrl);
+        Object.entries(ticket.headers).forEach(([name, value]) => xhr.setRequestHeader(name, value));
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) onProgress?.(event.loaded / event.total);
@@ -79,37 +71,13 @@ function sendFile(
         xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed (${xhr.status})`)));
         xhr.onerror = () => reject(new Error("Upload failed (network error)"));
 
-        if (ticket.provider === "CF_IMAGES") {
-            const form = new FormData();
-            form.append("file", file);
-            xhr.send(form);
-        } else {
-            xhr.send(file);
-        }
+        xhr.send(file);
     });
 }
 
 /**
- * Images over the Cloudflare Images limit are compressed in the browser
- * rather than rejected (360° panoramas are often larger than 10MB).
- */
-async function fitToLimit(file: File, kind: MediaKind): Promise<File> {
-    if (file.size <= MAX_SIZE[kind]) return file;
-    if (kind !== "IMAGE") {
-        throw new Error(`Le fichier dépasse la taille maximale (${MAX_SIZE[kind] / GB} Go).`);
-    }
-    const compressed = await imageCompression(file, {
-        maxSizeMB: 9.5,
-        maxWidthOrHeight: 12000, // Cloudflare Images max dimension
-        useWebWorker: true,
-    });
-    return new File([compressed], file.name, { type: compressed.type || file.type });
-}
-
-/**
- * Direct upload: ask the backend where to send the file, send it straight to
- * Cloudflare Images / R2, then let the backend verify it. Resolves with the
- * READY media record.
+ * Direct upload: ask the backend for a presigned URL, send the file straight
+ * to R2, then let the backend verify it. Resolves with the READY media record.
  */
 export async function uploadMedia(
     file: File,
@@ -117,23 +85,21 @@ export async function uploadMedia(
     token: string,
     { scope = "main", onProgress }: { scope?: MediaScope; onProgress?: (fraction: number) => void } = {}
 ): Promise<PlaygroundMedia> {
-    const kind = classifyFile(file);
-    if (!kind) throw new Error("Seules les images et les vidéos sont acceptées.");
-
-    const toUpload = await fitToLimit(file, kind);
+    if (!classifyFile(file)) throw new Error("Seules les images et les vidéos sont acceptées.");
+    if (file.size > MAX_UPLOAD_SIZE) throw new Error(`Le fichier dépasse la taille maximale (${MAX_UPLOAD_SIZE / GB} Go).`);
 
     const ticket = await request<UploadTicket>("/media/uploads", token, {
         method: "POST",
         body: JSON.stringify({
             playgroundId,
-            filename: toUpload.name,
-            mimeType: toUpload.type,
-            size: toUpload.size,
+            filename: file.name,
+            mimeType: file.type,
+            size: file.size,
             scope,
         }),
     });
 
-    await sendFile(ticket, toUpload, onProgress);
+    await sendFile(ticket, file, onProgress);
 
     return request<PlaygroundMedia>(`/media/uploads/${ticket.media._id}/complete`, token, { method: "POST" });
 }

@@ -32,7 +32,7 @@ const PictoMedia = mongoose.model<MediaDocument>("PictoMedia", mediaSchema);
 
 
 //=========================== Image Schema ===========================
-// Stored in Cloudflare Images (non-GIF images only)
+// Stored in Cloudflare Images (non-GIF images up to its 10MB upload limit)
 
 export interface ImageDocument extends MediaDocument {
   cloudflareImageId?: string; // Optional field for Cloudflare image ID
@@ -48,7 +48,8 @@ const PictoImage = PictoMedia.discriminator<ImageDocument>("PictoImage", imageSc
 
 
 //=========================== R2 backed media ===========================
-// GIFs and videos are stored as-is in R2, addressed by their object key
+// GIFs, videos and images too large for Cloudflare Images (most 360°
+// panoramas) are stored as-is in R2, addressed by their object key
 
 export interface R2MediaDocument extends MediaDocument {
   r2Key?: string;
@@ -70,4 +71,12 @@ const gifSchema = new Schema<R2MediaDocument>({
 
 const PictoGif = PictoMedia.discriminator<R2MediaDocument>("PictoGif", gifSchema);
 
-export { PictoMedia, PictoImage, PictoVideo, PictoGif };
+const r2ImageSchema = new Schema<R2MediaDocument>({
+  r2Key:{type:String, required:false},
+},{
+  timestamps:true
+});
+
+const PictoR2Image = PictoMedia.discriminator<R2MediaDocument>("PictoR2Image", r2ImageSchema);
+
+export { PictoMedia, PictoImage, PictoVideo, PictoGif, PictoR2Image };

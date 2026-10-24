@@ -7,8 +7,7 @@ const BASE = import.meta.env.VITE_BACKEND_URL;
 /**
  * Hotspot types supported end-to-end against the backend. Image/GIF/video
  * hotspots either point to an external URL (YouTube, Giphy, …) or to a file
- * uploaded through the /media pipeline (Cloudflare Images for images, R2 for
- * GIFs and videos). createHotspot/updateHotspot throw a clear error for any
+ * uploaded to R2 through the /media pipeline. createHotspot/updateHotspot throw a clear error for any
  * other type rather than silently corrupting data.
  */
 type SupportedHotspotType = "text" | "label" | "hyperlink" | "image" | "gif" | "video";
@@ -166,9 +165,9 @@ async function request(path: string, token: string, init?: RequestInit) {
 }
 
 /**
- * `ViewerDataSource` implementation backed by the backend API (Cloudflare
- * Images for the panorama background, Mongo Annotation/Content documents for
- * hotspots, Cloudflare Images / R2 for hotspot files). `viewerId` here is a
+ * `ViewerDataSource` implementation backed by the backend API (R2 for the
+ * panorama background and hotspot files, Mongo Annotation/Content documents
+ * for hotspots). `viewerId` here is a
  * PictoPlayground id (an activity's `playground`), not a client-generated
  * UUID like IndexedDbDataSource uses.
  *

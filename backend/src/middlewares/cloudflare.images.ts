@@ -115,19 +115,6 @@ export async function uploadFileToImages (
 }
 
 
-/**
- * Fetch an image's record. For a direct upload, the record exists (as a
- * draft) as soon as the upload URL is created, and only loses `draft` once
- * the browser has actually uploaded the file.
- */
-export async function getImageFromImages(imageId: string) {
-    const image = await cloudflare_client.images.v1.get(imageId, {
-        account_id: env.CLOUDFLARE_ACCOUNT_ID,
-    });
-    // `draft` is returned by the API but missing from the SDK's Image type.
-    return image as typeof image & { draft?: boolean };
-}
-
 export async function deleteImageFromImages(imageId: string) {
     try {
         await cloudflare_client.images.v1.delete(imageId, {
