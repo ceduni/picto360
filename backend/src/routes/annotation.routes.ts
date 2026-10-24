@@ -2,6 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import AnnotationService from '../services/annotation.service';
 import { AnnotationDocument } from '../models/annotation.model';
 import { authenticate } from '@/middlewares/firebaseAuth';
+import { MediaServiceError } from '@/services/media.service';
+import { resolveUser } from '@/utils/resolveUser';
 
 async function createAnnotation(request: FastifyRequest<{ Body: AnnotationDocument }>, reply: FastifyReply) {
   try {
@@ -86,10 +88,16 @@ async function getAnnotationsForProject(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
 ) {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+
   try {
-    const annotations = await AnnotationService.getAnnotationsForProject(request.params.id);
+    const annotations = await AnnotationService.getAnnotationsWithMediaAccess(resolved.user, request.params.id);
     reply.send(annotations);
   } catch (error: any) {
+    if (error instanceof MediaServiceError) {
+      return reply.code(error.statusCode).send({ message: error.message });
+    }
     reply.code(500).send({ error: error.message });
   }
 }

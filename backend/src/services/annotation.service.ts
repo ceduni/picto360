@@ -1,4 +1,7 @@
 import Annotation, { AnnotationDocument } from '../models/annotation.model';
+import { MediaContentDocument } from '../models/content/mediaContent.model';
+import { UserDocument } from '../models/user.model';
+import MediaService from './media.service';
 
 class AnnotationService {
   async createAnnotation(annotation: AnnotationDocument) {
@@ -46,6 +49,31 @@ class AnnotationService {
    */
   async getAnnotationsForProject(projectId: string) {
     return Annotation.find({ project: projectId }).populate("content");
+  }
+
+  /**
+   * Same as getAnnotationsForProject, plus a short lived signed URL
+   * (`content.access`) for every uploaded media, signed in one batch so the
+   * client doesn't need a round-trip per media hotspot.
+   */
+  async getAnnotationsWithMediaAccess(user: UserDocument, projectId: string) {
+    const annotations = (await this.getAnnotationsForProject(projectId)).map((annotation) => annotation.toObject());
+
+    const mediaIdOf = (annotation: (typeof annotations)[number]) => {
+      const content = annotation.content as unknown as MediaContentDocument | undefined;
+      return content?.contentType === "MediaContent" && content.media ? String(content.media) : null;
+    };
+
+    const mediaIds = annotations.map(mediaIdOf).filter((id): id is string => id !== null);
+    if (mediaIds.length === 0) return annotations;
+
+    const access = await MediaService.getAccessUrlsForPlayground(user, projectId, mediaIds);
+
+    return annotations.map((annotation) => {
+      const mediaId = mediaIdOf(annotation);
+      if (!mediaId) return annotation;
+      return { ...annotation, content: { ...(annotation.content as object), access: access.get(mediaId) ?? null } };
+    });
   }
 }
 

@@ -201,15 +201,27 @@ class MediaService {
     const media = await this.getMedia(mediaId);
     await this.authorize(user, await this.playgroundOf(media), ["VIEW"]);
     if (media.status !== "READY") throw new MediaServiceError("Media is not available yet", 409);
+    return this.sign(media);
+  }
 
-    const kind = kindOf(media);
-    const ttl = ACCESS_URL_TTL_SECONDS[kind];
+  /**
+   * Signed read URLs for several media of one playground, with a single
+   * permission check (used to hydrate annotation media). Media that isn't
+   * READY or belongs to another playground is left out of the result.
+   */
+  async getAccessUrlsForPlayground(user: UserDocument, playgroundId: string, mediaIds: string[]) {
+    if (!Types.ObjectId.isValid(playgroundId)) throw new MediaServiceError("Invalid playground id", 400);
+    const playground = await PictoPlayground.findById(playgroundId);
+    if (!playground) throw new MediaServiceError("Playground not found", 404);
+    await this.authorize(user, playground, ["VIEW"]);
 
-    const url = kind === "IMAGE"
-      ? await signPrivateImageURL({ imageId: (media as ImageDocument).cloudflareImageId, expiryMinutes: ttl / 60 })
-      : await getR2DownloadUrl((media as R2MediaDocument).r2Key!, ttl);
+    const ids = mediaIds.filter((id) => Types.ObjectId.isValid(id));
+    const medias = ids.length
+      ? await PictoMedia.find({ _id: { $in: ids }, playground: playground._id, status: "READY" })
+      : [];
 
-    return { url, kind, expiresAt: new Date(Date.now() + ttl * 1000) };
+    const entries = await Promise.all(medias.map(async (media) => [String(media._id), await this.sign(media)] as const));
+    return new Map(entries);
   }
 
   /** Removes the file from storage, the record, and its playground reference. */
@@ -228,6 +240,17 @@ class MediaService {
 
     await PictoPlayground.updateOne({ _id: playground._id }, { $pull: { main_medias: media._id } });
     await media.deleteOne();
+  }
+
+  private async sign(media: MediaDocument) {
+    const kind = kindOf(media);
+    const ttl = ACCESS_URL_TTL_SECONDS[kind];
+
+    const url = kind === "IMAGE"
+      ? await signPrivateImageURL({ imageId: (media as ImageDocument).cloudflareImageId, expiryMinutes: ttl / 60 })
+      : await getR2DownloadUrl((media as R2MediaDocument).r2Key!, ttl);
+
+    return { url, kind, expiresAt: new Date(Date.now() + ttl * 1000) };
   }
 
   private async getMedia(mediaId: string) {

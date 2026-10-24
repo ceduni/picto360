@@ -29,7 +29,7 @@ jest.mock("@/models/pictoMedia.model", () => {
   }
   class PictoGif extends FakeMedia {}
   class PictoVideo extends FakeMedia {}
-  return { PictoMedia: { findById: jest.fn() }, PictoImage, PictoGif, PictoVideo };
+  return { PictoMedia: { findById: jest.fn(), find: jest.fn() }, PictoImage, PictoGif, PictoVideo };
 });
 
 jest.mock("@/models/pictoPlayground.model", () => ({
@@ -163,5 +163,30 @@ describe("completeUpload", () => {
 
     await expectMediaError(MediaService.completeUpload(user, "650000000000000000000abc"), 409);
     expect(media.status).toBe("PENDING");
+  });
+});
+
+describe("getAccessUrlsForPlayground", () => {
+  const VIDEO_ID = "650000000000000000000abc";
+
+  it("checks VIEW once and signs only READY media of that playground", async () => {
+    const video = new (PictoVideo as any)({ playground: PLAYGROUND_ID, status: "READY", r2Key: "k" });
+    m(PictoMedia.find).mockResolvedValue([video]);
+    m(r2.getR2DownloadUrl).mockResolvedValue("https://r2/signed");
+
+    const result = await MediaService.getAccessUrlsForPlayground(user, PLAYGROUND_ID, [VIDEO_ID, "not-an-id"]);
+
+    expect(permisionService.verifyUserPermForProject).toHaveBeenCalledTimes(1);
+    expect(permisionService.verifyUserPermForProject).toHaveBeenCalledWith(user, playground, ["VIEW"]);
+    expect(PictoMedia.find).toHaveBeenCalledWith({ _id: { $in: [VIDEO_ID] }, playground: PLAYGROUND_ID, status: "READY" });
+    expect(r2.getR2DownloadUrl).toHaveBeenCalledWith("k", 4 * 60 * 60);
+    expect(result.get(VIDEO_ID)).toMatchObject({ url: "https://r2/signed", kind: "VIDEO" });
+  });
+
+  it("refuses without VIEW on the playground", async () => {
+    m(permisionService.verifyUserPermForProject).mockResolvedValue(false);
+
+    await expectMediaError(MediaService.getAccessUrlsForPlayground(user, PLAYGROUND_ID, [VIDEO_ID]), 403);
+    expect(PictoMedia.find).not.toHaveBeenCalled();
   });
 });
