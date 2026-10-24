@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, NotFound, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { readFile } from "node:fs/promises";
 import { Upload } from "@aws-sdk/lib-storage";
@@ -51,20 +51,54 @@ export async function multipartUploadToR2(key: string, filePath: string) {
     }
 }
 
-export async function getR2UploadUrl(file_type:string, file_key:string) {
-    // Implementation for getting R2 short lived upload URL
-    const presignedUrl = await getSignedUrl(
+/**
+ * Short lived URL the browser PUTs the file to directly. The Content-Type is
+ * part of the signature, so the client must send the exact same header.
+ */
+export async function getR2UploadUrl(file_type:string, file_key:string, expiresIn = 3600) {
+    return getSignedUrl(
         S3,
         new PutObjectCommand({
             Bucket: env.R2_MEDIA_BUCKET_NAME,
             Key: file_key,
             ContentType: file_type,
         }),
-        { expiresIn: 3600 }, // Valid for 1 hour
+        { expiresIn },
     );
+}
 
-    console.log(presignedUrl);
-    // Return presignedUrl to the client
+/**
+ * Short lived URL the browser can read the file from (supports Range
+ * requests, so it works as a <video> source).
+ */
+export async function getR2DownloadUrl(file_key:string, expiresIn = 3600) {
+    return getSignedUrl(
+        S3,
+        new GetObjectCommand({
+            Bucket: env.R2_MEDIA_BUCKET_NAME,
+            Key: file_key,
+        }),
+        { expiresIn },
+    );
+}
+
+/**
+ * Returns the stored object's size and content type, or null if nothing has
+ * been uploaded under that key yet.
+ */
+export async function headR2Object(file_key:string) {
+    try {
+        const head = await S3.send(
+            new HeadObjectCommand({
+                Bucket: env.R2_MEDIA_BUCKET_NAME,
+                Key: file_key,
+            }),
+        );
+        return { size: head.ContentLength ?? 0, contentType: head.ContentType };
+    } catch (error) {
+        if (error instanceof NotFound) return null;
+        throw error;
+    }
 }
 
 

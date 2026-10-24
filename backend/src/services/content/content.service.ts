@@ -4,7 +4,7 @@ import Content, { ContentDocument } from "@/models/content/baseContent.model";
 // Content.discriminators below. Nothing else in the codebase imports them,
 // so without this the discriminator map is empty and createContent/
 // updateContent silently fall back to the base Content schema, dropping
-// type-specific fields like `body`/`url`/`r2Key`.
+// type-specific fields like `body`/`url`/`media`.
 import "@/models/content/textContent.model";
 import "@/models/content/linkContent.model";
 import "@/models/content/mediaContent.model";

@@ -1,10 +1,9 @@
-import { uploadFileToImages, signPrivateImageURL } from "@/middlewares/cloudflare.images";
+import { uploadFileToImages, signPrivateImageURL, buildImageDeliveryUrl } from "@/middlewares/cloudflare.images";
 import { PictoImage, MediaDocument, ImageDocument } from "@/models/pictoMedia.model";
 import { PlaygroundDocument } from "@/models/pictoPlayground.model";
 import {UserDocument} from "@models/user.model"
 import permisionService from "./permission.service";
 import { PermissionAction } from "@/models/user_perm.model";
-import { env } from "@/config/env";
 
 class ImageService {
 
@@ -13,14 +12,7 @@ class ImageService {
     const cloudflare_status = await uploadFileToImages(fileName,file,mimeType)
 
     if (cloudflare_status.uploaded){
-        // Cloudflare's SDK response may already include a delivery URL for the
-        // "private" variant in `variants`. If the account doesn't return one
-        // (e.g. variants weren't populated on the response), fall back to
-        // building the delivery URL ourselves — same shape used for signing
-        // in signPrivateImageURL: https://imagedelivery.net/<account_id>/<imageId>/public
-        const deliveryUrl =
-          cloudflare_status.variants?.find((e) => e.endsWith("public")) ??
-          `https://imagedelivery.net/${env.CLOUDFLARE_IMAGES_ACCOUNT_HASH}/${cloudflare_status.id}/public`;
+        const deliveryUrl = buildImageDeliveryUrl(cloudflare_status.id!); // uploadFileToImages throws when id is missing
 
         // store into db
         const store_image = new PictoImage({

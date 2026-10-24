@@ -1,18 +1,19 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import Cloudflare from 'cloudflare';
-import { env } from 'process';
+import { env } from '@/config/env';
 
 const cloudflare_client = new Cloudflare({
-  apiToken: env.CLOUDFLARE_API_TOKEN, // This is the default and can be omitted
+  apiToken: env.CLOUDFLARE_API_TOKEN,
 });
 
-
+// R2 exposes an S3-compatible API, authenticated with R2-specific access keys
+// (not the Cloudflare API token above).
 const S3 = new S3Client({
 	region: "auto",
-	endpoint: `https://${env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+	endpoint: env.R2_ENDPOINT,
 	credentials: {
-		accessKeyId: `${env.CLOUDFLARE_ACCESS_KEY_ID}`,
-		secretAccessKey: `${env.CLOUDFLARE_SECRET_ACCESS_KEY}`,
+		accessKeyId: env.R2_ACCESS_KEY_ID,
+		secretAccessKey: env.R2_SECRET_ACCESS_KEY,
 	},
 });
 

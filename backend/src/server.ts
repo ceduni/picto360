@@ -4,6 +4,7 @@ import annotationRoutes from "./routes/annotation.routes";
 import contentRoutes from "./routes/content/content.routes";
 import imageCompressionRoutes from "./routes/imageCompression.routes";
 import imageRoutes from "./routes/image.routes";
+import mediaRoutes from "./routes/media.routes";
 import projectRoutes from "./routes/project.routes";
 import connectToDatabase  from "./utils/db";
 import fastifyMultipart from "@fastify/multipart";
@@ -82,6 +83,7 @@ const setupServer = async () => {
 
     fastify.register(annotationRoutes);
     fastify.register(imageRoutes);
+    fastify.register(mediaRoutes);
     fastify.register(projectRoutes);
 
     fastify.get("/", async (_request, reply) => {

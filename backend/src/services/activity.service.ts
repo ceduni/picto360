@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import ActivityModels, { IConstraint } from "../models/activity.model";
-import { User } from "@/models/user.model";
+import { resolveUser } from "@/utils/resolveUser";
 import Team, { ITeam } from "@/models/team.model";
 import mongoose from "mongoose";
 import PictoPlayground, { PlaygroundDocument } from "@/models/pictoPlayground.model";
@@ -43,21 +43,6 @@ export interface UpdateDraftBody {
   constraints?: IConstraint[];
   deadline?: string;
   teamsList?: IncomingTeam[];
-}
-
-async function resolveUser(request: FastifyRequest, reply: FastifyReply) {
-  const firebaseUser = request.user;
-  if (!firebaseUser) {
-    reply.status(401).send({ message: "Unauthorized" });
-    return null;
-  }
-  const uid: string = firebaseUser.uid;
-  const user = await User.findOne({ uid });
-  if (!user) {
-    reply.status(404).send({ message: "User account not found" });
-    return null;
-  }
-  return { user, uid };
 }
 
 async function upsertTeams(
@@ -264,7 +249,7 @@ export const attachPlaygroundImage = async (
     } else {
       project = await PictoPlayground.create({
         name: `${activity.title} - Playground`,
-        images: [],
+        main_medias: [],
       });
 
       // A brand-new project has no OLP record for anyone yet. Grant the
@@ -296,7 +281,7 @@ export const attachPlaygroundImage = async (
     await activity.save();
 
     const populated = await Activity.findById(activity._id)
-      .populate({ path: "playground", populate: { path: "images" } })
+      .populate({ path: "playground", populate: { path: "main_medias" } })
       .lean();
 
     return reply.send(populated);
@@ -322,7 +307,7 @@ export const getActivities = async (request: FastifyRequest, reply: FastifyReply
     const activities = await Activity.find({ createdBy: userId })
       .populate("teams")
       .populate("createdBy")
-      .populate({ path: "playground", populate: { path: "images" } })
+      .populate({ path: "playground", populate: { path: "main_medias" } })
       .lean();
 
     const activitiesWithOwnership = activities.map((act) => {
@@ -362,7 +347,7 @@ export const getActivityById = async (request: FastifyRequest, reply: FastifyRep
         populate: [{ path: "participantsList" }],
       })
       .populate("createdBy")
-      .populate({ path: "playground", populate: { path: "images" } })
+      .populate({ path: "playground", populate: { path: "main_medias" } })
       .lean();
 
     if (!activity) return reply.status(404).send({ message: "Activity not found" });

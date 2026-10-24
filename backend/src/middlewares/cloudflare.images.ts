@@ -8,6 +8,15 @@ export async function getDirectUploadUrl () {
     })
 }
 
+/**
+ * Unsigned delivery URL of an image's "public" variant. Images are uploaded
+ * with requireSignedURLs, so this must go through signPrivateImageURL before
+ * the front-end can read it.
+ */
+export function buildImageDeliveryUrl(imageId: string) {
+  return `https://imagedelivery.net/${env.CLOUDFLARE_IMAGES_ACCOUNT_HASH}/${imageId}/public`;
+}
+
 function getPrivateImageBaseUrl({
   previousUrl,
   imageId,
@@ -27,7 +36,7 @@ function getPrivateImageBaseUrl({
   }
 
   if (imageId) {
-    return `https://imagedelivery.net/${env.CLOUDFLARE_IMAGES_ACCOUNT_HASH}/${imageId}/public`;
+    return buildImageDeliveryUrl(imageId);
   }
 
   throw new Error("Either previousUrl or imageId is required");
@@ -103,4 +112,30 @@ export async function uploadFileToImages (
     }
 
     return cloud_image
+}
+
+
+/**
+ * Fetch an image's record. For a direct upload, the record exists (as a
+ * draft) as soon as the upload URL is created, and only loses `draft` once
+ * the browser has actually uploaded the file.
+ */
+export async function getImageFromImages(imageId: string) {
+    const image = await cloudflare_client.images.v1.get(imageId, {
+        account_id: env.CLOUDFLARE_ACCOUNT_ID,
+    });
+    // `draft` is returned by the API but missing from the SDK's Image type.
+    return image as typeof image & { draft?: boolean };
+}
+
+export async function deleteImageFromImages(imageId: string) {
+    try {
+        await cloudflare_client.images.v1.delete(imageId, {
+            account_id: env.CLOUDFLARE_ACCOUNT_ID,
+        });
+    } catch (error: any) {
+        // Already gone: deleting is idempotent from our point of view.
+        if (error?.status === 404) return;
+        throw error;
+    }
 }

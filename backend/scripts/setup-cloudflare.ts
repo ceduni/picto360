@@ -60,10 +60,33 @@ async function setVariantsPrivate(variantName:string){
   }
 }
 
+// Browsers upload to R2 directly with presigned PUT URLs and read back with
+// presigned GET URLs, so the bucket must accept cross-origin requests from
+// the frontend.
+async function setBucketCors(bucketName: string) {
+  await cloudflare.r2.buckets.cors.update(bucketName, {
+    account_id: accountId!,
+    rules: [
+      {
+        id: "frontend-direct-upload",
+        allowed: {
+          origins: [env.FRONTEND_SERVER],
+          methods: ["GET", "HEAD", "PUT"],
+          headers: ["Content-Type", "Range"],
+        },
+        exposeHeaders: ["ETag", "Content-Length", "Content-Range"],
+        maxAgeSeconds: 3600,
+      },
+    ],
+  });
+  console.log(`CORS set on R2 bucket: ${bucketName} (origin ${env.FRONTEND_SERVER})`);
+}
+
 async function setupCloudflare() {
   await setVariantsPrivate("variant200")
   for (const bucketName of buckets) {
     await createBucket(bucketName);
+    await setBucketCors(bucketName);
   }
 }
 
