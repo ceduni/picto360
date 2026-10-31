@@ -180,6 +180,49 @@ describe("completeUpload", () => {
   });
 });
 
+describe("abortUpload", () => {
+  it("removes a PENDING record and whatever reached R2", async () => {
+    const media = new (PictoR2Image as any)({ playground: PLAYGROUND_ID, status: "PENDING", r2Key: "k" });
+    const deleteOne = jest.spyOn(media, "deleteOne");
+    m(PictoMedia.findById).mockResolvedValue(media);
+
+    await MediaService.abortUpload(user, "650000000000000000000abc");
+
+    expect(permisionService.verifyUserPermForProject).toHaveBeenCalledWith(user, playground, ["UPLOAD"]);
+    expect(r2.deleteFileFromR2).toHaveBeenCalledWith("k");
+    expect(deleteOne).toHaveBeenCalled();
+  });
+
+  it("also clears a FAILED record", async () => {
+    const media = new (PictoVideo as any)({ playground: PLAYGROUND_ID, status: "FAILED", r2Key: "k" });
+    const deleteOne = jest.spyOn(media, "deleteOne");
+    m(PictoMedia.findById).mockResolvedValue(media);
+
+    await MediaService.abortUpload(user, "650000000000000000000abc");
+
+    expect(deleteOne).toHaveBeenCalled();
+  });
+
+  it("never deletes a READY media", async () => {
+    const media = new (PictoR2Image as any)({ playground: PLAYGROUND_ID, status: "READY", r2Key: "k" });
+    const deleteOne = jest.spyOn(media, "deleteOne");
+    m(PictoMedia.findById).mockResolvedValue(media);
+
+    await expectMediaError(MediaService.abortUpload(user, "650000000000000000000abc"), 409);
+    expect(r2.deleteFileFromR2).not.toHaveBeenCalled();
+    expect(deleteOne).not.toHaveBeenCalled();
+  });
+
+  it("requires UPLOAD on the playground", async () => {
+    const media = new (PictoR2Image as any)({ playground: PLAYGROUND_ID, status: "PENDING", r2Key: "k" });
+    m(PictoMedia.findById).mockResolvedValue(media);
+    m(permisionService.verifyUserPermForProject).mockResolvedValue(false);
+
+    await expectMediaError(MediaService.abortUpload(user, "650000000000000000000abc"), 403);
+    expect(r2.deleteFileFromR2).not.toHaveBeenCalled();
+  });
+});
+
 describe("getAccessUrlsForPlayground", () => {
   const VIDEO_ID = "650000000000000000000abc";
 

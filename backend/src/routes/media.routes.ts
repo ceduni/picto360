@@ -64,6 +64,22 @@ async function completeUpload(
   }
 }
 
+/** The browser's upload failed or was cancelled: drop the PENDING record. */
+async function abortUpload(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  const resolved = await resolveUser(request, reply);
+  if (!resolved) return;
+
+  try {
+    await MediaService.abortUpload(resolved.user, request.params.id);
+    return reply.code(204).send();
+  } catch (error) {
+    return sendError(reply, error);
+  }
+}
+
 async function getAccessUrl(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
@@ -97,6 +113,7 @@ async function deleteMedia(
 export default async function mediaRoutes(server: FastifyInstance) {
   server.post<{ Body: CreateUploadBody }>("/media/uploads", { preHandler: authenticate }, createUpload);
   server.post<{ Params: { id: string } }>("/media/uploads/:id/complete", { preHandler: authenticate }, completeUpload);
+  server.post<{ Params: { id: string } }>("/media/uploads/:id/abort", { preHandler: authenticate }, abortUpload);
   server.get<{ Params: { id: string } }>("/media/:id/access-url", { preHandler: authenticate }, getAccessUrl);
   server.delete<{ Params: { id: string } }>("/media/:id", { preHandler: authenticate }, deleteMedia);
 }

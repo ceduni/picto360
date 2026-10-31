@@ -172,6 +172,24 @@ class MediaService {
   }
 
   /**
+   * Called by the browser when its direct upload failed or was cancelled, so
+   * the record doesn't stay PENDING. Media that already reached READY must go
+   * through deleteMedia instead.
+   */
+  async abortUpload(user: UserDocument, mediaId: string) {
+    const media = await this.getMedia(mediaId);
+    await this.authorize(user, await this.playgroundOf(media), ["UPLOAD"]);
+
+    if (media.status === "READY") throw new MediaServiceError("This upload is already complete, delete the media instead", 409);
+
+    // The PUT may have landed even though the browser saw an error
+    const key = (media as R2MediaDocument).r2Key;
+    if (providerOf(media) === "R2" && key) await deleteFileFromR2(key);
+
+    await media.deleteOne();
+  }
+
+  /**
    * Short lived URL the browser can read the file from. This is the single
    * place read access is decided, so the participant flow plugs in here.
    */

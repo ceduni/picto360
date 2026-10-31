@@ -28,11 +28,18 @@ const mediaSchema = new Schema<MediaDocument>({
   timestamps:true
 });
 
+// Safety net for uploads the browser never completed nor aborted (tab closed,
+// crash): MongoDB drops PENDING records a day after they were created. Upload
+// URLs expire after an hour, so nothing can still be in flight by then.
+const PENDING_UPLOAD_TTL_SECONDS = 24 * 60 * 60;
+mediaSchema.index({ createdAt: 1 }, { expireAfterSeconds: PENDING_UPLOAD_TTL_SECONDS, partialFilterExpression: { status: "PENDING" } });
+
 const PictoMedia = mongoose.model<MediaDocument>("PictoMedia", mediaSchema);
 
 
 //=========================== Image Schema ===========================
-// Stored in Cloudflare Images (non-GIF images up to its 10MB upload limit)
+// Legacy: images uploaded to Cloudflare Images before everything moved to R2.
+// Still read and deleted, never created anymore.
 
 export interface ImageDocument extends MediaDocument {
   cloudflareImageId?: string; // Optional field for Cloudflare image ID
@@ -48,8 +55,8 @@ const PictoImage = PictoMedia.discriminator<ImageDocument>("PictoImage", imageSc
 
 
 //=========================== R2 backed media ===========================
-// GIFs, videos and images too large for Cloudflare Images (most 360°
-// panoramas) are stored as-is in R2, addressed by their object key
+// Every new upload (images, GIFs, videos) is stored as-is in R2, addressed by
+// its object key
 
 export interface R2MediaDocument extends MediaDocument {
   r2Key?: string;

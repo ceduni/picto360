@@ -99,9 +99,15 @@ export async function uploadMedia(
         }),
     });
 
-    await sendFile(ticket, file, onProgress);
-
-    return request<PlaygroundMedia>(`/media/uploads/${ticket.media._id}/complete`, token, { method: "POST" });
+    try {
+        await sendFile(ticket, file, onProgress);
+        return await request<PlaygroundMedia>(`/media/uploads/${ticket.media._id}/complete`, token, { method: "POST" });
+    } catch (error) {
+        // Don't leave a PENDING record behind. Best effort: if this call fails
+        // too, the backend drops PENDING records after a day anyway.
+        await request(`/media/uploads/${ticket.media._id}/abort`, token, { method: "POST" }).catch(() => undefined);
+        throw error;
+    }
 }
 
 /** Get the activity's playground, creating it on first use. */

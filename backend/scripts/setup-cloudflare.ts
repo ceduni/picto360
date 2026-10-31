@@ -92,6 +92,12 @@ async function setupCloudflare() {
 
 setupCloudflare().catch((error) => {
   console.error("Cloudflare setup failed");
+  if (error?.status === 403) {
+    console.error(
+      "CLOUDFLARE_API_TOKEN was refused. It needs 'Account > Cloudflare Images: Edit' and " +
+      "'Account > Workers R2 Storage: Edit' (the R2 access keys can't manage bucket CORS)."
+    );
+  }
   console.error(error);
   process.exit(1);
 });

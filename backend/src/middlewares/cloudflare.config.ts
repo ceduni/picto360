@@ -15,6 +15,11 @@ const S3 = new S3Client({
 		accessKeyId: env.R2_ACCESS_KEY_ID,
 		secretAccessKey: env.R2_SECRET_ACCESS_KEY,
 	},
+	// Since 3.729 the SDK adds checksums by default, which R2 doesn't fully
+	// support. For presigned PUTs it would also bake the CRC32 of an empty body
+	// into the URL, which can't match the file the browser sends.
+	requestChecksumCalculation: "WHEN_REQUIRED",
+	responseChecksumValidation: "WHEN_REQUIRED",
 });
 
 export { cloudflare_client, S3 };

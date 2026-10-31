@@ -63,7 +63,8 @@ export async function getR2UploadUrl(file_type:string, file_key:string, expiresI
             Key: file_key,
             ContentType: file_type,
         }),
-        { expiresIn },
+        // Without this the SDK only signs `host` and any Content-Type is accepted
+        { expiresIn, signableHeaders: new Set(["content-type"]) },
     );
 }
 
