@@ -1,15 +1,11 @@
 import Cloudflare from "cloudflare";
 import { env } from "../src/config/env";
 
-const DEFAULT_MEDIA_BUCKET_NAME = "picto-media";
-
 const accountId = env.CLOUDFLARE_ACCOUNT_ID;
 const apiToken = env.CLOUDFLARE_API_TOKEN;
 
-const buckets = [
-  env.R2_MEDIA_BUCKET_NAME ||
-    DEFAULT_MEDIA_BUCKET_NAME,
-];
+// Same bucket the app signs uploads for (default "picto360-uploads", see env.ts).
+const buckets = [env.R2_MEDIA_BUCKET_NAME];
 
 if (!accountId) {
   throw new Error("Missing CLOUDFLARE_ACCOUNT_ID");
